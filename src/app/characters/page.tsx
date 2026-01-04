@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { collection, query, getDocs, onSnapshot } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "@/firebaseConfig";
 import { useCharacterStore, Character } from "@/store/useCharacterStore";
 import { motion } from "framer-motion";
-import { User, Shield, Sword, Scroll, ArrowRight } from "lucide-react";
+import { User, Sword, ArrowRight } from "lucide-react";
 
 export default function CharacterSelectPage() {
   const router = useRouter();
@@ -17,22 +14,33 @@ export default function CharacterSelectPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
-        fetchCharacters(user.uid);
-      } else {
-        setLoading(false);
-        // Redirect to login if needed, or stay for public/demo
-      }
-    });
+    let unsubscribe: (() => void) | undefined;
 
-    return () => unsubscribe();
+    (async () => {
+      const { onAuthStateChanged } = await import("firebase/auth");
+      const { auth } = await import("@/firebaseConfig");
+
+      unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setCurrentUser(user);
+          fetchCharacters(user.uid);
+        } else {
+          setLoading(false);
+        }
+      });
+    })();
+
+    return () => unsubscribe?.();
   }, [setUserCharacters]);
 
   const fetchCharacters = async (uid: string) => {
     try {
       setLoading(true);
+      const { collection, query, onSnapshot } = await import(
+        "firebase/firestore"
+      );
+      const { db } = await import("@/firebaseConfig");
+
       const q = query(collection(db, "users", uid, "characters"));
       // Using onSnapshot for real-time list updates
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -48,7 +56,6 @@ export default function CharacterSelectPage() {
           raceName: c.race?.name || "Desconhecido",
           className: c.class?.name || "Desconhecido",
           level: c.level || 1,
-          // image: ... add logic if images exist
         }));
 
         setUserCharacters(summaryList);

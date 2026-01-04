@@ -2,8 +2,8 @@ import { dbAdmin } from "@/lib/firebaseAdmin";
 import GrimorioClient from "./GrimorioClient";
 import { Spell } from "@/interfaces/Spells";
 
-// Force dynamic because we are fetching from DB (though for spells it could be cached heavily)
-export const dynamic = "force-dynamic";
+// Use ISR (Incremental Static Regeneration) for better performance
+// Spells don't change frequently, so we can cache them
 export const revalidate = 3600; // Revalidate every hour
 
 async function getSpells(): Promise<Spell[]> {
