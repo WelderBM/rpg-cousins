@@ -4,7 +4,14 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Sword, BookOpen, Scroll, ShieldAlert, Wand2 } from "lucide-react";
+import {
+  Sword,
+  BookOpen,
+  Scroll,
+  ShieldAlert,
+  Wand2,
+  Users,
+} from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -16,6 +23,7 @@ const navItems = [
   { name: "Home", href: "/", icon: Sword },
   { name: "Novo Personagem", href: "/wizard", icon: Wand2 },
   { name: "Magias", href: "/grimorio", icon: BookOpen },
+  { name: "Meus Heróis", href: "/characters", icon: Users },
   { name: "Wiki", href: "/wiki", icon: Scroll },
   { name: "Mestre", href: "/admin", icon: ShieldAlert },
 ];
