@@ -98,6 +98,10 @@ export default function CharacterSelectPage() {
       if (charSnap.exists()) {
         const charData = { id: charSnap.id, ...charSnap.data() } as Character;
         setActiveCharacter(charData);
+
+        // Store ID in localStorage for persistence
+        localStorage.setItem("rpg_active_char_id", charId);
+
         router.push("/my-character");
       }
     } catch (e) {
