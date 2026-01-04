@@ -44,16 +44,19 @@ const RoleSelection = () => {
       selectedRace?.attributes.attrs.find(
         (a) => a.attr === Atributo.CONSTITUICAO
       )?.mod || 0;
-    const conValue = baseAttributes[Atributo.CONSTITUICAO] + raceConBonus;
-    const conMod = getModifier(conValue);
+
+    // Note: Base Attributes are 0-based now (representing delta from 10).
+    // So real score = 10 + Base + Race.
+    const conScore = 10 + baseAttributes[Atributo.CONSTITUICAO] + raceConBonus;
+    const conMod = getModifier(conScore);
 
     // INT Mod for Skills
     const raceIntBonus =
       selectedRace?.attributes.attrs.find(
         (a) => a.attr === Atributo.INTELIGENCIA
       )?.mod || 0;
-    const intValue = baseAttributes[Atributo.INTELIGENCIA] + raceIntBonus;
-    const intMod = getModifier(intValue);
+    const intScore = 10 + baseAttributes[Atributo.INTELIGENCIA] + raceIntBonus;
+    const intMod = getModifier(intScore);
 
     return {
       hp: selectedPreview.pv + conMod,

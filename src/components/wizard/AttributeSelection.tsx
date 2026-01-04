@@ -20,8 +20,13 @@ const getRacialBonus = (race: Race | null, attr: Atributo) => {
   return found ? found.mod : 0;
 };
 
-// Helper: T20 Modifier formula: floor((val - 10) / 2)
-const getModifier = (val: number) => Math.floor((val - 10) / 2);
+// Modifiers in T20: (Value - 10) / 2
+// With our Base 0 representing 10: (0 + Bonus - 0) / 2 = Bonus / 2?
+// Effectively, calculating from the Final Total Score (10 + Base + Race).
+const getModifier = (basePts: number, raceBonus: number) => {
+  const totalScore = 10 + basePts + raceBonus;
+  return Math.floor((totalScore - 10) / 2);
+};
 
 const AttributeSelection = () => {
   const {
@@ -34,9 +39,12 @@ const AttributeSelection = () => {
 
   const handleIncrement = (attr: Atributo) => {
     const currentValue = baseAttributes[attr];
-    if (currentValue >= 15) return; // Cap at 15 for point buy
+    if (currentValue >= 4) return; // Cap at +4 as requested (Real 14)
 
     const nextValue = currentValue + 1;
+
+    // Calculate cost difference for the step
+    // Note: We recalculate total cost in the store, but here we peek to disable button
     const currentCost = calculateAttributeCost(currentValue);
     const nextCost = calculateAttributeCost(nextValue);
     const costDiff = nextCost - currentCost;
@@ -48,9 +56,10 @@ const AttributeSelection = () => {
 
   const handleDecrement = (attr: Atributo) => {
     const currentValue = baseAttributes[attr];
-    if (currentValue <= 10) return;
+    if (currentValue <= -2) return; // Cap min at -2 (Real 8)
 
     const prevValue = currentValue - 1;
+    // Decreasing always refunds or costs negative, so we can always do it unless hit limit
     updateBaseAttribute(attr, prevValue);
   };
 
@@ -77,7 +86,7 @@ const AttributeSelection = () => {
           {pointsRemaining}
         </div>
         <p className="text-xs text-neutral-500 mt-2">
-          Gastos totais limitados a 20 pontos
+          Saldo Inicial: 10 Pontos
         </p>
 
         {selectedRace?.attributes.attrs.some((a) => a.attr === "any") && (
@@ -93,23 +102,26 @@ const AttributeSelection = () => {
         {ATTRIBUTES_LIST.map((attr) => {
           const racialBonus = getRacialBonus(selectedRace, attr);
           const baseValue = baseAttributes[attr];
-          const finalValue = baseValue + racialBonus;
-          const modifier = getModifier(finalValue);
+
+          // Display Values
+          const purchaseValue = baseValue; // -2 to +4
+          const totalScore = 10 + purchaseValue + racialBonus;
+          const modifier = getModifier(purchaseValue, racialBonus);
           const modString = modifier >= 0 ? `+${modifier}` : `${modifier}`;
 
-          // Cost to next
-          const nextValue = baseValue + 1;
+          // Cost Logic for UI
+          const nextValue = purchaseValue + 1;
           const costToUpgrade =
-            nextValue <= 15
+            nextValue <= 4
               ? calculateAttributeCost(nextValue) -
-                calculateAttributeCost(baseValue)
+                calculateAttributeCost(purchaseValue)
               : null;
 
           const canUpgrade =
-            nextValue <= 15 &&
+            nextValue <= 4 &&
             costToUpgrade !== null &&
             pointsRemaining >= costToUpgrade;
-          const canDowngrade = baseValue > 10;
+          const canDowngrade = purchaseValue > -2;
 
           return (
             <div
@@ -148,8 +160,13 @@ const AttributeSelection = () => {
                   <Minus size={16} />
                 </button>
 
-                <div className="w-8 text-center font-cinzel text-xl font-bold text-white">
-                  {finalValue}
+                <div className="flex flex-col items-center w-12">
+                  <span className="font-cinzel text-xl font-bold text-white leading-none">
+                    {totalScore}
+                  </span>
+                  <span className="text-[10px] text-neutral-500 font-mono">
+                    ({purchaseValue > 0 ? `+${purchaseValue}` : purchaseValue})
+                  </span>
                 </div>
 
                 <button

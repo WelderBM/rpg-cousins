@@ -1,38 +1,43 @@
 import { Atributo } from "../data/atributos";
 
-export const INITIAL_POINTS = 20;
+export const INITIAL_POINTS = 10;
 
-export const ATTRIBUTE_COSTS: Record<number, number> = {
-  10: 0,
-  11: 1, // 10->11
-  12: 1, // 11->12
-  13: 2, // 12->13
-  14: 2, // 13->14
-  15: 5, // 14->15
-  16: 5, // Assuming pattern or consistent with 15? User only specified up to 15. I will Cap at 15 for now or assume cost 5 continues? T20 usually goes to 18.
-  // User input "Subir para 15: Custo 5". Explicitly didn't mention 16, 17, 18.
-  // Standard T20 Jogo do Ano caps simple point buy at 18?
-  // Let's assume max buyable is 15 based on the user specifically mentioning it as the last item.
-  // If I need to go higher, I'll need clarification. For now, max 15.
+// Marginal costs for increasing from (N-1) to N
+const POSITIVE_COSTS: Record<number, number> = {
+  1: 1, // 0 -> 1: Costs 1
+  2: 1, // 1 -> 2: Costs 1
+  3: 2, // 2 -> 3: Costs 2
+  4: 3, // 3 -> 4: Costs 3
+  5: 4, // 4 -> 5: Costs 4 (Extrapolated / T20 Standard for 15 usually expensive)
 };
 
-// Cumulative cost map calculation for performance
-const CUMULATIVE_COSTS: Record<number, number> = {
-  10: 0,
-  11: 1,
-  12: 2,
-  13: 4,
-  14: 6,
-  15: 11,
+// Marginal gain for decreasing from (N+1) to N
+// For negatives: -1 costs -1 (gains 1).
+const NEGATIVE_COSTS: Record<number, number> = {
+  0: -1, // -1 -> 0: Costs -1 (meaning 0 costs 1 more than -1) -> Wait, logic is usually absolute cost from 0.
+  // We want to calculate Total Cost of a value relative to 0.
 };
 
 export function calculateAttributeCost(value: number): number {
-  if (value <= 10) return 0;
-  if (CUMULATIVE_COSTS[value] !== undefined) {
-    return CUMULATIVE_COSTS[value];
+  if (value === 0) return 0;
+
+  let totalCost = 0;
+
+  if (value > 0) {
+    for (let i = 1; i <= value; i++) {
+      totalCost += POSITIVE_COSTS[i] || 5; // Default to 5 or strictly limit?
+    }
+  } else {
+    // Value is negative e.g., -1, -2
+    // Cost should be negative (refunding points)
+    // Typically -1 grants 1 point => Cost is -1.
+    // -2 grants 2 points => Cost is -2.
+    // Assuming linear -1 per step for negatives as requested ("ganhar pontos extras").
+    totalCost = value * 1; // Direct linear relation for negatives usually.
+    // If user meant complex sell logic, they would say. "reduzir para -1 ou -2" usually implies simple linear buyback.
   }
-  // Fallback if user somehow goes beyond defined standard without config
-  return 0;
+
+  return totalCost;
 }
 
 export function calculateTotalPointsSpent(
