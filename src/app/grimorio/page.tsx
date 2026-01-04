@@ -12,7 +12,9 @@ async function getSpells(): Promise<Spell[]> {
     if (snapshot.empty) {
       return [];
     }
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Spell));
+    return snapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() } as unknown as Spell)
+    );
   } catch (error) {
     console.error("Error fetching spells:", error);
     return [];
