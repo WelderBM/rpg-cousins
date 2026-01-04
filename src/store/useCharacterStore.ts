@@ -11,6 +11,37 @@ import {
   INITIAL_POINTS,
 } from "../utils/attributeUtils";
 
+export interface Character {
+  id?: string;
+  name: string;
+  race: Race | null;
+  class: ClassDescription | null;
+  level: number;
+  attributes: Record<Atributo, number>;
+  skills: Skill[];
+  origin: Origin | null;
+  originBenefits: {
+    type: "skill" | "power" | "general_power";
+    name: string;
+    value: any;
+  }[];
+  deity: Divindade | null;
+  prohibitedObligations?: string[];
+  grantedPower: GeneralPower | null;
+  bag: Bag; // Note: Bag class might need serialization handling for Firestore
+  money: number;
+  spells?: any[]; // Placeholder if needed
+}
+
+export interface CharacterSummary {
+  id: string;
+  name: string;
+  raceName: string;
+  className: string;
+  level: number;
+  image?: string; // For the race image
+}
+
 interface CharacterWizardState {
   step: number;
   selectedRace: Race | null;
@@ -28,6 +59,13 @@ interface CharacterWizardState {
   money: number;
   baseAttributes: Record<Atributo, number>;
   pointsRemaining: number;
+
+  // Character Name
+  name: string;
+
+  // Multi-character support
+  userCharacters: CharacterSummary[];
+  activeCharacter: Character | null;
 
   // Actions
   setStep: (step: number) => void;
@@ -48,6 +86,13 @@ interface CharacterWizardState {
   addToBag: (item: Equipment) => void;
   removeFromBag: (item: Equipment) => void;
   updateMoney: (value: number) => void;
+  setName: (name: string) => void;
+
+  // Multi-character Actions
+  setUserCharacters: (list: CharacterSummary[]) => void;
+  setActiveCharacter: (char: Character) => void;
+  updateActiveCharacter: (updates: Partial<Character>) => void;
+  clearActiveCharacter: () => void;
 }
 
 import { ClassDescription } from "../interfaces/Class";
@@ -75,6 +120,10 @@ export const useCharacterStore = create<CharacterWizardState>((set, get) => ({
   money: 100, // Default start
   baseAttributes: { ...INITIAL_ATTRIBUTES },
   pointsRemaining: INITIAL_POINTS,
+
+  name: "",
+  userCharacters: [],
+  activeCharacter: null,
 
   setStep: (step) => set({ step }),
 
@@ -175,4 +224,44 @@ export const useCharacterStore = create<CharacterWizardState>((set, get) => ({
       });
     }
   },
+
+  setName: (name) => set({ name }),
+
+  setUserCharacters: (list) => set({ userCharacters: list }),
+
+  setActiveCharacter: (char) => {
+    let bagInstance = char.bag;
+    // Re-hydrate Bag if it's a plain object (from JSON/Firestore)
+    if (char.bag && !(char.bag instanceof Bag)) {
+      // Create new instance which loads defaults
+      bagInstance = new Bag();
+      // If we have saved equipments, overwrite the defaults entirely
+      // This assumes the saved state is the source of truth
+      if ((char.bag as any).equipments) {
+        bagInstance.setEquipments((char.bag as any).equipments);
+      }
+    }
+    set({ activeCharacter: { ...char, bag: bagInstance } });
+  },
+
+  updateActiveCharacter: (updates) => {
+    set((state) => {
+      if (!state.activeCharacter) return {};
+
+      let updatedChar = { ...state.activeCharacter, ...updates };
+
+      // Handle Bag updates specifically if they come in as plain objects
+      if (updates.bag && !(updates.bag instanceof Bag)) {
+        const newBag = new Bag();
+        if ((updates.bag as any).equipments) {
+          newBag.setEquipments((updates.bag as any).equipments);
+        }
+        updatedChar.bag = newBag;
+      }
+
+      return { activeCharacter: updatedChar };
+    });
+  },
+
+  clearActiveCharacter: () => set({ activeCharacter: null }),
 }));
