@@ -14,10 +14,9 @@ import {
   Package,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GENERAL_EQUIPMENT } from "../../data/equipamentos-gerais";
-import EQUIPAMENTOS from "../../data/equipamentos";
-import { Armas } from "../../data/equipamentos";
 import Equipment from "../../interfaces/Equipment";
+import { getEquipmentsByCategory, findEquipmentByName } from "@/lib/localData";
+import { Armas } from "../../data/equipamentos";
 
 // Merge all shop items
 const SHOP_CATEGORIES = [
@@ -123,52 +122,30 @@ const EquipmentSelection = () => {
     addToBag(Armas.ADAGA);
   };
 
-  // Helper to search DB
-  const findEquipmentByName = (name: string): Equipment | undefined => {
-    // Search General
-    const general = GENERAL_EQUIPMENT.generalItems.find(
-      (i) => i.nome.toLowerCase() === name.toLowerCase()
-    );
-    if (general) return general;
-
-    // Search Weapons
-    const weapons = Object.values(EQUIPAMENTOS.armasSimples || [])
-      .concat(EQUIPAMENTOS.armasMarciais || [])
-      .find((i) => i.nome.toLowerCase() === name.toLowerCase());
-    if (weapons) return weapons;
-
-    return undefined;
-  };
-
   // --- 2. Market Data ---
+  /**
+   * OTIMIZAÇÃO DE PERFORMANCE
+   *
+   * Usa getEquipmentsByCategory do localData.ts para carregar dados estáticos locais
+   * Memoização garante que a lista só é recalculada quando activeTab ou searchTerm mudam
+   */
   const marketItems = useMemo(() => {
+    const categories = getEquipmentsByCategory();
     let items: Equipment[] = [];
 
-    // Aggregate
-    // Weapons
-    const weapons = [
-      ...EQUIPAMENTOS.armasSimples,
-      ...EQUIPAMENTOS.armasMarciais,
-      ...EQUIPAMENTOS.armasExoticas,
-      ...EQUIPAMENTOS.armasDeFogo,
-    ];
-    // Armor
-    const armors = [
-      ...EQUIPAMENTOS.armadurasLeves,
-      ...EQUIPAMENTOS.armaduraPesada,
-      ...EQUIPAMENTOS.escudos,
-    ];
-    // General
-    const general = GENERAL_EQUIPMENT.generalItems; // Includes adventurer, tools, esoteric
-
     if (activeTab === "all") {
-      items = [...weapons, ...armors, ...general];
+      items = [
+        ...categories.weapons,
+        ...categories.armors,
+        ...categories.shields,
+        ...categories.general,
+      ];
     } else if (activeTab === "weapons") {
-      items = weapons;
+      items = categories.weapons;
     } else if (activeTab === "armor") {
-      items = armors;
+      items = [...categories.armors, ...categories.shields];
     } else if (activeTab === "general") {
-      items = general;
+      items = categories.general;
     }
 
     // Search Filter

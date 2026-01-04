@@ -1,28 +1,20 @@
-import { dbAdmin } from "@/lib/firebaseAdmin";
 import GrimorioClient from "./GrimorioClient";
 import { Spell } from "@/interfaces/Spells";
+import { getAllSpells } from "@/lib/localData";
 
-// Use ISR (Incremental Static Regeneration) for better performance
-// Spells don't change frequently, so we can cache them
-export const revalidate = 3600; // Revalidate every hour
+// Como os dados são estáticos e carregados localmente, não precisamos de ISR
+// A página pode ser totalmente estática (SSG - Static Site Generation)
 
-async function getSpells(): Promise<Spell[]> {
-  try {
-    const snapshot = await dbAdmin.collection("spells").get();
-    if (snapshot.empty) {
-      return [];
-    }
-    return snapshot.docs.map(
-      (doc) => ({ id: doc.id, ...doc.data() } as unknown as Spell)
-    );
-  } catch (error) {
-    console.error("Error fetching spells:", error);
-    return [];
-  }
+/**
+ * Carrega magias diretamente dos arquivos locais
+ * Performance máxima: sem latência de rede, sem consultas ao banco
+ */
+function getSpells(): Spell[] {
+  return getAllSpells();
 }
 
-export default async function GrimorioPage() {
-  const spells = await getSpells();
+export default function GrimorioPage() {
+  const spells = getSpells();
 
   return (
     <div className="container mx-auto max-w-7xl animate-in fade-in duration-500">

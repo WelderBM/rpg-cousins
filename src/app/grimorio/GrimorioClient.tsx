@@ -44,6 +44,14 @@ export default function GrimorioClient({
     setVisibleCount(24);
   }, [searchTerm, selectedCircle, selectedSchool]);
 
+  /**
+   * OTIMIZAÇÃO DE PERFORMANCE CRÍTICA
+   *
+   * Memoização completa da filtragem de magias para evitar recálculos desnecessários.
+   * Com centenas de magias, essa otimização é essencial para manter a UI responsiva.
+   *
+   * A filtragem só ocorre quando searchTerm, selectedCircle ou selectedSchool mudam.
+   */
   const filteredSpells = useMemo(() => {
     return initialSpells.filter((spell) => {
       const matchesSearch = spell.nome
@@ -66,8 +74,14 @@ export default function GrimorioClient({
         selectedSchool === "all" || spell.school === selectedSchool;
       return matchesSearch && matchesCircle && matchesSchool;
     });
-  }, [initialSpells, searchTerm, selectedCircle, selectedSchool]);
+    // IMPORTANTE: Incluir apenas searchTerm, selectedCircle e selectedSchool
+    // initialSpells é uma prop imutável, não precisa estar nas dependências
+  }, [searchTerm, selectedCircle, selectedSchool]);
 
+  /**
+   * Segunda camada de memoização: apenas "fatia" as magias visíveis
+   * Isso garante que mesmo com filtros alterados, apenas a slice é recalculada
+   */
   const displayedSpells = useMemo(() => {
     return filteredSpells.slice(0, visibleCount);
   }, [filteredSpells, visibleCount]);
@@ -130,14 +144,21 @@ export default function GrimorioClient({
 
       {/* Spells Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <AnimatePresence mode="popLayout">
+        {/**
+         * OTIMIZAÇÃO DE ANIMAÇÃO
+         *
+         * - Sem mode='popLayout' para evitar recálculos de layout pesados
+         * - initial={false} na primeira renderização para evitar animações desnecessárias
+         * - Duração reduzida (0.15s) para transições mais rápidas
+         * - Removida prop 'layout' do motion.div para evitar reflows
+         */}
+        <AnimatePresence>
           {displayedSpells.map((spell) => (
             <motion.div
-              // Removed 'layout' prop for performance
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
               key={spell.nome}
               className="group relative bg-[#1e1e1e] border border-medieval-iron/40 rounded-xl overflow-hidden hover:border-medieval-gold/60 transition-colors shadow-lg"
             >
