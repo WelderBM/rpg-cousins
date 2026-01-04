@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #1c1917;
+  --foreground: #d5c4a1;
+}
+
+@layer base {
+  body {
+    @apply bg-medieval-stone text-parchment-light font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif text-medieval-gold;
+  }
+}
