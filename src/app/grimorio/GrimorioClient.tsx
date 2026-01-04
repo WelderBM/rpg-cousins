@@ -2,7 +2,7 @@
 
 import { useGrimorioStore } from "@/store/grimorioStore";
 import { Spell, spellsCircles } from "@/interfaces/Spells";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Filter, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -33,9 +33,16 @@ export default function GrimorioClient({
     setSpells,
   } = useGrimorioStore();
 
+  const [visibleCount, setVisibleCount] = useState(24);
+
   useEffect(() => {
     setSpells(initialSpells);
   }, [initialSpells, setSpells]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [searchTerm, selectedCircle, selectedSchool]);
 
   const filteredSpells = useMemo(() => {
     return initialSpells.filter((spell) => {
@@ -60,6 +67,16 @@ export default function GrimorioClient({
       return matchesSearch && matchesCircle && matchesSchool;
     });
   }, [initialSpells, searchTerm, selectedCircle, selectedSchool]);
+
+  const displayedSpells = useMemo(() => {
+    return filteredSpells.slice(0, visibleCount);
+  }, [filteredSpells, visibleCount]);
+
+  const hasMore = visibleCount < filteredSpells.length;
+
+  const loadMore = () => {
+    setVisibleCount((prev) => prev + 24);
+  };
 
   return (
     <div className="space-y-6">
@@ -113,13 +130,13 @@ export default function GrimorioClient({
 
       {/* Spells Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <AnimatePresence>
-          {filteredSpells.map((spell) => (
+        <AnimatePresence mode="popLayout">
+          {displayedSpells.map((spell) => (
             <motion.div
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              // Removed 'layout' prop for performance
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2 }}
               key={spell.nome}
               className="group relative bg-[#1e1e1e] border border-medieval-iron/40 rounded-xl overflow-hidden hover:border-medieval-gold/60 transition-colors shadow-lg"
@@ -188,6 +205,17 @@ export default function GrimorioClient({
           ))}
         </AnimatePresence>
       </div>
+
+      {hasMore && (
+        <div className="flex justify-center pt-8 pb-4">
+          <button
+            onClick={loadMore}
+            className="px-8 py-3 bg-medieval-stone border border-medieval-gold/30 text-medieval-gold font-serif text-lg rounded-lg hover:bg-medieval-gold/10 transition-colors shadow-lg active:scale-95"
+          >
+            Carregar Mais Magias
+          </button>
+        </div>
+      )}
 
       {filteredSpells.length === 0 && (
         <div className="text-center py-20 opacity-50">
