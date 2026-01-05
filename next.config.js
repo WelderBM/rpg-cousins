@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Optimize production builds
-  swcMinify: true,
+  // swcMinify is enabled by default in Next.js 13+
   
   // Optimize images
   images: {

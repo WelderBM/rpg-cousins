@@ -41,3 +41,6 @@ next-env.d.ts
 
 # Secrets
 serviceAccountKey.json
+
+# User Content
+*.pdf
