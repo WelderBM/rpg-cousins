@@ -1,12 +1,13 @@
-import Race from '../../interfaces/Race';
-import { Atributo } from '../atributos';
+import Race from "../../interfaces/Race";
+import { Atributo } from "../atributos";
 
 const MEDUSA: Race = {
-  name: 'Medusa',
+  name: "Medusa",
   attributes: {
     attrs: [
-      { attr: Atributo.DESTREZA, mod: 2 },
-      { attr: Atributo.CARISMA, mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
     ],
   },
   faithProbability: {
@@ -19,31 +20,31 @@ const MEDUSA: Race = {
   },
   abilities: [
     {
-      name: 'Cria de Megalokk',
+      name: "Cria de Megalokk",
       description:
-        'Você é uma criatura do tipo monstro e recebe visão no escuro.',
+        "Você é uma criatura do tipo monstro e recebe visão no escuro.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Cria de Megalokk',
+            type: "power",
+            name: "Cria de Megalokk",
           },
           action: {
-            type: 'addSense',
-            sense: 'Visão no escuro',
+            type: "addSense",
+            sense: "Visão no escuro",
           },
         },
       ],
     },
     {
-      name: 'Natureza Venenosa',
+      name: "Natureza Venenosa",
       description:
-        'Você recebe resistência a veneno 5 e pode gastar uma ação de movimento e 1 PM para envenenar uma arma que esteja empunhando. A arma causa +1d12 pontos de dano de veneno. O veneno dura até você acertar um ataque ou até o fim da cena (o que acontecer primeiro).',
+        "Você recebe resistência a veneno 5 e pode gastar uma ação de movimento e 1 PM para envenenar uma arma que esteja empunhando. A arma causa +1d12 pontos de dano de veneno. O veneno dura até você acertar um ataque ou até o fim da cena (o que acontecer primeiro).",
     },
     {
-      name: 'Olhar Atordoante',
+      name: "Olhar Atordoante",
       description:
-        'Você pode gastar uma ação de movimento e 1 PM para forçar uma criatura em alcance curto a fazer um teste de Fortitude (CD Car). Se a criatura falhar, fica atordoada por 1 rodada. Se passar, fica imune a esta habilidade por um dia.',
+        "Você pode gastar uma ação de movimento e 1 PM para forçar uma criatura em alcance curto a fazer um teste de Fortitude (CD Car). Se a criatura falhar, fica atordoada por 1 rodada. Se passar, fica imune a esta habilidade por um dia.",
     },
   ],
 };

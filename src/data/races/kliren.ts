@@ -1,16 +1,16 @@
-import Skill from '@/interfaces/Skills';
-import Race from '../../interfaces/Race';
-import { Atributo } from '../atributos';
-import PROFICIENCIAS from '../proficiencias';
-import { SKILLS_WITHOUT_OFICIO_QUALQUER } from '../pericias';
+import Skill from "@/interfaces/Skills";
+import Race from "../../interfaces/Race";
+import { Atributo } from "../atributos";
+import PROFICIENCIAS from "../proficiencias";
+import { SKILLS_WITHOUT_OFICIO_QUALQUER } from "../pericias";
 
 const KLIREN: Race = {
-  name: 'Kliren',
+  name: "Kliren",
   attributes: {
     attrs: [
       { attr: Atributo.INTELIGENCIA, mod: 2 },
-      { attr: Atributo.CARISMA, mod: 1 },
-      { attr: Atributo.FORCA, mod: -1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
     ],
   },
   faithProbability: {
@@ -20,17 +20,17 @@ const KLIREN: Race = {
   },
   abilities: [
     {
-      name: 'Híbrido',
+      name: "Híbrido",
       description:
-        'Sua natureza multifacetada fez com que você aprendesse conhecimentos variados. Você se torna treinado em uma perícia a sua escolha (não precisa ser da sua classe).',
+        "Sua natureza multifacetada fez com que você aprendesse conhecimentos variados. Você se torna treinado em uma perícia a sua escolha (não precisa ser da sua classe).",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Híbrido',
+            type: "power",
+            name: "Híbrido",
           },
           action: {
-            type: 'learnSkill',
+            type: "learnSkill",
             availableSkills: SKILLS_WITHOUT_OFICIO_QUALQUER,
             pick: 1,
           },
@@ -38,27 +38,22 @@ const KLIREN: Race = {
       ],
     },
     {
-      name: 'Engenhosidade',
+      name: "Engenhosidade",
       description:
-        'Quando faz um teste de perícia, você pode gastar 2 PM para somar sua Inteligência no teste. Você não pode usar esta habilidade em testes de ataque. Caso receba esta habilidade novamente, seu custo é reduzido em –1 PM.',
+        "Quando faz um teste de perícia, você pode gastar 2 PM para somar sua Inteligência no teste. Você não pode usar esta habilidade em testes de ataque. Caso receba esta habilidade novamente, seu custo é reduzido em –1 PM.",
     },
     {
-      name: 'Ossos Frágeis',
+      name: "Vanguardista",
       description:
-        'Você sofre 1 ponto de dano adicional por dado de dano de impacto. Por exemplo, se for atingido por uma clava (dano 1d6), sofre 1d6+1 pontos de dano. Se cair de 3m de altura (dano 2d6), sofre 2d6+2 pontos de dano.',
-    },
-    {
-      name: 'Vanguardista',
-      description:
-        'Você recebe proficiência em armas de fogo e +2 em testes de Ofício (um qualquer, a sua escolha).',
+        "Você recebe proficiência em armas de fogo e +2 em testes de Ofício (um qualquer, a sua escolha).",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Vanguardista',
+            type: "power",
+            name: "Vanguardista",
           },
           action: {
-            type: 'addProficiency',
+            type: "addProficiency",
             availableProficiencies: [PROFICIENCIAS.FOGO],
             pick: 1,
           },
@@ -67,15 +62,15 @@ const KLIREN: Race = {
       sheetBonuses: [
         {
           source: {
-            type: 'power',
-            name: 'Vanguardista',
+            type: "power",
+            name: "Vanguardista",
           },
           target: {
-            type: 'Skill',
+            type: "Skill",
             name: Skill.OFICIO,
           },
           modifier: {
-            type: 'Fixed',
+            type: "Fixed",
             value: 2,
           },
         },

@@ -1,12 +1,12 @@
-import Race from '../../interfaces/Race';
+import Race from "../../interfaces/Race";
 
 const HUMANO: Race = {
-  name: 'Humano',
+  name: "Humano",
   attributes: {
     attrs: [
-      { attr: 'any', mod: 1 },
-      { attr: 'any', mod: 1 },
-      { attr: 'any', mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
     ],
   },
   faithProbability: {
@@ -16,18 +16,18 @@ const HUMANO: Race = {
   },
   abilities: [
     {
-      name: 'Versátil',
+      name: "Versátil",
       description:
-        'Você se torna treinado em duas perícias a sua escolha (não precisam ser da sua classe). Você pode trocar uma dessas perícias por um poder geral a sua escolha.',
+        "Você se torna treinado em três perícias a sua escolha (não precisam ser da sua classe). Você pode trocar uma dessas perícias por um poder geral a sua escolha.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Versátil',
+            type: "power",
+            name: "Versátil",
           },
           action: {
-            type: 'special',
-            specialAction: 'humanoVersatil',
+            type: "special",
+            specialAction: "humanoVersatil",
           },
         },
       ],

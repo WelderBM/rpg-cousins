@@ -1,105 +1,287 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import RACAS from "../../data/racas"; // Assuming relative path
+import Image from "next/image";
+import RACAS from "../../data/racas";
 import Race from "../../interfaces/Race";
 import { useCharacterStore } from "../../store/useCharacterStore";
-import { ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check, Sparkles } from "lucide-react";
+
+/**
+ * Mapeamento de raças para imagens
+ * Normaliza nomes para evitar problemas de case-sensitivity
+ * IMPORTANTE: Os nomes devem corresponder exatamente aos definidos em src/data/races/
+ */
+const RACE_IMAGE_MAP: Record<string, string> = {
+  "Suraggel (Aggelus)": "/suraggel-angelus.webp", // ✅ Corrigido: nome completo
+  "Suraggel (Sulfure)": "/suraggel-sufure.webp", // ✅ Corrigido: nome completo
+  Anão: "/anao.webp",
+  Dahllan: "/dahllan.webp",
+  Elfo: "/elfo.webp",
+  Goblin: "/goblin.webp",
+  Lefou: "/lefou.webp",
+  Minotauro: "/minotauro.webp",
+  Qareen: "/qareen.webp",
+  Golem: "/golem.webp",
+  Hynne: "/hynne.webp",
+  Humano: "/humano.webp",
+  Kliren: "/kliren.webp",
+  Medusa: "/medusa.webp",
+  Osteon: "/osteon.webp",
+  Sereia: "/sereia.webp",
+  Sílfide: "/tilfide.webp",
+  Trog: "/trog.webp",
+};
+
+/**
+ * Componente de Card de Raça Visual
+ * Estilo Hearthstone: moldura dourada, imagem destacada, efeitos hover
+ *
+ * ✨ OTIMIZADO: Memoizado com React.memo para evitar re-renders
+ */
+const RaceCard = React.memo(
+  ({ race, onClick }: { race: Race; onClick: () => void }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const imagePath = RACE_IMAGE_MAP[race.name] || "/humano.webp"; // Fallback
+
+    return (
+      <motion.div
+        onClick={onClick}
+        whileHover={{ scale: 1.05, y: -5 }}
+        whileTap={{ scale: 0.98 }}
+        className="group relative cursor-pointer"
+      >
+        {/* Moldura externa - Dourada medieval */}
+        <div className="relative bg-gradient-to-br from-amber-900/40 via-amber-700/20 to-amber-900/40 p-[3px] rounded-2xl overflow-hidden shadow-2xl shadow-black/50 hover:shadow-amber-900/50 transition-all duration-300">
+          {/* Brilho animado no hover */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-amber-500/0 to-transparent group-hover:via-amber-400/20 transition-all duration-500 opacity-0 group-hover:opacity-100" />
+
+          {/* Card interno */}
+          <div className="relative bg-stone-900/90 backdrop-blur-md rounded-2xl overflow-hidden">
+            {/* Imagem da raça */}
+            <div className="relative aspect-square overflow-hidden">
+              {/* Skeleton Loading */}
+              {!imageLoaded && (
+                <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-800 animate-pulse">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Sparkles className="w-12 h-12 text-amber-500/30 animate-spin" />
+                  </div>
+                </div>
+              )}
+
+              {/* Imagem Real */}
+              <Image
+                src={imagePath}
+                alt={race.name}
+                fill
+                className={`object-cover transition-all duration-700 ${
+                  imageLoaded
+                    ? "opacity-100 scale-100 group-hover:scale-110"
+                    : "opacity-0 scale-105"
+                }`}
+                onLoad={() => setImageLoaded(true)}
+                priority={false} // Lazy load para performance
+              />
+
+              {/* Overlay gradiente no hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
+            </div>
+
+            {/* Nome da raça */}
+            <div className="relative p-4 bg-gradient-to-t from-stone-950 to-stone-900/50 border-t border-amber-700/30">
+              <h3 className="text-xl font-cinzel text-center text-amber-100 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
+                {race.name}
+              </h3>
+
+              {/* Indicador de seleção */}
+              <div className="absolute -top-3 right-4 bg-amber-600 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg shadow-amber-600/50">
+                <ChevronRight className="w-4 h-4 text-white" />
+              </div>
+            </div>
+
+            {/* Borda brilhante decorativa */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+);
+
+// DisplayName para debugging no React DevTools
+RaceCard.displayName = "RaceCard";
 
 const RaceSelection = () => {
   const selectRace = useCharacterStore((state) => state.selectRace);
   const [selectedPreview, setSelectedPreview] = useState<Race | null>(null);
 
   return (
-    <div className="w-full h-full min-h-[60vh] relative overflow-hidden">
+    <div className="w-full h-full min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-950 via-stone-950 to-neutral-950">
+      {/* Background decorativo */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.1),transparent_50%)]" />
+      </div>
+
       <AnimatePresence mode="wait">
         {!selectedPreview ? (
           <motion.div
             key="list"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col gap-4 p-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="relative flex flex-col gap-6 p-4 md:p-8 pb-24"
           >
-            <h2 className="text-2xl font-cinzel text-amber-500 mb-4 text-center">
-              Escolha sua Raça
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
-              {RACAS.map((race) => (
-                <div
-                  key={race.name}
-                  onClick={() => setSelectedPreview(race)}
-                  className="bg-neutral-900/80 border border-neutral-700 hover:border-amber-500/50 p-4 rounded-xl cursor-pointer transition-all hover:bg-neutral-800 flex justify-between items-center group"
+            {/* Título */}
+            <div className="flex flex-col items-center gap-4 mb-12">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => (window.location.href = "/grimorio")}
+                  className="p-2 bg-black/40 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-2 group"
                 >
-                  <span className="text-lg font-cinzel text-neutral-200 group-hover:text-amber-400">
-                    {race.name}
+                  <ChevronLeft
+                    size={20}
+                    className="group-hover:-translate-x-1 transition-transform"
+                  />
+                  <span className="text-xs uppercase tracking-widest font-bold">
+                    Sair
                   </span>
-                  <ChevronRight className="text-neutral-500 group-hover:text-amber-500" />
-                </div>
-              ))}
+                </button>
+                <motion.h2
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-cinzel text-amber-500 text-center drop-shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+                >
+                  Escolha sua Raça
+                </motion.h2>
+              </div>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-neutral-400 text-center font-cinzel tracking-[0.2em] text-sm md:text-base uppercase"
+              >
+                Sua jornada em Arton começa aqui
+              </motion.p>
             </div>
+
+            {/* Grid Responsivo de Raças */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full"
+            >
+              {RACAS.map((race, index) => (
+                <motion.div
+                  key={race.name}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: Math.min(0.05 * index, 0.4), // Cap delay at 0.4s
+                    duration: 0.2,
+                  }}
+                  layout
+                >
+                  <RaceCard
+                    race={race}
+                    onClick={() => setSelectedPreview(race)}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
           </motion.div>
         ) : (
           <motion.div
             key="detail"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-col h-full bg-neutral-900 rounded-lg overflow-hidden"
+            className="relative flex flex-col h-full min-h-screen max-w-2xl mx-auto w-full" // ✅ Adicionado max-w-2xl e mx-auto
           >
-            {/* Header */}
-            <div className="p-4 bg-neutral-950 flex items-center justify-between border-b border-neutral-800">
+            {/* Header com imagem de fundo - ALTURA REDUZIDA */}
+            <div className="relative h-48 md:h-64 overflow-hidden">
+              {" "}
+              {/* ✅ Reduzido de h-64 md:h-80 */}
+              {/* Imagem de fundo da raça */}
+              <Image
+                src={RACE_IMAGE_MAP[selectedPreview.name] || "/humano.webp"}
+                alt={selectedPreview.name}
+                fill
+                className="object-cover object-top" // ✅ object-top para mostrar rosto, não pés
+                priority
+              />
+              {/* Overlay escuro mais forte para melhor legibilidade */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-stone-950" />{" "}
+              {/* ✅ Overlay mais escuro */}
+              {/* Botão voltar */}
               <button
                 onClick={() => setSelectedPreview(null)}
-                className="flex items-center text-neutral-400 hover:text-white transition-colors"
-                aria-label="Voltar"
+                className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2 bg-black/60 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-200 hover:text-amber-400 hover:border-amber-500/50 transition-all"
               >
-                <ChevronLeft size={24} />
-                <span className="ml-1">Voltar</span>
+                <ChevronLeft size={20} />
+                <span className="hidden sm:inline">Voltar</span>
               </button>
-              <h2 className="text-xl font-cinzel text-amber-500">
-                {selectedPreview.name}
-              </h2>
-              <div className="w-8" /> {/* Spacer for centering */}
+              {/* Título da raça - Posição ajustada */}
+              <div className="absolute bottom-4 left-4 right-4">
+                {" "}
+                {/* ✅ Reduzido bottom de 6 para 4 */}
+                <h2 className="text-3xl md:text-4xl font-cinzel text-amber-100 drop-shadow-2xl">
+                  {" "}
+                  {/* ✅ Reduzido de text-4xl md:text-5xl */}
+                  {selectedPreview.name}
+                </h2>
+              </div>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
-              {/* Stats Summary - Simplified for now, showing ability names */}
-              <div className="bg-neutral-950/50 p-4 rounded-lg border border-neutral-800">
-                <h3 className="text-sm uppercase tracking-wider text-neutral-500 mb-2">
+            {/* Conteúdo scrollável com largura controlada */}
+            <div className="flex-1 overflow-y-auto bg-stone-950 p-6 md:p-8 space-y-6 scrollbar-thin scrollbar-thumb-amber-900/30 scrollbar-track-transparent">
+              {/* Habilidades de Raça */}
+              <div className="bg-stone-900/50 backdrop-blur-sm border border-amber-900/20 p-6 rounded-xl">
+                <h3 className="text-lg font-cinzel text-amber-500 mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
                   Habilidades de Raça
                 </h3>
                 <ul className="space-y-4">
-                  {selectedPreview.abilities.map((ability) => (
-                    <li key={ability.name} className="flex flex-col">
-                      <span className="font-bold text-amber-500/90">
+                  {selectedPreview.abilities.map((ability, idx) => (
+                    <motion.li
+                      key={ability.name}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="border-l-2 border-amber-700/40 pl-4"
+                    >
+                      <span className="font-bold text-amber-400 text-lg">
                         {ability.name}
                       </span>
-                      <p className="text-sm text-neutral-300 leading-relaxed mt-1">
+                      <p className="text-sm text-neutral-300 leading-relaxed mt-2">
                         {ability.description}
                       </p>
-                    </li>
+                    </motion.li>
                   ))}
                 </ul>
               </div>
 
-              {/* Modifiers Hint */}
-              <div className="text-xs text-neutral-500 italic text-center">
+              {/* Dica */}
+              <div className="text-center text-xs text-neutral-500 italic bg-black/20 p-4 rounded-lg border border-neutral-800/50">
                 Ao selecionar esta raça, atributos e deslocamento serão
                 ajustados automaticamente.
               </div>
             </div>
 
-            {/* Footer Action */}
-            <div className="p-4 bg-neutral-950 border-t border-neutral-800 sticky bottom-0">
+            {/* Footer Action - Sticky */}
+            <div className="sticky bottom-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-stone-950/90 border-t border-amber-900/20 backdrop-blur-md">
               <button
                 onClick={() => selectRace(selectedPreview)}
-                className="w-full py-4 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-lg shadow-amber-900/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2"
+                className="w-full mx-auto block py-4 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500 text-white font-bold rounded-xl shadow-2xl shadow-amber-900/50 hover:shadow-amber-600/50 active:scale-[0.98] transition-all flex justify-center items-center gap-3 group"
               >
-                <Check size={20} />
-                Confirmar {selectedPreview.name}
+                <Check
+                  size={24}
+                  className="group-hover:rotate-12 transition-transform"
+                />
+                <span className="text-lg">
+                  Confirmar {selectedPreview.name}
+                </span>
               </button>
             </div>
           </motion.div>
