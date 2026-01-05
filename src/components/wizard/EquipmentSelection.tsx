@@ -12,6 +12,8 @@ import {
   Check,
   X,
   Package,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Equipment from "../../interfaces/Equipment";
@@ -192,18 +194,27 @@ const EquipmentSelection = () => {
     <div className="w-full h-full min-h-[80vh] flex flex-col relative bg-neutral-900">
       {/* --- Top Bar: Money & Status --- */}
       <div className="sticky top-0 z-30 bg-neutral-950/90 backdrop-blur border-b border-amber-900/30 p-4 shadow-lg">
-        <div className="flex justify-between items-center max-w-md mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="bg-amber-500/10 p-2 rounded-full border border-amber-500/20">
-              <Coins className="text-amber-400" size={24} />
-            </div>
-            <div>
-              <p className="text-xs text-neutral-400 uppercase tracking-widest">
-                Dinheiro
-              </p>
-              <p className="text-2xl font-cinzel text-amber-100 font-bold">
-                T$ {money}
-              </p>
+        <div className="flex justify-between items-center mx-auto">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setStep(4)}
+              className="p-2 bg-neutral-900 border border-neutral-800 rounded-lg text-neutral-400 hover:text-white transition-all"
+              title="Voltar"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="bg-amber-500/10 p-2 rounded-full border border-amber-500/20">
+                <Coins className="text-amber-400" size={24} />
+              </div>
+              <div>
+                <p className="text-xs text-neutral-400 uppercase tracking-widest">
+                  Dinheiro
+                </p>
+                <p className="text-2xl font-cinzel text-amber-100 font-bold">
+                  T$ {money}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -221,7 +232,7 @@ const EquipmentSelection = () => {
 
       {/* --- Main Content --- */}
       <div className="flex-1 overflow-y-auto pb-24">
-        <div className="max-w-md mx-auto p-4 space-y-6">
+        <div className="mx-auto p-4 space-y-6">
           {/* Inventory Section */}
           <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
             <div className="bg-neutral-950 p-3 border-b border-neutral-800 flex justify-between items-center">
@@ -348,7 +359,7 @@ const EquipmentSelection = () => {
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 w-full max-w-md mx-auto p-4 bg-neutral-950 border-t border-neutral-800 z-40 left-0 right-0">
+      <div className="fixed bottom-0 w-full mx-auto p-4 bg-neutral-950 border-t border-neutral-800 z-40 left-0 right-0">
         <button
           onClick={() => setStep(6)}
           className="w-full py-4 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-lg shadow-amber-900/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2"

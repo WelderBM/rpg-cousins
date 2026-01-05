@@ -22,7 +22,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 const navItems = [
   { name: "Home", href: "/", icon: Sword },
   { name: "Novo Personagem", href: "/wizard", icon: Wand2 },
-  { name: "Magias", href: "/grimorio", icon: BookOpen },
+  { name: "Poderes", href: "/grimorio", icon: BookOpen },
   { name: "Meus Heróis", href: "/characters", icon: Users },
   { name: "Wiki", href: "/wiki", icon: Scroll },
   { name: "Mestre", href: "/admin", icon: ShieldAlert },

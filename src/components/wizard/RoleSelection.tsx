@@ -20,8 +20,14 @@ import { SheetAction } from "../../interfaces/CharacterSheet";
 const getModifier = (val: number) => Math.floor((val - 10) / 2);
 
 const RoleSelection = () => {
-  const { selectedRace, baseAttributes, selectClass, updateSkills, setStep } =
-    useCharacterStore();
+  const {
+    selectedRace,
+    baseAttributes,
+    flexibleAttributeChoices,
+    selectClass,
+    updateSkills,
+    setStep,
+  } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] =
     useState<ClassDescription | null>(null);
@@ -39,31 +45,29 @@ const RoleSelection = () => {
   const stats = useMemo(() => {
     if (!selectedPreview) return null;
 
-    // CON Mod for HP
-    const raceConBonus =
-      selectedRace?.attributes.attrs.find(
-        (a) => a.attr === Atributo.CONSTITUICAO
-      )?.mod || 0;
+    // Get final attributes using a robust helper logic
+    const getFinalAttr = (attr: Atributo) => {
+      let bonus = 0;
+      // Fixed bonuses
+      if (selectedRace) {
+        selectedRace.attributes.attrs.forEach((a, idx) => {
+          if (a.attr === attr) bonus += a.mod;
+          if (a.attr === "any" && flexibleAttributeChoices[idx] === attr)
+            bonus += a.mod;
+        });
+      }
+      return baseAttributes[attr] + bonus;
+    };
 
-    // Note: Base Attributes are 0-based now (representing delta from 10).
-    // So real score = 10 + Base + Race.
-    const conScore = 10 + baseAttributes[Atributo.CONSTITUICAO] + raceConBonus;
-    const conMod = getModifier(conScore);
-
-    // INT Mod for Skills
-    const raceIntBonus =
-      selectedRace?.attributes.attrs.find(
-        (a) => a.attr === Atributo.INTELIGENCIA
-      )?.mod || 0;
-    const intScore = 10 + baseAttributes[Atributo.INTELIGENCIA] + raceIntBonus;
-    const intMod = getModifier(intScore);
+    const conMod = getFinalAttr(Atributo.CONSTITUICAO); // Store stores mod-based values now
+    const intMod = getFinalAttr(Atributo.INTELIGENCIA);
 
     return {
-      hp: selectedPreview.pv + conMod,
+      hp: selectedPreview.pv + conMod, // PV = Base + CON mod
       pm: selectedPreview.pm,
       intMod,
     };
-  }, [selectedPreview, selectedRace, baseAttributes]);
+  }, [selectedPreview, selectedRace, baseAttributes, flexibleAttributeChoices]);
 
   // Reset choices when preview changes
   useEffect(() => {
@@ -152,9 +156,20 @@ const RoleSelection = () => {
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-4 p-4"
           >
-            <h2 className="text-2xl font-cinzel text-amber-500 mb-4 text-center">
-              Escolha sua Classe
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => setStep(2)}
+                className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-200 hover:text-amber-400 hover:border-amber-500/50 transition-all"
+              >
+                <ChevronLeft size={20} />
+                <span className="hidden sm:inline">Voltar</span>
+              </button>
+              <h2 className="text-2xl font-cinzel text-amber-500 flex-1 text-center">
+                Escolha sua Classe
+              </h2>
+              <div className="w-[88px] hidden sm:block" />{" "}
+              {/* Spacer for centering */}
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
               {CLASSES.map((role) => (
                 <div

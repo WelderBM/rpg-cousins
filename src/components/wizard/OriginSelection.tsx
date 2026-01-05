@@ -78,9 +78,19 @@ const OriginSelection = () => {
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-4 p-4"
           >
-            <h2 className="text-2xl font-cinzel text-amber-500 mb-4 text-center">
-              Escolha sua Origem
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => setStep(3)}
+                className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-200 hover:text-amber-400 hover:border-amber-500/50 transition-all"
+              >
+                <ChevronLeft size={20} />
+                <span className="hidden sm:inline">Voltar</span>
+              </button>
+              <h2 className="text-2xl font-cinzel text-amber-500 flex-1 text-center">
+                Escolha sua Origem
+              </h2>
+              <div className="w-[88px] hidden sm:block" />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-20">
               {Object.values(ORIGINS)
                 .sort((a, b) => a.name.localeCompare(b.name))
