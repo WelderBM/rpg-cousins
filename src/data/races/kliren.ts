@@ -6,6 +6,14 @@ import { SKILLS_WITHOUT_OFICIO_QUALQUER } from "../pericias";
 
 const KLIREN: Race = {
   name: "Kliren",
+  description:
+    "Seres curiosos e inventivos, frutos da união entre gnomos e humanos, sempre em busca de inovação.",
+  appearance:
+    "Possuem a estatura humana, mas traços gnomicos como orelhas pontudas, cabelos de cores vibrantes e um brilho de curiosidade nos olhos.",
+  personality:
+    "Inteligentes, criativos e muitas vezes excêntricos, os kliren veem o mundo como um quebra-cabeça a ser resolvido ou melhorado.",
+  commonReligions:
+    "Tannatoh (Conhecimento), Valkaria (Ambição) e Hyninn (Trapaça).",
   attributes: {
     attrs: [
       { attr: Atributo.INTELIGENCIA, mod: 2 },

@@ -1,25 +1,25 @@
-import { Atributo } from '../data/atributos';
-import { SheetBonus, SheetAction } from './CharacterSheet';
-import { FaithProbability } from './Divindade';
-import { Requirement } from './Poderes';
-import Skill from './Skills';
-import { SpellSchool } from './Spells';
+import { Atributo } from "../data/atributos";
+import { SheetBonus, SheetAction } from "./CharacterSheet";
+import { FaithProbability } from "./Divindade";
+import { Requirement } from "./Poderes";
+import Skill from "./Skills";
+import { SpellSchool } from "./Spells";
 
 export type ClassNames =
-  | 'Arcanista'
-  | 'Bárbaro'
-  | 'Bardo'
-  | 'Caçador'
-  | 'Cavaleiro'
-  | 'Clérigo'
-  | 'Guerreiro'
-  | 'Inventor'
-  | 'Ladino'
-  | 'Lutador'
-  | 'Nobre'
-  | 'Paladino'
-  | 'Bucaneiro'
-  | 'Druida';
+  | "Arcanista"
+  | "Bárbaro"
+  | "Bardo"
+  | "Caçador"
+  | "Cavaleiro"
+  | "Clérigo"
+  | "Guerreiro"
+  | "Inventor"
+  | "Ladino"
+  | "Lutador"
+  | "Nobre"
+  | "Paladino"
+  | "Bucaneiro"
+  | "Druida";
 export interface BasicExpertise {
   type: string;
   list: Skill[];
@@ -49,7 +49,7 @@ export type ClassPower = {
 
 export interface SpellPath {
   initialSpells: number;
-  spellType: 'Arcane' | 'Divine';
+  spellType: "Arcane" | "Divine";
   schools?: SpellSchool[];
   qtySpellsLearnAtLevel: (level: number) => number;
   spellCircleAvailableAtLevel: (level: number) => number;
@@ -74,4 +74,6 @@ export interface ClassDescription {
   spellPath?: SpellPath;
   setup?: (classe: ClassDescription) => ClassDescription;
   originalAbilities?: ClassAbility[]; // Internal field to preserve original abilities during level-ups
+  description?: string;
+  detailedProficiencies?: string;
 }

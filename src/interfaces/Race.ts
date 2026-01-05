@@ -1,27 +1,27 @@
-import { Atributo } from '../data/atributos';
-import { CharacterAttributes, CharacterReligion } from './Character';
+import { Atributo } from "../data/atributos";
+import { CharacterAttributes, CharacterReligion } from "./Character";
 // eslint-disable-next-line
-import CharacterSheet, { SheetAction, SheetBonus } from './CharacterSheet';
-import { ClassDescription } from './Class';
-import { FaithProbability } from './Divindade';
-import Origin from './Origin';
-import { OriginPower, GeneralPower } from './Poderes';
-import Bag from './Bag';
-import Skill from './Skills';
-import { Spell } from './Spells';
+import CharacterSheet, { SheetAction, SheetBonus } from "./CharacterSheet";
+import { ClassDescription } from "./Class";
+import { FaithProbability } from "./Divindade";
+import Origin from "./Origin";
+import { OriginPower, GeneralPower } from "./Poderes";
+import Bag from "./Bag";
+import Skill from "./Skills";
+import { Spell } from "./Spells";
 
 export interface RaceAttributeAbility {
-  attr: Atributo | 'any';
+  attr: Atributo | "any";
   mod: number;
 }
 
 export type raceSize =
-  | 'MINUSCULO'
-  | 'PEQUENO'
-  | 'MEDIO'
-  | 'GRANDE'
-  | 'ENORME'
-  | 'COLOSSAL';
+  | "MINUSCULO"
+  | "PEQUENO"
+  | "MEDIO"
+  | "GRANDE"
+  | "ENORME"
+  | "COLOSSAL";
 
 interface SizeModifiers {
   stealth: number;
@@ -61,26 +61,26 @@ export type RaceAbility = {
 };
 
 export type RaceNames =
-  | 'Humano'
-  | 'Dahlan'
-  | 'Anão'
-  | 'Elfo'
-  | 'Dahllan'
-  | 'Osteon'
-  | 'Goblin'
-  | 'Lefou'
-  | 'Kliren'
-  | 'Minotauro'
-  | 'Qareen'
-  | 'Golem'
-  | 'Hynne'
-  | 'Medusa'
-  | 'Sereia'
-  | 'Sílfide'
-  | 'Suraggel'
-  | 'Trog'
-  | 'Suraggel (Aggelus)'
-  | 'Suraggel (Sulfure)';
+  | "Humano"
+  | "Dahlan"
+  | "Anão"
+  | "Elfo"
+  | "Dahllan"
+  | "Osteon"
+  | "Goblin"
+  | "Lefou"
+  | "Kliren"
+  | "Minotauro"
+  | "Qareen"
+  | "Golem"
+  | "Hynne"
+  | "Medusa"
+  | "Sereia"
+  | "Sílfide"
+  | "Suraggel"
+  | "Trog"
+  | "Suraggel (Aggelus)"
+  | "Suraggel (Sulfure)";
 
 export default interface Race {
   name: RaceNames;
@@ -94,4 +94,8 @@ export default interface Race {
   getDisplacement?: (race: Race) => number;
   faithProbability?: FaithProbability;
   size?: RaceSize;
+  description?: string;
+  appearance?: string;
+  personality?: string;
+  commonReligions?: string;
 }

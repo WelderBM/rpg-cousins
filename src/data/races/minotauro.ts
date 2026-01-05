@@ -1,18 +1,25 @@
-import Equipment from '../../interfaces/Equipment';
-import Race from '../../interfaces/Race';
-import { Atributo } from '../atributos';
+import Equipment from "../../interfaces/Equipment";
+import Race from "../../interfaces/Race";
+import { Atributo } from "../atributos";
 
 const chifres: Equipment = {
-  group: 'Arma',
-  nome: 'Chifres',
-  dano: '1d6',
-  critico: 'x2',
-  tipo: 'Perf.',
+  group: "Arma",
+  nome: "Chifres",
+  dano: "1d6",
+  critico: "x2",
+  tipo: "Perf.",
   preco: 0,
 };
 
 const MINOTAURO: Race = {
-  name: 'Minotauro',
+  name: "Minotauro",
+  description:
+    "Criaturas poderosas e honradas que valorizam a força física e a ordem social.",
+  appearance:
+    "Cabeça de touro sobre um corpo humano massivo e musculoso. Possuem chifres imponentes e pelos curtos.",
+  personality:
+    "Orgulhosos e decididos, minotauros seguem um código de honra rígido. Embora possam ser vistos como arrogantes, são protetores ferozes de seus aliados.",
+  commonReligions: "Arsenal (Guerra) e Valkaria (Ambição).",
   attributes: {
     attrs: [
       { attr: Atributo.FORCA, mod: 2 },
@@ -29,54 +36,54 @@ const MINOTAURO: Race = {
   },
   abilities: [
     {
-      name: 'Chifres',
+      name: "Chifres",
       description:
-        'Você possui uma arma natural de chifres (dano 1d6, crítico x2, perfuração). Quando usa a ação atacar, pode gastar 1 PM para fazer um ataque corpo a corpo extra com os chifres.',
+        "Você possui uma arma natural de chifres (dano 1d6, crítico x2, perfuração). Quando usa a ação atacar, pode gastar 1 PM para fazer um ataque corpo a corpo extra com os chifres.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Minotauro',
+            type: "power",
+            name: "Minotauro",
           },
           action: {
-            type: 'addEquipment',
+            type: "addEquipment",
             equipment: {
               Arma: [chifres],
             },
-            description: 'Chifres pode ser usado como arma.',
+            description: "Chifres pode ser usado como arma.",
           },
         },
       ],
     },
     {
-      name: 'Couro Rígido',
+      name: "Couro Rígido",
       description:
-        'Sua pele é dura como a de um touro. Você recebe +1 na Defesa.',
+        "Sua pele é dura como a de um touro. Você recebe +1 na Defesa.",
       sheetBonuses: [
         {
           source: {
-            type: 'power',
-            name: 'Couro Rígido',
+            type: "power",
+            name: "Couro Rígido",
           },
           target: {
-            type: 'Defense',
+            type: "Defense",
           },
           modifier: {
-            type: 'Fixed',
+            type: "Fixed",
             value: 1,
           },
         },
       ],
     },
     {
-      name: 'Faro',
+      name: "Faro",
       description:
-        'Você tem olfato apurado. Você não fica desprevenido e sofre apenas camuflagem (em vez de camuflagem total) contra inimigos em alcance curto que não possa ver.',
+        "Você tem olfato apurado. Você não fica desprevenido e sofre apenas camuflagem (em vez de camuflagem total) contra inimigos em alcance curto que não possa ver.",
     },
     {
-      name: 'Medo de Altura',
+      name: "Medo de Altura",
       description:
-        'Se estiver adjacente a uma queda de 3m ou mais de altura (como um buraco ou penhasco), você fica abalado.',
+        "Se estiver adjacente a uma queda de 3m ou mais de altura (como um buraco ou penhasco), você fica abalado.",
     },
   ],
 };

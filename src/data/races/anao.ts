@@ -1,5 +1,5 @@
-import Race from '../../interfaces/Race';
-import { Atributo } from '../atributos';
+import Race from "../../interfaces/Race";
+import { Atributo } from "../atributos";
 
 // const DWARF_WEAPONS = [
 //   Armas.MACHADO_DE_BATALHA.nome,
@@ -11,7 +11,15 @@ import { Atributo } from '../atributos';
 // ];
 
 const ANAO: Race = {
-  name: 'Anão',
+  name: "Anão",
+  description:
+    "Criaturas robustas e leais, moldadas pelas rochas e pela tradição.",
+  appearance:
+    "Robustos e baixos (entre 1,20m e 1,50m), com pele em tons de terra e olhos escuros. Homens ostentam barbas longas e trançadas que são fonte de imenso orgulho; mulheres usam cabelos igualmente ornamentados.",
+  personality:
+    "Teimosos como a rocha e leais como o aço, anões valorizam tradição, honra e trabalho duro. São conhecidos por sua paciência lendária para o artesanato e memória implacável para ofensas.",
+  commonReligions:
+    "Khalmyr (Justiça), Tenebra (Trevas e Artesanato) e Arsenal (Guerra).",
   attributes: {
     attrs: [
       { attr: Atributo.CONSTITUICAO, mod: 2 },
@@ -30,58 +38,58 @@ const ANAO: Race = {
   getDisplacement: () => 6,
   abilities: [
     {
-      name: 'Conhecimento das Rochas',
+      name: "Conhecimento das Rochas",
       description:
-        'Você recebe visão no escuro e +2 em testes de Percepção e Sobrevivência realizados no subterrâneo.',
+        "Você recebe visão no escuro e +2 em testes de Percepção e Sobrevivência realizados no subterrâneo.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Conhecimento das Rochas',
+            type: "power",
+            name: "Conhecimento das Rochas",
           },
           action: {
-            type: 'addSense',
-            sense: 'Visão no Escuro',
+            type: "addSense",
+            sense: "Visão no Escuro",
           },
         },
       ],
     },
     {
-      name: 'Devagar e Sempre',
+      name: "Devagar e Sempre",
       description:
-        'Seu deslocamento é 6m (em vez de 9m). Porém, seu deslocamento não é reduzido por uso de armadura ou excesso de carga.',
+        "Seu deslocamento é 6m (em vez de 9m). Porém, seu deslocamento não é reduzido por uso de armadura ou excesso de carga.",
       sheetBonuses: [
         {
           source: {
-            type: 'power',
-            name: 'Devagar e Sempre',
+            type: "power",
+            name: "Devagar e Sempre",
           },
           target: {
-            type: 'Displacement',
+            type: "Displacement",
           },
           modifier: {
-            type: 'Fixed',
+            type: "Fixed",
             value: -3,
           },
         },
       ],
     },
     {
-      name: 'Tradição de Heredrimm',
+      name: "Tradição de Heredrimm",
       description:
-        'Você é perito nas armas tradicionais anãs, seja por ter treinado com elas, seja por usá-las como ferramentas de ofício. Para você, todos os machados, martelos, marretas e picaretas são armas simples. Você recebe +2 em ataques com essas armas.',
+        "Você é perito nas armas tradicionais anãs, seja por ter treinado com elas, seja por usá-las como ferramentas de ofício. Para você, todos os machados, martelos, marretas e picaretas são armas simples. Você recebe +2 em ataques com essas armas.",
       sheetBonuses: [
         {
           source: {
-            type: 'race',
-            raceName: 'Anão',
+            type: "race",
+            raceName: "Anão",
           },
           target: {
-            type: 'WeaponAttack',
-            weaponTags: ['heredrimm'],
+            type: "WeaponAttack",
+            weaponTags: ["heredrimm"],
           },
           modifier: {
-            type: 'Fixed',
+            type: "Fixed",
             value: 2,
           },
         },
@@ -111,21 +119,21 @@ const ANAO: Race = {
       // },
     },
     {
-      name: 'Duro com Pedra',
+      name: "Duro com Pedra",
       description:
-        'Você recebe +3 pontos de vida no 1º nível e +1 por nível seguinte.',
+        "Você recebe +3 pontos de vida no 1º nível e +1 por nível seguinte.",
       sheetBonuses: [
         {
           source: {
-            type: 'power',
-            name: 'Duro com Pedra',
+            type: "power",
+            name: "Duro com Pedra",
           },
           target: {
-            type: 'PV',
+            type: "PV",
           },
           modifier: {
-            type: 'LevelCalc',
-            formula: '{level} + 2',
+            type: "LevelCalc",
+            formula: "{level} + 2",
           },
         },
       ],

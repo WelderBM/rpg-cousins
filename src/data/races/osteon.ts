@@ -1,8 +1,8 @@
-import Race from '../../interfaces/Race';
-import { getRandomItemFromArray } from '../../functions/randomUtils';
-import { getRaceDisplacement, getRaceSize } from './functions/functions';
-import { Atributo } from '../atributos';
-import HUMANO from './humano';
+import Race from "../../interfaces/Race";
+import { getRandomItemFromArray } from "../../functions/randomUtils";
+import { getRaceDisplacement, getRaceSize } from "./functions/functions";
+import { Atributo } from "../atributos";
+import HUMANO from "./humano";
 
 // function addSkillOrGeneralPower(sheet: CharacterSheet, substeps: SubStep[]) {
 //   const shouldGetSkill = Math.random() > 0.5;
@@ -49,13 +49,20 @@ import HUMANO from './humano';
 // }
 
 const OSTEON: Race = {
-  name: 'Osteon',
+  name: "Osteon",
+  description:
+    "Mortos-vivos inteligentes que buscam um propósito ou redenção em sua segunda vida (ou morte).",
+  appearance:
+    "Esqueletos animados que muitas vezes vestem as roupas de sua vida passada. Suas órbitas brilham com uma luz fria e misteriosa.",
+  personality:
+    "Variam de cínicos e sombrios a inquisitivos e sábios, carregando memórias fragmentadas da pessoa que foram um dia.",
+  commonReligions: "Tenebra (Trevas) ou Aharadak (Tormenta).",
   attributes: {
     attrs: [
       { attr: Atributo.CONSTITUICAO, mod: -1 },
-      { attr: 'any', mod: 1 },
-      { attr: 'any', mod: 1 },
-      { attr: 'any', mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
     ],
   },
   faithProbability: {
@@ -65,7 +72,7 @@ const OSTEON: Race = {
   },
   setup: (race, allRaces) => {
     const validRaces = allRaces.filter(
-      (element) => element.name !== 'Golem' && element.name !== 'Osteon'
+      (element) => element.name !== "Golem" && element.name !== "Osteon"
     );
 
     const randomNumber = Math.random();
@@ -95,22 +102,22 @@ const OSTEON: Race = {
   },
   abilities: [
     {
-      name: 'Armadura Óssea',
-      description: 'Você recebe resistência a corte, frio e perfuração 5.',
+      name: "Armadura Óssea",
+      description: "Você recebe resistência a corte, frio e perfuração 5.",
     },
     {
-      name: 'Memória Póstuma',
+      name: "Memória Póstuma",
       description:
-        'Você se torna treinado em uma perícia (não precisa ser da sua classe) ou recebe um poder geral a sua escolha. Como alternativa, você pode ser um osteon de outra raça humanoide que não humano. Neste caso, você ganha uma habilidade dessa raça a sua escolha. Se a raça era de tamanho diferente de Médio, você também possui sua categoria de tamanho.',
+        "Você se torna treinado em uma perícia (não precisa ser da sua classe) ou recebe um poder geral a sua escolha. Como alternativa, você pode ser um osteon de outra raça humanoide que não humano. Neste caso, você ganha uma habilidade dessa raça a sua escolha. Se a raça era de tamanho diferente de Médio, você também possui sua categoria de tamanho.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Memória Póstuma',
+            type: "power",
+            name: "Memória Póstuma",
           },
           action: {
-            type: 'special',
-            specialAction: 'osteonMemoriaPostuma',
+            type: "special",
+            specialAction: "osteonMemoriaPostuma",
           },
         },
         // action(sheet: CharacterSheet, subSteps: SubStep[]): CharacterSheet {
@@ -129,9 +136,9 @@ const OSTEON: Race = {
       ],
     },
     {
-      name: 'Natureza Esquelética',
+      name: "Natureza Esquelética",
       description:
-        'Você é uma criatura do tipo morto-vivo. Recebe visão no escuro e imunidade a doenças, fadiga, sangramento, sono e venenos. Além disso, não precisa respirar, alimentar-se ou dormir. Por fim, habilidades mágicas de cura causam dano a você e você não se beneficia de itens ingeríveis (comidas, poções etc.), mas dano de trevas recupera seus PV.',
+        "Você é uma criatura do tipo morto-vivo. Recebe visão no escuro e imunidade a doenças, fadiga, sangramento, sono e venenos. Além disso, não precisa respirar, alimentar-se ou dormir. Por fim, habilidades mágicas de cura causam dano a você e você não se beneficia de itens ingeríveis (comidas, poções etc.), mas dano de trevas recupera seus PV.",
     },
   ],
 };

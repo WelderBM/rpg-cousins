@@ -1,9 +1,16 @@
-import Race from '../../interfaces/Race';
-import { Atributo } from '../atributos';
-import { spellsCircle1 } from '../magias/generalSpells';
+import Race from "../../interfaces/Race";
+import { Atributo } from "../atributos";
+import { spellsCircle1 } from "../magias/generalSpells";
 
 const QAREEN: Race = {
-  name: 'Qareen',
+  name: "Qareen",
+  description:
+    "Descendentes de gênios que carregam a magia em seu sangue e a generosidade em seus corações.",
+  appearance:
+    "Humanos belos com traços exóticos: pele com reflexos metálicos, olhos de cores incomuns ou pequenas marcas elementais em seus corpos.",
+  personality:
+    "Extrovertidos e prestativos, sentem uma necessidade inata de ajudar os outros e encontram alegria na cooperação e no uso da magia.",
+  commonReligions: "Wynna (Magia).",
   attributes: {
     attrs: [
       { attr: Atributo.CARISMA, mod: 2 },
@@ -23,27 +30,27 @@ const QAREEN: Race = {
   },
   abilities: [
     {
-      name: 'Desejos',
+      name: "Desejos",
       description:
-        'Se lançar uma magia que alguém tenha pedido desde seu último turno, o custo da magia diminui em –1 PM. Fazer um desejo ao qareen é uma ação livre.',
+        "Se lançar uma magia que alguém tenha pedido desde seu último turno, o custo da magia diminui em –1 PM. Fazer um desejo ao qareen é uma ação livre.",
     },
     {
-      name: 'Resistência Elemental',
+      name: "Resistência Elemental",
       description:
-        'Conforme sua ascendência, você recebe resistência 10 a um tipo de dano. Escolha uma: frio (qareen da água), eletricidade (do ar), fogo (do fogo), ácido (da terra), luz (da luz) ou trevas (qareen das trevas).',
+        "Conforme sua ascendência, você recebe resistência 10 a um tipo de dano. Escolha uma: frio (qareen da água), eletricidade (do ar), fogo (do fogo), ácido (da terra), luz (da luz) ou trevas (qareen das trevas).",
     },
     {
-      name: 'Tatuagem mística',
+      name: "Tatuagem mística",
       description:
-        'Você pode lançar uma magia de 1º círculo a sua escolha (atributo-chave Carisma). Caso aprenda novamente essa magia, seu custo diminui em –1 PM.',
+        "Você pode lançar uma magia de 1º círculo a sua escolha (atributo-chave Carisma). Caso aprenda novamente essa magia, seu custo diminui em –1 PM.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Tatuagem mística',
+            type: "power",
+            name: "Tatuagem mística",
           },
           action: {
-            type: 'learnSpell',
+            type: "learnSpell",
             availableSpells: Object.values(spellsCircle1),
             pick: 1,
             customAttribute: Atributo.CARISMA,

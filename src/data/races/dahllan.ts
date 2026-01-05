@@ -1,11 +1,18 @@
-import Race from '../../interfaces/Race';
-import { Atributo } from '../atributos';
-import { spellsCircle1 } from '../magias/generalSpells';
+import Race from "../../interfaces/Race";
+import { Atributo } from "../atributos";
+import { spellsCircle1 } from "../magias/generalSpells";
 
 export const PLANTS_FRIEND_MANA_REDUCTION = 1;
 
 const DAHLLAN: Race = {
-  name: 'Dahllan',
+  name: "Dahllan",
+  description:
+    "Meias-dríades protegidas pelos espíritos da floresta, vivendo em harmonia com o ciclo da vida e da natureza.",
+  appearance:
+    "Traços humanos delicados mesclados com elementos vegetais, como cabelos que podem mudar com as estações e pele com tons de terra ou casca.",
+  personality:
+    "Calmas e pacientes, mas implacáveis quando o mundo natural é ameaçado. Possuem uma conexão espiritual profunda com a terra.",
+  commonReligions: "Allihanna (Natureza) e Lena (Vida).",
   attributes: {
     attrs: [
       { attr: Atributo.SABEDORIA, mod: 2 },
@@ -22,17 +29,17 @@ const DAHLLAN: Race = {
   },
   abilities: [
     {
-      name: 'Amiga das Plantas',
+      name: "Amiga das Plantas",
       description:
-        'Você pode lançar a magia Controlar Plantas (atributo-chave Sabedoria). Caso aprenda novamente essa magia, seu custo diminui em –1 PM.',
+        "Você pode lançar a magia Controlar Plantas (atributo-chave Sabedoria). Caso aprenda novamente essa magia, seu custo diminui em –1 PM.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Amiga das Plantas',
+            type: "power",
+            name: "Amiga das Plantas",
           },
           action: {
-            type: 'learnSpell',
+            type: "learnSpell",
             availableSpells: [spellsCircle1.controlarPlantas],
             pick: 1,
             customAttribute: Atributo.SABEDORIA,
@@ -41,14 +48,14 @@ const DAHLLAN: Race = {
       ],
     },
     {
-      name: 'Armadura de Allihanna',
+      name: "Armadura de Allihanna",
       description:
-        'Você pode gastar uma ação de movimento e 1 PM para transformar sua pele em casca de árvore, recebendo +2 na Defesa até o fim da cena.',
+        "Você pode gastar uma ação de movimento e 1 PM para transformar sua pele em casca de árvore, recebendo +2 na Defesa até o fim da cena.",
     },
     {
-      name: 'Empatia Selvagem',
+      name: "Empatia Selvagem",
       description:
-        'Você pode se comunicar com animais por meio de linguagem corporal e vocalizações. Você pode usar Adestramento para mudar atitude e pedir favores de animais (veja Diplomacia, na página 118). Caso receba esta habilidade novamente, recebe +2 em Adestramento.',
+        "Você pode se comunicar com animais por meio de linguagem corporal e vocalizações. Você pode usar Adestramento para mudar atitude e pedir favores de animais (veja Diplomacia, na página 118). Caso receba esta habilidade novamente, recebe +2 em Adestramento.",
     },
   ],
 };

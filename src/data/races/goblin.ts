@@ -1,10 +1,18 @@
-import Skill from '@/interfaces/Skills';
-import Race from '../../interfaces/Race';
-import { Atributo } from '../atributos';
-import { RACE_SIZES } from './raceSizes/raceSizes';
+import Skill from "@/interfaces/Skills";
+import Race from "../../interfaces/Race";
+import { Atributo } from "../atributos";
+import { RACE_SIZES } from "./raceSizes/raceSizes";
 
 const GOBLIN: Race = {
-  name: 'Goblin',
+  name: "Goblin",
+  description:
+    "Pequenos, ágeis e dotados de uma engenhosidade caótica, os goblins sobrevivem onde outros falham.",
+  appearance:
+    "Pequenos, com pele variando de verde a amarelo, narizes proeminentes e orelhas grandes. Seus olhos são brilhantes e atentos.",
+  personality:
+    "Curiosos, astutos e extremamente resilientes, goblins possuem um otimismo às vezes perigoso e uma habilidade natural para improvisar e sobreviver.",
+  commonReligions:
+    "Thwor (Mundo de Arton), Nimb (Sorte) e Megalokk (Monstros).",
   attributes: {
     attrs: [
       { attr: Atributo.DESTREZA, mod: 2 },
@@ -22,48 +30,48 @@ const GOBLIN: Race = {
   size: RACE_SIZES.PEQUENO,
   abilities: [
     {
-      name: 'Engenhoso',
+      name: "Engenhoso",
       description:
-        'Você não sofre penalidades em testes de perícia por não usar kits. Se usar o kit, recebe +2 no teste de perícia.',
+        "Você não sofre penalidades em testes de perícia por não usar kits. Se usar o kit, recebe +2 no teste de perícia.",
     },
     {
-      name: 'Espelunqueiro',
+      name: "Espelunqueiro",
       description:
-        'Você recebe visão no escuro e deslocamento de escalada igual ao seu deslocamento terrestre.',
+        "Você recebe visão no escuro e deslocamento de escalada igual ao seu deslocamento terrestre.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Espelunqueiro',
+            type: "power",
+            name: "Espelunqueiro",
           },
           action: {
-            type: 'addSense',
-            sense: 'Visão no escuro',
+            type: "addSense",
+            sense: "Visão no escuro",
           },
         },
       ],
     },
     {
-      name: 'Peste Esguia',
+      name: "Peste Esguia",
       description:
-        'Seu tamanho é Pequeno (veja a página 106), mas seu deslocamento se mantém 9m. Apesar de pequenos, goblins são rápidos.',
+        "Seu tamanho é Pequeno (veja a página 106), mas seu deslocamento se mantém 9m. Apesar de pequenos, goblins são rápidos.",
     },
     {
-      name: 'Rato das Ruas',
+      name: "Rato das Ruas",
       description:
-        'Você recebe +2 em Fortitude e sua recuperação de PV e PM nunca é inferior ao seu nível.',
+        "Você recebe +2 em Fortitude e sua recuperação de PV e PM nunca é inferior ao seu nível.",
       sheetBonuses: [
         {
           source: {
-            type: 'power',
-            name: 'Rato das Ruas',
+            type: "power",
+            name: "Rato das Ruas",
           },
           target: {
-            type: 'Skill',
+            type: "Skill",
             name: Skill.FORTITUDE,
           },
           modifier: {
-            type: 'Fixed',
+            type: "Fixed",
             value: 2,
           },
         },

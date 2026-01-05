@@ -3,6 +3,14 @@ import { Atributo } from "../atributos";
 
 const LEFOU: Race = {
   name: "Lefou",
+  description:
+    "Seres marcados pela influência da Tormenta, carregando deformidades que lhes conferem poderes terríveis e um fardo de preconceito.",
+  appearance:
+    "Humanoides com distorções físicas visíveis como carapaças quitinosas, tentáculos, olhos extras ou outras máculas aberrantes da Tormenta.",
+  personality:
+    "Frequentemente marginalizados, variam entre o isolamento amargo e a determinação feroz de provar seu valor, muitas vezes lutando contra a própria Tormenta.",
+  commonReligions:
+    "Aharadak (Tormenta) ou divindades que valorizam a força e a superação.",
   attributes: {
     attrs: [
       { attr: Atributo.CARISMA, mod: -1 },

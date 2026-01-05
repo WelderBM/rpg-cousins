@@ -3,6 +3,13 @@ import { Atributo } from "../atributos";
 
 const MEDUSA: Race = {
   name: "Medusa",
+  description:
+    "Mulheres marcadas por uma herança ancestral e perigosa, possuindo serpentes em vez de cabelos e um olhar petrificante.",
+  appearance:
+    "Belas e imponentes, com serpentes vivas que se movem constantemente em suas cabeças no lugar de cabelos.",
+  personality:
+    "Muitas vezes solitárias ou cautelosas devido ao impacto de seus poderes, possuem uma determinação obstinada e forte senso de preservação.",
+  commonReligions: "Tenebra (Trevas) ou Sszzaas (Traição).",
   attributes: {
     attrs: [
       { attr: "any", mod: 1 },

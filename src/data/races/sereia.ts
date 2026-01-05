@@ -1,6 +1,6 @@
-import Race from '../../interfaces/Race';
-import { Atributo } from '../atributos';
-import { spellsCircle1 } from '../magias/generalSpells';
+import Race from "../../interfaces/Race";
+import { Atributo } from "../atributos";
+import { spellsCircle1 } from "../magias/generalSpells";
 
 const seaSongSpells = [
   spellsCircle1.amedrontar,
@@ -14,12 +14,19 @@ const seaSongSpells = [
 // const goodWeapons = [Armas.TRIDENTE.nome, Armas.LANCA.nome, Armas.AZAGAIA.nome];
 
 const SEREIA: Race = {
-  name: 'Sereia',
+  name: "Sereia",
+  description:
+    "Habitantes dos oceanos com uma beleza hipnotizante e uma voz que pode acalmar ou enfurecer as águas.",
+  appearance:
+    "Humanoides com pernas em terra e caudas de peixe na água. Possuem pele em tons azulados ou esverdeados e cabelos que lembram algas.",
+  personality:
+    "Curiosos em relação ao mundo da superfície, alternam entre a timidez e o orgulho das profundezas, com grande afinidade pela vida marinha.",
+  commonReligions: "Oceano (Mares).",
   attributes: {
     attrs: [
-      { attr: 'any', mod: 1 },
-      { attr: 'any', mod: 1 },
-      { attr: 'any', mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
     ],
   },
   faithProbability: {
@@ -29,17 +36,17 @@ const SEREIA: Race = {
   },
   abilities: [
     {
-      name: 'Canção dos Mares',
+      name: "Canção dos Mares",
       description:
-        'Você pode lançar duas das magias a seguir: Amedrontar, Comando, Despedaçar, Enfeitiçar, Hipnotismo ou Sono (atributo-chave Carisma). Caso aprenda novamente uma dessas magias, seu custo diminui em –1 PM.',
+        "Você pode lançar duas das magias a seguir: Amedrontar, Comando, Despedaçar, Enfeitiçar, Hipnotismo ou Sono (atributo-chave Carisma). Caso aprenda novamente uma dessas magias, seu custo diminui em –1 PM.",
       sheetActions: [
         {
           source: {
-            type: 'power',
-            name: 'Canção dos Mares',
+            type: "power",
+            name: "Canção dos Mares",
           },
           action: {
-            type: 'learnSpell',
+            type: "learnSpell",
             availableSpells: seaSongSpells,
             pick: 2,
             customAttribute: Atributo.CARISMA,
@@ -48,21 +55,21 @@ const SEREIA: Race = {
       ],
     },
     {
-      name: 'Mestre do Tridente',
+      name: "Mestre do Tridente",
       description:
-        'Para você, o tridente é uma arma simples. Além disso, você recebe +2 em rolagens de dano com azagaias, lanças e tridentes',
+        "Para você, o tridente é uma arma simples. Além disso, você recebe +2 em rolagens de dano com azagaias, lanças e tridentes",
       sheetBonuses: [
         {
           source: {
-            type: 'race',
-            raceName: 'Sereia',
+            type: "race",
+            raceName: "Sereia",
           },
           target: {
-            type: 'WeaponDamage',
-            weaponTags: ['armaDeMar'],
+            type: "WeaponDamage",
+            weaponTags: ["armaDeMar"],
           },
           modifier: {
-            type: 'Fixed',
+            type: "Fixed",
             value: 2,
           },
         },
@@ -100,9 +107,9 @@ const SEREIA: Race = {
       // },
     },
     {
-      name: 'Transformação Anfíbia',
+      name: "Transformação Anfíbia",
       description:
-        'Você pode respirar debaixo d’água e possui uma cauda que fornece deslocamento de natação 12m. Quando fora d’água, sua cauda desaparece e dá lugar a pernas (deslocamento 9m). Se permanecer mais de um dia sem contato com água, você não recupera PM com descanso até voltar para a água (ou, pelo menos, tomar um bom banho!).',
+        "Você pode respirar debaixo d’água e possui uma cauda que fornece deslocamento de natação 12m. Quando fora d’água, sua cauda desaparece e dá lugar a pernas (deslocamento 9m). Se permanecer mais de um dia sem contato com água, você não recupera PM com descanso até voltar para a água (ou, pelo menos, tomar um bom banho!).",
     },
   ],
 };

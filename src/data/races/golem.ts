@@ -3,6 +3,13 @@ import { Atributo } from "../atributos";
 
 const GOLEM: Race = {
   name: "Golem",
+  description:
+    "Construtos dotados de consciência, criados para servir mas capazes de forjar seu próprio destino.",
+  appearance:
+    "Formas humanoides feitas de pedra, metal, barro ou madeira, com símbolos mágicos gravados em seus corpos e um núcleo pulsante de energia.",
+  personality:
+    "Lógicos e focados, golens aprendem sobre emoções e individualidade conforme interagem com o mundo, sendo extremamente leais aos seus ideais.",
+  commonReligions: "Geralmente nenhuma, ou a de seu criador.",
   attributes: {
     attrs: [
       { attr: "any", mod: 2 },

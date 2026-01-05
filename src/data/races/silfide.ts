@@ -12,6 +12,13 @@ const fairySpells = [
 
 const SILFIDE: Race = {
   name: "Sílfide",
+  description:
+    "Pequenas fadas travessas ligadas ao Reino de Pondsmânia, movidas pela curiosidade e pela magia da natureza.",
+  appearance:
+    "Diminutas e aladas, com feições delicadas e brilhantes. Suas asas lembram as de borboletas ou libélulas.",
+  personality:
+    "Brincalhonas, avoadas e extremamente curiosas. Raramente levam as coisas a sério, mas são aliadas leais e cheias de recursos mágicos.",
+  commonReligions: "Allihanna (Natureza) ou Wynna (Magia).",
   attributes: {
     attrs: [
       { attr: Atributo.CARISMA, mod: 2 },
