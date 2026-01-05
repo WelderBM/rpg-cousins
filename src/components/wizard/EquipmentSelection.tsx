@@ -156,13 +156,14 @@ const EquipmentSelection = () => {
       items = items.filter((i) => i.nome.toLowerCase().includes(lower));
     }
 
-    return items.sort((a, b) => a.preco - b.preco);
+    return items.sort((a, b) => (a.preco ?? 0) - (b.preco ?? 0));
   }, [activeTab, searchTerm]);
 
   // --- 3. Actions ---
   const handleBuy = (item: Equipment) => {
-    if (money >= item.preco) {
-      updateMoney(money - item.preco);
+    const itemPrice = item.preco ?? 0;
+    if (money >= itemPrice) {
+      updateMoney(money - itemPrice);
       addToBag(item);
     }
   };
@@ -170,7 +171,7 @@ const EquipmentSelection = () => {
   const handleSell = (item: Equipment) => {
     // Sell for half price? Or full refund for wizard mode?
     // Usually Wizard Mode = Refund to change mind.
-    updateMoney(money + item.preco);
+    updateMoney(money + (item.preco ?? 0));
     removeFromBag(item);
   };
 
@@ -320,7 +321,7 @@ const EquipmentSelection = () => {
             {/* List */}
             <div className="grid grid-cols-1 gap-2">
               {marketItems.map((item, i) => {
-                const canAfford = money >= item.preco;
+                const canAfford = money >= (item.preco ?? 0);
                 return (
                   <div
                     key={`${item.nome}-${i}`}

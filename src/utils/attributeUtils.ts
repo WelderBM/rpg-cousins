@@ -1,6 +1,6 @@
 import { Atributo } from "../data/atributos";
 
-export const INITIAL_POINTS = 20;
+export const INITIAL_POINTS = 10;
 
 /**
  * Tabela de Custos do T20 Original (Versão 20 pontos)

@@ -25,7 +25,7 @@ const navItems = [
   { name: "Poderes", href: "/grimorio", icon: BookOpen },
   { name: "Meus Heróis", href: "/characters", icon: Users },
   { name: "Wiki", href: "/wiki", icon: Scroll },
-  { name: "Mestre", href: "/admin", icon: ShieldAlert },
+  { name: "Mestre", href: "/mestre", icon: ShieldAlert },
 ];
 
 export default function MainLayout({

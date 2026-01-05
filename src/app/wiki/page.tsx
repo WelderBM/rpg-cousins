@@ -15,6 +15,8 @@ import {
   CheckCircle2,
   Filter,
   ArrowLeft,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -86,6 +88,14 @@ export default function WikiPage() {
   const [selectedItem, setSelectedItem] = useState<ItemBase | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [displayLimit, setDisplayLimit] = useState(ITEMS_PER_PAGE);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Filter States
+  const [spellCircle, setSpellCircle] = useState<number | "all">("all");
+  const [spellSchool, setSpellSchool] = useState<string | "all">("all");
+  const [equipGroup, setEquipGroup] = useState<string | "all">("all");
+  const [powerType, setPowerType] = useState<string | "all">("all");
+  const [maxPrice, setMaxPrice] = useState<number | "">("");
 
   // Reset limit when category or search changes
   useEffect(() => {
@@ -140,7 +150,34 @@ export default function WikiPage() {
 
   // Filtering
   const filteredItems = useMemo(() => {
-    const items = data[activeCategory];
+    let items = data[activeCategory];
+
+    // Category Specific Filters
+    if (activeCategory === "magias") {
+      if (spellCircle !== "all") {
+        items = items.filter((i) => i.raw.spellCircle === spellCircle);
+      }
+      if (spellSchool !== "all") {
+        items = items.filter((i) => i.raw.school === spellSchool);
+      }
+    }
+
+    if (activeCategory === "equipamentos") {
+      if (equipGroup !== "all") {
+        items = items.filter((i) => i.raw.group === equipGroup);
+      }
+      if (maxPrice !== "") {
+        items = items.filter((i) => i.raw.preco <= maxPrice);
+      }
+    }
+
+    if (activeCategory === "poderes") {
+      if (powerType !== "all") {
+        items = items.filter((i) => i.raw.type === powerType);
+      }
+    }
+
+    // Search Query
     if (!searchQuery) return items;
 
     const query = searchQuery.toLowerCase();
@@ -150,7 +187,16 @@ export default function WikiPage() {
         i.type?.toLowerCase().includes(query) ||
         (i.description && i.description.toLowerCase().includes(query))
     );
-  }, [data, activeCategory, searchQuery]);
+  }, [
+    data,
+    activeCategory,
+    searchQuery,
+    spellCircle,
+    spellSchool,
+    equipGroup,
+    maxPrice,
+    powerType,
+  ]);
 
   // Handlers
   const handleCopyLink = (item: ItemBase) => {
@@ -266,11 +312,165 @@ export default function WikiPage() {
                     <b className="text-neutral-400 italic">Tormenta20 JDA</b>
                   </span>
                 </div>
-                <div className="flex items-center gap-2 hover:text-amber-400 transition-colors cursor-pointer">
+                <button
+                  onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                  className={`flex items-center gap-2 transition-colors cursor-pointer px-3 py-1.5 rounded-lg border ${
+                    isFiltersOpen ||
+                    spellCircle !== "all" ||
+                    spellSchool !== "all" ||
+                    equipGroup !== "all" ||
+                    powerType !== "all" ||
+                    maxPrice !== ""
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                      : "border-transparent hover:text-amber-400"
+                  }`}
+                >
                   <Filter size={14} />
                   Filtros Avançados
-                </div>
+                  {isFiltersOpen ? (
+                    <ChevronUp size={14} />
+                  ) : (
+                    <ChevronDown size={14} />
+                  )}
+                </button>
               </div>
+
+              {/* Advanced Filters Panel */}
+              <AnimatePresence>
+                {isFiltersOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="bg-neutral-900/50 border border-amber-900/20 rounded-2xl p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                      {activeCategory === "magias" && (
+                        <>
+                          <div>
+                            <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                              Círculo
+                            </label>
+                            <select
+                              value={spellCircle}
+                              onChange={(e) =>
+                                setSpellCircle(
+                                  e.target.value === "all"
+                                    ? "all"
+                                    : Number(e.target.value)
+                                )
+                              }
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                            >
+                              <option value="all">Todos</option>
+                              <option value="1">1º Círculo</option>
+                              <option value="2">2º Círculo</option>
+                              <option value="3">3º Círculo</option>
+                              <option value="4">4º Círculo</option>
+                              <option value="5">5º Círculo</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                              Escola
+                            </label>
+                            <select
+                              value={spellSchool}
+                              onChange={(e) => setSpellSchool(e.target.value)}
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                            >
+                              <option value="all">Todas</option>
+                              <option value="Abjur">Abjuração</option>
+                              <option value="Adiv">Adivinhação</option>
+                              <option value="Conv">Convocação</option>
+                              <option value="Encan">Encantamento</option>
+                              <option value="Evoc">Evocação</option>
+                              <option value="Ilusão">Ilusão</option>
+                              <option value="Necro">Necromancia</option>
+                              <option value="Trans">Transmutação</option>
+                            </select>
+                          </div>
+                        </>
+                      )}
+
+                      {activeCategory === "equipamentos" && (
+                        <>
+                          <div>
+                            <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                              Grupo
+                            </label>
+                            <select
+                              value={equipGroup}
+                              onChange={(e) => setEquipGroup(e.target.value)}
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                            >
+                              <option value="all">Todos</option>
+                              <option value="Arma">Armas</option>
+                              <option value="Armadura">Armaduras</option>
+                              <option value="Escudo">Escudos</option>
+                              <option value="Item Geral">Itens Gerais</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                              Preço Máximo (T$)
+                            </label>
+                            <input
+                              type="number"
+                              value={maxPrice}
+                              onChange={(e) =>
+                                setMaxPrice(
+                                  e.target.value === ""
+                                    ? ""
+                                    : Number(e.target.value)
+                                )
+                              }
+                              placeholder="Ex: 100"
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {activeCategory === "poderes" && (
+                        <div>
+                          <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                            Tipo de Poder
+                          </label>
+                          <select
+                            value={powerType}
+                            onChange={(e) => setPowerType(e.target.value)}
+                            className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                          >
+                            <option value="all">Todos</option>
+                            <option value="Combate">Combate</option>
+                            <option value="Destino">Destino</option>
+                            <option value="Magia">Magia</option>
+                            <option value="Concedido">Concedido</option>
+                            <option value="Tormenta">Tormenta</option>
+                          </select>
+                        </div>
+                      )}
+
+                      <div className="flex items-end">
+                        <button
+                          onClick={() => {
+                            setSpellCircle("all");
+                            setSpellSchool("all");
+                            setEquipGroup("all");
+                            setPowerType("all");
+                            setMaxPrice("");
+                            setSearchQuery("");
+                          }}
+                          className="text-[10px] uppercase font-bold text-neutral-500 hover:text-red-400 transition-colors flex items-center gap-1 mb-2"
+                        >
+                          <X size={12} /> Limpar Filtros
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </header>
 

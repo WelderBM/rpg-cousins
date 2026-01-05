@@ -55,7 +55,7 @@ export const SystemExplanationModal = React.memo(
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { val: "-1", cost: "Ganha +1pt" },
+                { val: "-1", cost: "Ganha +2pts" },
                 { val: "0", cost: "Custo 0" },
                 { val: "+1", cost: "Custo 1" },
                 { val: "+2", cost: "Custo 2" },
@@ -76,8 +76,8 @@ export const SystemExplanationModal = React.memo(
               ))}
             </div>
             <p className="text-[10px] text-neutral-500 mt-4 italic">
-              * Reduzir um atributo para -1 libera 1 ponto extra para gastar em
-              outro lugar.
+              * Reduzir um atributo para -1 libera 2 pontos extras para gastar
+              em outro lugar.
             </p>
           </section>
 

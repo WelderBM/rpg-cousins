@@ -75,11 +75,32 @@ const RoleSelection = () => {
     setOptionalSkillChoices([]);
   }, [selectedPreview]);
 
+  // Calculate available skills for the optional list (excluding those already picked in basic)
+  const availableSkillsPool = useMemo(() => {
+    if (!selectedPreview) return [];
+
+    return selectedPreview.periciasrestantes.list.filter((skill) => {
+      // Check if already mandatory/picked in basic
+      const isPickedInBasic =
+        Object.values(basicSkillChoices).includes(skill) ||
+        selectedPreview.periciasbasicas.some(
+          (g) => g.type === "and" && g.list.includes(skill)
+        );
+
+      return !isPickedInBasic;
+    });
+  }, [selectedPreview, basicSkillChoices]);
+
   // Determine how many optional skills can be picked
   const maxOptionalSkills = useMemo(() => {
     if (!selectedPreview || !stats) return 0;
-    return selectedPreview.periciasrestantes.qtd + stats.intMod;
-  }, [selectedPreview, stats]);
+    // Base + Int, floor at 0
+    const rawTarget = selectedPreview.periciasrestantes.qtd + stats.intMod;
+    const target = Math.max(0, rawTarget);
+
+    // Safety: if the pool is smaller than the target, use pool size
+    return Math.min(target, availableSkillsPool.length);
+  }, [selectedPreview, stats, availableSkillsPool]);
 
   const handleOptionalSkillToggle = (skill: Skill) => {
     if (optionalSkillChoices.includes(skill)) {
@@ -334,24 +355,7 @@ const RoleSelection = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {selectedPreview.periciasrestantes.list.map((skill) => {
-                    // Filter out already selected in basic
-                    const isBasic = selectedPreview.periciasbasicas.some((g) =>
-                      g.list.includes(skill)
-                    );
-                    if (isBasic) return null; // Wait, sometimes "remaining" list includes basic ones if you didn't pick them?
-                    // Usually periciasrestantes list excludes the absolutely mandatory ones,
-                    // but might overlap with 'OR' choices.
-                    // T20: "Escolha X entre [Lista Completa]". If I picked Luta in basic, I can't pick it again here.
-
-                    const isPickedInBasic =
-                      Object.values(basicSkillChoices).includes(skill) ||
-                      selectedPreview.periciasbasicas.some(
-                        (g) => g.type === "and" && g.list.includes(skill)
-                      );
-
-                    if (isPickedInBasic) return null;
-
+                  {availableSkillsPool.map((skill) => {
                     const isSelected = optionalSkillChoices.includes(skill);
                     const isDisabled =
                       !isSelected &&

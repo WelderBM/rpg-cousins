@@ -17,8 +17,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${cinzel.variable}`}>
-      <body className={inter.className}>
+    <html
+      lang="pt-BR"
+      className={`${inter.variable} ${cinzel.variable}`}
+      suppressHydrationWarning
+    >
+      <body className={inter.className} suppressHydrationWarning>
         <MainLayout>{children}</MainLayout>
       </body>
     </html>
