@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useCharacterStore } from "../../store/useCharacterStore";
+import { useStore } from "../../store";
 import {
   Shield,
   Zap,
@@ -18,6 +20,8 @@ import {
 import { Atributo } from "../../data/atributos";
 import { CharacterService } from "../../lib/characterService";
 
+import { formatAssetName } from "../../utils/assetUtils";
+
 const SummarySelection = () => {
   const {
     name,
@@ -28,12 +32,15 @@ const SummarySelection = () => {
     flexibleAttributeChoices,
     selectedOrigin,
     selectedDeity,
-    selectedGrantedPower,
+    selectedGrantedPowers,
     bag,
     money,
     selectedSkills,
     setStep,
+    resetWizard,
   } = useCharacterStore();
+
+  const { user } = useStore();
 
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,19 +69,41 @@ const SummarySelection = () => {
   };
 
   // Generate IA Prompt
-  const aiPrompt = `Portrayal of a ${selectedRace?.name} ${
-    selectedClass?.name
-  } character from a fantasy world. 
-Attributes: ${Object.entries(finalAttributes)
-    .filter(([_, val]) => val > 1)
-    .map(([attr, _]) => attr)
-    .join(", ")}. 
-Equipment: ${Object.values(bag.getEquipments())
+  const aiPrompt = `Portrayal of a ${
+    selectedRace?.name || "Fantasy Character"
+  } ${selectedClass?.name || "Warrior"}.
+  
+Character Details:
+- Name: ${name || "Unknown"}
+- Race: ${selectedRace?.name || "Unknown"} (Typical features of this race)
+- Class: ${selectedClass?.name || "Unknown"} (Wearing typical class gear)
+- Origin: ${selectedOrigin?.name || "Unknown Origin"}
+- Deity: ${selectedDeity?.name || "No Deity"}
+
+Attributes & Stats:
+- Strength: ${finalAttributes[Atributo.FORCA]}
+- Dexterity: ${finalAttributes[Atributo.DESTREZA]}
+- Constitution: ${finalAttributes[Atributo.CONSTITUICAO]}
+- Intelligence: ${finalAttributes[Atributo.INTELIGENCIA]}
+- Wisdom: ${finalAttributes[Atributo.SABEDORIA]}
+- Charisma: ${finalAttributes[Atributo.CARISMA]}
+
+Skills & Abilities:
+- Trained Skills: ${selectedSkills.join(", ")}
+${
+  selectedGrantedPowers.length > 0
+    ? `- Special Powers: ${selectedGrantedPowers.map((p) => p.name).join(", ")}`
+    : ""
+}
+
+Equipment & Gear:
+- Weapons/Items: ${Object.values(bag.getEquipments())
     .flat()
-    .slice(0, 5)
     .map((i) => i.nome)
-    .join(", ")}. 
-Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic composition.`;
+    .join(", ")}
+
+Style:
+Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic composition, detailed texture, 8k resolution, trending on ArtStation, Unreal Engine 5 render.`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(aiPrompt);
@@ -103,12 +132,10 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         skills: selectedSkills,
         originName: selectedOrigin?.name || null,
         deityName: selectedDeity?.name || null,
-        grantedPower: selectedGrantedPower
-          ? {
-              name: selectedGrantedPower.name,
-              description: selectedGrantedPower.description,
-            }
-          : null,
+        grantedPowers: selectedGrantedPowers.map((p) => ({
+          name: p.name,
+          description: p.description || p.text || "",
+        })),
         money,
         // Convert class instance to plain object
         bag: {
@@ -121,9 +148,12 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
 
       await CharacterService.saveCharacter(characterData);
 
+      // Clear the local draft to prevent duplication
+      resetWizard();
+
       // Success redirect after animation
       setTimeout(() => {
-        window.location.href = "/heroes";
+        window.location.href = "/heroes"; // Correct path as per file structure
       }, 2000);
     } catch (err) {
       console.error(err);
@@ -160,8 +190,8 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-neutral-100 pb-32">
-      <div className="max-w-4xl mx-auto p-4 sm:p-8">
+    <div className="min-h-screen bg-stone-950 text-neutral-100 pb-48 md:pb-32">
+      <div className="max-w-5xl mx-auto p-4 sm:p-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-12">
           <button
@@ -170,7 +200,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
           >
             <ChevronLeft size={24} />
           </button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl md:text-5xl font-cinzel text-amber-500">
               Resumo Final
             </h1>
@@ -181,11 +211,54 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Left Column: Identity \u0026 Attributes */}
+          {/* Left Column: Identity & Attributes */}
           <div className="md:col-span-1 space-y-6">
+            {/* Visual Identity Preview */}
+            <div className="relative aspect-[3/4] bg-stone-900 rounded-2xl overflow-hidden border-2 border-amber-900/30 group shadow-2xl">
+              {/* Race Background */}
+              {selectedRace && (
+                <Image
+                  src={`/assets/races/${formatAssetName(
+                    selectedRace.name
+                  )}.webp`}
+                  alt={selectedRace.name}
+                  fill
+                  className="object-cover opacity-30 grayscale-[50%]"
+                />
+              )}
+              {/* Class Overlay */}
+              {selectedClass && (
+                <div className="absolute inset-0 flex items-center justify-center p-8">
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="relative w-full h-full"
+                  >
+                    <Image
+                      src={`/assets/classes/${formatAssetName(
+                        selectedClass.name
+                      )}.webp`}
+                      alt={selectedClass.name}
+                      fill
+                      className="object-contain drop-shadow-[0_0_30px_rgba(251,191,36,0.4)]"
+                    />
+                  </motion.div>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="text-[10px] text-amber-500 font-bold uppercase tracking-[0.2em] mb-1">
+                  Retrato Estimado
+                </div>
+                <div className="text-xl font-cinzel text-amber-100 truncate">
+                  {name || "Sem Nome"}
+                </div>
+              </div>
+            </div>
+
             {/* Character Name Input */}
-            <div className="bg-neutral-900/50 border-2 border-amber-900/30 rounded-2xl p-6 shadow-xl space-y-4">
-              <label className="text-[10px] text-amber-500/70 uppercase font-bold tracking-[0.2em]">
+            <div className="bg-neutral-900/50 border border-amber-900/30 rounded-2xl p-6 shadow-xl space-y-2">
+              <label className="text-[10px] text-amber-500/70 uppercase font-black tracking-[0.2em]">
                 O Nome do Herói
               </label>
               <input
@@ -250,7 +323,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
               </div>
 
               <div className="relative z-10 space-y-8">
-                {/* Race \u0026 Class Block */}
+                {/* Race & Class Block */}
                 <div className="flex flex-col sm:flex-row gap-8">
                   <div className="space-y-1">
                     <h4 className="text-[10px] text-neutral-500 uppercase tracking-widest">
@@ -276,7 +349,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
                   </div>
                 </div>
 
-                {/* Origin \u0026 Deity Block */}
+                {/* Origin & Deity Block */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8 border-t border-white/5">
                   <div className="space-y-1">
                     <h4 className="text-[10px] text-neutral-500 uppercase tracking-widest">
@@ -303,17 +376,19 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
                 </div>
 
                 {/* Special Perks Block */}
-                {selectedGrantedPower && (
-                  <div className="pt-8 border-t border-white/5 space-y-1">
+                {selectedGrantedPowers && selectedGrantedPowers.length > 0 && (
+                  <div className="pt-8 border-t border-white/5 space-y-3">
                     <h4 className="text-[10px] text-neutral-500 uppercase tracking-widest">
-                      Poder Concedido
+                      Poderes Concedidos ({selectedGrantedPowers.length})
                     </h4>
-                    <div className="flex items-center gap-3">
-                      <Zap className="text-amber-400" size={18} />
-                      <span className="text-lg text-amber-100 font-cinzel leading-none">
-                        {selectedGrantedPower.name}
-                      </span>
-                    </div>
+                    {selectedGrantedPowers.map((power) => (
+                      <div key={power.name} className="flex items-center gap-3">
+                        <Zap className="text-amber-400" size={18} />
+                        <span className="text-lg text-amber-100 font-cinzel leading-none">
+                          {power.name}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -338,7 +413,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
                   )}
                 </button>
               </div>
-              <p className="text-xs text-neutral-400 leading-relaxed italic pr-12">
+              <p className="text-xs text-neutral-400 leading-relaxed italic pr-12 whitespace-pre-wrap">
                 "{aiPrompt}"
               </p>
               <div className="mt-4 pt-4 border-t border-amber-900/20">
@@ -386,13 +461,33 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         </div>
 
         {/* Final Action Button */}
-        <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-40 border-t border-amber-900/10">
-          <div className="max-w-4xl mx-auto">
+        <div className="fixed bottom-24 md:bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-40 border-t border-amber-900/10">
+          <div className="max-w-5xl mx-auto flex flex-col items-center gap-3">
+            {!user ? (
+              <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3 flex items-center gap-3 max-w-lg w-full">
+                <div className="p-2 bg-red-500/10 rounded-full text-red-400">
+                  <User size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-red-200 font-bold">
+                    Autenticação Necessária
+                  </p>
+                  <p className="text-xs text-red-300/70">
+                    Você precisa estar logado para salvar seu herói.
+                  </p>
+                </div>
+              </div>
+            ) : null}
             <button
               onClick={handleFinalize}
-              className="w-full py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-black font-black font-cinzel uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:grayscale"
+              disabled={!user || isFinalizing}
+              className="w-full py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-black font-black font-cinzel uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
             >
-              Finalizar Personagem
+              {isFinalizing
+                ? "Salvando..."
+                : user
+                ? "Finalizar Personagem"
+                : "Faça Login para Salvar"}
             </button>
           </div>
         </div>

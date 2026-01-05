@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import CLASSES from "../../data/classes";
 import { useCharacterStore } from "../../store/useCharacterStore";
 import {
@@ -9,16 +10,73 @@ import {
   Shield,
   Zap,
   Book,
-  Info,
   Swords,
+  Brain,
+  Sparkles,
 } from "lucide-react";
 import { ClassDescription } from "../../interfaces/Class";
 import Skill from "../../interfaces/Skills";
 import { Atributo } from "../../data/atributos";
-import { SheetAction } from "../../interfaces/CharacterSheet";
 
-// Helper to get modifier
-const getModifier = (val: number) => Math.floor((val - 10) / 2);
+import { formatAssetName } from "../../utils/assetUtils";
+
+/**
+ * Componente de Card de Classe Visual
+ */
+const RoleCard = React.memo(
+  ({ role, onClick }: { role: ClassDescription; onClick: () => void }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    const assetName = formatAssetName(role.name);
+    const imagePath = `/assets/classes/${assetName}.webp`;
+
+    return (
+      <motion.div
+        onClick={onClick}
+        whileHover={{ scale: 1.05, y: -5 }}
+        whileTap={{ scale: 0.98 }}
+        className="group relative cursor-pointer"
+      >
+        <div className="relative bg-gradient-to-br from-amber-900/40 via-amber-700/20 to-amber-900/40 p-[2px] rounded-2xl overflow-hidden shadow-2xl shadow-black/50 hover:shadow-amber-900/50 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-amber-500/0 to-transparent group-hover:via-amber-400/20 transition-all duration-500 opacity-0 group-hover:opacity-100" />
+          <div className="relative bg-stone-900/90 backdrop-blur-md rounded-2xl overflow-hidden">
+            <div className="relative aspect-[3/4] overflow-hidden">
+              {!imageLoaded && (
+                <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-800 animate-pulse">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Sparkles className="w-8 h-8 text-amber-500/30 animate-spin" />
+                  </div>
+                </div>
+              )}
+              <Image
+                src={imagePath}
+                alt={role.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className={`object-cover transition-all duration-700 ${
+                  imageLoaded
+                    ? "opacity-100 scale-100 group-hover:scale-110"
+                    : "opacity-0 scale-105"
+                }`}
+                onLoad={() => setImageLoaded(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-900/20 to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-300" />
+            </div>
+            <div className="relative p-4 bg-gradient-to-t from-stone-950 to-stone-900/50 border-t border-amber-700/30">
+              <h3 className="text-xl font-cinzel text-center text-amber-100 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
+                {role.name}
+              </h3>
+              <div className="absolute -top-3 right-4 bg-amber-600 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg shadow-amber-600/50">
+                <ChevronRight className="w-4 h-4 text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+);
+RoleCard.displayName = "RoleCard";
 
 const RoleSelection = () => {
   const {
@@ -28,28 +86,69 @@ const RoleSelection = () => {
     selectClass,
     updateSkills,
     setStep,
+    roleSelectionState,
+    setRoleSelectionState,
   } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] =
     useState<ClassDescription | null>(null);
 
-  // State for skill selections
-  // For basic skills that have "OR" choices (e.g. Luta OR Pontaria)
+  // --- SELECTION STATES ---
   const [basicSkillChoices, setBasicSkillChoices] = useState<
     Record<number, Skill>
   >({});
+  const [classSkillChoices, setClassSkillChoices] = useState<Skill[]>([]);
+  const [generalSkillChoices, setGeneralSkillChoices] = useState<Skill[]>([]);
 
-  // For the pool of remaining skills to choose from
-  const [optionalSkillChoices, setOptionalSkillChoices] = useState<Skill[]>([]);
+  // Sync LOCAL state with STORE when initialized or when Store changes
+  useEffect(() => {
+    if (roleSelectionState.previewName) {
+      const cls = CLASSES.find(
+        (c) => c.name === roleSelectionState.previewName
+      );
+      if (cls) {
+        setSelectedPreview(cls);
+        setBasicSkillChoices(roleSelectionState.basic);
+        setClassSkillChoices(roleSelectionState.classSkills);
+        setGeneralSkillChoices(roleSelectionState.generalSkills);
+      }
+    }
+  }, []); // Run once on mount
 
-  // Calculate stats based on current race/attributes
+  // Sync STORE with LOCAL state whenever local state changes
+  useEffect(() => {
+    if (selectedPreview) {
+      setRoleSelectionState({
+        previewName: selectedPreview.name,
+        basic: basicSkillChoices,
+        classSkills: classSkillChoices,
+        generalSkills: generalSkillChoices,
+      });
+    }
+  }, [
+    selectedPreview,
+    basicSkillChoices,
+    classSkillChoices,
+    generalSkillChoices,
+    setRoleSelectionState,
+  ]);
+
+  const handlePreviewChange = (cls: ClassDescription | null) => {
+    if (cls && cls.name !== selectedPreview?.name) {
+      // Reset choices for new class
+      setBasicSkillChoices({});
+      setClassSkillChoices([]);
+      setGeneralSkillChoices([]);
+    }
+    setSelectedPreview(cls);
+  };
+
+  // --- CALCULATIONS ---
   const stats = useMemo(() => {
     if (!selectedPreview) return null;
 
-    // Get final attributes using a robust helper logic
     const getFinalAttr = (attr: Atributo) => {
       let bonus = 0;
-      // Fixed bonuses
       if (selectedRace) {
         selectedRace.attributes.attrs.forEach((a, idx) => {
           if (a.attr === attr) bonus += a.mod;
@@ -60,114 +159,108 @@ const RoleSelection = () => {
       return baseAttributes[attr] + bonus;
     };
 
-    const conMod = getFinalAttr(Atributo.CONSTITUICAO); // Store stores mod-based values now
+    const conMod = getFinalAttr(Atributo.CONSTITUICAO);
     const intMod = getFinalAttr(Atributo.INTELIGENCIA);
 
     return {
-      hp: selectedPreview.pv + conMod, // PV = Base + CON mod
+      hp: selectedPreview.pv + conMod,
       pm: selectedPreview.pm,
       intMod,
     };
   }, [selectedPreview, selectedRace, baseAttributes, flexibleAttributeChoices]);
 
-  // Reset choices when preview changes
-  useEffect(() => {
-    setBasicSkillChoices({});
-    setOptionalSkillChoices([]);
-  }, [selectedPreview]);
+  const limits = useMemo(() => {
+    if (!selectedPreview || !stats)
+      return { class: 0, general: 0, raceBonus: 0 };
 
-  // Calculate available skills for the optional list (excluding those already picked in basic)
-  const availableSkillsPool = useMemo(() => {
+    const classQty = selectedPreview.periciasrestantes.qtd;
+    const isHuman = selectedRace?.name === "Humano";
+    const raceBonus = isHuman ? 1 : 0;
+    const generalQty = Math.max(0, stats.intMod) + raceBonus;
+
+    return {
+      class: classQty,
+      general: generalQty,
+      raceBonus,
+    };
+  }, [selectedPreview, stats, selectedRace]);
+
+  // --- POOL CALCULATIONS ---
+  const pickedInBasic = useMemo(() => {
     if (!selectedPreview) return [];
-
-    return selectedPreview.periciasrestantes.list.filter((skill) => {
-      // Check if already mandatory/picked in basic
-      const isPickedInBasic =
-        Object.values(basicSkillChoices).includes(skill) ||
-        selectedPreview.periciasbasicas.some(
-          (g) => g.type === "and" && g.list.includes(skill)
-        );
-
-      return !isPickedInBasic;
-    });
+    const fixed = selectedPreview.periciasbasicas
+      .filter((g) => g.type === "and")
+      .flatMap((g) => g.list);
+    const choices = Object.values(basicSkillChoices);
+    return [...fixed, ...choices];
   }, [selectedPreview, basicSkillChoices]);
 
-  // Determine how many optional skills can be picked
-  const maxOptionalSkills = useMemo(() => {
-    if (!selectedPreview || !stats) return 0;
-    // Base + Int, floor at 0
-    const rawTarget = selectedPreview.periciasrestantes.qtd + stats.intMod;
-    const target = Math.max(0, rawTarget);
+  const availableForClass = useMemo(() => {
+    if (!selectedPreview) return [];
+    return selectedPreview.periciasrestantes.list.filter(
+      (s) => !pickedInBasic.includes(s)
+    );
+  }, [selectedPreview, pickedInBasic]);
 
-    // Safety: if the pool is smaller than the target, use pool size
-    return Math.min(target, availableSkillsPool.length);
-  }, [selectedPreview, stats, availableSkillsPool]);
+  const availableForGeneral = useMemo(() => {
+    if (!selectedPreview) return [];
+    const allSkills = Object.values(Skill);
+    const alreadyPicked = [...pickedInBasic, ...classSkillChoices];
+    return allSkills.filter((s) => !alreadyPicked.includes(s)).sort();
+  }, [pickedInBasic, classSkillChoices, selectedPreview]);
 
-  const handleOptionalSkillToggle = (skill: Skill) => {
-    if (optionalSkillChoices.includes(skill)) {
-      setOptionalSkillChoices((prev) => prev.filter((s) => s !== skill));
+  // --- HANDLERS ---
+  const toggleClassSkill = (skill: Skill) => {
+    if (classSkillChoices.includes(skill)) {
+      setClassSkillChoices(classSkillChoices.filter((s) => s !== skill));
     } else {
-      if (optionalSkillChoices.length < maxOptionalSkills) {
-        setOptionalSkillChoices((prev) => [...prev, skill]);
+      if (classSkillChoices.length < limits.class) {
+        setClassSkillChoices([...classSkillChoices, skill]);
+      }
+    }
+  };
+
+  const toggleGeneralSkill = (skill: Skill) => {
+    if (generalSkillChoices.includes(skill)) {
+      setGeneralSkillChoices(generalSkillChoices.filter((s) => s !== skill));
+    } else {
+      if (generalSkillChoices.length < limits.general) {
+        setGeneralSkillChoices([...generalSkillChoices, skill]);
       }
     }
   };
 
   const handleConfirm = () => {
     if (!selectedPreview) return;
-
-    // Aggregate final skills
-    const finalSkills: Skill[] = [];
-
-    // Add basic (mandatory and choices)
-    selectedPreview.periciasbasicas.forEach((group, idx) => {
-      if (group.type === "and") {
-        finalSkills.push(...group.list);
-      } else if (group.type === "or") {
-        if (basicSkillChoices[idx]) {
-          finalSkills.push(basicSkillChoices[idx]);
-        }
-      }
-    });
-
-    // Add optional
-    finalSkills.push(...optionalSkillChoices);
-
+    const finalSkills = [
+      ...pickedInBasic,
+      ...classSkillChoices,
+      ...generalSkillChoices,
+    ];
     selectClass(selectedPreview);
     updateSkills(finalSkills);
-    // Proceed to next step (or finish if this is current last step)
-    // For now we might just log or alert, but usually we would setStep(4)
-    // The prompt implies "Creating Step 3", so user might expect it to handle next.
-    // I'll assume step 4 is next.
     setStep(4);
   };
 
-  // Validation
   const isValid = useMemo(() => {
     if (!selectedPreview) return false;
-
-    // Check basic choices
-    const allBasicChoicesMade = selectedPreview.periciasbasicas.every(
-      (group, idx) => {
-        if (group.type === "or") return !!basicSkillChoices[idx];
-        return true;
-      }
+    const basicDone = selectedPreview.periciasbasicas.every((g, i) =>
+      g.type === "or" ? !!basicSkillChoices[i] : true
     );
+    const classDone = classSkillChoices.length === limits.class;
+    const generalDone = generalSkillChoices.length === limits.general;
 
-    // Check optional quantity
-    // It's strictly equal or just max? Usually you MUST pick all allowed.
-    const allOptionalPicked = optionalSkillChoices.length === maxOptionalSkills;
-
-    return allBasicChoicesMade && allOptionalPicked;
+    return basicDone && classDone && generalDone;
   }, [
     selectedPreview,
     basicSkillChoices,
-    optionalSkillChoices,
-    maxOptionalSkills,
+    classSkillChoices,
+    generalSkillChoices,
+    limits,
   ]);
 
   return (
-    <div className="w-full h-full min-h-[60vh] relative overflow-hidden">
+    <div className="w-full min-h-screen relative bg-stone-950 pb-32">
       <AnimatePresence mode="wait">
         {!selectedPreview ? (
           <motion.div
@@ -176,34 +269,43 @@ const RoleSelection = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-col gap-4 p-4"
+            className="flex flex-col gap-8 p-4 md:p-8 max-w-7xl mx-auto pb-48 md:pb-32"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mt-4">
               <button
                 onClick={() => setStep(2)}
-                className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-200 hover:text-amber-400 hover:border-amber-500/50 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-stone-900 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10"
               >
                 <ChevronLeft size={20} />
                 <span className="hidden sm:inline">Voltar</span>
               </button>
-              <h2 className="text-2xl font-cinzel text-amber-500 flex-1 text-center">
+              <h2 className="text-3xl md:text-5xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
                 Escolha sua Classe
               </h2>
-              <div className="w-[88px] hidden sm:block" />{" "}
-              {/* Spacer for centering */}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
-              {CLASSES.map((role) => (
-                <div
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-neutral-400 text-center font-cinzel tracking-[0.2em] text-sm md:text-base uppercase -mt-4"
+            >
+              Defina seu caminho marcial ou mágico
+            </motion.p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {CLASSES.map((role, index) => (
+                <motion.div
                   key={role.name}
-                  onClick={() => setSelectedPreview(role)}
-                  className="bg-neutral-900/80 border border-neutral-700 hover:border-amber-500/50 p-4 rounded-xl cursor-pointer transition-all hover:bg-neutral-800 flex justify-between items-center group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
                 >
-                  <span className="text-lg font-cinzel text-neutral-200 group-hover:text-amber-400">
-                    {role.name}
-                  </span>
-                  <ChevronRight className="text-neutral-500 group-hover:text-amber-500" />
-                </div>
+                  <RoleCard
+                    role={role}
+                    onClick={() => handlePreviewChange(role)}
+                  />
+                </motion.div>
               ))}
             </div>
           </motion.div>
@@ -214,219 +316,256 @@ const RoleSelection = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-col h-full bg-neutral-900 rounded-lg overflow-hidden"
+            className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 pb-48 md:pb-32"
           >
             {/* Header */}
-            <div className="p-4 bg-neutral-950 flex items-center justify-between border-b border-neutral-800">
+            <div className="flex items-center justify-between border-b border-stone-800 pb-4">
               <button
                 onClick={() => setSelectedPreview(null)}
                 className="flex items-center text-neutral-400 hover:text-white transition-colors"
+                aria-label="Voltar"
               >
                 <ChevronLeft size={24} />
-                <span className="ml-1">Voltar</span>
+                <span className="ml-1 font-bold uppercase tracking-wider text-xs">
+                  Voltar
+                </span>
               </button>
-              <h2 className="text-xl font-cinzel text-amber-500">
+              <h2 className="text-3xl md:text-4xl font-cinzel text-amber-500 drop-shadow-lg">
                 {selectedPreview.name}
               </h2>
               <div className="w-8" />
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-neutral-700">
-              {/* Stats Cards */}
-              {/* Stats Cards */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-red-950/30 p-4 rounded-xl border border-red-900/30 flex flex-col items-center">
-                  <div className="flex items-center gap-2 mb-1 text-red-400">
-                    <Shield size={16} />{" "}
-                    <span className="text-[10px] font-bold uppercase tracking-widest">
-                      Vida (PV)
-                    </span>
+            {/* Stats & Description */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Image & Description Banner */}
+              <div className="md:col-span-2 relative overflow-hidden flex items-center bg-stone-900/50 rounded-2xl min-h-[300px]">
+                <div className="absolute inset-0">
+                  <Image
+                    src={`/assets/classes/${formatAssetName(
+                      selectedPreview.name
+                    )}.webp`}
+                    alt={selectedPreview.name}
+                    fill
+                    className="object-cover object-top opacity-30"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/80 to-transparent" />
+                </div>
+                <div className="relative z-10 p-6">
+                  <p className="text-neutral-300 leading-relaxed italic text-sm md:text-base border-l-4 border-amber-600/50 pl-4">
+                    "{selectedPreview.description || "Descrição indisponível."}"
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-row md:flex-col gap-4">
+                <div className="flex-1 bg-red-950/20 p-4 rounded-xl border border-red-900/30 flex flex-col items-center justify-center">
+                  <div className="flex items-center gap-2 mb-1 text-red-400/80">
+                    <Shield size={16} />
+                    <span className="text-[10px] font-bold uppercase">PV</span>
                   </div>
-                  <span className="text-3xl font-cinzel text-white">
+                  <span className="text-3xl font-cinzel text-red-100 font-bold">
                     {stats?.hp}
                   </span>
-                  <span className="text-[10px] text-red-400/60 font-bold">
-                    BASE {selectedPreview.pv} + CON
-                  </span>
                 </div>
-                <div className="bg-blue-950/30 p-4 rounded-xl border border-blue-900/30 flex flex-col items-center">
-                  <div className="flex items-center gap-2 mb-1 text-blue-400">
-                    <Zap size={16} />{" "}
-                    <span className="text-[10px] font-bold uppercase tracking-widest">
-                      Mana (PM)
-                    </span>
+                <div className="flex-1 bg-blue-950/20 p-4 rounded-xl border border-blue-900/30 flex flex-col items-center justify-center">
+                  <div className="flex items-center gap-2 mb-1 text-blue-400/80">
+                    <Zap size={16} />
+                    <span className="text-[10px] font-bold uppercase">PM</span>
                   </div>
-                  <span className="text-3xl font-cinzel text-white">
+                  <span className="text-3xl font-cinzel text-blue-100 font-bold">
                     {stats?.pm}
                   </span>
-                  <span className="text-[10px] text-blue-400/60 font-bold">
-                    BASE {selectedPreview.pm}
-                  </span>
                 </div>
               </div>
+            </div>
 
-              {/* Lore / Description */}
-              <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl relative overflow-hidden group">
-                <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-                  <Book size={120} />
-                </div>
-                <h3 className="text-amber-500 font-cinzel text-lg mb-3 flex items-center gap-2">
-                  <Info size={16} /> Essência da Classe
-                </h3>
-                <p className="text-neutral-300 leading-relaxed italic border-l-2 border-amber-500/30 pl-4 text-sm">
-                  {selectedPreview.description ||
-                    "Uma das lendárias sendas de Arton."}
-                </p>
-              </div>
-
-              {/* Proficiencies Detailed */}
-              <div className="space-y-3">
-                <h3 className="text-xs font-cinzel text-amber-500 uppercase tracking-[0.2em] font-bold flex items-center gap-2">
-                  <Swords size={16} /> Treinamento & Armas
-                </h3>
-                <div className="bg-black/40 p-4 rounded-xl border border-white/5">
-                  <p className="text-sm text-neutral-400 leading-relaxed italic mb-4">
-                    {selectedPreview.detailedProficiencies ||
-                      "Treinamento básico em combate e sobrevivência."}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPreview.proficiencias.map((prof, i) => (
-                      <span
-                        key={i}
-                        className="px-3 py-1 bg-neutral-800 text-neutral-400 text-[10px] font-bold uppercase rounded-full border border-neutral-700"
-                      >
-                        {prof}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Skill Selection - Mandatory */}
-              <div>
-                <h3 className="text-sm uppercase tracking-wider text-neutral-500 mb-3 flex items-center gap-2">
-                  <Book size={14} /> Perícias Básicas
-                </h3>
-                <div className="space-y-3">
-                  {selectedPreview.periciasbasicas.map((group, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-neutral-950/50 p-3 rounded border border-neutral-800"
-                    >
-                      {group.type === "and" ? (
-                        <div className="flex flex-wrap gap-2">
-                          {group.list.map((skill) => (
-                            <span
-                              key={skill}
-                              className="text-amber-500 font-bold text-sm flex items-center gap-1"
-                            >
-                              <Check size={12} /> {skill}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          <span className="text-xs text-neutral-400 mb-1 block">
-                            Escolha uma:
+            {/* SKILLS - BASIC */}
+            <section className="space-y-4">
+              <h3 className="text-amber-500 font-cinzel text-lg border-b border-amber-900/30 pb-2 flex items-center gap-2">
+                <Book size={18} /> Perícias Básicas
+              </h3>
+              <div className="grid gap-3">
+                {selectedPreview.periciasbasicas.map((group, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-stone-900/50 p-4 rounded-xl border border-stone-800"
+                  >
+                    {group.type === "and" ? (
+                      <div className="flex flex-wrap gap-3">
+                        {group.list.map((skill) => (
+                          <span
+                            key={skill}
+                            className="bg-black/40 text-amber-200 px-3 py-1 rounded text-sm font-bold flex items-center gap-2 border border-amber-900/20"
+                          >
+                            <Check size={14} className="text-amber-500" />{" "}
+                            {skill}
                           </span>
-                          {group.list.map((skill) => (
-                            <label
-                              key={skill}
-                              className="flex items-center gap-2 cursor-pointer hover:bg-neutral-800/50 p-1 rounded"
-                            >
-                              <input
-                                type="radio"
-                                name={`basic-skill-${idx}`}
-                                className="accent-amber-500"
-                                checked={basicSkillChoices[idx] === skill}
-                                onChange={() =>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <span className="text-xs text-stone-500 uppercase font-black tracking-widest block">
+                          Escolha uma opção:
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {group.list.map((skill) => {
+                            const selected = basicSkillChoices[idx] === skill;
+                            return (
+                              <button
+                                key={skill}
+                                onClick={() =>
                                   setBasicSkillChoices({
                                     ...basicSkillChoices,
                                     [idx]: skill,
                                   })
                                 }
-                              />
-                              <span className="text-sm text-neutral-200">
+                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
+                                  selected
+                                    ? "bg-amber-600 text-stone-950 border-amber-500 shadow-lg shadow-amber-900/40"
+                                    : "bg-stone-800 text-stone-400 border-stone-700 hover:border-stone-500"
+                                }`}
+                              >
                                 {skill}
-                              </span>
-                            </label>
-                          ))}
+                              </button>
+                            );
+                          })}
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* SKILLS - CLASS */}
+            <section className="space-y-4">
+              <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
+                <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
+                  <Swords size={18} /> Treinamento de Classe
+                </h3>
+                <span
+                  className={`text-xs font-bold px-3 py-1 rounded-full ${
+                    classSkillChoices.length === limits.class
+                      ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50"
+                      : "bg-stone-800 text-stone-400 border border-stone-700"
+                  }`}
+                >
+                  {classSkillChoices.length} / {limits.class}
+                </span>
               </div>
 
-              {/* Skill Selection - Optional */}
-              <div className="pb-20">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-sm uppercase tracking-wider text-neutral-500">
-                    Perícias Adicionais
-                  </h3>
-                  <span
-                    className={`text-xs font-bold px-2 py-1 rounded ${
-                      optionalSkillChoices.length === maxOptionalSkills
-                        ? "bg-green-900/20 text-green-400"
-                        : "bg-neutral-800 text-neutral-400"
-                    }`}
-                  >
-                    {optionalSkillChoices.length} / {maxOptionalSkills}
-                  </span>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {availableForClass.map((skill) => {
+                  const isSelected = classSkillChoices.includes(skill);
+                  const isDisabled =
+                    !isSelected && classSkillChoices.length >= limits.class;
+                  return (
+                    <button
+                      key={skill}
+                      disabled={isDisabled}
+                      onClick={() => toggleClassSkill(skill)}
+                      className={`text-left px-3 py-3 rounded-lg border transition-all text-sm flex items-center gap-2 ${
+                        isSelected
+                          ? "bg-amber-900/30 border-amber-500 text-amber-100"
+                          : isDisabled
+                          ? "opacity-30 cursor-not-allowed border-transparent text-stone-600 bg-stone-900"
+                          : "bg-stone-900 border-stone-800 text-stone-400 hover:border-amber-900/50 hover:bg-stone-800"
+                      }`}
+                    >
+                      <div
+                        className={`w-4 h-4 rounded border flex items-center justify-center ${
+                          isSelected
+                            ? "bg-amber-500 border-amber-500"
+                            : "border-stone-600 bg-black/40"
+                        }`}
+                      >
+                        {isSelected && (
+                          <Check size={12} className="text-stone-950" />
+                        )}
+                      </div>
+                      {skill}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {availableSkillsPool.map((skill) => {
-                    const isSelected = optionalSkillChoices.includes(skill);
+            {/* SKILLS - GENERAL/INT */}
+            <section className="space-y-4">
+              <div className="flex justify-between items-end border-b border-blue-900/30 pb-2">
+                <h3 className="text-blue-400 font-cinzel text-lg flex items-center gap-2">
+                  <Brain size={18} /> Inteligência (+{limits.general})
+                </h3>
+                <span
+                  className={`text-xs font-bold px-3 py-1 rounded-full ${
+                    generalSkillChoices.length === limits.general
+                      ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50"
+                      : "bg-stone-800 text-stone-400 border border-stone-700"
+                  }`}
+                >
+                  {generalSkillChoices.length} / {limits.general}
+                </span>
+              </div>
+
+              {limits.general === 0 ? (
+                <div className="p-6 bg-stone-900/30 rounded-xl border border-dashed border-stone-800 text-center text-stone-500 italic text-sm">
+                  Sem bônus disponível (Inteligência baixa ou neutra).
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {availableForGeneral.map((skill) => {
+                    const isSelected = generalSkillChoices.includes(skill);
                     const isDisabled =
                       !isSelected &&
-                      optionalSkillChoices.length >= maxOptionalSkills;
-
+                      generalSkillChoices.length >= limits.general;
                     return (
-                      <label
+                      <button
                         key={skill}
-                        className={`flex items-center gap-2 p-2 rounded border transition-all cursor-pointer
-                           ${
-                             isSelected
-                               ? "bg-amber-900/20 border-amber-500/50 text-amber-100"
-                               : isDisabled
-                               ? "opacity-50 cursor-not-allowed border-transparent bg-neutral-900"
-                               : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700"
-                           }`}
+                        disabled={isDisabled}
+                        onClick={() => toggleGeneralSkill(skill)}
+                        className={`text-left px-3 py-3 rounded-lg border transition-all text-sm flex items-center gap-2 ${
+                          isSelected
+                            ? "bg-blue-900/20 border-blue-500 text-blue-100"
+                            : isDisabled
+                            ? "opacity-30 cursor-not-allowed border-transparent text-stone-600 bg-stone-900"
+                            : "bg-stone-900 border-stone-800 text-stone-400 hover:border-blue-900/50 hover:bg-stone-800"
+                        }`}
                       >
-                        <input
-                          type="checkbox"
-                          className="accent-amber-500 rounded sm:w-4 sm:h-4"
-                          checked={isSelected}
-                          disabled={isDisabled}
-                          onChange={() => handleOptionalSkillToggle(skill)}
-                        />
-                        <span className="text-sm truncate" title={skill}>
-                          {skill}
-                        </span>
-                      </label>
+                        <div
+                          className={`w-4 h-4 rounded border flex items-center justify-center ${
+                            isSelected
+                              ? "bg-blue-500 border-blue-500"
+                              : "border-stone-600 bg-black/40"
+                          }`}
+                        >
+                          {isSelected && (
+                            <Check size={12} className="text-stone-950" />
+                          )}
+                        </div>
+                        {skill}
+                      </button>
                     );
                   })}
                 </div>
-              </div>
-            </div>
+              )}
+            </section>
 
-            {/* Footer Action */}
-            <div className="p-4 bg-neutral-950 border-t border-neutral-800 sticky bottom-0 z-20">
-              <button
-                onClick={handleConfirm}
-                disabled={!isValid}
-                className={`w-full py-4 font-bold rounded-lg shadow-lg flex justify-center items-center gap-2 transition-all
-                  ${
+            {/* ACTION FOOTER */}
+            <div className="fixed bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
+              <div className="max-w-4xl mx-auto">
+                <button
+                  onClick={handleConfirm}
+                  disabled={!isValid}
+                  className={`w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.99] ${
                     isValid
-                      ? "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-900/20 active:scale-[0.98]"
-                      : "bg-neutral-800 text-neutral-500 cursor-not-allowed"
+                      ? "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 shadow-amber-900/20"
+                      : "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700"
                   }`}
-              >
-                <Check size={20} />
-                Confirmar {selectedPreview.name}
-              </button>
+                >
+                  <Check size={24} /> Confirmar Classe
+                </button>
+              </div>
             </div>
           </motion.div>
         )}

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { Atributo } from "../data/atributos";
 import Race from "../interfaces/Race";
 import Origin, { OriginBenefits } from "../interfaces/Origin";
@@ -11,6 +12,8 @@ import {
   calculateTotalPointsSpent,
   INITIAL_POINTS,
 } from "../utils/attributeUtils";
+import { ClassDescription } from "../interfaces/Class";
+import Skill from "../interfaces/Skills";
 
 export interface CharacterSummary {
   id: string;
@@ -26,6 +29,15 @@ interface CharacterWizardState {
   selectedRace: Race | null;
   selectedClass: ClassDescription | null;
   selectedSkills: Skill[];
+
+  // Draft state for Role Selection persistence
+  roleSelectionState: {
+    previewName: string | null; // changed to string to avoid complex object nesting issues in persistence if needed, but object is fine
+    basic: Record<number, Skill>;
+    classSkills: Skill[];
+    generalSkills: Skill[];
+  };
+
   selectedOrigin: Origin | null;
   originBenefits: {
     type: "skill" | "power" | "general_power";
@@ -33,7 +45,7 @@ interface CharacterWizardState {
     value: any;
   }[];
   selectedDeity: Divindade | null;
-  selectedGrantedPower: GeneralPower | null;
+  selectedGrantedPowers: GeneralPower[];
   bag: Bag;
   money: number;
   baseAttributes: Record<Atributo, number>;
@@ -55,6 +67,13 @@ interface CharacterWizardState {
   selectRace: (race: Race) => void;
   selectClass: (role: ClassDescription) => void;
   updateSkills: (skills: Skill[]) => void;
+  setRoleSelectionState: (state: {
+    previewName: string | null;
+    basic: Record<number, Skill>;
+    classSkills: Skill[];
+    generalSkills: Skill[];
+  }) => void;
+
   selectOrigin: (origin: Origin) => void;
   setOriginBenefits: (
     benefits: {
@@ -64,9 +83,9 @@ interface CharacterWizardState {
     }[]
   ) => void;
   selectDeity: (deity: Divindade) => void;
-  selectGrantedPower: (power: GeneralPower) => void;
+  selectGrantedPowers: (powers: GeneralPower[]) => void;
   updateBaseAttribute: (attr: Atributo, value: number) => void;
-  setFlexibleAttributeChoice: (index: number, attr: Atributo) => void; // NOVO
+  setFlexibleAttributeChoice: (index: number, attr: Atributo) => void;
   addToBag: (item: Equipment) => void;
   removeFromBag: (item: Equipment) => void;
   updateMoney: (value: number) => void;
@@ -77,10 +96,10 @@ interface CharacterWizardState {
   setActiveCharacter: (char: Character) => void;
   updateActiveCharacter: (updates: Partial<Character>) => void;
   clearActiveCharacter: () => void;
-}
 
-import { ClassDescription } from "../interfaces/Class";
-import Skill from "../interfaces/Skills";
+  // Wizard Management
+  resetWizard: () => void;
+}
 
 const INITIAL_ATTRIBUTES: Record<Atributo, number> = {
   [Atributo.FORCA]: 0,
@@ -91,172 +110,225 @@ const INITIAL_ATTRIBUTES: Record<Atributo, number> = {
   [Atributo.CARISMA]: 0,
 };
 
-export const useCharacterStore = create<CharacterWizardState>((set, get) => ({
-  step: 1,
-  selectedRace: null,
-  selectedClass: null,
-  selectedSkills: [],
-  selectedOrigin: null,
-  originBenefits: [],
-  selectedDeity: null,
-  selectedGrantedPower: null,
-  bag: new Bag(),
-  money: 100, // Default start
-  baseAttributes: { ...INITIAL_ATTRIBUTES },
-  pointsRemaining: INITIAL_POINTS,
-  flexibleAttributeChoices: {}, // Inicialmente vazio
+export const useCharacterStore = create<CharacterWizardState>()(
+  persist(
+    (set, get) => ({
+      step: 1,
+      selectedRace: null,
+      selectedClass: null,
+      selectedSkills: [],
 
-  name: "",
-  userCharacters: [],
-  activeCharacter: null,
-
-  setStep: (step) => set({ step }),
-
-  selectRace: (race) => {
-    // Limpa escolhas flexíveis ao trocar de raça
-    set({ selectedRace: race, step: 2, flexibleAttributeChoices: {} });
-  },
-
-  selectClass: (role) => {
-    set({ selectedClass: role });
-  },
-
-  updateSkills: (skills) => {
-    set({ selectedSkills: skills });
-  },
-
-  selectOrigin: (origin) => {
-    set({ selectedOrigin: origin, originBenefits: [] });
-  },
-
-  setOriginBenefits: (benefits) => {
-    set({ originBenefits: benefits });
-  },
-
-  selectDeity: (deity) => {
-    set({ selectedDeity: deity, selectedGrantedPower: null });
-  },
-
-  selectGrantedPower: (power) => {
-    set({ selectedGrantedPower: power });
-  },
-
-  addToBag: (item) => {
-    const currentBag = get().bag;
-    // We need to clone or create new because it's a class with mutation methods
-    // However, Bag class mutation might not trigger reactivity if we don't set new instance
-    // Or we use Immer. Zustand works with immutability.
-
-    // Bag.addEquipment merges. Let's create a new bag from current
-    const newBag = new Bag(currentBag.getEquipments());
-
-    // Need to format item for addEquipment.
-    // addEquipment takes Partial<BagEquipments> which is { [Group]: Equipment[] }
-    // Item has 'group' property.
-
-    // Map internal 'group' names like 'Arma', 'Armadura', 'Item Geral' to Bag keys if different?
-    // Bag keys: 'Item Geral', 'Arma', 'Armadura', 'Escudo', 'Alimentação', etc.
-    // They seem to match.
-
-    // Logic to add:
-    const group = item.group || "Item Geral";
-    // TS might complain about dynamic key if not cast
-    const partial: any = {};
-    partial[group] = [item];
-
-    newBag.addEquipment(partial);
-    set({ bag: newBag });
-  },
-
-  removeFromBag: (item) => {
-    // Current Bag class doesn't have explicit remove single item method exposed in snippet?
-    // Snippet shows addEquipment merge logic.
-    // We might need to manually filter Equipments.
-
-    const currentBag = get().bag;
-    const equips = { ...currentBag.getEquipments() };
-    const group = item.group || "Item Geral";
-
-    if (equips[group as keyof typeof equips]) {
-      const list = equips[group as keyof typeof equips];
-      const idx = list.findIndex((i) => i.nome === item.nome);
-      if (idx > -1) {
-        list.splice(idx, 1);
-        // Re-instantiate
-        const newBag = new Bag(equips);
-        set({ bag: newBag });
-      }
-    }
-  },
-
-  updateMoney: (val) => {
-    set({ money: val });
-  },
-
-  updateBaseAttribute: (attr, value) => {
-    const currentBase = get().baseAttributes;
-
-    // Create hypothetical new state
-    const newBase = { ...currentBase, [attr]: value };
-
-    // Check cost
-    const totalSpent = calculateTotalPointsSpent(newBase);
-
-    // We allow update if totalSpent <= INITIAL_POINTS
-    if (totalSpent <= INITIAL_POINTS) {
-      set({
-        baseAttributes: newBase,
-        pointsRemaining: INITIAL_POINTS - totalSpent,
-      });
-    }
-  },
-
-  setFlexibleAttributeChoice: (index, attr) => {
-    set((state) => ({
-      flexibleAttributeChoices: {
-        ...state.flexibleAttributeChoices,
-        [index]: attr,
+      roleSelectionState: {
+        previewName: null,
+        basic: {},
+        classSkills: [],
+        generalSkills: [],
       },
-    }));
-  },
 
-  setName: (name) => set({ name }),
+      selectedOrigin: null,
+      originBenefits: [],
+      selectedDeity: null,
+      selectedGrantedPowers: [],
+      bag: new Bag(),
+      money: 100, // Default start
+      baseAttributes: { ...INITIAL_ATTRIBUTES },
+      pointsRemaining: INITIAL_POINTS,
+      flexibleAttributeChoices: {}, // Inicialmente vazio
 
-  setUserCharacters: (list) => set({ userCharacters: list }),
+      name: "",
+      userCharacters: [],
+      activeCharacter: null,
 
-  setActiveCharacter: (char) => {
-    let bagInstance = char.bag;
-    // Re-hydrate Bag if it's a plain object (from JSON/Firestore)
-    if (char.bag && !(char.bag instanceof Bag)) {
-      // Create new instance which loads defaults
-      bagInstance = new Bag();
-      // If we have saved equipments, overwrite the defaults entirely
-      // This assumes the saved state is the source of truth
-      if ((char.bag as any).equipments) {
-        bagInstance.setEquipments((char.bag as any).equipments);
-      }
-    }
-    set({ activeCharacter: { ...char, bag: bagInstance } });
-  },
+      setStep: (step) => set({ step }),
 
-  updateActiveCharacter: (updates) => {
-    set((state) => {
-      if (!state.activeCharacter) return {};
+      selectRace: (race) => {
+        // Limpa escolhas flexíveis ao trocar de raça
+        set({ selectedRace: race, step: 2, flexibleAttributeChoices: {} });
+      },
 
-      let updatedChar = { ...state.activeCharacter, ...updates };
+      selectClass: (role) => {
+        set({ selectedClass: role });
+      },
 
-      // Handle Bag updates specifically if they come in as plain objects
-      if (updates.bag && !(updates.bag instanceof Bag)) {
-        const newBag = new Bag();
-        if ((updates.bag as any).equipments) {
-          newBag.setEquipments((updates.bag as any).equipments);
+      updateSkills: (skills) => {
+        set({ selectedSkills: skills });
+      },
+
+      setRoleSelectionState: (state) => {
+        set({ roleSelectionState: state });
+      },
+
+      selectOrigin: (origin) => {
+        // Fixed: Do NOT clear originBenefits here, as they are part of the selection process
+        set({ selectedOrigin: origin });
+      },
+
+      setOriginBenefits: (benefits) => {
+        set({ originBenefits: benefits });
+      },
+
+      selectDeity: (deity) => {
+        set({ selectedDeity: deity, selectedGrantedPowers: [] });
+      },
+
+      selectGrantedPowers: (powers) => {
+        set({ selectedGrantedPowers: powers });
+      },
+
+      addToBag: (item) => {
+        const currentBag = get().bag;
+        const newBag = new Bag(currentBag.getEquipments());
+        const group = item.group || "Item Geral";
+        const partial: any = {};
+        partial[group] = [item];
+        newBag.addEquipment(partial);
+        set({ bag: newBag });
+      },
+
+      removeFromBag: (item) => {
+        const currentBag = get().bag;
+        const equips = { ...currentBag.getEquipments() };
+        const group = item.group || "Item Geral";
+
+        if (equips[group as keyof typeof equips]) {
+          const list = equips[group as keyof typeof equips];
+          const idx = list.findIndex((i) => i.nome === item.nome);
+          if (idx > -1) {
+            list.splice(idx, 1);
+            const newBag = new Bag(equips);
+            set({ bag: newBag });
+          }
         }
-        updatedChar.bag = newBag;
-      }
+      },
 
-      return { activeCharacter: updatedChar };
-    });
-  },
+      updateMoney: (val) => {
+        set({ money: val });
+      },
 
-  clearActiveCharacter: () => set({ activeCharacter: null }),
-}));
+      updateBaseAttribute: (attr, value) => {
+        const currentBase = get().baseAttributes;
+        const newBase = { ...currentBase, [attr]: value };
+        const totalSpent = calculateTotalPointsSpent(newBase);
+
+        if (totalSpent <= INITIAL_POINTS) {
+          set({
+            baseAttributes: newBase,
+            pointsRemaining: INITIAL_POINTS - totalSpent,
+          });
+        }
+      },
+
+      setFlexibleAttributeChoice: (index, attr) => {
+        set((state) => ({
+          flexibleAttributeChoices: {
+            ...state.flexibleAttributeChoices,
+            [index]: attr,
+          },
+        }));
+      },
+
+      setName: (name) => set({ name }),
+
+      setUserCharacters: (list) => set({ userCharacters: list }),
+
+      setActiveCharacter: (char) => {
+        let bagInstance = char.bag;
+        if (char.bag && !(char.bag instanceof Bag)) {
+          bagInstance = new Bag();
+          if ((char.bag as any).equipments) {
+            bagInstance.setEquipments((char.bag as any).equipments);
+          }
+        }
+        set({ activeCharacter: { ...char, bag: bagInstance } });
+      },
+
+      updateActiveCharacter: (updates) => {
+        set((state) => {
+          if (!state.activeCharacter) return {};
+          let updatedChar = { ...state.activeCharacter, ...updates };
+          if (updates.bag && !(updates.bag instanceof Bag)) {
+            const newBag = new Bag();
+            if ((updates.bag as any).equipments) {
+              newBag.setEquipments((updates.bag as any).equipments);
+            }
+            updatedChar.bag = newBag;
+          }
+          return { activeCharacter: updatedChar };
+        });
+      },
+
+      clearActiveCharacter: () => set({ activeCharacter: null }),
+
+      resetWizard: () => {
+        set({
+          step: 1,
+          selectedRace: null,
+          selectedClass: null,
+          selectedSkills: [],
+          roleSelectionState: {
+            previewName: null,
+            basic: {},
+            classSkills: [],
+            generalSkills: [],
+          },
+          selectedOrigin: null,
+          originBenefits: [],
+          selectedDeity: null,
+          selectedGrantedPowers: [],
+          bag: new Bag(),
+          money: 100,
+          baseAttributes: { ...INITIAL_ATTRIBUTES },
+          pointsRemaining: INITIAL_POINTS,
+          flexibleAttributeChoices: {},
+          name: "",
+        });
+      },
+    }),
+    {
+      name: "rpg-wizard-storage",
+      partialize: (state) => ({
+        step: state.step,
+        selectedRace: state.selectedRace,
+        selectedClass: state.selectedClass,
+        selectedSkills: state.selectedSkills,
+        roleSelectionState: state.roleSelectionState,
+        selectedOrigin: state.selectedOrigin,
+        originBenefits: state.originBenefits,
+        selectedDeity: state.selectedDeity,
+        selectedGrantedPowers: state.selectedGrantedPowers,
+        bag: state.bag,
+        money: state.money,
+        baseAttributes: state.baseAttributes,
+        pointsRemaining: state.pointsRemaining,
+        flexibleAttributeChoices: state.flexibleAttributeChoices,
+        name: state.name,
+        activeCharacter: state.activeCharacter,
+        userCharacters: state.userCharacters,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state && state.bag && !(state.bag instanceof Bag)) {
+          const newBag = new Bag();
+          if ((state.bag as any).equipments) {
+            newBag.setEquipments((state.bag as any).equipments);
+          }
+          state.bag = newBag;
+        }
+
+        // Rehydrate Active Character Bag
+        if (
+          state &&
+          state.activeCharacter &&
+          state.activeCharacter.bag &&
+          !(state.activeCharacter.bag instanceof Bag)
+        ) {
+          const newCharBag = new Bag();
+          const charBagData = state.activeCharacter.bag as any;
+          if (charBagData.equipments) {
+            newCharBag.setEquipments(charBagData.equipments);
+          }
+          state.activeCharacter.bag = newCharBag;
+        }
+      },
+    }
+  )
+);

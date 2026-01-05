@@ -1,21 +1,17 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCharacterStore } from "../../store/useCharacterStore";
 import {
   Coins,
   ShoppingBag,
   Sword,
   Shield as ShieldIcon,
-  Hammer,
-  MoreHorizontal,
   Plus,
-  Minus,
-  Check,
   X,
   Package,
   ChevronLeft,
-  ChevronRight,
+  Check,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import Equipment from "../../interfaces/Equipment";
 import { getEquipmentsByCategory, findEquipmentByName } from "@/lib/localData";
 import { Armas } from "../../data/equipamentos";
@@ -24,7 +20,9 @@ import { Armas } from "../../data/equipamentos";
 const SHOP_CATEGORIES = [
   { id: "all", label: "Tudo", icon: ShoppingBag },
   { id: "weapons", label: "Armas", icon: Sword },
-  { id: "armor", label: "Armaduras", icon: ShieldIcon },
+  { id: "armor", label: "Defesa", icon: ShieldIcon },
+  { id: "alchemy", label: "Alquimia", icon: Package },
+  { id: "clothing", label: "Vestuário", icon: Package },
   { id: "general", label: "Geral", icon: Package },
 ];
 
@@ -35,36 +33,29 @@ const EquipmentSelection = () => {
     addToBag,
     removeFromBag,
     updateMoney,
-    selectedClass,
     selectedOrigin,
     setStep,
-    baseAttributes,
   } = useCharacterStore();
 
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeView, setActiveView] = useState<"bag" | "market">("bag");
 
-  // --- 1. Initial Load Logic (Once) ---
-  // Add default items from Class and Origin if Bag is empty (approx checking logic)
-  // For a wizard store, usually we do this when entering the step or transitioning.
-  // Ideally this logic belongs in the Store action `initInventory()` but we can do it here with a flag/memo.
-  // However, react strict mode might double trigger.
-  // For now, let's assume the user starts with empty bag in this session or we trust the store persistence.
-  // Since we don't have a "Initialized" flag, we might skip auto-add for this iteration
-  // OR we provide a "Receber Kit Inicial" button if bag is empty.
-
-  // Better UX: Button "Resgatar Equipamento Inicial" if bag is empty.
   // --- Data Loading State ---
   const [categories, setCategories] = useState<{
     weapons: Equipment[];
     armors: Equipment[];
     shields: Equipment[];
     general: Equipment[];
+    alchemy: Equipment[];
+    clothing: Equipment[];
   }>({
     weapons: [],
     armors: [],
     shields: [],
     general: [],
+    alchemy: [],
+    clothing: [],
   });
 
   useEffect(() => {
@@ -79,20 +70,14 @@ const EquipmentSelection = () => {
   const hasItems = Object.values(bag.getEquipments()).flat().length > 0;
 
   const handleGrantInitialItems = async () => {
-    let initialItems: Equipment[] = [];
-
     // 1. Origin Items
     if (selectedOrigin && selectedOrigin.getItems) {
       const originItems = selectedOrigin.getItems();
-      // Use for...of to allow await inside loop
       for (const i of originItems) {
         let eq: Equipment | undefined;
-
         if (typeof i.equipment === "string") {
-          // Try to find in databases
           eq = await findEquipmentByName(i.equipment);
           if (!eq) {
-            // Create generic
             eq = {
               nome: i.equipment,
               group: "Item Geral",
@@ -101,7 +86,6 @@ const EquipmentSelection = () => {
             };
           }
         }
-
         if (eq) {
           addToBag(eq);
         }
@@ -128,15 +112,7 @@ const EquipmentSelection = () => {
   };
 
   // --- 2. Market Data ---
-  /**
-   * OTIMIZAÇÃO DE PERFORMANCE
-   *
-   * Usa dados carregados via useEffect do localData
-   */
   const marketItems = useMemo(() => {
-    // If data is not yet loaded (weapons empty), return empty or loading
-    // categories state is initialized empty.
-
     let items: Equipment[] = [];
 
     if (activeTab === "all") {
@@ -145,6 +121,8 @@ const EquipmentSelection = () => {
         ...categories.armors,
         ...categories.shields,
         ...categories.general,
+        ...categories.alchemy,
+        ...categories.clothing,
       ];
     } else if (activeTab === "weapons") {
       items = categories.weapons;
@@ -152,6 +130,10 @@ const EquipmentSelection = () => {
       items = [...categories.armors, ...categories.shields];
     } else if (activeTab === "general") {
       items = categories.general;
+    } else if (activeTab === "alchemy") {
+      items = categories.alchemy;
+    } else if (activeTab === "clothing") {
+      items = categories.clothing;
     }
 
     // Search Filter
@@ -173,8 +155,6 @@ const EquipmentSelection = () => {
   };
 
   const handleSell = (item: Equipment) => {
-    // Sell for half price? Or full refund for wizard mode?
-    // Usually Wizard Mode = Refund to change mind.
     updateMoney(money + (item.preco ?? 0));
     removeFromBag(item);
   };
@@ -182,24 +162,12 @@ const EquipmentSelection = () => {
   // --- UI Helpers ---
   const bagItemsFlat = Object.values(bag.getEquipments()).flat();
   const bagWeight = bag.getSpaces();
-  // Load Capacity: Str * 3 (Simplification)
-  // Strength is Base + Race (Need to calc again or store provides?)
-  // Store has `baseAttributes`. We can roughly calc.
-  // Let's assume Capacity = 10 for now standard or calc if possible.
-  const strMod = useCharacterStore.getState().baseAttributes.Força || 0;
-  // Wait, base is 0. Score is 10. Mod is 0.
-  // Capacity rules T20: 3 * FOR (Strength Score? Or just 3 * (Strength Score usually)).
-  // Carry Capacity = 3 * Strength.
-  // If Str=10, Cap=30 spaces? No, standard is 10 spaces + 2 per STR mod?
-  // T20 JDA: Carga Básica = 3 * Força (Atributo?).
-  // Let's use 10 + (StrMod * 2) generic rule or just StrScore * 3?
-  // Let's stick to simple "N spaces used".
 
   return (
     <div className="w-full h-full min-h-[80vh] flex flex-col relative bg-neutral-900">
       {/* --- Top Bar: Money & Status --- */}
       <div className="sticky top-0 z-30 bg-neutral-950/90 backdrop-blur border-b border-amber-900/30 p-4 shadow-lg">
-        <div className="flex justify-between items-center mx-auto">
+        <div className="flex justify-between items-center mx-auto max-w-5xl">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setStep(4)}
@@ -236,142 +204,206 @@ const EquipmentSelection = () => {
       </div>
 
       {/* --- Main Content --- */}
-      <div className="flex-1 overflow-y-auto pb-24">
-        <div className="mx-auto p-4 space-y-6">
-          {/* Inventory Section */}
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
-            <div className="bg-neutral-950 p-3 border-b border-neutral-800 flex justify-between items-center">
-              <h3 className="font-cinzel text-neutral-400 flex items-center gap-2">
-                <Package size={16} /> Mochila ({bagItemsFlat.length})
-              </h3>
-              {!hasItems && (
-                <button
-                  onClick={handleGrantInitialItems}
-                  className="text-xs bg-amber-900/30 text-amber-500 px-2 py-1 rounded border border-amber-900/50 hover:bg-amber-900/50 transition-colors"
-                >
-                  Resgatar Kit Inicial
-                </button>
-              )}
+      <div className="flex-1 overflow-y-auto pb-48 md:pb-32">
+        <div className="mx-auto p-4 space-y-6 max-w-5xl">
+          <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 md:p-10 shadow-2xl">
+            {/* Tabs Navigation */}
+            <div className="flex border-b border-stone-800 mb-8">
+              <button
+                onClick={() => setActiveView("bag")}
+                className={`px-6 py-3 font-cinzel text-lg transition-all border-b-2 ${
+                  activeView === "bag"
+                    ? "border-amber-500 text-amber-500 bg-amber-500/5"
+                    : "border-transparent text-stone-500 hover:text-stone-300 hover:bg-white/5"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Package size={18} />
+                  Mochila
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveView("market")}
+                className={`px-6 py-3 font-cinzel text-lg transition-all border-b-2 ${
+                  activeView === "market"
+                    ? "border-amber-500 text-amber-500 bg-amber-500/5"
+                    : "border-transparent text-stone-500 hover:text-stone-300 hover:bg-white/5"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <ShoppingBag size={18} />
+                  Mercado
+                </div>
+              </button>
             </div>
 
-            <div className="max-h-48 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-neutral-700">
-              {bagItemsFlat.length > 0 ? (
-                bagItemsFlat.map((item, idx) => (
-                  <div
-                    key={`${item.nome}-${idx}`}
-                    className="flex justify-between items-center bg-neutral-800/50 p-2 rounded group"
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-neutral-200">
-                        {item.nome}
-                      </span>
-                      <span className="text-[10px] text-neutral-500">
-                        {item.group} • {item.spaces} esp.
-                      </span>
+            <AnimatePresence mode="wait">
+              {activeView === "bag" ? (
+                <motion.div
+                  key="bag"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  className="space-y-6"
+                >
+                  <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                    <div className="bg-neutral-950 p-3 border-b border-neutral-800 flex justify-between items-center">
+                      <h3 className="font-cinzel text-neutral-400 flex items-center gap-2">
+                        <Package size={16} /> Sua Mochila ({bagItemsFlat.length}
+                        )
+                      </h3>
+                      {!hasItems && (
+                        <button
+                          onClick={handleGrantInitialItems}
+                          className="text-xs bg-amber-900/30 text-amber-500 px-2 py-1 rounded border border-amber-900/50 hover:bg-amber-900/50 transition-colors"
+                        >
+                          Resgatar Kit Inicial
+                        </button>
+                      )}
                     </div>
-                    <button
-                      onClick={() => handleSell(item)}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-red-400 hover:bg-red-900/20 rounded transition-all"
-                      title="Remover (Reembolsar)"
-                    >
-                      <X size={14} />
-                    </button>
+
+                    <div className="max-h-96 overflow-y-auto p-4 space-y-2 scrollbar-thin scrollbar-thumb-neutral-700">
+                      {bagItemsFlat.length > 0 ? (
+                        bagItemsFlat.map((item, idx) => (
+                          <div
+                            key={`${item.nome}-${idx}`}
+                            className="flex justify-between items-center bg-neutral-800/50 border border-neutral-700/50 p-3 rounded-lg group"
+                          >
+                            <div className="flex flex-col">
+                              <span className="text-sm font-bold text-neutral-200">
+                                {item.nome}
+                              </span>
+                              <span className="text-xs text-neutral-500 uppercase tracking-tighter">
+                                {item.group} • {item.spaces} esp.
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => handleSell(item)}
+                              className="p-2 text-neutral-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-all"
+                              title="Remover (Reembolsar)"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-12">
+                          <Package className="w-12 h-12 text-neutral-800 mx-auto mb-3" />
+                          <p className="text-neutral-500 italic">
+                            Sua mochila está vazia. Explore o mercado para se
+                            equipar!
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ))
+                </motion.div>
               ) : (
-                <p className="text-center text-neutral-600 py-8 text-sm italic">
-                  Sua mochila está vazia.
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Market Section */}
-          <div>
-            <h3 className="font-cinzel text-amber-500 text-lg mb-4 text-center">
-              Mercado
-            </h3>
-
-            {/* Tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide justify-center">
-              {SHOP_CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveTab(cat.id)}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all
-                                        ${
-                                          activeTab === cat.id
-                                            ? "bg-amber-600 text-white shadow-lg"
-                                            : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
-                                        }`}
+                <motion.div
+                  key="market"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="space-y-6"
                 >
-                  <cat.icon size={14} />
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Search */}
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Buscar item..."
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg py-2 px-4 text-sm text-neutral-200 focus:outline-none focus:border-amber-500/50 placeholder-neutral-600"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            {/* List */}
-            <div className="grid grid-cols-1 gap-2">
-              {marketItems.map((item, i) => {
-                const canAfford = money >= (item.preco ?? 0);
-                return (
-                  <div
-                    key={`${item.nome}-${i}`}
-                    className="bg-neutral-900/80 border border-neutral-800 p-3 rounded-lg flex justify-between items-center hover:border-neutral-700 transition-colors"
-                  >
-                    <div>
-                      <div className="font-bold text-sm text-neutral-200">
-                        {item.nome}
-                      </div>
-                      <div className="text-xs text-neutral-500 flex gap-2">
-                        <span className="text-amber-500/80">
-                          T$ {item.preco}
-                        </span>
-                        <span>•</span>
-                        <span>{item.spaces} esp.</span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleBuy(item)}
-                      disabled={!canAfford}
-                      className={`w-8 h-8 rounded flex items-center justify-center transition-all
-                                                ${
-                                                  canAfford
-                                                    ? "bg-neutral-800 text-green-500 hover:bg-green-900/30 hover:scale-110"
-                                                    : "bg-neutral-800/50 text-neutral-600 cursor-not-allowed"
-                                                }`}
-                    >
-                      <Plus size={16} />
-                    </button>
+                  {/* Market Categories */}
+                  <div className="flex gap-2 overflow-x-auto pb-4 justify-center no-scrollbar">
+                    {SHOP_CATEGORIES.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setActiveTab(cat.id)}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all
+                          ${
+                            activeTab === cat.id
+                              ? "bg-amber-600 text-white shadow-lg shadow-amber-900/20 scale-105"
+                              : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+                          }`}
+                      >
+                        <cat.icon size={16} />
+                        {cat.label}
+                      </button>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Market Search */}
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      placeholder="Buscar no mercado..."
+                      className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl py-3 px-5 text-neutral-200 focus:outline-none focus:border-amber-500/50 placeholder-neutral-600 transition-all shadow-inner"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Market List */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    {marketItems.map((item, i) => {
+                      const canAfford = money >= (item.preco ?? 0);
+                      return (
+                        <div
+                          key={`${item.nome}-${i}`}
+                          className="bg-neutral-900/40 border border-neutral-800/60 p-4 rounded-2xl flex justify-between items-center hover:border-amber-500/30 transition-all group"
+                        >
+                          <div>
+                            <div className="font-bold text-neutral-200 group-hover:text-amber-500 transition-colors">
+                              {item.nome}
+                            </div>
+                            <div className="text-xs text-neutral-500 mt-1 flex items-center gap-2">
+                              <span className="text-amber-500 font-bold">
+                                T$ {item.preco}
+                              </span>
+                              <span className="w-1 h-1 rounded-full bg-neutral-700" />
+                              <span className="uppercase tracking-tighter">
+                                {item.spaces} esp.
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleBuy(item)}
+                            disabled={!canAfford}
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg
+                              ${
+                                canAfford
+                                  ? "bg-neutral-800 text-green-500 hover:bg-green-500 hover:text-white hover:scale-110 active:scale-90"
+                                  : "bg-neutral-800/30 text-neutral-700 cursor-not-allowed opacity-50"
+                              }`}
+                            title={
+                              canAfford
+                                ? "Comprar item"
+                                : "Dinheiro insuficiente"
+                            }
+                          >
+                            <Plus size={20} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 w-full mx-auto p-4 bg-neutral-950 border-t border-neutral-800 z-40 left-0 right-0">
-        <button
-          onClick={() => setStep(6)}
-          className="w-full py-4 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-lg shadow-amber-900/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2"
-        >
-          <Check size={20} />
-          Finalizar Equipamento
-        </button>
+      <div className="fixed bottom-24 md:bottom-0 w-full mx-auto p-4 bg-black/80 backdrop-blur-md border-t border-neutral-800 z-40 left-0 right-0">
+        <div className="max-w-5xl mx-auto flex gap-4">
+          <button
+            onClick={() => setStep(4)}
+            className="px-6 py-4 bg-neutral-800 hover:bg-neutral-700 text-neutral-400 font-bold rounded-2xl transition-all"
+          >
+            Voltar
+          </button>
+          <button
+            onClick={() => setStep(6)}
+            className="flex-1 py-4 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-2xl shadow-xl shadow-amber-900/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2"
+          >
+            <Check size={20} />
+            Revisar Ficha
+          </button>
+        </div>
       </div>
     </div>
   );
