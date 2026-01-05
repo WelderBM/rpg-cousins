@@ -20,18 +20,7 @@ import {
   Edit2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-  Timestamp,
-  updateDoc,
-} from "firebase/firestore";
-import { db } from "@/firebaseConfig";
+
 import {
   ThreatSheet,
   ThreatType,
@@ -123,6 +112,11 @@ export default function MestreClient() {
   const fetchThreats = async () => {
     setIsLoading(true);
     try {
+      const { collection, getDocs, query, orderBy } = await import(
+        "firebase/firestore"
+      );
+      const { db } = await import("@/firebaseConfig");
+
       const q = query(collection(db, "threats"), orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       const fetchedThreats = querySnapshot.docs.map((doc) => ({
@@ -184,6 +178,11 @@ export default function MestreClient() {
 
     setIsSaving(true);
     try {
+      const { collection, addDoc, updateDoc, doc, Timestamp } = await import(
+        "firebase/firestore"
+      );
+      const { db } = await import("@/firebaseConfig");
+
       const dataToSave = {
         ...formData,
         updatedAt: Timestamp.now(),
@@ -214,6 +213,9 @@ export default function MestreClient() {
     if (!confirm("Tem certeza que deseja excluir esta ameaça?")) return;
 
     try {
+      const { doc, deleteDoc } = await import("firebase/firestore");
+      const { db } = await import("@/firebaseConfig");
+
       await deleteDoc(doc(db, "threats", id));
       fetchThreats();
     } catch (error) {
