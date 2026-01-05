@@ -19,13 +19,14 @@ export const CharacterService = {
       };
 
       // If user is logged in, save to their subcollection
-      const user = auth.currentUser;
+      const user = auth?.currentUser;
       if (user) {
         return this.saveUserCharacter(user.uid, dataToSave);
       }
 
       // Fallback to global (or error out if auth required)
-      const docRef = await addDoc(collection(db, COLLECTION_NAME), dataToSave);
+      if (!db) throw new Error("Firebase not initialized");
+      const docRef = await addDoc(collection(db!, COLLECTION_NAME), dataToSave);
       return docRef.id;
     } catch (error) {
       console.error("Erro ao salvar personagem:", error);
@@ -47,7 +48,7 @@ export const CharacterService = {
       };
 
       const docRef = await addDoc(
-        collection(db, "users", uid, "characters"),
+        collection(db!, "users", uid, "characters"),
         dataToSave
       );
       return docRef.id;
@@ -69,7 +70,7 @@ export const CharacterService = {
       );
       const { db } = await import("../firebaseConfig");
 
-      const charRef = doc(db, "users", uid, "characters", charId);
+      const charRef = doc(db!, "users", uid, "characters", charId);
 
       const dataToUpdate = {
         ...updates,
@@ -95,13 +96,13 @@ export const CharacterService = {
 
       if (isMestre) {
         // Mestre vê TODOS os personagens de todas as subcoleções 'characters'
-        q = query(collectionGroup(db, "characters"));
+        q = query(collectionGroup(db!, "characters"));
       } else if (userId) {
         // Usuário vê apenas os seus na subcoleção
-        q = query(collection(db, "users", userId, "characters"));
+        q = query(collection(db!, "users", userId, "characters"));
       } else {
         // Fallback: Tenta buscar globais se não estiver logado (ou se for o comportamento antigo)
-        q = query(collection(db, COLLECTION_NAME));
+        q = query(collection(db!, COLLECTION_NAME));
       }
 
       const querySnapshot = await getDocs(q);
@@ -124,9 +125,9 @@ export const CharacterService = {
       const { db } = await import("../firebaseConfig");
 
       if (path) {
-        await deleteDoc(doc(db, path));
+        await deleteDoc(doc(db!, path));
       } else {
-        await deleteDoc(doc(db, COLLECTION_NAME, id));
+        await deleteDoc(doc(db!, COLLECTION_NAME, id));
       }
     } catch (error) {
       console.error("Erro ao deletar personagem:", error);
