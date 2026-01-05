@@ -50,7 +50,7 @@ const OriginCard = React.memo(
                 alt={origin.name}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className={`object-cover transition-all duration-700 ${
+                className={`object-cover object-top transition-all duration-700 ${
                   imageLoaded
                     ? "opacity-100 scale-100 group-hover:scale-110"
                     : "opacity-0 scale-105"
@@ -209,7 +209,7 @@ const OriginSelection = () => {
             {/* Selection Area */}
             <div className="bg-stone-900/30 rounded-2xl border border-stone-800 overflow-hidden">
               {/* Image Header Banner */}
-              <div className="relative min-h-[250px] flex items-center justify-center p-6">
+              <div className="relative min-h-[300px] md:min-h-[500px] flex items-center justify-center p-6">
                 <div className="absolute inset-0">
                   <Image
                     src={`/assets/origins/${formatAssetName(

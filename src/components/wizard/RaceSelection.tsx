@@ -54,7 +54,7 @@ const RaceCard = React.memo(
                 src={imagePath}
                 alt={race.name}
                 fill
-                className={`object-cover transition-all duration-700 ${
+                className={`object-cover object-top transition-all duration-700 ${
                   imageLoaded
                     ? "opacity-100 scale-100 group-hover:scale-110"
                     : "opacity-0 scale-105"
@@ -168,7 +168,7 @@ const RaceSelection = () => {
             className="relative flex flex-col h-full min-h-screen max-w-5xl mx-auto w-full"
           >
             {/* Header com imagem de fundo */}
-            <div className="relative h-64 md:h-96 overflow-hidden">
+            <div className="relative h-72 md:h-[500px] overflow-hidden">
               <Image
                 src={`/assets/races/${formatAssetName(
                   selectedPreview.name
