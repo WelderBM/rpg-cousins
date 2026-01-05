@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCharacterStore } from "../../store/useCharacterStore";
-import { Atributo } from "../../data/atributos";
+import { useCharacterStore } from "../../../store/useCharacterStore";
+import { Atributo } from "../../../data/atributos";
 import {
   calculateAttributeCost,
   INITIAL_POINTS,
-} from "../../utils/attributeUtils";
-import Race from "../../interfaces/Race";
+} from "../../../utils/attributeUtils";
+import Race from "../../../interfaces/Race";
 import {
   Plus,
   ChevronLeft,
@@ -15,10 +15,10 @@ import {
   Check,
 } from "lucide-react";
 
-import { BuildArchetypeBadge } from "./AttributeSelection/ArchetypeBadge";
-import { AttributeCard } from "./AttributeSelection/AttributeCard";
-import { ImpactPanel } from "./AttributeSelection/ImpactPanel";
-import { SystemExplanationModal } from "./AttributeSelection/ExplanationModal";
+import { BuildArchetypeBadge } from "./ArchetypeBadge";
+import { AttributeCard } from "./AttributeCard";
+import { ImpactPanel } from "./ImpactPanel";
+import { SystemExplanationModal } from "./ExplanationModal";
 
 // ============================================
 // CONFIGURAÇÕES & CONSTANTES
