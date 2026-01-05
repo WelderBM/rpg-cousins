@@ -1,5 +1,5 @@
-import { Atributo } from '../data/atributos';
-import { COMBAT_TABLES } from '../data/threats/combatTables';
+import { Atributo } from "../data/atributos";
+import { COMBAT_TABLES } from "../data/threats/combatTables";
 import {
   ChallengeLevel,
   ChallengeTier,
@@ -11,8 +11,8 @@ import {
   ThreatSheet,
   ResistanceAssignments,
   ResistanceType,
-} from '../interfaces/ThreatSheet';
-import { SkillsAttrs } from '../interfaces/Skills';
+} from "../interfaces/ThreatSheet";
+import { SkillsAttrs } from "../interfaces/Skills";
 
 /**
  * Converte o enum ChallengeLevel para valor numérico
@@ -113,10 +113,10 @@ export function calculateSkillValue(
  * Calcula o modificador de um atributo
  */
 export function calculateAttributeModifier(
-  attributeValue: number | '-'
+  attributeValue: number | "-"
 ): number {
   if (
-    attributeValue === '-' ||
+    attributeValue === "-" ||
     attributeValue === undefined ||
     attributeValue === null ||
     Number.isNaN(attributeValue)
@@ -152,7 +152,7 @@ export function calculateAllSkills(
 
     // Apply resistance bonuses for Fortitude, Reflexos, Vontade
     if (resistanceAssignments && combatStats) {
-      const resistanceSkills = ['Fortitude', 'Reflexos', 'Vontade'];
+      const resistanceSkills = ["Fortitude", "Reflexos", "Vontade"];
       if (resistanceSkills.includes(skillName)) {
         const resistanceType =
           resistanceAssignments[skillName as keyof ResistanceAssignments];
@@ -160,13 +160,13 @@ export function calculateAllSkills(
 
         switch (resistanceType) {
           case ResistanceType.STRONG:
-            resistanceBonus = combatStats.weakSave; // Strong resistance = lowest bonus
+            resistanceBonus = combatStats.strongSave;
             break;
           case ResistanceType.MEDIUM:
-            resistanceBonus = combatStats.mediumSave; // Medium resistance = medium bonus
+            resistanceBonus = combatStats.mediumSave;
             break;
           case ResistanceType.WEAK:
-            resistanceBonus = combatStats.strongSave; // Weak resistance = highest bonus
+            resistanceBonus = combatStats.weakSave;
             break;
           default:
             resistanceBonus = 0;
@@ -309,11 +309,11 @@ export function generateThreatId(): string {
  */
 export function getTierDisplayName(tier: ChallengeTier): string {
   const tierNames = {
-    [ChallengeTier.INICIANTE]: 'Iniciante',
-    [ChallengeTier.VETERANO]: 'Veterano',
-    [ChallengeTier.CAMPEAO]: 'Campeão',
-    [ChallengeTier.LENDA]: 'Lenda',
-    [ChallengeTier.L_PLUS]: 'Lenda+',
+    [ChallengeTier.INICIANTE]: "Iniciante",
+    [ChallengeTier.VETERANO]: "Veterano",
+    [ChallengeTier.CAMPEAO]: "Campeão",
+    [ChallengeTier.LENDA]: "Lenda",
+    [ChallengeTier.L_PLUS]: "Lenda+",
   };
 
   return tierNames[tier];
@@ -326,27 +326,27 @@ export function validateThreat(threat: Partial<ThreatSheet>): string[] {
   const errors: string[] = [];
 
   if (!threat.name?.trim()) {
-    errors.push('Nome é obrigatório');
+    errors.push("Nome é obrigatório");
   }
 
   if (!threat.type) {
-    errors.push('Tipo é obrigatório');
+    errors.push("Tipo é obrigatório");
   }
 
   if (!threat.size) {
-    errors.push('Tamanho é obrigatório');
+    errors.push("Tamanho é obrigatório");
   }
 
   if (!threat.role) {
-    errors.push('Papel é obrigatório');
+    errors.push("Papel é obrigatório");
   }
 
   if (!threat.challengeLevel) {
-    errors.push('Nível de Desafio é obrigatório');
+    errors.push("Nível de Desafio é obrigatório");
   }
 
   if (!threat.displacement?.trim()) {
-    errors.push('Deslocamento é obrigatório');
+    errors.push("Deslocamento é obrigatório");
   }
 
   return errors;
