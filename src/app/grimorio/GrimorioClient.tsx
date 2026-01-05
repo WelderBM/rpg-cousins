@@ -162,10 +162,6 @@ export default function GrimorioClient({
               key={spell.nome}
               className="group relative bg-[#1e1e1e] border border-medieval-iron/40 rounded-xl overflow-hidden hover:border-medieval-gold/60 transition-colors shadow-lg"
             >
-              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                <BookOpen className="w-12 h-12 text-medieval-gold" />
-              </div>
-
               <div className="p-5 space-y-3">
                 <div className="flex justify-between items-start">
                   <h3 className="font-serif text-xl font-bold text-medieval-gold group-hover:text-amber-400 transition-colors">

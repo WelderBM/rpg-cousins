@@ -60,6 +60,10 @@ interface CharacterWizardState {
   baseAttributes: Record<Atributo, number>;
   pointsRemaining: number;
 
+  // Escolhas de atributos flexíveis (para raças como Humano que têm "any")
+  // Mapeia índice do bônus flexível → atributo escolhido
+  flexibleAttributeChoices: Record<number, Atributo>;
+
   // Character Name
   name: string;
 
@@ -83,6 +87,7 @@ interface CharacterWizardState {
   selectDeity: (deity: Divindade) => void;
   selectGrantedPower: (power: GeneralPower) => void;
   updateBaseAttribute: (attr: Atributo, value: number) => void;
+  setFlexibleAttributeChoice: (index: number, attr: Atributo) => void; // NOVO
   addToBag: (item: Equipment) => void;
   removeFromBag: (item: Equipment) => void;
   updateMoney: (value: number) => void;
@@ -120,6 +125,7 @@ export const useCharacterStore = create<CharacterWizardState>((set, get) => ({
   money: 100, // Default start
   baseAttributes: { ...INITIAL_ATTRIBUTES },
   pointsRemaining: INITIAL_POINTS,
+  flexibleAttributeChoices: {}, // Inicialmente vazio
 
   name: "",
   userCharacters: [],
@@ -128,7 +134,8 @@ export const useCharacterStore = create<CharacterWizardState>((set, get) => ({
   setStep: (step) => set({ step }),
 
   selectRace: (race) => {
-    set({ selectedRace: race, step: 2 });
+    // Limpa escolhas flexíveis ao trocar de raça
+    set({ selectedRace: race, step: 2, flexibleAttributeChoices: {} });
   },
 
   selectClass: (role) => {
@@ -223,6 +230,15 @@ export const useCharacterStore = create<CharacterWizardState>((set, get) => ({
         pointsRemaining: INITIAL_POINTS - totalSpent,
       });
     }
+  },
+
+  setFlexibleAttributeChoice: (index, attr) => {
+    set((state) => ({
+      flexibleAttributeChoices: {
+        ...state.flexibleAttributeChoices,
+        [index]: attr,
+      },
+    }));
   },
 
   setName: (name) => set({ name }),
