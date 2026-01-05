@@ -2,22 +2,11 @@
  * Local Data Provider - Carrega dados estáticos diretamente dos arquivos locais
  * Em vez de buscar no Firestore, usamos os arquivos em src/data/ para performance máxima
  *
- * ✨ OTIMIZAÇÃO: Cache em memória para evitar retrabalho
+ * ✨ OTIMIZAÇÃO: Cache em memória e Lazy Loading com Code Splitting
  */
 
 import { Spell } from "@/interfaces/Spells";
 import Equipment from "@/interfaces/Equipment";
-import {
-  spellsCircle1,
-  spellsCircle2,
-  spellsCircle3,
-  spellsCircle4,
-  spellsCircle5,
-} from "@/data/magias/generalSpells";
-import EQUIPAMENTOS, { Armas, Armaduras, Escudos } from "@/data/equipamentos";
-import { GENERAL_EQUIPMENT } from "@/data/equipamentos-gerais";
-import RACAS from "@/data/racas";
-import generalPowers from "@/data/poderes";
 import Race from "@/interfaces/Race";
 import { GeneralPower } from "@/interfaces/Poderes";
 
@@ -26,7 +15,7 @@ import { GeneralPower } from "@/interfaces/Poderes";
 // ============================================
 
 /**
- * Cache de magias - inicializado lazy (só na primeira chamada)
+ * Cache de magias - inicializado lazy
  */
 let cachedSpells: Spell[] | null = null;
 
@@ -38,43 +27,33 @@ let cachedEquipments: Equipment[] | null = null;
 /**
  * Cache de equipamentos por categoria - inicializado lazy
  */
-let cachedEquipmentsByCategory: ReturnType<
-  typeof buildEquipmentsByCategory
-> | null = null;
+let cachedEquipmentsByCategory: any | null = null;
+
 let cachedRaces: Race[] | null = null;
 let cachedPowers: GeneralPower[] | null = null;
 
-/**
- * Constrói objeto de equipamentos por categoria
- * Separado em função para poder cachear
- */
-function buildEquipmentsByCategory() {
-  return {
-    weapons: [
-      ...EQUIPAMENTOS.armasSimples,
-      ...EQUIPAMENTOS.armasMarciais,
-      ...EQUIPAMENTOS.armasExoticas,
-      ...EQUIPAMENTOS.armasDeFogo,
-    ],
-    armors: [...EQUIPAMENTOS.armadurasLeves, ...EQUIPAMENTOS.armaduraPesada],
-    shields: EQUIPAMENTOS.escudos,
-    general: GENERAL_EQUIPMENT.generalItems,
-  };
-}
-
 // ============================================
-// FUNÇÕES PÚBLICAS COM CACHE
+// FUNÇÕES PÚBLICAS COM CACHE E ASYNC
 // ============================================
 
 /**
  * Carrega todas as magias dos arquivos locais
- * ✨ CACHE: Retorna a mesma referência em chamadas subsequentes
+ * ✨ ALTA PERFORMANCE: Usa dynamic input para Code Splitting
  *
- * @returns Array de todas as magias (200+ itens)
+ * @returns Promise<Array> de todas as magias
  */
-export function getAllSpells(): Spell[] {
-  if (cachedSpells === null) {
-    // Primeira chamada: constrói e cacheia
+export async function getAllSpells(): Promise<Spell[]> {
+  if (cachedSpells) return cachedSpells;
+
+  try {
+    const {
+      spellsCircle1,
+      spellsCircle2,
+      spellsCircle3,
+      spellsCircle4,
+      spellsCircle5,
+    } = await import("@/data/magias/generalSpells");
+
     cachedSpells = [
       ...Object.values(spellsCircle1),
       ...Object.values(spellsCircle2),
@@ -84,22 +63,34 @@ export function getAllSpells(): Spell[] {
     ];
 
     if (typeof window !== "undefined") {
-      console.log(`[Cache] Magias carregadas: ${cachedSpells.length} itens`);
+      console.log(`[LazyLoad] Magias carregadas: ${cachedSpells.length} itens`);
     }
-  }
 
-  return cachedSpells;
+    return cachedSpells;
+  } catch (error) {
+    console.error("Erro ao carregar magias:", error);
+    return [];
+  }
 }
 
 /**
  * Carrega todos os equipamentos dos arquivos locais
- * ✨ CACHE: Retorna a mesma referência em chamadas subsequentes
  *
- * @returns Array de todos os equipamentos
+ * @returns Promise<Array> de todos os equipamentos
  */
-export function getAllEquipments(): Equipment[] {
-  if (cachedEquipments === null) {
-    // Primeira chamada: constrói e cacheia
+export async function getAllEquipments(): Promise<Equipment[]> {
+  if (cachedEquipments) return cachedEquipments;
+
+  try {
+    // Importação dinâmica dos arquivos de equipamentos
+    const {
+      default: EQUIPAMENTOS,
+      Armas,
+      Armaduras,
+      Escudos,
+    } = await import("@/data/equipamentos");
+    const { GENERAL_EQUIPMENT } = await import("@/data/equipamentos-gerais");
+
     cachedEquipments = [
       ...Object.values(Armas),
       ...Object.values(Armaduras),
@@ -109,23 +100,27 @@ export function getAllEquipments(): Equipment[] {
 
     if (typeof window !== "undefined") {
       console.log(
-        `[Cache] Equipamentos carregados: ${cachedEquipments.length} itens`
+        `[LazyLoad] Equipamentos carregados: ${cachedEquipments.length} itens`
       );
     }
-  }
 
-  return cachedEquipments;
+    return cachedEquipments;
+  } catch (error) {
+    console.error("Erro ao carregar equipamentos:", error);
+    return [];
+  }
 }
 
 /**
  * Busca um equipamento específico por nome
- * ✨ OTIMIZADO: Usa cache de getAllEquipments()
  *
  * @param name Nome do equipamento
- * @returns Equipment ou undefined
+ * @returns Promise<Equipment | undefined>
  */
-export function findEquipmentByName(name: string): Equipment | undefined {
-  const allEquipments = getAllEquipments(); // Usa cache
+export async function findEquipmentByName(
+  name: string
+): Promise<Equipment | undefined> {
+  const allEquipments = await getAllEquipments(); // Usa cache async
   return allEquipments.find(
     (eq) => eq.nome.toLowerCase() === name.toLowerCase()
   );
@@ -133,41 +128,66 @@ export function findEquipmentByName(name: string): Equipment | undefined {
 
 /**
  * Carrega equipamentos agrupados por categoria
- * ✨ CACHE: Retorna a mesma referência em chamadas subsequentes
  *
- * @returns Objeto com arrays por categoria
+ * @returns Promise<Objeto> com arrays por categoria
  */
-export function getEquipmentsByCategory() {
-  if (cachedEquipmentsByCategory === null) {
-    // Primeira chamada: constrói e cacheia
-    cachedEquipmentsByCategory = buildEquipmentsByCategory();
+export async function getEquipmentsByCategory() {
+  if (cachedEquipmentsByCategory) return cachedEquipmentsByCategory;
+
+  try {
+    const { default: EQUIPAMENTOS } = await import("@/data/equipamentos");
+    const { GENERAL_EQUIPMENT } = await import("@/data/equipamentos-gerais");
+
+    cachedEquipmentsByCategory = {
+      weapons: [
+        ...EQUIPAMENTOS.armasSimples,
+        ...EQUIPAMENTOS.armasMarciais,
+        ...EQUIPAMENTOS.armasExoticas,
+        ...EQUIPAMENTOS.armasDeFogo,
+      ],
+      armors: [...EQUIPAMENTOS.armadurasLeves, ...EQUIPAMENTOS.armaduraPesada],
+      shields: EQUIPAMENTOS.escudos,
+      general: GENERAL_EQUIPMENT.generalItems,
+    };
 
     if (typeof window !== "undefined") {
-      console.log("[Cache] Equipamentos por categoria carregados");
+      console.log("[LazyLoad] Equipamentos por categoria carregados");
     }
-  }
 
-  return cachedEquipmentsByCategory;
+    return cachedEquipmentsByCategory;
+  } catch (error) {
+    console.error("Erro ao carregar equipamentos por categoria:", error);
+    return { weapons: [], armors: [], shields: [], general: [] };
+  }
 }
 
 /**
  * Carrega todas as raças
  */
-export function getAllRaces(): Race[] {
-  if (cachedRaces === null) {
+export async function getAllRaces(): Promise<Race[]> {
+  if (cachedRaces) return cachedRaces;
+
+  try {
+    const { default: RACAS } = await import("@/data/racas");
     cachedRaces = RACAS;
     if (typeof window !== "undefined") {
-      console.log(`[Cache] Raças carregadas: ${cachedRaces.length}`);
+      console.log(`[LazyLoad] Raças carregadas: ${cachedRaces.length}`);
     }
+    return cachedRaces;
+  } catch (error) {
+    console.error("Erro ao carregar raças:", error);
+    return [];
   }
-  return cachedRaces;
 }
 
 /**
  * Carrega todos os poderes gerais
  */
-export function getAllPowers(): GeneralPower[] {
-  if (cachedPowers === null) {
+export async function getAllPowers(): Promise<GeneralPower[]> {
+  if (cachedPowers) return cachedPowers;
+
+  try {
+    const { default: generalPowers } = await import("@/data/poderes");
     cachedPowers = [
       ...generalPowers.COMBATE,
       ...generalPowers.CONCEDIDOS,
@@ -176,15 +196,17 @@ export function getAllPowers(): GeneralPower[] {
       ...generalPowers.TORMENTA,
     ];
     if (typeof window !== "undefined") {
-      console.log(`[Cache] Poderes carregados: ${cachedPowers.length}`);
+      console.log(`[LazyLoad] Poderes carregados: ${cachedPowers.length}`);
     }
+    return cachedPowers;
+  } catch (error) {
+    console.error("Erro ao carregar poderes:", error);
+    return [];
   }
-  return cachedPowers;
 }
 
 /**
- * Limpa todos os caches (útil para testes ou hot reload)
- * ⚠️ Normalmente não é necessário chamar isso em produção
+ * Limpa todos os caches
  */
 export function clearAllCaches() {
   cachedSpells = null;

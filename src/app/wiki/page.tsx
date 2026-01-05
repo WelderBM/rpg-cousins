@@ -17,6 +17,14 @@ import {
   ArrowLeft,
   ChevronDown,
   ChevronUp,
+  Heart,
+  Swords,
+  Brain,
+  Compass,
+  Feather,
+  Flame,
+  Star,
+  Scale,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -90,9 +98,15 @@ export default function WikiPage() {
   const [displayLimit, setDisplayLimit] = useState(ITEMS_PER_PAGE);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  // Filter States
+  // Filter States - Magias
   const [spellCircle, setSpellCircle] = useState<number | "all">("all");
   const [spellSchool, setSpellSchool] = useState<string | "all">("all");
+  const [spellExecution, setSpellExecution] = useState<string | "all">("all");
+  const [spellRange, setSpellRange] = useState<string | "all">("all");
+  const [spellDuration, setSpellDuration] = useState<string | "all">("all");
+  const [spellTarget, setSpellTarget] = useState("");
+
+  // Filter States - Outros
   const [equipGroup, setEquipGroup] = useState<string | "all">("all");
   const [powerType, setPowerType] = useState<string | "all">("all");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
@@ -102,51 +116,99 @@ export default function WikiPage() {
     setDisplayLimit(ITEMS_PER_PAGE);
   }, [activeCategory, searchQuery]);
 
-  // Data Loading
-  const data = useMemo(() => {
-    const magias = getAllSpells().map((s) => ({
-      id: `spell-${s.nome}`,
-      name: s.nome,
-      category: "magias" as Category,
-      type: `${s.escola} • ${s.circulo}º Círculo`,
-      description: s.execucao + " | " + s.alcance,
-      raw: s,
-    }));
+  // Data State
+  const [data, setData] = useState<{
+    magias: ItemBase[];
+    equipamentos: ItemBase[];
+    racas: ItemBase[];
+    poderes: ItemBase[];
+  }>({
+    magias: [],
+    equipamentos: [],
+    racas: [],
+    poderes: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-    const equipamentos = getAllEquipments().map((e) => ({
-      id: `equip-${e.nome}`,
-      name: e.nome,
-      category: "equipamentos" as Category,
-      type: e.group,
-      description: `T$ ${e.preco} • ${e.spaces} esp.`,
-      raw: e,
-    }));
+  // Load data for active category
+  useEffect(() => {
+    let isMounted = true;
 
-    const racas = getAllRaces().map((r) => {
-      const attrs = r.attributes.attrs
-        .map((a) => `${a.mod > 0 ? "+" : ""}${a.mod} ${a.attr}`)
-        .join(", ");
-      return {
-        id: `race-${r.name}`,
-        name: r.name,
-        category: "racas" as Category,
-        type: "Raça Jogável",
-        description: `Bônus: ${attrs}`,
-        raw: r,
-      };
-    });
+    const loadData = async () => {
+      // If we already have data for this category, don't re-fetch
+      if (data[activeCategory].length > 0) {
+        setIsLoading(false);
+        return;
+      }
 
-    const poderes = getAllPowers().map((p) => ({
-      id: `power-${p.name}`,
-      name: p.name,
-      category: "poderes" as Category,
-      type: p.type,
-      description: p.description,
-      raw: p,
-    }));
+      setIsLoading(true);
 
-    return { magias, equipamentos, racas, poderes };
-  }, []);
+      try {
+        let items: ItemBase[] = [];
+
+        if (activeCategory === "magias") {
+          const rawSpells = await getAllSpells();
+          items = rawSpells.map((s) => ({
+            id: `spell-${s.nome}`,
+            name: s.nome,
+            category: "magias" as Category,
+            type: `${s.school} • ${s.spellCircle}`,
+            description: s.execucao + " | " + s.alcance,
+            raw: s,
+          }));
+        } else if (activeCategory === "equipamentos") {
+          const rawEquips = await getAllEquipments();
+          items = rawEquips.map((e) => ({
+            id: `equip-${e.nome}`,
+            name: e.nome,
+            category: "equipamentos" as Category,
+            type: e.group,
+            description: `T$ ${e.preco} • ${e.spaces} esp.`,
+            raw: e,
+          }));
+        } else if (activeCategory === "racas") {
+          const rawRaces = await getAllRaces();
+          items = rawRaces.map((r) => {
+            const attrs = r.attributes.attrs
+              .map((a) => `${a.mod > 0 ? "+" : ""}${a.mod} ${a.attr}`)
+              .join(", ");
+            return {
+              id: `race-${r.name}`,
+              name: r.name,
+              category: "racas" as Category,
+              type: "Raça Jogável",
+              description: `Bônus: ${attrs}`,
+              raw: r,
+            };
+          });
+        } else if (activeCategory === "poderes") {
+          const rawPowers = await getAllPowers();
+          items = rawPowers.map((p) => ({
+            id: `power-${p.name}`,
+            name: p.name,
+            category: "poderes" as Category,
+            type: p.type,
+            description: p.description,
+            raw: p,
+          }));
+        }
+
+        if (isMounted) {
+          setData((prev) => ({ ...prev, [activeCategory]: items }));
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Error loading wiki data:", error);
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeCategory]);
 
   // Filtering
   const filteredItems = useMemo(() => {
@@ -155,10 +217,32 @@ export default function WikiPage() {
     // Category Specific Filters
     if (activeCategory === "magias") {
       if (spellCircle !== "all") {
-        items = items.filter((i) => i.raw.spellCircle === spellCircle);
+        items = items.filter((i) => {
+          const circleValue = i.raw.spellCircle;
+          return circleValue.includes(`${spellCircle}º`);
+        });
       }
       if (spellSchool !== "all") {
         items = items.filter((i) => i.raw.school === spellSchool);
+      }
+      if (spellExecution !== "all") {
+        items = items.filter((i) => i.raw.execucao.includes(spellExecution));
+      }
+      if (spellRange !== "all") {
+        items = items.filter((i) => i.raw.alcance.includes(spellRange));
+      }
+      if (spellDuration !== "all") {
+        items = items.filter((i) =>
+          i.raw.duracao.toLowerCase().includes(spellDuration.toLowerCase())
+        );
+      }
+      if (spellTarget !== "") {
+        const target = spellTarget.toLowerCase();
+        items = items.filter(
+          (i) =>
+            (i.raw.alvo && i.raw.alvo.toLowerCase().includes(target)) ||
+            (i.raw.area && i.raw.area.toLowerCase().includes(target))
+        );
       }
     }
 
@@ -173,7 +257,9 @@ export default function WikiPage() {
 
     if (activeCategory === "poderes") {
       if (powerType !== "all") {
-        items = items.filter((i) => i.raw.type === powerType);
+        items = items.filter(
+          (i) => i.raw.type === powerType || i.type === powerType
+        );
       }
     }
 
@@ -193,6 +279,10 @@ export default function WikiPage() {
     searchQuery,
     spellCircle,
     spellSchool,
+    spellExecution,
+    spellRange,
+    spellDuration,
+    spellTarget,
     equipGroup,
     maxPrice,
     powerType,
@@ -318,6 +408,10 @@ export default function WikiPage() {
                     isFiltersOpen ||
                     spellCircle !== "all" ||
                     spellSchool !== "all" ||
+                    spellExecution !== "all" ||
+                    spellRange !== "all" ||
+                    spellDuration !== "all" ||
+                    spellTarget !== "" ||
                     equipGroup !== "all" ||
                     powerType !== "all" ||
                     maxPrice !== ""
@@ -344,9 +438,9 @@ export default function WikiPage() {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="bg-neutral-900/50 border border-amber-900/20 rounded-2xl p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-neutral-900/50 border border-amber-900/20 rounded-2xl p-6 space-y-4">
                       {activeCategory === "magias" && (
-                        <>
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                           <div>
                             <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
                               Círculo
@@ -360,7 +454,7 @@ export default function WikiPage() {
                                     : Number(e.target.value)
                                 )
                               }
-                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
                             >
                               <option value="all">Todos</option>
                               <option value="1">1º Círculo</option>
@@ -377,7 +471,7 @@ export default function WikiPage() {
                             <select
                               value={spellSchool}
                               onChange={(e) => setSpellSchool(e.target.value)}
-                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
                             >
                               <option value="all">Todas</option>
                               <option value="Abjur">Abjuração</option>
@@ -390,81 +484,160 @@ export default function WikiPage() {
                               <option value="Trans">Transmutação</option>
                             </select>
                           </div>
-                        </>
-                      )}
-
-                      {activeCategory === "equipamentos" && (
-                        <>
                           <div>
                             <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
-                              Grupo
+                              Execução
                             </label>
                             <select
-                              value={equipGroup}
-                              onChange={(e) => setEquipGroup(e.target.value)}
-                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                              value={spellExecution}
+                              onChange={(e) =>
+                                setSpellExecution(e.target.value)
+                              }
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
                             >
-                              <option value="all">Todos</option>
-                              <option value="Arma">Armas</option>
-                              <option value="Armadura">Armaduras</option>
-                              <option value="Escudo">Escudos</option>
-                              <option value="Item Geral">Itens Gerais</option>
+                              <option value="all">Qualquer</option>
+                              <option value="Padrão">Padrão</option>
+                              <option value="Movimento">Movimento</option>
+                              <option value="Completa">Completa</option>
+                              <option value="Livre">Livre</option>
+                              <option value="Reação">Reação</option>
                             </select>
                           </div>
                           <div>
                             <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
-                              Preço Máximo (T$)
+                              Alcance
+                            </label>
+                            <select
+                              value={spellRange}
+                              onChange={(e) => setSpellRange(e.target.value)}
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
+                            >
+                              <option value="all">Qualquer</option>
+                              <option value="Pessoal">Pessoal</option>
+                              <option value="Toque">Toque</option>
+                              <option value="Curto">Curto</option>
+                              <option value="Médio">Médio</option>
+                              <option value="Longo">Longo</option>
+                              <option value="Ilimitado">Ilimitado</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                              Duração
+                            </label>
+                            <select
+                              value={spellDuration}
+                              onChange={(e) => setSpellDuration(e.target.value)}
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
+                            >
+                              <option value="all">Qualquer</option>
+                              <option value="Instantânea">Instantânea</option>
+                              <option value="Cena">Cena</option>
+                              <option value="Sustentada">Sustentada</option>
+                              <option value="1 dia">1 Dia</option>
+                              <option value="Permanente">Permanente</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                              Alvo/Área
                             </label>
                             <input
-                              type="number"
-                              value={maxPrice}
-                              onChange={(e) =>
-                                setMaxPrice(
-                                  e.target.value === ""
-                                    ? ""
-                                    : Number(e.target.value)
-                                )
-                              }
-                              placeholder="Ex: 100"
-                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+                              type="text"
+                              value={spellTarget}
+                              onChange={(e) => setSpellTarget(e.target.value)}
+                              placeholder="Ex: Criatura"
+                              className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
                             />
                           </div>
-                        </>
-                      )}
-
-                      {activeCategory === "poderes" && (
-                        <div>
-                          <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
-                            Tipo de Poder
-                          </label>
-                          <select
-                            value={powerType}
-                            onChange={(e) => setPowerType(e.target.value)}
-                            className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
-                          >
-                            <option value="all">Todos</option>
-                            <option value="Combate">Combate</option>
-                            <option value="Destino">Destino</option>
-                            <option value="Magia">Magia</option>
-                            <option value="Concedido">Concedido</option>
-                            <option value="Tormenta">Tormenta</option>
-                          </select>
                         </div>
                       )}
 
-                      <div className="flex items-end">
+                      {(activeCategory === "equipamentos" ||
+                        activeCategory === "poderes") && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                          {activeCategory === "equipamentos" && (
+                            <>
+                              <div>
+                                <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                                  Grupo
+                                </label>
+                                <select
+                                  value={equipGroup}
+                                  onChange={(e) =>
+                                    setEquipGroup(e.target.value)
+                                  }
+                                  className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
+                                >
+                                  <option value="all">Todos</option>
+                                  <option value="Arma">Armas</option>
+                                  <option value="Armadura">Armaduras</option>
+                                  <option value="Escudo">Escudos</option>
+                                  <option value="Item Geral">
+                                    Itens Gerais
+                                  </option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                                  Preço Máximo (T$)
+                                </label>
+                                <input
+                                  type="number"
+                                  value={maxPrice}
+                                  onChange={(e) =>
+                                    setMaxPrice(
+                                      e.target.value === ""
+                                        ? ""
+                                        : Number(e.target.value)
+                                    )
+                                  }
+                                  placeholder="Ex: 100"
+                                  className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
+                                />
+                              </div>
+                            </>
+                          )}
+
+                          {activeCategory === "poderes" && (
+                            <div>
+                              <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
+                                Tipo de Poder
+                              </label>
+                              <select
+                                value={powerType}
+                                onChange={(e) => setPowerType(e.target.value)}
+                                className="w-full bg-black/40 border border-neutral-800 rounded-lg p-2 text-xs text-neutral-300 outline-none focus:border-amber-500/50"
+                              >
+                                <option value="all">Todos</option>
+                                <option value="COMBATE">Combate</option>
+                                <option value="DESTINO">Destino</option>
+                                <option value="MAGIA">Magia</option>
+                                <option value="CONCEDIDOS">Concedido</option>
+                                <option value="TORMENTA">Tormenta</option>
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex justify-end pt-2">
                         <button
                           onClick={() => {
                             setSpellCircle("all");
                             setSpellSchool("all");
+                            setSpellExecution("all");
+                            setSpellRange("all");
+                            setSpellDuration("all");
+                            setSpellTarget("");
                             setEquipGroup("all");
                             setPowerType("all");
                             setMaxPrice("");
                             setSearchQuery("");
                           }}
-                          className="text-[10px] uppercase font-bold text-neutral-500 hover:text-red-400 transition-colors flex items-center gap-1 mb-2"
+                          className="text-[10px] uppercase font-bold text-neutral-500 hover:text-red-400 transition-colors flex items-center gap-1"
                         >
-                          <X size={12} /> Limpar Filtros
+                          <X size={12} /> Limpar Todos os Filtros
                         </button>
                       </div>
                     </div>
@@ -476,99 +649,113 @@ export default function WikiPage() {
 
           {/* Grid Layout */}
           <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar pb-32">
-            <div className="max-w-5xl mx-auto">
-              <motion.div
-                layout
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-              >
-                <AnimatePresence mode="popLayout">
-                  {filteredItems.slice(0, displayLimit).map((item, idx) => {
-                    const CategoryIcon =
-                      CATEGORIES.find((c) => c.id === item.category)?.icon ||
-                      Info;
-                    return (
-                      <motion.div
-                        key={item.id}
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ delay: Math.min(idx * 0.02, 0.3) }}
-                        onClick={() => setSelectedItem(item)}
-                        className="group relative bg-neutral-900/40 border border-neutral-800 rounded-2xl p-5 cursor-pointer hover:bg-neutral-800/60 hover:border-amber-700/50 hover:shadow-2xl hover:shadow-amber-500/5 transition-all active:scale-[0.98]"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div
-                            className={`p-2 rounded-lg bg-white/5 text-neutral-400 group-hover:text-amber-500 transition-colors`}
-                          >
-                            <CategoryIcon size={18} />
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCopyLink(item);
-                            }}
-                            className="p-2 text-neutral-600 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors"
-                          >
-                            {copiedId === item.id ? (
-                              <CheckCircle2
-                                size={16}
-                                className="text-emerald-500"
-                              />
-                            ) : (
-                              <Copy size={16} />
-                            )}
-                          </button>
-                        </div>
-
-                        <h3 className="font-cinzel text-lg text-neutral-200 group-hover:text-amber-100 mb-1 line-clamp-1">
-                          {item.name}
-                        </h3>
-                        <p className="text-[10px] text-amber-500/70 font-bold uppercase tracking-widest mb-3">
-                          {item.type}
-                        </p>
-
-                        <p className="text-xs text-neutral-500 line-clamp-2 italic leading-relaxed">
-                          {item.description ||
-                            "Nenhuma descrição detalhada disponível."}
-                        </p>
-
-                        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                          <ChevronRight size={18} className="text-amber-500" />
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-              </motion.div>
-
-              {filteredItems.length > displayLimit && (
-                <div className="mt-12 flex justify-center">
-                  <button
-                    onClick={() =>
-                      setDisplayLimit((prev) => prev + ITEMS_PER_PAGE)
-                    }
-                    className="px-8 py-3 bg-neutral-900 border border-amber-900/30 text-amber-500 font-bold font-cinzel rounded-xl hover:bg-amber-500 hover:text-black transition-all shadow-xl shadow-amber-900/5 active:scale-95"
-                  >
-                    Carregar Mais Sabedoria...
-                  </button>
-                </div>
-              )}
-
-              {filteredItems.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <div className="p-4 bg-neutral-900 rounded-full mb-4 border border-neutral-800">
-                    <Search size={48} className="text-neutral-700" />
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="relative">
+                  <div className="w-16 h-16 border-4 border-amber-900/30 border-t-amber-500 rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Zap size={20} className="text-amber-500 animate-pulse" />
                   </div>
-                  <h3 className="text-xl font-cinzel text-neutral-400">
-                    Nenhum resultado encontrado
-                  </h3>
-                  <p className="text-sm text-neutral-600 mt-2">
-                    Tente ajustar sua busca ou mudar de categoria.
-                  </p>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="max-w-5xl mx-auto">
+                <motion.div
+                  layout
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                >
+                  <AnimatePresence mode="popLayout">
+                    {filteredItems.slice(0, displayLimit).map((item, idx) => {
+                      const CategoryIcon =
+                        CATEGORIES.find((c) => c.id === item.category)?.icon ||
+                        Info;
+                      return (
+                        <motion.div
+                          key={item.id}
+                          layout
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ delay: Math.min(idx * 0.02, 0.3) }}
+                          onClick={() => setSelectedItem(item)}
+                          className="group relative bg-neutral-900/40 border border-neutral-800 rounded-2xl p-5 cursor-pointer hover:bg-neutral-800/60 hover:border-amber-700/50 hover:shadow-2xl hover:shadow-amber-500/5 transition-all active:scale-[0.98]"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div
+                              className={`p-2 rounded-lg bg-white/5 text-neutral-400 group-hover:text-amber-500 transition-colors`}
+                            >
+                              <CategoryIcon size={18} />
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyLink(item);
+                              }}
+                              className="p-2 text-neutral-600 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors"
+                            >
+                              {copiedId === item.id ? (
+                                <CheckCircle2
+                                  size={16}
+                                  className="text-emerald-500"
+                                />
+                              ) : (
+                                <Copy size={16} />
+                              )}
+                            </button>
+                          </div>
+
+                          <h3 className="font-cinzel text-lg text-neutral-200 group-hover:text-amber-100 mb-1 line-clamp-1">
+                            {item.name}
+                          </h3>
+                          <p className="text-[10px] text-amber-500/70 font-bold uppercase tracking-widest mb-3">
+                            {item.type}
+                          </p>
+
+                          <p className="text-xs text-neutral-500 line-clamp-2 italic leading-relaxed">
+                            {item.description ||
+                              "Nenhuma descrição detalhada disponível."}
+                          </p>
+
+                          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                            <ChevronRight
+                              size={18}
+                              className="text-amber-500"
+                            />
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </motion.div>
+
+                {filteredItems.length > displayLimit && (
+                  <div className="mt-12 flex justify-center">
+                    <button
+                      onClick={() =>
+                        setDisplayLimit((prev) => prev + ITEMS_PER_PAGE)
+                      }
+                      className="px-8 py-3 bg-neutral-900 border border-amber-900/30 text-amber-500 font-bold font-cinzel rounded-xl hover:bg-amber-500 hover:text-black transition-all shadow-xl shadow-amber-900/5 active:scale-95"
+                    >
+                      Carregar Mais Sabedoria...
+                    </button>
+                  </div>
+                )}
+
+                {filteredItems.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <div className="p-4 bg-neutral-900 rounded-full mb-4 border border-neutral-800">
+                      <Search size={48} className="text-neutral-700" />
+                    </div>
+                    <h3 className="text-xl font-cinzel text-neutral-400">
+                      Nenhum resultado encontrado
+                    </h3>
+                    <p className="text-sm text-neutral-600 mt-2">
+                      Tente ajustar sua busca ou mudar de categoria.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Lateral Drawer / Detail View */}
@@ -729,49 +916,233 @@ export default function WikiPage() {
                       )}
 
                       {selectedItem.category === "racas" && (
-                        <div className="space-y-6">
-                          <section>
-                            <h4 className="text-amber-500 font-cinzel text-lg mb-3">
-                              Ficha da Raça
+                        <div className="space-y-10">
+                          {/* 1. Visão Geral (Lore) */}
+                          <section className="space-y-6">
+                            <div className="p-6 bg-amber-500/5 border border-amber-500/20 rounded-2xl relative overflow-hidden group">
+                              <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <Users size={120} />
+                              </div>
+                              <h4 className="text-amber-500 font-cinzel text-xl mb-3 flex items-center gap-2">
+                                <Info size={20} /> Visão Geral
+                              </h4>
+                              <p className="text-neutral-300 leading-relaxed italic text-lg border-l-2 border-amber-500/30 pl-4">
+                                {selectedItem.raw.description ||
+                                  "Uma raça única habitando as terras de Arton."}
+                              </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-3">
+                                <h5 className="text-amber-400 font-cinzel flex items-center gap-2 text-sm uppercase tracking-wider">
+                                  <Feather size={16} /> Aparência
+                                </h5>
+                                <p className="text-sm text-neutral-400 leading-relaxed">
+                                  {selectedItem.raw.appearance ||
+                                    "Aparência variada conforme a linhagem."}
+                                </p>
+                              </div>
+                              <div className="space-y-3">
+                                <h5 className="text-amber-400 font-cinzel flex items-center gap-2 text-sm uppercase tracking-wider">
+                                  <Brain size={16} /> Personalidade
+                                </h5>
+                                <p className="text-sm text-neutral-400 leading-relaxed">
+                                  {selectedItem.raw.personality ||
+                                    "Traços comportamentais distintos."}
+                                </p>
+                              </div>
+                            </div>
+                          </section>
+
+                          {/* 2. Atributos Mecânicos (Visual) */}
+                          <section className="space-y-6">
+                            <h4 className="text-amber-500 font-cinzel text-xl flex items-center gap-2">
+                              <Swords size={20} /> Atributos & Físico
                             </h4>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="p-3 bg-black/30 rounded-lg border border-white/5">
-                                <div className="text-[10px] text-neutral-500 uppercase font-black">
+
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                              <div className="p-4 bg-black/40 rounded-xl border border-white/5 text-center group hover:border-amber-500/30 transition-colors">
+                                <div className="text-[10px] text-neutral-500 uppercase font-bold mb-1">
                                   Tamanho
                                 </div>
-                                <div className="text-sm text-neutral-200 mt-1">
+                                <div className="text-lg text-neutral-200 font-cinzel">
                                   {selectedItem.raw.size?.name || "Médio"}
                                 </div>
                               </div>
-                              <div className="p-3 bg-black/30 rounded-lg border border-white/5">
-                                <div className="text-[10px] text-neutral-500 uppercase font-black">
+                              <div className="p-4 bg-black/40 rounded-xl border border-white/5 text-center group hover:border-amber-500/30 transition-colors">
+                                <div className="text-[10px] text-neutral-500 uppercase font-bold mb-1">
                                   Deslocamento
                                 </div>
-                                <div className="text-sm text-neutral-200 mt-1">
+                                <div className="text-lg text-neutral-200 font-cinzel">
                                   {selectedItem.raw.getDisplacement?.(
                                     selectedItem.raw
                                   ) || 9}
                                   m
                                 </div>
                               </div>
+                              <div className="col-span-2 p-4 bg-black/40 rounded-xl border border-white/5 group hover:border-amber-500/30 transition-colors">
+                                <div className="text-[10px] text-neutral-500 uppercase font-bold mb-2">
+                                  Bônus de Atributos
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {selectedItem.raw.attributes.attrs.map(
+                                    (at: any, i: number) => (
+                                      <span
+                                        key={i}
+                                        className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                          at.mod > 0
+                                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                            : "bg-red-500/10 text-red-400 border border-red-500/20"
+                                        }`}
+                                      >
+                                        {at.mod > 0 ? "+" : ""}
+                                        {at.mod} {at.attr}
+                                      </span>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Detalhes de Atributos em Barras Curtas (Simulação Visual) */}
+                            <div className="p-6 bg-black/20 rounded-2xl border border-white/5 space-y-4">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-neutral-500 uppercase font-bold">
+                                  Impacto no Jogo
+                                </span>
+                                <div className="flex gap-1">
+                                  {(() => {
+                                    // Heuristic calculation for "Game Impact" / Complexity
+                                    let impactScore = 2;
+                                    const r = selectedItem.raw;
+
+                                    // Flexible attributes imply versatility (+1)
+                                    if (
+                                      r.attributes?.attrs?.some(
+                                        (a: any) => a.attr === "any"
+                                      )
+                                    )
+                                      impactScore += 1;
+
+                                    // More abilities imply more complexity/power
+                                    if (r.abilities?.length > 2)
+                                      impactScore += 1;
+                                    if (r.abilities?.length > 3)
+                                      impactScore += 1;
+
+                                    // Non-standard displacement or size often implies gameplay impact
+                                    if (
+                                      r.getDisplacement &&
+                                      r.getDisplacement(r) !== 9
+                                    )
+                                      impactScore += 0.5;
+                                    if (r.size && r.size?.name !== "Médio")
+                                      impactScore += 0.5;
+
+                                    const finalScore = Math.min(
+                                      5,
+                                      Math.floor(impactScore)
+                                    );
+
+                                    return [1, 2, 3, 4, 5].map((s) => (
+                                      <div
+                                        key={s}
+                                        className={`w-2 h-2 rounded-full ${
+                                          s <= finalScore
+                                            ? "bg-amber-500"
+                                            : "bg-white/10"
+                                        }`}
+                                      />
+                                    ));
+                                  })()}
+                                </div>
+                              </div>
+                              <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: "80%" }}
+                                  className="h-full bg-gradient-to-r from-amber-600 to-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+                                />
+                              </div>
                             </div>
                           </section>
 
-                          <section>
-                            <h4 className="text-amber-500 font-cinzel text-lg mb-3">
-                              Habilidades de Raça
+                          {/* 3. Fé & Religião */}
+                          <section className="space-y-6">
+                            <h4 className="text-amber-500 font-cinzel text-xl flex items-center gap-2">
+                              <Flame size={20} /> Fé & Devoção
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-4">
+                                <h5 className="text-amber-400 font-cinzel text-sm uppercase tracking-wider flex items-center gap-2">
+                                  <Scale size={16} /> Religiões Comuns
+                                </h5>
+                                <p className="text-sm text-neutral-400 italic">
+                                  {selectedItem.raw.commonReligions ||
+                                    "Variada entre o Panteão."}
+                                </p>
+                              </div>
+
+                              {selectedItem.raw.faithProbability && (
+                                <div className="space-y-4">
+                                  <h5 className="text-amber-400 font-cinzel text-sm uppercase tracking-wider flex items-center gap-2">
+                                    <Star size={16} /> Probabilidade de Devoção
+                                  </h5>
+                                  <div className="flex flex-wrap gap-2">
+                                    {Object.entries(
+                                      selectedItem.raw.faithProbability
+                                    ).map(([deus, prob]: [any, any]) => (
+                                      <div
+                                        key={deus}
+                                        className="px-3 py-2 bg-neutral-800/50 border border-neutral-700 rounded-lg flex items-center gap-3 group hover:border-amber-500/50 transition-all"
+                                      >
+                                        <span className="text-[10px] font-bold text-neutral-300">
+                                          {deus}
+                                        </span>
+                                        <div className="flex gap-0.5">
+                                          {Array.from({ length: 3 }).map(
+                                            (_, i) => (
+                                              <div
+                                                key={i}
+                                                className={`w-1 h-3 rounded-full ${
+                                                  i < (prob as number)
+                                                    ? "bg-amber-500"
+                                                    : "bg-white/5"
+                                                }`}
+                                              />
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </section>
+
+                          {/* 4. Habilidades (Dropdowns) */}
+                          <section className="space-y-6">
+                            <h4 className="text-amber-500 font-cinzel text-xl flex items-center gap-2">
+                              <Zap size={20} /> Habilidades de Raça
                             </h4>
                             <div className="space-y-4">
                               {selectedItem.raw.abilities?.map(
                                 (ab: any, i: number) => (
                                   <div
                                     key={i}
-                                    className="p-4 bg-black/30 border border-white/5 rounded-xl"
+                                    className="p-5 bg-neutral-900/50 border border-white/5 rounded-2xl hover:bg-neutral-800/50 transition-colors group"
                                   >
-                                    <div className="text-amber-400 font-bold mb-1">
-                                      {ab.name}
+                                    <div className="flex items-center justify-between mb-2">
+                                      <div className="text-amber-400 font-cinzel font-bold text-lg">
+                                        {ab.name}
+                                      </div>
+                                      <div className="p-1 px-2 bg-amber-500/10 text-amber-500 text-[10px] font-bold rounded uppercase">
+                                        Passiva
+                                      </div>
                                     </div>
-                                    <p className="text-sm text-neutral-400 italic line-clamp-3 hover:line-clamp-none transition-all">
+                                    <p className="text-sm text-neutral-400 leading-relaxed italic">
                                       {ab.description}
                                     </p>
                                   </div>

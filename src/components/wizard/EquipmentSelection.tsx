@@ -54,30 +54,43 @@ const EquipmentSelection = () => {
   // OR we provide a "Receber Kit Inicial" button if bag is empty.
 
   // Better UX: Button "Resgatar Equipamento Inicial" if bag is empty.
+  // --- Data Loading State ---
+  const [categories, setCategories] = useState<{
+    weapons: Equipment[];
+    armors: Equipment[];
+    shields: Equipment[];
+    general: Equipment[];
+  }>({
+    weapons: [],
+    armors: [],
+    shields: [],
+    general: [],
+  });
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await getEquipmentsByCategory();
+      setCategories(data);
+    };
+    loadData();
+  }, []);
+
+  // --- 1. Initial Load Logic (Once) ---
   const hasItems = Object.values(bag.getEquipments()).flat().length > 0;
 
-  const handleGrantInitialItems = () => {
-    // Class Items (Simulated logic based on T20 standard, usually defined in Class Description but text based there?
-    // Data file only has 'proficiencias'. Real data `items` is missing in `src/data/classes.ts` based on my view?
-    // Wait, looking at `guerreiro.ts` (viewed earlier), it didn't strictly list starting items in the interface used.
-    // Origin items ARE defined in `src/data/origins`.
-
+  const handleGrantInitialItems = async () => {
     let initialItems: Equipment[] = [];
 
     // 1. Origin Items
     if (selectedOrigin && selectedOrigin.getItems) {
       const originItems = selectedOrigin.getItems();
-      originItems.forEach((i) => {
-        // Map Origin Item format to Equipment
-        // Origin Item: { equipment: string | Equipment, qtd?, description? }
-        // We need to find real Equipment object if it's a string, or create a mock one.
-
+      // Use for...of to allow await inside loop
+      for (const i of originItems) {
         let eq: Equipment | undefined;
 
         if (typeof i.equipment === "string") {
           // Try to find in databases
-          // Function to find by name
-          eq = findEquipmentByName(i.equipment);
+          eq = await findEquipmentByName(i.equipment);
           if (!eq) {
             // Create generic
             eq = {
@@ -87,25 +100,15 @@ const EquipmentSelection = () => {
               preco: 0,
             };
           }
-        } else {
-          // It's already equipment object? The interface says string usually.
-          // types say `equipment: string`. Wait `getItems` returns `Items[]`.
-          // The snippet for Origins showed `equipment: 'Traje de Sacerdote'`.
-          // We fallback to generic.
         }
 
         if (eq) {
           addToBag(eq);
-          // If qtd > 1, add loop? `addToBag` just pushes one.
-          // Bag mechanics usually accumulate or show Qtd.
-          // Current Bag logic: `newEquips.concat`. So duplicate entries.
-          // We'll leave as is.
         }
-      });
+      }
     }
 
     // 2 Class Items (Mocked generic kit)
-    // Standard T20: Backpack, Sleeping Bag, Traveler's Outfit.
     addToBag({ nome: "Mochila", group: "Item Geral", spaces: 0, preco: 0 });
     addToBag({
       nome: "Saco de dormir",
@@ -128,11 +131,12 @@ const EquipmentSelection = () => {
   /**
    * OTIMIZAÇÃO DE PERFORMANCE
    *
-   * Usa getEquipmentsByCategory do localData.ts para carregar dados estáticos locais
-   * Memoização garante que a lista só é recalculada quando activeTab ou searchTerm mudam
+   * Usa dados carregados via useEffect do localData
    */
   const marketItems = useMemo(() => {
-    const categories = getEquipmentsByCategory();
+    // If data is not yet loaded (weapons empty), return empty or loading
+    // categories state is initialized empty.
+
     let items: Equipment[] = [];
 
     if (activeTab === "all") {
@@ -157,7 +161,7 @@ const EquipmentSelection = () => {
     }
 
     return items.sort((a, b) => (a.preco ?? 0) - (b.preco ?? 0));
-  }, [activeTab, searchTerm]);
+  }, [categories, activeTab, searchTerm]);
 
   // --- 3. Actions ---
   const handleBuy = (item: Equipment) => {

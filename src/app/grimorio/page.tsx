@@ -9,12 +9,12 @@ import { getAllSpells } from "@/lib/localData";
  * Carrega magias diretamente dos arquivos locais
  * Performance máxima: sem latência de rede, sem consultas ao banco
  */
-function getSpells(): Spell[] {
-  return getAllSpells();
+async function getSpells(): Promise<Spell[]> {
+  return await getAllSpells();
 }
 
-export default function GrimorioPage() {
-  const spells = getSpells();
+export default async function GrimorioPage() {
+  const spells = await getSpells();
 
   return (
     <div className="container mx-auto max-w-7xl animate-in fade-in duration-500">
