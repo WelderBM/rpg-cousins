@@ -9,6 +9,7 @@ import AttributeSelection from "../../components/wizard/AttributeSelection";
 import RoleSelection from "../../components/wizard/RoleSelection";
 import HistorySelection from "../../components/wizard/HistorySelection";
 import EquipmentSelection from "../../components/wizard/EquipmentSelection";
+import SummarySelection from "../../components/wizard/SummarySelection";
 
 export default function WizardPage() {
   const step = useCharacterStore((state) => state.step);
@@ -31,9 +32,10 @@ export default function WizardPage() {
             {step === 3 && <RoleSelection />}
             {step === 4 && <HistorySelection />}
             {step === 5 && <EquipmentSelection />}
+            {step === 6 && <SummarySelection />}
 
             {/* Placeholder for future steps */}
-            {step > 5 && (
+            {step > 6 && (
               <div className="p-8 text-center pt-32">
                 <h2 className="text-2xl font-cinzel text-amber-500 mb-4">
                   Em Breve
