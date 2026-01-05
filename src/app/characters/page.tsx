@@ -6,9 +6,6 @@ import { useCharacterStore } from "@/store/useCharacterStore";
 import { Character } from "@/interfaces/Character";
 import { motion } from "framer-motion";
 import { User, Sword, ArrowRight } from "lucide-react";
-import { onAuthStateChanged } from "firebase/auth";
-import { collection, query, onSnapshot, doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/firebaseConfig";
 
 export default function CharacterSelectPage() {
   const router = useRouter();
@@ -20,14 +17,19 @@ export default function CharacterSelectPage() {
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
 
-    unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
-        fetchCharacters(user.uid);
-      } else {
-        setLoading(false);
-      }
-    });
+    (async () => {
+      const { onAuthStateChanged } = await import("firebase/auth");
+      const { auth } = await import("@/firebaseConfig");
+
+      unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setCurrentUser(user);
+          fetchCharacters(user.uid);
+        } else {
+          setLoading(false);
+        }
+      });
+    })();
 
     return () => unsubscribe?.();
   }, [setUserCharacters]);
@@ -36,7 +38,12 @@ export default function CharacterSelectPage() {
     try {
       setLoading(true);
 
-      const q = query(collection(db, "users", uid, "characters"));
+      const { collection, query, onSnapshot } = await import(
+        "firebase/firestore"
+      );
+      const { db } = await import("@/firebaseConfig");
+
+      const q = query(collection(db as any, "users", uid, "characters"));
       // Using onSnapshot for real-time list updates
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const chars: any[] = [];
@@ -67,15 +74,18 @@ export default function CharacterSelectPage() {
   const handleSelectCharacter = async (charId: string) => {
     if (!currentUser) return;
 
-    // In a real app we might fetch the full details here if list only had summary
-    // But for now, we'll fetch single doc to be sure we have everything
-    // actually, we can just get it from the store if we loaded full data,
-    // but the list state is 'CharacterSummary'.
-    // Let's fetch the full document to be safe and robust.
-
     try {
+      const { doc, getDoc } = await import("firebase/firestore");
+      const { db } = await import("@/firebaseConfig");
+
       // Finding the character in the DB
-      const charRef = doc(db, "users", currentUser.uid, "characters", charId);
+      const charRef = doc(
+        db as any,
+        "users",
+        currentUser.uid,
+        "characters",
+        charId
+      );
       const charSnap = await getDoc(charRef);
 
       if (charSnap.exists()) {

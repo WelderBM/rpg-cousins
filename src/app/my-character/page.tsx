@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import { useCharacterStore } from "@/store/useCharacterStore";
 import { Character } from "@/interfaces/Character";
 import { Coins, Heart, Shield, Zap } from "lucide-react";
-import { doc, onSnapshot } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "@/firebaseConfig";
 
 export default function MyCharacterPage() {
   const router = useRouter();
@@ -19,49 +16,60 @@ export default function MyCharacterPage() {
   useEffect(() => {
     let unsubscribeAuth: (() => void) | undefined;
 
-    unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        router.push("/"); // Redirect to home/login if not authenticated
-        return;
-      }
+    (async () => {
+      const { onAuthStateChanged } = await import("firebase/auth");
+      const { auth } = await import("@/firebaseConfig");
 
-      if (!activeCharacter) {
-        const storedId = localStorage.getItem("rpg_active_char_id");
-        if (storedId) {
-          router.push("/characters");
-        } else {
-          router.push("/characters");
+      unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          router.push("/"); // Redirect to home/login if not authenticated
+          return;
         }
-      } else {
-        setInitializing(false);
-      }
-    });
+
+        if (!activeCharacter) {
+          const storedId = localStorage.getItem("rpg_active_char_id");
+          if (storedId) {
+            router.push("/characters");
+          } else {
+            router.push("/characters");
+          }
+        } else {
+          setInitializing(false);
+        }
+      });
+    })();
 
     return () => unsubscribeAuth?.();
   }, [activeCharacter, router]);
 
   // Real-time Synchronization
   useEffect(() => {
-    if (!activeCharacter?.id) return;
+    const charId = activeCharacter?.id;
+    if (!charId) return;
 
     let unsubscribeSnapshot: (() => void) | undefined;
 
-    if (!auth.currentUser) return;
+    (async () => {
+      const { doc, onSnapshot } = await import("firebase/firestore");
+      const { auth, db } = await import("@/firebaseConfig");
 
-    const charRef = doc(
-      db,
-      "users",
-      auth.currentUser.uid,
-      "characters",
-      activeCharacter.id
-    );
+      if (!auth.currentUser) return;
 
-    unsubscribeSnapshot = onSnapshot(charRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as Partial<Character>;
-        updateActiveCharacter(data);
-      }
-    });
+      const charRef = doc(
+        db as any,
+        "users",
+        auth.currentUser.uid,
+        "characters",
+        charId
+      );
+
+      unsubscribeSnapshot = onSnapshot(charRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data() as Partial<Character>;
+          updateActiveCharacter(data);
+        }
+      });
+    })();
 
     return () => unsubscribeSnapshot?.();
   }, [activeCharacter?.id, updateActiveCharacter]);
