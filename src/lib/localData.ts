@@ -16,6 +16,10 @@ import {
 } from "@/data/magias/generalSpells";
 import EQUIPAMENTOS, { Armas, Armaduras, Escudos } from "@/data/equipamentos";
 import { GENERAL_EQUIPMENT } from "@/data/equipamentos-gerais";
+import RACAS from "@/data/racas";
+import generalPowers from "@/data/poderes";
+import Race from "@/interfaces/Race";
+import { GeneralPower } from "@/interfaces/Poderes";
 
 // ============================================
 // CACHE EM MEMÓRIA (Module-level singletons)
@@ -37,6 +41,8 @@ let cachedEquipments: Equipment[] | null = null;
 let cachedEquipmentsByCategory: ReturnType<
   typeof buildEquipmentsByCategory
 > | null = null;
+let cachedRaces: Race[] | null = null;
+let cachedPowers: GeneralPower[] | null = null;
 
 /**
  * Constrói objeto de equipamentos por categoria
@@ -145,6 +151,38 @@ export function getEquipmentsByCategory() {
 }
 
 /**
+ * Carrega todas as raças
+ */
+export function getAllRaces(): Race[] {
+  if (cachedRaces === null) {
+    cachedRaces = RACAS;
+    if (typeof window !== "undefined") {
+      console.log(`[Cache] Raças carregadas: ${cachedRaces.length}`);
+    }
+  }
+  return cachedRaces;
+}
+
+/**
+ * Carrega todos os poderes gerais
+ */
+export function getAllPowers(): GeneralPower[] {
+  if (cachedPowers === null) {
+    cachedPowers = [
+      ...generalPowers.COMBATE,
+      ...generalPowers.CONCEDIDOS,
+      ...generalPowers.DESTINO,
+      ...generalPowers.MAGIA,
+      ...generalPowers.TORMENTA,
+    ];
+    if (typeof window !== "undefined") {
+      console.log(`[Cache] Poderes carregados: ${cachedPowers.length}`);
+    }
+  }
+  return cachedPowers;
+}
+
+/**
  * Limpa todos os caches (útil para testes ou hot reload)
  * ⚠️ Normalmente não é necessário chamar isso em produção
  */
@@ -152,6 +190,8 @@ export function clearAllCaches() {
   cachedSpells = null;
   cachedEquipments = null;
   cachedEquipmentsByCategory = null;
+  cachedRaces = null;
+  cachedPowers = null;
 
   if (typeof window !== "undefined") {
     console.log("[Cache] Todos os caches limpos");
