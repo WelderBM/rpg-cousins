@@ -23,10 +23,11 @@ const HeroesPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) return;
     const unsubscribe = auth.onAuthStateChanged((user) => {
       loadHeroes(user);
     });
-    return () => unsubscribe();
+    return () => unsubscribe?.();
   }, []);
 
   const loadHeroes = async (user: any) => {

@@ -29,10 +29,12 @@ export default function UserMenu() {
     let unsubscribe: any;
     // Dynamic import for firebase auth to avoid SSR issues if any
     import("firebase/auth").then(({ onAuthStateChanged }) => {
-      unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        setUser(currentUser);
-        setGlobalUser(currentUser);
-      });
+      if (auth) {
+        unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          setUser(currentUser);
+          setGlobalUser(currentUser);
+        });
+      }
     });
     return () => {
       if (unsubscribe) unsubscribe();
@@ -40,6 +42,7 @@ export default function UserMenu() {
   }, [setGlobalUser]);
 
   const handleLogin = async () => {
+    if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -59,6 +62,7 @@ export default function UserMenu() {
 
   const handleMasterLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!auth) return;
     setLoading(true);
     try {
       const { signInWithEmailAndPassword } = await import("firebase/auth");
@@ -76,6 +80,7 @@ export default function UserMenu() {
   };
 
   const handleLogout = async () => {
+    if (!auth) return;
     await signOut(auth);
     clearActiveCharacter();
     setGlobalUser(null);

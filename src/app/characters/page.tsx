@@ -26,44 +26,46 @@ export default function CharacterSelectPage() {
       );
       const { db } = await import("@/firebaseConfig");
 
-      authUnsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setCurrentUser(user);
-          setLoading(true);
+      if (auth && db) {
+        authUnsubscribe = onAuthStateChanged(auth, (user) => {
+          if (user) {
+            setCurrentUser(user);
+            setLoading(true);
 
-          if (charsUnsubscribe) charsUnsubscribe();
+            if (charsUnsubscribe) charsUnsubscribe();
 
-          const q = query(collection(db, "users", user.uid, "characters"));
-          charsUnsubscribe = onSnapshot(
-            q,
-            (querySnapshot) => {
-              const chars: any[] = [];
-              querySnapshot.forEach((doc) => {
-                chars.push({ id: doc.id, ...doc.data() });
-              });
+            const q = query(collection(db, "users", user.uid, "characters"));
+            charsUnsubscribe = onSnapshot(
+              q,
+              (querySnapshot) => {
+                const chars: any[] = [];
+                querySnapshot.forEach((doc) => {
+                  chars.push({ id: doc.id, ...doc.data() });
+                });
 
-              const summaryList = chars.map((c) => ({
-                id: c.id,
-                name: c.name,
-                raceName: c.race?.name || "Desconhecido",
-                className: c.class?.name || "Desconhecido",
-                level: c.level || 1,
-              }));
+                const summaryList = chars.map((c) => ({
+                  id: c.id,
+                  name: c.name,
+                  raceName: c.race?.name || "Desconhecido",
+                  className: c.class?.name || "Desconhecido",
+                  level: c.level || 1,
+                }));
 
-              setUserCharacters(summaryList);
-              setLoading(false);
-            },
-            (error) => {
-              console.error("Error fetching chars", error);
-              setLoading(false);
-            }
-          );
-        } else {
-          setCurrentUser(null);
-          setUserCharacters([]);
-          setLoading(false);
-        }
-      });
+                setUserCharacters(summaryList);
+                setLoading(false);
+              },
+              (error) => {
+                console.error("Error fetching chars", error);
+                setLoading(false);
+              }
+            );
+          } else {
+            setCurrentUser(null);
+            setUserCharacters([]);
+            setLoading(false);
+          }
+        });
+      }
     })();
 
     return () => {

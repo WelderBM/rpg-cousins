@@ -1,0 +1,240 @@
+﻿src/app/market/page.tsx(60,40): error TS2345: Argument of type 'Auth | undefined' is not assignable to parameter of type 'Auth'.
+  Type 'undefined' is not assignable to type 'Auth'.
+src/app/market/page.tsx(114,10): error TS18048: 'auth' is possibly 'undefined'.
+src/app/market/page.tsx(189,9): error TS18048: 'auth' is possibly 'undefined'.
+src/app/mestre/MestreClient.tsx(111,34): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/app/mestre/MestreClient.tsx(183,29): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path?: string | undefined, ...pathSegments: string[]): DocumentReference<unknown, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/app/mestre/MestreClient.tsx(185,33): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/app/mestre/MestreClient.tsx(210,27): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path?: string | undefined, ...pathSegments: string[]): DocumentReference<unknown, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/data/races/__tests__/anao.spec.ts(4,26): error TS2307: Cannot find module '../../../__mocks__/classes/inventor' or its corresponding type declarations.
+src/data/races/__tests__/anao.spec.ts(7,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/anao.spec.ts(12,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/anao.spec.ts(14,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/dahllan.spec.ts(6,24): error TS2307: Cannot find module '../../../__mocks__/classes/druida' or its corresponding type declarations.
+src/data/races/__tests__/dahllan.spec.ts(7,26): error TS2307: Cannot find module '../../../__mocks__/classes/inventor' or its corresponding type declarations.
+src/data/races/__tests__/dahllan.spec.ts(13,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/dahllan.spec.ts(17,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/dahllan.spec.ts(20,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/dahllan.spec.ts(22,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/dahllan.spec.ts(34,9): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/dahllan.spec.ts(36,7): error TS2304: Cannot find name 'fail'.
+src/data/races/__tests__/elfo.spec.ts(4,26): error TS2307: Cannot find module '../../../__mocks__/classes/inventor' or its corresponding type declarations.
+src/data/races/__tests__/elfo.spec.ts(7,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/elfo.spec.ts(12,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/elfo.spec.ts(13,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/golem.spec.ts(4,26): error TS2307: Cannot find module '../../../__mocks__/classes/inventor' or its corresponding type declarations.
+src/data/races/__tests__/golem.spec.ts(7,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/golem.spec.ts(12,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/golem.spec.ts(13,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/golem.spec.ts(15,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/golem.spec.ts(17,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/humano.spec.ts(3,24): error TS2307: Cannot find module '../../../__mocks__/classes/druida' or its corresponding type declarations.
+src/data/races/__tests__/humano.spec.ts(6,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/humano.spec.ts(7,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/humano.spec.ts(15,9): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/humano.spec.ts(16,9): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/humano.spec.ts(17,9): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/humano.spec.ts(20,11): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/humano.spec.ts(22,11): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/kliren.spec.ts(3,26): error TS2307: Cannot find module '../../../__mocks__/classes/inventor' or its corresponding type declarations.
+src/data/races/__tests__/kliren.spec.ts(7,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/kliren.spec.ts(11,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/kliren.spec.ts(12,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/kliren.spec.ts(14,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/kliren.spec.ts(15,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/kliren.spec.ts(17,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/kliren.spec.ts(18,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/minotauro.spec.ts(4,26): error TS2307: Cannot find module '../../../__mocks__/classes/inventor' or its corresponding type declarations.
+src/data/races/__tests__/minotauro.spec.ts(7,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/minotauro.spec.ts(12,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/minotauro.spec.ts(17,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/minotauro.spec.ts(19,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/minotauro.spec.ts(20,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/qareen.spec.ts(3,24): error TS2307: Cannot find module '../../../__mocks__/classes/druida' or its corresponding type declarations.
+src/data/races/__tests__/qareen.spec.ts(4,26): error TS2307: Cannot find module '../../../__mocks__/classes/inventor' or its corresponding type declarations.
+src/data/races/__tests__/qareen.spec.ts(9,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/qareen.spec.ts(13,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/qareen.spec.ts(14,5): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/qareen.spec.ts(17,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/data/races/__tests__/qareen.spec.ts(22,7): error TS2304: Cannot find name 'expect'.
+src/data/races/__tests__/qareen.spec.ts(29,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(1,24): error TS2307: Cannot find module '../../__mocks__/attributes' or its corresponding type declarations.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(2,26): error TS2307: Cannot find module '../../__mocks__/classes/inventor' or its corresponding type declarations.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(15,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(22,7): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(34,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(35,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(36,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(39,7): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(43,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(46,7): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(50,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(52,7): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(58,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(63,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(81,7): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(82,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(84,7): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(86,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/getSkillsAndPowers.spec.ts(87,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/raceModifications.spec.ts(19,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/raceModifications.spec.ts(20,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/raceModifications.spec.ts(41,5): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/raceModifications.spec.ts(52,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/raceModifications.spec.ts(56,7): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/raceModifications.spec.ts(67,9): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/randomName.spec.ts(17,5): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/randomName.spec.ts(25,5): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/randomName.spec.ts(26,5): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/randomName.spec.ts(52,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/randomName.spec.ts(53,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/randomName.spec.ts(63,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/randomName.spec.ts(76,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(2,42): error TS2307: Cannot find module '../../__mocks__/characterSheet' or its corresponding type declarations.
+src/functions/__tests__/recalculateSheet.spec.ts(8,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(11,3): error TS2304: Cannot find name 'beforeEach'.
+src/functions/__tests__/recalculateSheet.spec.ts(20,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(21,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(37,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(43,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(46,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(58,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(64,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(65,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(68,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(80,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(86,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(87,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(93,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(94,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(116,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(117,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(126,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(130,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(133,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(143,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(157,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(163,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(166,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(176,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(187,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(195,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(199,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(200,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(215,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(218,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(224,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(227,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(251,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(254,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(258,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(262,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(263,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(269,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(270,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(273,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(279,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(284,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(287,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(295,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(296,7): error TS2304: Cannot find name 'expect'.
+src/functions/__tests__/recalculateSheet.spec.ts(299,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/functions/__tests__/recalculateSheet.spec.ts(317,7): error TS2304: Cannot find name 'expect'.
+src/lib/characterService.ts(51,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/lib/characterService.ts(73,27): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path?: string | undefined, ...pathSegments: string[]): DocumentReference<unknown, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/lib/characterService.ts(99,35): error TS2345: Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+  Type 'undefined' is not assignable to type 'Firestore'.
+src/lib/characterService.ts(102,30): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/lib/characterService.ts(105,30): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): CollectionReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/lib/characterService.ts(128,29): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path?: string | undefined, ...pathSegments: string[]): DocumentReference<unknown, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.
+src/lib/characterService.ts(130,29): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(firestore: Firestore, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'Firestore'.
+      Type 'undefined' is not assignable to type 'Firestore'.
+  Overload 2 of 3, '(reference: CollectionReference<unknown, DocumentData>, path?: string | undefined, ...pathSegments: string[]): DocumentReference<unknown, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'CollectionReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'CollectionReference<unknown, DocumentData>'.
+  Overload 3 of 3, '(reference: DocumentReference<unknown, DocumentData>, path: string, ...pathSegments: string[]): DocumentReference<DocumentData, DocumentData>', gave the following error.
+    Argument of type 'Firestore | undefined' is not assignable to parameter of type 'DocumentReference<unknown, DocumentData>'.
+      Type 'undefined' is not assignable to type 'DocumentReference<unknown, DocumentData>'.

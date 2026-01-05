@@ -50,6 +50,8 @@ export default function MyCharacterPage() {
 
   // Authentication and Character Check
   useEffect(() => {
+    if (!auth) return;
+
     let unsubscribeAuth: (() => void) | undefined;
 
     unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -87,7 +89,7 @@ export default function MyCharacterPage() {
 
   // Real-time Synchronization
   useEffect(() => {
-    if (!activeCharacter?.id || !auth.currentUser) return;
+    if (!auth || !db || !activeCharacter?.id || !auth.currentUser) return;
 
     const charRef = doc(
       db,
@@ -150,7 +152,7 @@ export default function MyCharacterPage() {
   ]);
 
   const handleSaveMoney = async () => {
-    if (!activeCharacter || !auth.currentUser) return;
+    if (!auth || !activeCharacter || !auth.currentUser) return;
 
     try {
       updateActiveCharacter({ money: tempMoney });
@@ -167,7 +169,7 @@ export default function MyCharacterPage() {
   };
 
   const handleSavePv = async () => {
-    if (!activeCharacter || !auth.currentUser) return;
+    if (!auth || !activeCharacter || !auth.currentUser) return;
     try {
       updateActiveCharacter({ currentPv: tempPv });
       setIsEditingPv(false);
@@ -183,7 +185,7 @@ export default function MyCharacterPage() {
   };
 
   const handleSavePm = async () => {
-    if (!activeCharacter || !auth.currentUser) return;
+    if (!auth || !activeCharacter || !auth.currentUser) return;
     try {
       updateActiveCharacter({ currentPm: tempPm });
       setIsEditingPm(false);
