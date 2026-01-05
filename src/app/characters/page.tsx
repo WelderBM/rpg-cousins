@@ -80,7 +80,13 @@ export default function CharacterSelectPage() {
       const { db } = await import("@/firebaseConfig");
 
       // Finding the character in the DB
-      const charRef = doc(db, "users", currentUser.uid, "characters", charId);
+      const charRef = doc(
+        db as any,
+        "users",
+        currentUser.uid,
+        "characters",
+        charId
+      );
       const charSnap = await getDoc(charRef);
 
       if (charSnap.exists()) {
