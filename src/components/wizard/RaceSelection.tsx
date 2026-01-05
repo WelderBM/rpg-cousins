@@ -4,7 +4,20 @@ import Image from "next/image";
 import RACAS from "../../data/racas";
 import Race from "../../interfaces/Race";
 import { useCharacterStore } from "../../store/useCharacterStore";
-import { ChevronRight, ChevronLeft, Check, Sparkles } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  Sparkles,
+  Swords,
+  Brain,
+  Feather,
+  Info,
+  Scale,
+  Star,
+  Flame,
+  Users,
+} from "lucide-react";
 
 /**
  * Mapeamento de raças para imagens
@@ -235,26 +248,156 @@ const RaceSelection = () => {
             </div>
 
             {/* Conteúdo scrollável com largura controlada */}
-            <div className="flex-1 overflow-y-auto bg-stone-950 p-6 md:p-8 space-y-6 scrollbar-thin scrollbar-thumb-amber-900/30 scrollbar-track-transparent">
+            <div className="flex-1 overflow-y-auto bg-stone-950 p-6 md:p-8 space-y-10 scrollbar-thin scrollbar-thumb-amber-900/30 scrollbar-track-transparent">
+              {/* 1. Visão Geral (Lore) */}
+              <div className="space-y-6">
+                <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl relative overflow-hidden group">
+                  <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+                    <Users size={120} />
+                  </div>
+                  <h4 className="text-amber-500 font-cinzel text-xl mb-3 flex items-center gap-2">
+                    <Info size={18} /> Visão Geral
+                  </h4>
+                  <p className="text-neutral-300 leading-relaxed italic text-lg border-l-2 border-amber-500/20 pl-4">
+                    {selectedPreview.description ||
+                      "Uma raça única habitando as terras de Arton."}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3 bg-black/20 p-4 rounded-xl border border-white/5">
+                    <h5 className="text-amber-400 font-cinzel flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold">
+                      <Feather size={14} /> Aparência
+                    </h5>
+                    <p className="text-sm text-neutral-400 leading-relaxed italic">
+                      {selectedPreview.appearance ||
+                        "Aparência variada conforme a linhagem."}
+                    </p>
+                  </div>
+                  <div className="space-y-3 bg-black/20 p-4 rounded-xl border border-white/5">
+                    <h5 className="text-amber-400 font-cinzel flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold">
+                      <Brain size={14} /> Personalidade
+                    </h5>
+                    <p className="text-sm text-neutral-400 leading-relaxed italic">
+                      {selectedPreview.personality ||
+                        "Traços comportamentais distintos."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Atributos Mecânicos (Visual) */}
+              <div className="space-y-6">
+                <h3 className="text-lg font-cinzel text-amber-500 flex items-center gap-2">
+                  <Swords size={20} />
+                  Atributos & Modificadores
+                </h3>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {selectedPreview.attributes.attrs.map(
+                    (at: any, i: number) => (
+                      <div
+                        key={i}
+                        className="p-4 bg-black/30 border border-white/5 rounded-xl text-center group hover:border-amber-500/30 transition-all"
+                      >
+                        <div className="text-[10px] text-neutral-500 uppercase font-bold mb-1 group-hover:text-amber-500/70 transition-colors">
+                          {at.attr}
+                        </div>
+                        <div
+                          className={`text-2xl font-cinzel ${
+                            at.mod > 0 ? "text-emerald-400" : "text-red-400"
+                          }`}
+                        >
+                          {at.mod > 0 ? "+" : ""}
+                          {at.mod}
+                        </div>
+                      </div>
+                    )
+                  )}
+                  <div className="p-4 bg-black/30 border border-white/5 rounded-xl text-center">
+                    <div className="text-[10px] text-neutral-500 uppercase font-bold mb-1">
+                      Desloc.
+                    </div>
+                    <div className="text-2xl font-cinzel text-neutral-200">
+                      {selectedPreview.getDisplacement?.(selectedPreview) || 9}m
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Fé & Devoção */}
+              <div className="space-y-6">
+                <h3 className="text-lg font-cinzel text-amber-500 flex items-center gap-2">
+                  <Flame size={20} />
+                  Fé & Devoção
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h5 className="text-amber-400 font-cinzel text-[10px] uppercase tracking-wider flex items-center gap-2 font-bold">
+                      <Scale size={14} /> Religiões Comuns
+                    </h5>
+                    <p className="text-sm text-neutral-400 italic bg-black/20 p-4 rounded-xl border border-white/5">
+                      {selectedPreview.commonReligions ||
+                        "Variada entre o Panteão."}
+                    </p>
+                  </div>
+
+                  {selectedPreview.faithProbability && (
+                    <div className="space-y-4">
+                      <h5 className="text-amber-400 font-cinzel text-[10px] uppercase tracking-wider flex items-center gap-2 font-bold">
+                        <Star size={14} /> Afinidade Divina
+                      </h5>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(selectedPreview.faithProbability).map(
+                          ([deus, prob]: [any, any]) => (
+                            <div
+                              key={deus}
+                              className="px-3 py-2 bg-neutral-900/50 border border-neutral-800 rounded-lg flex items-center gap-3"
+                            >
+                              <span className="text-[10px] font-bold text-neutral-300 uppercase letter-spacing-1">
+                                {deus}
+                              </span>
+                              <div className="flex gap-0.5">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-1 h-3 rounded-full ${
+                                      i < (prob as number)
+                                        ? "bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]"
+                                        : "bg-white/5"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Habilidades de Raça */}
-              <div className="bg-stone-900/50 backdrop-blur-sm border border-amber-900/20 p-6 rounded-xl">
+              <div className="bg-stone-900/50 backdrop-blur-sm border border-amber-900/20 p-6 rounded-xl space-y-6">
                 <h3 className="text-lg font-cinzel text-amber-500 mb-4 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
-                  Habilidades de Raça
+                  Habilidades Raciais
                 </h3>
-                <ul className="space-y-4">
+                <ul className="space-y-6">
                   {selectedPreview.abilities.map((ability, idx) => (
                     <motion.li
                       key={ability.name}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="border-l-2 border-amber-700/40 pl-4"
+                      className="border-l-2 border-amber-700/40 pl-6 group"
                     >
-                      <span className="font-bold text-amber-400 text-lg">
+                      <span className="font-cinzel font-bold text-amber-400 text-xl group-hover:text-amber-300 transition-colors">
                         {ability.name}
                       </span>
-                      <p className="text-sm text-neutral-300 leading-relaxed mt-2">
+                      <p className="text-sm text-neutral-300 leading-relaxed mt-3 italic opacity-80 group-hover:opacity-100 transition-opacity">
                         {ability.description}
                       </p>
                     </motion.li>
@@ -263,9 +406,9 @@ const RaceSelection = () => {
               </div>
 
               {/* Dica */}
-              <div className="text-center text-xs text-neutral-500 italic bg-black/20 p-4 rounded-lg border border-neutral-800/50">
+              <div className="text-center text-[10px] text-neutral-600 uppercase tracking-widest bg-black/40 p-6 rounded-xl border border-neutral-900 select-none">
                 Ao selecionar esta raça, atributos e deslocamento serão
-                ajustados automaticamente.
+                ajustados automaticamente em sua ficha de personagem.
               </div>
             </div>
 

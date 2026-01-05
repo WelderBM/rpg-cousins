@@ -168,7 +168,7 @@ export default function GrimorioClient({
                     {spell.nome}
                   </h3>
                   <span className="text-xs font-bold px-2 py-1 rounded bg-medieval-gold/10 text-medieval-gold border border-medieval-gold/20">
-                    {spell.spellCircle}º Círculo
+                    {spell.spellCircle}
                   </span>
                 </div>
 

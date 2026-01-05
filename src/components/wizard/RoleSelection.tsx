@@ -10,6 +10,7 @@ import {
   Zap,
   Book,
   Info,
+  Swords,
 } from "lucide-react";
 import { ClassDescription } from "../../interfaces/Class";
 import Skill from "../../interfaces/Skills";
@@ -233,51 +234,72 @@ const RoleSelection = () => {
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-neutral-700">
               {/* Stats Cards */}
+              {/* Stats Cards */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-red-950/30 p-4 rounded-lg border border-red-900/30 flex flex-col items-center">
+                <div className="bg-red-950/30 p-4 rounded-xl border border-red-900/30 flex flex-col items-center">
                   <div className="flex items-center gap-2 mb-1 text-red-400">
                     <Shield size={16} />{" "}
-                    <span className="text-xs font-bold uppercase">
+                    <span className="text-[10px] font-bold uppercase tracking-widest">
                       Vida (PV)
                     </span>
                   </div>
-                  <span className="text-2xl font-cinzel text-white">
+                  <span className="text-3xl font-cinzel text-white">
                     {stats?.hp}
                   </span>
-                  <span className="text-[10px] text-red-400/60">
-                    Base {selectedPreview.pv} + Con
+                  <span className="text-[10px] text-red-400/60 font-bold">
+                    BASE {selectedPreview.pv} + CON
                   </span>
                 </div>
-                <div className="bg-blue-950/30 p-4 rounded-lg border border-blue-900/30 flex flex-col items-center">
+                <div className="bg-blue-950/30 p-4 rounded-xl border border-blue-900/30 flex flex-col items-center">
                   <div className="flex items-center gap-2 mb-1 text-blue-400">
                     <Zap size={16} />{" "}
-                    <span className="text-xs font-bold uppercase">
+                    <span className="text-[10px] font-bold uppercase tracking-widest">
                       Mana (PM)
                     </span>
                   </div>
-                  <span className="text-2xl font-cinzel text-white">
+                  <span className="text-3xl font-cinzel text-white">
                     {stats?.pm}
                   </span>
-                  <span className="text-[10px] text-blue-400/60">
-                    Base {selectedPreview.pm}
+                  <span className="text-[10px] text-blue-400/60 font-bold">
+                    BASE {selectedPreview.pm}
                   </span>
                 </div>
               </div>
 
-              {/* Proficiencies */}
-              <div>
-                <h3 className="text-sm uppercase tracking-wider text-neutral-500 mb-2">
-                  Proficiências
+              {/* Lore / Description */}
+              <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl relative overflow-hidden group">
+                <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+                  <Book size={120} />
+                </div>
+                <h3 className="text-amber-500 font-cinzel text-lg mb-3 flex items-center gap-2">
+                  <Info size={16} /> Essência da Classe
                 </h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedPreview.proficiencias.map((prof, i) => (
-                    <span
-                      key={i}
-                      className="px-2 py-1 bg-neutral-800 text-neutral-300 text-xs rounded border border-neutral-700"
-                    >
-                      {prof}
-                    </span>
-                  ))}
+                <p className="text-neutral-300 leading-relaxed italic border-l-2 border-amber-500/30 pl-4 text-sm">
+                  {selectedPreview.description ||
+                    "Uma das lendárias sendas de Arton."}
+                </p>
+              </div>
+
+              {/* Proficiencies Detailed */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-cinzel text-amber-500 uppercase tracking-[0.2em] font-bold flex items-center gap-2">
+                  <Swords size={16} /> Treinamento & Armas
+                </h3>
+                <div className="bg-black/40 p-4 rounded-xl border border-white/5">
+                  <p className="text-sm text-neutral-400 leading-relaxed italic mb-4">
+                    {selectedPreview.detailedProficiencies ||
+                      "Treinamento básico em combate e sobrevivência."}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedPreview.proficiencias.map((prof, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 bg-neutral-800 text-neutral-400 text-[10px] font-bold uppercase rounded-full border border-neutral-700"
+                      >
+                        {prof}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
