@@ -15,61 +15,62 @@ export default function CharacterSelectPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
+    let authUnsubscribe: (() => void) | undefined;
+    let charsUnsubscribe: (() => void) | undefined;
 
     (async () => {
       const { onAuthStateChanged } = await import("firebase/auth");
       const { auth } = await import("@/firebaseConfig");
-
-      unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setCurrentUser(user);
-          fetchCharacters(user.uid);
-        } else {
-          setLoading(false);
-        }
-      });
-    })();
-
-    return () => unsubscribe?.();
-  }, [setUserCharacters]);
-
-  const fetchCharacters = async (uid: string) => {
-    try {
-      setLoading(true);
-
       const { collection, query, onSnapshot } = await import(
         "firebase/firestore"
       );
       const { db } = await import("@/firebaseConfig");
 
-      const q = query(collection(db as any, "users", uid, "characters"));
-      // Using onSnapshot for real-time list updates
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const chars: any[] = [];
-        querySnapshot.forEach((doc) => {
-          chars.push({ id: doc.id, ...doc.data() });
-        });
+      authUnsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setCurrentUser(user);
+          setLoading(true);
 
-        // Map to summary for the list
-        const summaryList = chars.map((c) => ({
-          id: c.id,
-          name: c.name,
-          raceName: c.race?.name || "Desconhecido",
-          className: c.class?.name || "Desconhecido",
-          level: c.level || 1,
-        }));
+          if (charsUnsubscribe) charsUnsubscribe();
 
-        setUserCharacters(summaryList);
-        setLoading(false);
+          const q = query(collection(db, "users", user.uid, "characters"));
+          charsUnsubscribe = onSnapshot(
+            q,
+            (querySnapshot) => {
+              const chars: any[] = [];
+              querySnapshot.forEach((doc) => {
+                chars.push({ id: doc.id, ...doc.data() });
+              });
+
+              const summaryList = chars.map((c) => ({
+                id: c.id,
+                name: c.name,
+                raceName: c.race?.name || "Desconhecido",
+                className: c.class?.name || "Desconhecido",
+                level: c.level || 1,
+              }));
+
+              setUserCharacters(summaryList);
+              setLoading(false);
+            },
+            (error) => {
+              console.error("Error fetching chars", error);
+              setLoading(false);
+            }
+          );
+        } else {
+          setCurrentUser(null);
+          setUserCharacters([]);
+          setLoading(false);
+        }
       });
+    })();
 
-      return () => unsubscribe();
-    } catch (error) {
-      console.error("Error fetching characters:", error);
-      setLoading(false);
-    }
-  };
+    return () => {
+      if (authUnsubscribe) authUnsubscribe();
+      if (charsUnsubscribe) charsUnsubscribe();
+    };
+  }, [setUserCharacters]);
 
   const handleSelectCharacter = async (charId: string) => {
     if (!currentUser) return;
@@ -117,6 +118,17 @@ export default function CharacterSelectPage() {
       </h1>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {!currentUser && !loading && (
+          <div className="col-span-full py-8 text-center text-parchment-DEFAULT border border-dashed border-medieval-iron/50 rounded-xl bg-black/20 mb-4">
+            <p className="text-xl font-serif text-medieval-gold mb-2">
+              Aventureiro Anônimo
+            </p>
+            <p className="text-sm opacity-70 max-w-md mx-auto">
+              Seus heróis não serão salvos na nuvem se você não estiver logado.
+              Use o menu lateral para entrar em sua conta.
+            </p>
+          </div>
+        )}
         {userCharacters.map((char) => (
           <motion.div
             key={char.id}

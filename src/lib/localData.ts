@@ -148,6 +148,9 @@ export async function getEquipmentsByCategory() {
       armors: [...EQUIPAMENTOS.armadurasLeves, ...EQUIPAMENTOS.armaduraPesada],
       shields: EQUIPAMENTOS.escudos,
       general: GENERAL_EQUIPMENT.generalItems,
+      alchemy: GENERAL_EQUIPMENT.alchemyItems,
+      clothing: GENERAL_EQUIPMENT.clothingItems,
+      food: GENERAL_EQUIPMENT.foodItems,
     };
 
     if (typeof window !== "undefined") {
@@ -157,7 +160,15 @@ export async function getEquipmentsByCategory() {
     return cachedEquipmentsByCategory;
   } catch (error) {
     console.error("Erro ao carregar equipamentos por categoria:", error);
-    return { weapons: [], armors: [], shields: [], general: [] };
+    return {
+      weapons: [],
+      armors: [],
+      shields: [],
+      general: [],
+      alchemy: [],
+      clothing: [],
+      food: [],
+    };
   }
 }
 

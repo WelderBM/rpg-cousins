@@ -16,18 +16,26 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { auth } from "../../firebaseConfig";
+
 const HeroesPage = () => {
   const [heroes, setHeroes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadHeroes();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      loadHeroes(user);
+    });
+    return () => unsubscribe();
   }, []);
 
-  const loadHeroes = async () => {
+  const loadHeroes = async (user: any) => {
     try {
       setLoading(true);
-      const data = await CharacterService.getCharacters();
+      const isMestre = localStorage.getItem("mestre_auth") === "true";
+      const uid = user?.uid;
+      // Fetch characters based on role
+      const data = await CharacterService.getCharacters(uid, isMestre);
       setHeroes(data);
     } catch (error) {
       console.error(error);
@@ -36,14 +44,14 @@ const HeroesPage = () => {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string, path?: string) => {
     if (
       confirm(
         `Tem certeza que deseja deletar ${name}? Esta ação é irreversível.`
       )
     ) {
       try {
-        await CharacterService.deleteCharacter(id);
+        await CharacterService.deleteCharacter(id, path);
         setHeroes((prev) => prev.filter((h) => h.id !== id));
       } catch (error) {
         alert("Erro ao deletar personagem.");
@@ -133,7 +141,9 @@ const HeroesPage = () => {
                         </div>
                       </div>
                       <button
-                        onClick={() => handleDelete(hero.id, hero.name)}
+                        onClick={() =>
+                          handleDelete(hero.id, hero.name, hero.path)
+                        }
                         className="p-2 text-neutral-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
                         title="Deletar"
                       >

@@ -41,5 +41,7 @@ export interface Character {
   grantedPower: GeneralPower | null;
   bag: Bag; // Note: Bag class might need serialization handling for Firestore
   money: number;
+  currentPv?: number;
+  currentPm?: number;
   spells?: any[]; // Placeholder if needed
 }

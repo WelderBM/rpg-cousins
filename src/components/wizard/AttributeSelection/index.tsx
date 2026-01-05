@@ -178,7 +178,7 @@ const AttributeSelection = () => {
         )}
       </AnimatePresence>
 
-      <div className="relative max-w-6xl mx-auto p-4 sm:p-6 min-h-screen flex flex-col pb-32">
+      <div className="relative max-w-5xl mx-auto p-4 sm:p-6 min-h-screen flex flex-col pb-48 md:pb-32">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button
@@ -308,22 +308,20 @@ const AttributeSelection = () => {
           ))}
         </div>
 
-        {/* Action Button */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md border-t border-amber-900/20 z-30">
-          <div className="max-w-6xl mx-auto flex justify-center">
-            <button
-              onClick={() => setStep(3)}
-              disabled={!canProceed}
-              className={`w-full max-w-md py-4 font-bold rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.98] ${
-                canProceed
-                  ? "bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-black"
-                  : "bg-neutral-800 text-neutral-500 opacity-50 cursor-not-allowed"
-              }`}
-            >
-              {canProceed ? "Pronto para a Aventura!" : "Confirme seus Pontos"}
-              <ChevronRight size={20} />
-            </button>
-          </div>
+        {/* Action Button - Centered in Parent */}
+        <div className="mt-12 pb-12 flex justify-center w-full">
+          <button
+            onClick={() => setStep(3)}
+            disabled={!canProceed}
+            className={`w-full max-w-md py-4 font-bold rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.98] ${
+              canProceed
+                ? "bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-black"
+                : "bg-neutral-800 text-neutral-500 opacity-50 cursor-not-allowed border border-neutral-700"
+            }`}
+          >
+            {canProceed ? "Pronto para a Aventura!" : "Confirme seus Pontos"}
+            <ChevronRight size={20} />
+          </button>
         </div>
       </div>
     </div>

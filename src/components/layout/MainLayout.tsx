@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   Wand2,
   Users,
+  ShoppingBag,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -24,9 +25,12 @@ const navItems = [
   { name: "Novo Personagem", href: "/wizard", icon: Wand2 },
   { name: "Poderes", href: "/grimorio", icon: BookOpen },
   { name: "Meus Heróis", href: "/characters", icon: Users },
+  { name: "Mercado", href: "/market", icon: ShoppingBag }, // NEW: Added Market
   { name: "Wiki", href: "/wiki", icon: Scroll },
   { name: "Mestre", href: "/mestre", icon: ShieldAlert },
 ];
+
+import UserMenu from "@/components/auth/UserMenu";
 
 export default function MainLayout({
   children,
@@ -83,11 +87,7 @@ export default function MainLayout({
           })}
         </nav>
 
-        <div className="mt-auto pt-6 border-t border-medieval-iron/50 text-center">
-          <p className="text-xs text-parchment-dark/60 font-serif">
-            Tormenta 20 System
-          </p>
-        </div>
+        <UserMenu />
       </aside>
 
       {/* Main Content */}
@@ -95,7 +95,7 @@ export default function MainLayout({
         {/* Background Texture Overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] mix-blend-overlay"></div>
 
-        <div className="relative z-10 p-4 md:p-8 pb-24 md:pb-8 min-h-full">
+        <div className="relative z-10 p-4 md:p-8 pb-24 md:pb-8 min-h-full max-w-5xl mx-auto">
           {children}
         </div>
       </main>

@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronUp,
   Heart,
+  ShoppingBag,
   Swords,
   Brain,
   Compass,
@@ -42,7 +43,7 @@ import { GeneralPower } from "@/interfaces/Poderes";
 // TYPES
 // ============================================
 
-type Category = "magias" | "equipamentos" | "poderes" | "racas";
+type Category = "magias" | "equipamentos" | "poderes" | "racas" | "mercado";
 
 interface ItemBase {
   id: string;
@@ -86,6 +87,13 @@ const CATEGORIES = [
     color: "text-emerald-400",
     bg: "bg-emerald-400/10",
   },
+  {
+    id: "mercado",
+    label: "Mercado",
+    icon: ShoppingBag,
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+  },
 ];
 
 const ITEMS_PER_PAGE = 24;
@@ -122,11 +130,13 @@ export default function WikiPage() {
     equipamentos: ItemBase[];
     racas: ItemBase[];
     poderes: ItemBase[];
+    mercado: ItemBase[];
   }>({
     magias: [],
     equipamentos: [],
     racas: [],
     poderes: [],
+    mercado: [],
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -191,6 +201,16 @@ export default function WikiPage() {
             description: p.description,
             raw: p,
           }));
+        } else if (activeCategory === "mercado") {
+          const rawEquips = await getAllEquipments();
+          items = rawEquips.map((e) => ({
+            id: `mercado-${e.nome}`,
+            name: e.nome,
+            category: "mercado" as Category,
+            type: e.group,
+            description: `T$ ${e.preco} • ${e.spaces} esp.`,
+            raw: e,
+          }));
         }
 
         if (isMounted) {
@@ -246,7 +266,7 @@ export default function WikiPage() {
       }
     }
 
-    if (activeCategory === "equipamentos") {
+    if (activeCategory === "equipamentos" || activeCategory === "mercado") {
       if (equipGroup !== "all") {
         items = items.filter((i) => i.raw.group === equipGroup);
       }
@@ -554,9 +574,11 @@ export default function WikiPage() {
                       )}
 
                       {(activeCategory === "equipamentos" ||
+                        activeCategory === "mercado" ||
                         activeCategory === "poderes") && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                          {activeCategory === "equipamentos" && (
+                          {(activeCategory === "equipamentos" ||
+                            activeCategory === "mercado") && (
                             <>
                               <div>
                                 <label className="block text-[10px] uppercase font-bold text-neutral-500 mb-2">
