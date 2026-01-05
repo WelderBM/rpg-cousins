@@ -57,6 +57,7 @@ const MarketPage = () => {
 
     const checkAuth = async () => {
       const { onAuthStateChanged } = await import("firebase/auth");
+      if (!auth) return;
       unsubscribe = onAuthStateChanged(auth, (user) => {
         if (!user) {
           router.push("/characters");
@@ -111,7 +112,7 @@ const MarketPage = () => {
   }, [categories, activeTab, searchTerm]);
 
   const handleTransaction = async (item: Equipment, type: "buy" | "sell") => {
-    if (!auth.currentUser || !activeCharacter) return;
+    if (!auth || !auth.currentUser || !activeCharacter) return;
 
     const price = item.preco || 0;
     let newMoney = activeCharacter.money;
