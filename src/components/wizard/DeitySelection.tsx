@@ -174,7 +174,7 @@ const DeitySelection = () => {
                           src={imagePath}
                           alt={deity.name}
                           fill
-                          className="object-cover opacity-40 group-hover:opacity-60 transition-all duration-700 scale-100 group-hover:scale-110"
+                          className="object-cover object-top opacity-40 group-hover:opacity-60 transition-all duration-700 scale-100 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-900/20 to-transparent" />
                         <div className="absolute inset-0 p-6 flex flex-col justify-end">
@@ -221,7 +221,7 @@ const DeitySelection = () => {
 
             {/* Banner Area */}
             <div className="bg-stone-900/30 rounded-2xl border border-stone-800 overflow-hidden">
-              <div className="relative min-h-[300px] flex items-center justify-center p-6">
+              <div className="relative min-h-[300px] md:min-h-[500px] flex items-center justify-center p-6">
                 <div className="absolute inset-0">
                   <Image
                     src={`/assets/deities/${formatAssetName(

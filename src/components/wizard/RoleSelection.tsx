@@ -53,7 +53,7 @@ const RoleCard = React.memo(
                 alt={role.name}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className={`object-cover transition-all duration-700 ${
+                className={`object-cover object-top transition-all duration-700 ${
                   imageLoaded
                     ? "opacity-100 scale-100 group-hover:scale-110"
                     : "opacity-0 scale-105"
@@ -339,7 +339,7 @@ const RoleSelection = () => {
             {/* Stats & Description */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Image & Description Banner */}
-              <div className="md:col-span-2 relative overflow-hidden flex items-center bg-stone-900/50 rounded-2xl min-h-[300px]">
+              <div className="md:col-span-2 relative overflow-hidden flex items-center bg-stone-900/50 rounded-2xl min-h-[300px] md:min-h-[500px]">
                 <div className="absolute inset-0">
                   <Image
                     src={`/assets/classes/${formatAssetName(

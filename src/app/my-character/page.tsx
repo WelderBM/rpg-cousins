@@ -29,10 +29,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Atributo } from "@/data/atributos";
 import Link from "next/link";
 import { CharacterService } from "@/lib/characterService";
-
-// Utility for attribute modifier
-const getMod = (val: number) => Math.floor((val - 10) / 2);
-const formatMod = (val: number) => (val >= 0 ? `+${val}` : val);
+import { getRaceByName } from "@/data/racas";
+import CLASSES from "@/data/classes";
+import { formatAssetName } from "@/utils/assetUtils";
 
 export default function MyCharacterPage() {
   const router = useRouter();
@@ -42,6 +41,12 @@ export default function MyCharacterPage() {
   // States for Money Management
   const [isEditingMoney, setIsEditingMoney] = useState(false);
   const [tempMoney, setTempMoney] = useState(0);
+
+  // States for Resources (PV/PM)
+  const [isEditingPv, setIsEditingPv] = useState(false);
+  const [tempPv, setTempPv] = useState(0);
+  const [isEditingPm, setIsEditingPm] = useState(false);
+  const [tempPm, setTempPm] = useState(0);
 
   // Authentication and Character Check
   useEffect(() => {
@@ -64,6 +69,16 @@ export default function MyCharacterPage() {
       } else {
         setInitializing(false);
         setTempMoney(activeCharacter.money);
+
+        // Derive max values first to safeguard defaults
+        const conMod = activeCharacter.attributes.Constituição;
+        const hpBase = activeCharacter.class?.pv || 16;
+        const hpMax = hpBase + conMod;
+        const pmBase = activeCharacter.class?.pm || 4;
+        const pmMax = pmBase;
+
+        setTempPv(activeCharacter.currentPv ?? hpMax);
+        setTempPm(activeCharacter.currentPm ?? pmMax);
       }
     });
 
@@ -84,36 +99,102 @@ export default function MyCharacterPage() {
 
     const unsubscribeSnapshot = onSnapshot(charRef, (docSnap) => {
       if (docSnap.exists()) {
-        const data = docSnap.data() as Partial<Character>;
-        updateActiveCharacter(data);
-        if (!isEditingMoney) {
-          setTempMoney(data.money || 0);
+        const data = docSnap.data() as Partial<Character> & {
+          raceName?: string;
+          className?: string;
+        };
+
+        // Hydration Logic for Legacy/Missing Data
+        if (!data.race && data.raceName) {
+          try {
+            data.race = getRaceByName(data.raceName);
+          } catch (e) {
+            console.error("Failed to hydrate race:", e);
+          }
         }
+
+        if (!data.class && data.className) {
+          try {
+            const foundClass = CLASSES.find((c) => c.name === data.className);
+            if (foundClass) {
+              // Clone to avoid reference issues
+              data.class = JSON.parse(JSON.stringify(foundClass));
+            }
+          } catch (e) {
+            console.error("Failed to hydrate class:", e);
+          }
+        }
+
+        updateActiveCharacter(data);
+
+        // Recalculate maxes for defaults
+        const conMod = (data.attributes as any)?.Constituição || 0;
+        const hpBase = data.class?.pv || 16;
+        const hpMax = hpBase + conMod;
+        const pmBase = data.class?.pm || 4;
+        const pmMax = pmBase;
+
+        if (!isEditingMoney) setTempMoney(data.money || 0);
+        if (!isEditingPv) setTempPv(data.currentPv ?? hpMax);
+        if (!isEditingPm) setTempPm(data.currentPm ?? pmMax);
       }
     });
 
     return () => unsubscribeSnapshot();
-  }, [activeCharacter?.id, updateActiveCharacter]);
+  }, [
+    activeCharacter?.id,
+    updateActiveCharacter,
+    isEditingMoney,
+    isEditingPv,
+    isEditingPm,
+  ]);
 
   const handleSaveMoney = async () => {
     if (!activeCharacter || !auth.currentUser) return;
 
     try {
-      // Optimistic update
       updateActiveCharacter({ money: tempMoney });
       setIsEditingMoney(false);
-
-      // Persist
       await CharacterService.updateCharacter(
         auth.currentUser.uid,
         activeCharacter.id!,
-        {
-          money: tempMoney,
-        }
+        { money: tempMoney }
       );
     } catch (e) {
       console.error(e);
       alert("Erro ao salvar Tibares.");
+    }
+  };
+
+  const handleSavePv = async () => {
+    if (!activeCharacter || !auth.currentUser) return;
+    try {
+      updateActiveCharacter({ currentPv: tempPv });
+      setIsEditingPv(false);
+      await CharacterService.updateCharacter(
+        auth.currentUser.uid,
+        activeCharacter.id!,
+        { currentPv: tempPv }
+      );
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao salvar PV.");
+    }
+  };
+
+  const handleSavePm = async () => {
+    if (!activeCharacter || !auth.currentUser) return;
+    try {
+      updateActiveCharacter({ currentPm: tempPm });
+      setIsEditingPm(false);
+      await CharacterService.updateCharacter(
+        auth.currentUser.uid,
+        activeCharacter.id!,
+        { currentPm: tempPm }
+      );
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao salvar PM.");
     }
   };
 
@@ -132,12 +213,14 @@ export default function MyCharacterPage() {
   }
 
   // Calculate generic HP/MP if not stored explicitly (fallback)
-  const conMod = getMod(activeCharacter.attributes.Constituição);
+  const conMod = activeCharacter.attributes.Constituição;
   const hpBase = activeCharacter.class?.pv || 16;
   const hpMax = hpBase + conMod;
+  const currentHp = activeCharacter.currentPv ?? hpMax;
 
   const pmBase = activeCharacter.class?.pm || 4;
   const pmMax = pmBase;
+  const currentPm = activeCharacter.currentPm ?? pmMax;
 
   const attributesList: { key: Atributo; label: string; icon: any }[] = [
     { key: Atributo.FORCA, label: "Força", icon: Swords },
@@ -213,17 +296,46 @@ export default function MyCharacterPage() {
                   <div className="absolute top-0 right-0 p-2 opacity-10">
                     <Heart size={40} />
                   </div>
-                  <span className="text-xs font-bold text-red-400/80 uppercase tracking-widest mb-1">
-                    Vida (PV)
-                  </span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-red-100">
-                      {hpMax}
+                  <div className="flex items-center justify-between w-full mb-1">
+                    <span className="text-xs font-bold text-red-400/80 uppercase tracking-widest">
+                      Vida (PV)
                     </span>
-                    <span className="text-xs text-red-500/60 font-medium">
-                      / {hpMax}
-                    </span>
+                    {!isEditingPv && (
+                      <button
+                        onClick={() => setIsEditingPv(true)}
+                        className="p-1 text-red-400/50 hover:text-red-300"
+                      >
+                        <Edit size={12} />
+                      </button>
+                    )}
                   </div>
+
+                  {isEditingPv ? (
+                    <div className="flex items-center gap-1 animate-in fade-in zoom-in">
+                      <input
+                        type="number"
+                        value={tempPv}
+                        onChange={(e) => setTempPv(Number(e.target.value))}
+                        className="w-16 bg-black/40 border border-red-500/50 rounded text-center font-bold text-red-100"
+                        autoFocus
+                      />
+                      <button onClick={handleSavePv}>
+                        <Check size={16} className="text-green-500" />
+                      </button>
+                      <button onClick={() => setIsEditingPv(false)}>
+                        <X size={16} className="text-red-500" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-red-100">
+                        {currentHp}
+                      </span>
+                      <span className="text-xs text-red-500/60 font-medium">
+                        / {hpMax}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -234,17 +346,46 @@ export default function MyCharacterPage() {
                   <div className="absolute top-0 right-0 p-2 opacity-10">
                     <Zap size={40} />
                   </div>
-                  <span className="text-xs font-bold text-blue-400/80 uppercase tracking-widest mb-1">
-                    Mana (PM)
-                  </span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-blue-100">
-                      {pmMax}
+                  <div className="flex items-center justify-between w-full mb-1">
+                    <span className="text-xs font-bold text-blue-400/80 uppercase tracking-widest">
+                      Mana (PM)
                     </span>
-                    <span className="text-xs text-blue-500/60 font-medium">
-                      / {pmMax}
-                    </span>
+                    {!isEditingPm && (
+                      <button
+                        onClick={() => setIsEditingPm(true)}
+                        className="p-1 text-blue-400/50 hover:text-blue-300"
+                      >
+                        <Edit size={12} />
+                      </button>
+                    )}
                   </div>
+
+                  {isEditingPm ? (
+                    <div className="flex items-center gap-1 animate-in fade-in zoom-in">
+                      <input
+                        type="number"
+                        value={tempPm}
+                        onChange={(e) => setTempPm(Number(e.target.value))}
+                        className="w-16 bg-black/40 border border-blue-500/50 rounded text-center font-bold text-blue-100"
+                        autoFocus
+                      />
+                      <button onClick={handleSavePm}>
+                        <Check size={16} className="text-green-500" />
+                      </button>
+                      <button onClick={() => setIsEditingPm(false)}>
+                        <X size={16} className="text-red-500" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-blue-100">
+                        {currentPm}
+                      </span>
+                      <span className="text-xs text-blue-500/60 font-medium">
+                        / {pmMax}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -262,7 +403,6 @@ export default function MyCharacterPage() {
         >
           {attributesList.map(({ key, label, icon: Icon }) => {
             const value = activeCharacter.attributes[key];
-            const mod = getMod(value);
             return (
               <div
                 key={key}
@@ -274,17 +414,8 @@ export default function MyCharacterPage() {
                 <span className="text-xs text-stone-500 uppercase font-bold tracking-wider mb-2">
                   {label.slice(0, 3)}
                 </span>
-                <span className="text-3xl font-serif font-bold text-neutral-200">
+                <span className="text-4xl font-serif font-bold text-neutral-200">
                   {value}
-                </span>
-                <span
-                  className={`absolute -bottom-3 px-2 py-0.5 rounded textxs font-bold border ${
-                    mod >= 0
-                      ? "bg-stone-800 border-stone-700 text-amber-500"
-                      : "bg-red-950/50 border-red-900/30 text-red-400"
-                  }`}
-                >
-                  {formatMod(mod)}
                 </span>
               </div>
             );
@@ -307,7 +438,9 @@ export default function MyCharacterPage() {
               {activeCharacter.class?.name && (
                 <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
                   <img
-                    src={`https://source.unsplash.com/featured/?fantasy,${activeCharacter.class.name}`}
+                    src={`/assets/classes/${formatAssetName(
+                      activeCharacter.class.name
+                    )}.webp`}
                     alt={activeCharacter.class.name}
                     className="w-full h-full object-cover grayscale mix-blend-overlay"
                   />
@@ -315,7 +448,6 @@ export default function MyCharacterPage() {
               )}
 
               <div className="relative z-10">
-                <div className="absolute top-0 left-0 w-1 h-full bg-amber-600/50" />
                 <h3 className="text-amber-500 font-serif text-lg mb-3 flex items-center gap-2">
                   <Scroll size={18} /> Essência da Classe
                 </h3>

@@ -129,6 +129,8 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         attributes: finalAttributes,
         baseAttributes, // Original points
         flexibleAttributeChoices,
+        race: selectedRace ? JSON.parse(JSON.stringify(selectedRace)) : null,
+        class: selectedClass ? JSON.parse(JSON.stringify(selectedClass)) : null,
         skills: selectedSkills,
         originName: selectedOrigin?.name || null,
         deityName: selectedDeity?.name || null,
@@ -223,7 +225,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
                   )}.webp`}
                   alt={selectedRace.name}
                   fill
-                  className="object-cover opacity-30 grayscale-[50%]"
+                  className="object-cover object-top opacity-30 grayscale-[50%]"
                 />
               )}
               {/* Class Overlay */}

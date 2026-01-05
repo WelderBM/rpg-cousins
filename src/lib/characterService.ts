@@ -83,17 +83,32 @@ export const CharacterService = {
     }
   },
 
-  // Listar todos os personagens (Global - Deprecated?)
-  async getCharacters() {
+  // Listar personagens
+  async getCharacters(userId?: string, isMestre: boolean = false) {
     try {
-      const { collection, getDocs, query } = await import("firebase/firestore");
+      const { collection, getDocs, query, collectionGroup } = await import(
+        "firebase/firestore"
+      );
       const { db } = await import("../firebaseConfig");
 
-      const q = query(collection(db, COLLECTION_NAME));
+      let q;
+
+      if (isMestre) {
+        // Mestre vê TODOS os personagens de todas as subcoleções 'characters'
+        q = query(collectionGroup(db, "characters"));
+      } else if (userId) {
+        // Usuário vê apenas os seus na subcoleção
+        q = query(collection(db, "users", userId, "characters"));
+      } else {
+        // Fallback: Tenta buscar globais se não estiver logado (ou se for o comportamento antigo)
+        q = query(collection(db, COLLECTION_NAME));
+      }
+
       const querySnapshot = await getDocs(q);
 
       return querySnapshot.docs.map((doc) => ({
         id: doc.id,
+        path: doc.ref.path, // Salva o caminho para poder atualizar/deletar depois
         ...(doc.data() as any),
       }));
     } catch (error) {
@@ -102,13 +117,17 @@ export const CharacterService = {
     }
   },
 
-  // Deletar um personagem (Global path)
-  async deleteCharacter(id: string) {
+  // Deletar um personagem
+  async deleteCharacter(id: string, path?: string) {
     try {
       const { doc, deleteDoc } = await import("firebase/firestore");
       const { db } = await import("../firebaseConfig");
 
-      await deleteDoc(doc(db, COLLECTION_NAME, id));
+      if (path) {
+        await deleteDoc(doc(db, path));
+      } else {
+        await deleteDoc(doc(db, COLLECTION_NAME, id));
+      }
     } catch (error) {
       console.error("Erro ao deletar personagem:", error);
       throw error;
