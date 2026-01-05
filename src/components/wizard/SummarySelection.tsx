@@ -39,27 +39,6 @@ const SummarySelection = () => {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Generate IA Prompt
-  const aiPrompt = `Portrayal of a ${selectedRace?.name} ${
-    selectedClass?.name
-  } character from a fantasy world. 
-Attributes: ${Object.entries(finalAttributes)
-    .filter(([_, val]) => val > 1)
-    .map(([attr, _]) => attr)
-    .join(", ")}. 
-Equipment: ${Object.values(bag.getEquipments())
-    .flat()
-    .slice(0, 5)
-    .map((i) => i.nome)
-    .join(", ")}. 
-Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic composition.`;
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(aiPrompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   // Helper to get final attribute value
   const getFinalAttr = (attr: Atributo) => {
     let bonus = 0;
@@ -80,6 +59,27 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
     [Atributo.INTELIGENCIA]: getFinalAttr(Atributo.INTELIGENCIA),
     [Atributo.SABEDORIA]: getFinalAttr(Atributo.SABEDORIA),
     [Atributo.CARISMA]: getFinalAttr(Atributo.CARISMA),
+  };
+
+  // Generate IA Prompt
+  const aiPrompt = `Portrayal of a ${selectedRace?.name} ${
+    selectedClass?.name
+  } character from a fantasy world. 
+Attributes: ${Object.entries(finalAttributes)
+    .filter(([_, val]) => val > 1)
+    .map(([attr, _]) => attr)
+    .join(", ")}. 
+Equipment: ${Object.values(bag.getEquipments())
+    .flat()
+    .slice(0, 5)
+    .map((i) => i.nome)
+    .join(", ")}. 
+Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic composition.`;
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(aiPrompt);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleFinalize = async () => {

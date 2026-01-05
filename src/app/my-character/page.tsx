@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCharacterStore, Character } from "@/store/useCharacterStore";
+import { useCharacterStore } from "@/store/useCharacterStore";
+import { Character } from "@/interfaces/Character";
 import { Coins, Heart, Shield, Zap } from "lucide-react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "@/firebaseConfig";
 
 export default function MyCharacterPage() {
   const router = useRouter();
@@ -15,43 +19,23 @@ export default function MyCharacterPage() {
   useEffect(() => {
     let unsubscribeAuth: (() => void) | undefined;
 
-    (async () => {
-      const { onAuthStateChanged } = await import("firebase/auth");
-      const { auth } = await import("@/firebaseConfig");
+    unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/"); // Redirect to home/login if not authenticated
+        return;
+      }
 
-      unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          router.push("/"); // Redirect to home/login if not authenticated
-          return;
-        }
-
-        // If we have an active character in memory, we are good to go initially
-        // But we should set up the listener.
-        // If we DON'T have one (e.g. refresh), we might want to check
-        // localStorage (if we implemented that) or just redirect to selection.
-        // The prompt said: "verifique se existe um personagem carregado no store. Se não houver, redirecione"
-
-        // However, for better UX on refresh, we might want to persist ID in localStorage.
-        // I'll stick to store check as requested first.
-
-        if (!activeCharacter) {
-          // Optional: Check localStorage
-          const storedId = localStorage.getItem("rpg_active_char_id");
-          if (storedId) {
-            // Attempt to restore (omitted for strict adherence to prompt "redirecione", but added for robustness)
-            // Actually, let's just redirect for now to be safe.
-            // router.push("/characters");
-            // But let's try to restore if possible, or just redirect.
-            // Given the prompt "Se não houver, redirecione para a lista de seleção", I will follow that.
-            router.push("/characters");
-          } else {
-            router.push("/characters");
-          }
+      if (!activeCharacter) {
+        const storedId = localStorage.getItem("rpg_active_char_id");
+        if (storedId) {
+          router.push("/characters");
         } else {
-          setInitializing(false);
+          router.push("/characters");
         }
-      });
-    })();
+      } else {
+        setInitializing(false);
+      }
+    });
 
     return () => unsubscribeAuth?.();
   }, [activeCharacter, router]);
@@ -62,31 +46,22 @@ export default function MyCharacterPage() {
 
     let unsubscribeSnapshot: (() => void) | undefined;
 
-    (async () => {
-      const { doc, onSnapshot } = await import("firebase/firestore");
-      const { auth, db } = await import("@/firebaseConfig");
+    if (!auth.currentUser) return;
 
-      if (!auth.currentUser) return;
+    const charRef = doc(
+      db,
+      "users",
+      auth.currentUser.uid,
+      "characters",
+      activeCharacter.id
+    );
 
-      const charRef = doc(
-        db,
-        "users",
-        auth.currentUser.uid,
-        "characters",
-        activeCharacter.id
-      );
-
-      unsubscribeSnapshot = onSnapshot(charRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data() as Partial<Character>;
-          // We update the store with any changes from DB (e.g. Master changed gold)
-
-          // Note: We should be careful not to overwrite local ephemeral state if any,
-          // but for a "viewer" dashboard, syncing is perfect.
-          updateActiveCharacter(data);
-        }
-      });
-    })();
+    unsubscribeSnapshot = onSnapshot(charRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data() as Partial<Character>;
+        updateActiveCharacter(data);
+      }
+    });
 
     return () => unsubscribeSnapshot?.();
   }, [activeCharacter?.id, updateActiveCharacter]);

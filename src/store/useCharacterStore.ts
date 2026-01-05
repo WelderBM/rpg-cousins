@@ -6,32 +6,11 @@ import Divindade from "../interfaces/Divindade";
 import { GeneralPower } from "../interfaces/Poderes";
 import Bag from "../interfaces/Bag";
 import Equipment from "../interfaces/Equipment";
+import { Character } from "../interfaces/Character";
 import {
   calculateTotalPointsSpent,
   INITIAL_POINTS,
 } from "../utils/attributeUtils";
-
-export interface Character {
-  id?: string;
-  name: string;
-  race: Race | null;
-  class: ClassDescription | null;
-  level: number;
-  attributes: Record<Atributo, number>;
-  skills: Skill[];
-  origin: Origin | null;
-  originBenefits: {
-    type: "skill" | "power" | "general_power";
-    name: string;
-    value: any;
-  }[];
-  deity: Divindade | null;
-  prohibitedObligations?: string[];
-  grantedPower: GeneralPower | null;
-  bag: Bag; // Note: Bag class might need serialization handling for Firestore
-  money: number;
-  spells?: any[]; // Placeholder if needed
-}
 
 export interface CharacterSummary {
   id: string;
