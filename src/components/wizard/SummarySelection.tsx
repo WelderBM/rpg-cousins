@@ -136,7 +136,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         deityName: selectedDeity?.name || null,
         grantedPowers: selectedGrantedPowers.map((p) => ({
           name: p.name,
-          description: p.description || p.text || "",
+          description: p.description || (p as any).text || "",
         })),
         money,
         // Convert class instance to plain object
