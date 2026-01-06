@@ -93,10 +93,10 @@ export const ThreatAttacks: React.FC<Props> = ({ formData, setFormData }) => {
               exit={{ opacity: 0, height: 0 }}
               className="bg-black/40 p-4 rounded-xl border border-medieval-iron/30 grid grid-cols-1 md:grid-cols-12 gap-4 items-end relative overflow-visible group"
             >
-              {/* Delete Button on Hover */}
+              {/* Delete Button */}
               <button
                 onClick={() => removeAttack(attack.id)}
-                className="absolute -top-2 -right-2 p-1.5 bg-medieval-blood text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:scale-110"
+                className="absolute -top-2 -right-2 p-1.5 bg-medieval-blood text-white rounded-full shadow-lg opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:scale-110"
                 title="Remover Ataque"
               >
                 <Trash2 className="w-3 h-3" />

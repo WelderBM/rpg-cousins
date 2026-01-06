@@ -9,6 +9,10 @@ import {
   Search,
   LayoutGrid,
   Eye,
+  Crown,
+  Star,
+  Swords,
+  Trash,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -35,20 +39,39 @@ import { ThreatAbilities } from "@/components/mestre/ThreatAbilities";
 import { ThreatSkills } from "@/components/mestre/ThreatSkills";
 import { MonsterStatBlock } from "@/components/mestre/MonsterStatBlock";
 import { ThreatPreviewCard } from "@/components/mestre/ThreatPreviewCard";
+import { Character } from "@/interfaces/Character";
+import { CharacterService } from "@/lib/characterService";
 
 // Password for DM area
 const MESTRE_PASSWORD = "mestre-cousins";
 
-type Tab = "lista" | "criador";
+type Tab = "lista" | "criador" | "herois";
 
 export default function MestreClient() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("lista");
   const [threats, setThreats] = useState<ThreatSheet[]>([]);
+  const [heroes, setHeroes] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const fetchActiveHeroes = async () => {
+    setIsLoading(true);
+    try {
+      const favs = (await CharacterService.getCharacters(
+        undefined,
+        true,
+        true
+      )) as Character[];
+      setHeroes(favs);
+    } catch (e) {
+      console.error("Failed to fetch heroes", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Form State
   const [formData, setFormData] = useState<Partial<ThreatSheet>>({
@@ -166,7 +189,13 @@ export default function MestreClient() {
         console.error(err);
       }
     }
-  }, [formData.challengeLevel, formData.role, formData.hasManaPoints]);
+  }, [
+    formData.challengeLevel,
+    formData.role,
+    formData.hasManaPoints,
+    JSON.stringify(formData.attributes),
+    JSON.stringify(formData.resistanceAssignments),
+  ]);
 
   const handleSaveThreat = async () => {
     if (!formData.name) {
@@ -286,6 +315,57 @@ export default function MestreClient() {
       t.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const favoriteThreats = threats.filter((t) => t.isFavorite);
+
+  const handleToggleFavorite = async (id: string, isFavorite: boolean) => {
+    // Update local state first for immediate UI feedback
+    setThreats((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, isFavorite } : t))
+    );
+
+    try {
+      const { doc, updateDoc } = await import("firebase/firestore");
+      const { db } = await import("@/firebaseConfig");
+      if (!db) return;
+
+      await updateDoc(doc(db, "threats", id), {
+        isFavorite: isFavorite,
+      });
+    } catch (e) {
+      console.error("Error updating favorite status:", e);
+    }
+  };
+
+  const handleClearCombat = async () => {
+    if (
+      !confirm("Deseja encerrar o combate e limpar todos os monstros ativos?")
+    )
+      return;
+
+    const favoriteIds = favoriteThreats.map((t) => t.id);
+
+    // Update local state
+    setThreats((prev) =>
+      prev.map((t) =>
+        favoriteIds.includes(t.id) ? { ...t, isFavorite: false } : t
+      )
+    );
+
+    try {
+      const { doc, updateDoc, writeBatch } = await import("firebase/firestore");
+      const { db } = await import("@/firebaseConfig");
+      if (!db) return;
+
+      const batch = writeBatch(db);
+      favoriteIds.forEach((id) => {
+        batch.update(doc(db, "threats", id), { isFavorite: false });
+      });
+      await batch.commit();
+    } catch (e) {
+      console.error("Error clearing combat:", e);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -338,7 +418,7 @@ export default function MestreClient() {
   const CurrentStepComponent = stepsConfig[step - 1].component;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 min-h-screen pb-20">
+    <div className="w-full mx-auto space-y-8 min-h-screen pb-20">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-medieval-iron/30 pb-6">
         <div>
@@ -372,6 +452,20 @@ export default function MestreClient() {
         >
           <List className="w-5 h-5" />
           Grimório de Monstros
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab("herois");
+            fetchActiveHeroes();
+          }}
+          className={`px-6 py-3 font-serif text-lg transition-all border-b-2 flex items-center gap-2 ${
+            activeTab === "herois"
+              ? "border-medieval-gold text-medieval-gold bg-medieval-gold/5"
+              : "border-transparent text-parchment-dark hover:text-parchment-light hover:bg-white/5"
+          }`}
+        >
+          <Crown className="w-5 h-5" />
+          Heróis Ativos
         </button>
         <button
           onClick={() => setActiveTab("criador")}
@@ -415,6 +509,42 @@ export default function MestreClient() {
                 </div>
               </div>
 
+              {/* Combate Ativo (Pinned Stars) */}
+              {favoriteThreats.length > 0 && (
+                <div className="bg-medieval-blood/5 border border-medieval-blood/20 rounded-2xl p-6 mb-8 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                    <Swords size={120} />
+                  </div>
+
+                  <div className="flex justify-between items-center mb-6 relative z-10">
+                    <h2 className="font-serif text-2xl font-bold text-medieval-gold flex items-center gap-3">
+                      <Swords className="text-medieval-blood" />
+                      Combate Ativo
+                    </h2>
+                    <button
+                      onClick={handleClearCombat}
+                      className="flex items-center gap-2 px-4 py-2 bg-medieval-blood/20 hover:bg-medieval-blood/40 text-medieval-blood border border-medieval-blood/30 rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
+                    >
+                      <Trash size={14} />
+                      Limpar Combate
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6 relative z-10">
+                    {favoriteThreats.map((threat) => (
+                      <ThreatPreviewCard
+                        key={`active-${threat.id}`}
+                        threat={threat}
+                        onEdit={handleEditThreat}
+                        onDuplicate={handleDuplicateThreat}
+                        onDelete={handleDeleteThreat}
+                        onToggleFavorite={handleToggleFavorite}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-20 opacity-50">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-medieval-gold mb-4"></div>
@@ -423,7 +553,7 @@ export default function MestreClient() {
                   </p>
                 </div>
               ) : filteredThreats.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6">
                   {filteredThreats.map((threat) => (
                     <ThreatPreviewCard
                       key={threat.id}
@@ -431,6 +561,7 @@ export default function MestreClient() {
                       onEdit={handleEditThreat}
                       onDuplicate={handleDuplicateThreat}
                       onDelete={handleDeleteThreat}
+                      onToggleFavorite={handleToggleFavorite}
                     />
                   ))}
                 </div>
@@ -446,6 +577,139 @@ export default function MestreClient() {
                   >
                     Criar primeiro monstro
                   </button>
+                </div>
+              )}
+            </motion.div>
+          ) : activeTab === "herois" ? (
+            <motion.div
+              key="herois"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-8"
+            >
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-20 opacity-50">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-medieval-gold mb-4"></div>
+                  <p className="text-parchment-dark font-serif">
+                    Convocando heróis...
+                  </p>
+                </div>
+              ) : heroes.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Object.entries(
+                    heroes.reduce((acc, hero) => {
+                      const owner = hero.ownerNickname || "Desconhecido";
+                      if (!acc[owner]) acc[owner] = [];
+                      acc[owner].push(hero);
+                      return acc;
+                    }, {} as Record<string, Character[]>)
+                  ).map(([owner, heroList]) => (
+                    <div
+                      key={owner}
+                      className="bg-medieval-stone/40 border border-medieval-iron/30 rounded-xl overflow-hidden"
+                    >
+                      <div className="bg-black/40 px-4 py-2 border-b border-medieval-iron/30 flex justify-between items-center">
+                        <h3 className="font-serif text-medieval-gold font-bold">
+                          {owner}
+                        </h3>
+                        <span className="text-xs text-parchment-dark">
+                          {heroList.length} Herói(s)
+                        </span>
+                      </div>
+                      <div className="p-4 space-y-4">
+                        {heroList.map((hero) => {
+                          // Calc stats
+                          const conMod = hero.attributes.Constituição; // Assuming flat number for now from simplified interface usage or check legacy
+                          const hpBase = hero.class?.pv || 16;
+                          // Check if attribute is object
+                          const conVal =
+                            typeof hero.attributes.Constituição === "object"
+                              ? (hero.attributes.Constituição as any).value
+                                  .total
+                              : hero.attributes.Constituição;
+
+                          const hpMax = hpBase + conVal;
+                          const currentHp = hero.currentPv ?? hpMax;
+                          const hpPercent = Math.min(
+                            100,
+                            Math.max(0, (currentHp / hpMax) * 100)
+                          );
+
+                          const pmBase = hero.class?.pm || 4;
+                          const pmMax = pmBase;
+                          const currentPm = hero.currentPm ?? pmMax;
+                          const pmPercent = Math.min(
+                            100,
+                            Math.max(0, (currentPm / pmMax) * 100)
+                          );
+
+                          return (
+                            <div
+                              key={hero.id}
+                              className="flex gap-4 items-center bg-black/20 p-3 rounded-lg border border-white/5 hover:border-medieval-gold/30 transition-colors"
+                            >
+                              {/* Avatar */}
+                              <div className="flex-shrink-0">
+                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-medieval-iron bg-stone-900">
+                                  {hero.imageUrl ? (
+                                    <img
+                                      src={hero.imageUrl}
+                                      alt={hero.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-xl">
+                                      🧙‍♂️
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Stats */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-baseline mb-1">
+                                  <h4 className="font-bold text-parchment-light truncate text-sm">
+                                    {hero.name}
+                                  </h4>
+                                  <span className="text-[10px] text-parchment-dark uppercase">
+                                    {hero.class?.name} Lv.{hero.level}
+                                  </span>
+                                </div>
+
+                                {/* HP Bar */}
+                                <div className="relative h-2 bg-stone-900 rounded-full mb-1 overflow-hidden">
+                                  <div
+                                    className="absolute top-0 left-0 h-full bg-red-600 rounded-full transition-all duration-500"
+                                    style={{ width: `${hpPercent}%` }}
+                                  />
+                                </div>
+
+                                {/* PM Bar */}
+                                <div className="relative h-1.5 bg-stone-900 rounded-full overflow-hidden">
+                                  <div
+                                    className="absolute top-0 left-0 h-full bg-blue-500 rounded-full transition-all duration-500"
+                                    style={{ width: `${pmPercent}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20 opacity-50 bg-medieval-stone/20 rounded-2xl border border-dashed border-medieval-iron/50">
+                  <Crown className="w-16 h-16 mx-auto mb-4 text-medieval-iron" />
+                  <p className="text-xl font-serif text-parchment-dark">
+                    Nenhum herói favorito encontrado.
+                  </p>
+                  <p className="text-sm text-parchment-dark/70 mt-2">
+                    Peça aos jogadores para marcarem seus personagens como
+                    favoritos (Estrela) na ficha.
+                  </p>
                 </div>
               )}
             </motion.div>
