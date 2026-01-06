@@ -5,14 +5,25 @@ import { useRouter } from "next/navigation";
 import { useCharacterStore } from "@/store/useCharacterStore";
 import { Character } from "@/interfaces/Character";
 import { motion } from "framer-motion";
-import { User, Sword, ArrowRight } from "lucide-react";
+import { User, Sword, ArrowRight, Trash2, AlertTriangle } from "lucide-react";
+import { CharacterService } from "@/lib/characterService";
 
 export default function CharacterSelectPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const { userCharacters, setUserCharacters, setActiveCharacter } =
-    useCharacterStore();
+  const {
+    userCharacters,
+    setUserCharacters,
+    setActiveCharacter,
+    activeCharacter,
+    clearActiveCharacter,
+  } = useCharacterStore();
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [characterToDelete, setCharacterToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     let authUnsubscribe: (() => void) | undefined;
@@ -105,6 +116,31 @@ export default function CharacterSelectPage() {
     }
   };
 
+  const handleDeleteCharacter = async () => {
+    if (!currentUser || !characterToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await CharacterService.deleteCharacter(
+        characterToDelete.id,
+        "users/" + currentUser.uid + "/characters/" + characterToDelete.id
+      );
+
+      // If the deleted character was the active one, clear it
+      if (activeCharacter?.id === characterToDelete.id) {
+        clearActiveCharacter();
+        localStorage.removeItem("rpg_active_char_id");
+      }
+
+      setCharacterToDelete(null);
+    } catch (error) {
+      console.error("Error deleting character:", error);
+      alert("Erro ao apagar herói. Tente novamente.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen text-medieval-gold">
@@ -134,11 +170,24 @@ export default function CharacterSelectPage() {
         {userCharacters.map((char) => (
           <motion.div
             key={char.id}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="group relative bg-[#1e1e1e] border-2 border-medieval-iron rounded-xl overflow-hidden hover:border-medieval-gold transition-all duration-300 shadow-lg cursor-pointer flex flex-col"
             onClick={() => handleSelectCharacter(char.id)}
           >
+            {/* Delete Button */}
+            <div className="absolute top-2 right-2 z-20">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCharacterToDelete({ id: char.id, name: char.name });
+                }}
+                className="p-2 text-red-500 hover:text-red-400 bg-black/60 rounded-full hover:bg-black/80 transition-colors shadow-lg border border-red-500/20"
+                title="Apagar Herói"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
             {/* Character Card Content */}
             <div className="p-6 flex flex-row items-center gap-4 relative z-10">
               <div className="h-16 w-16 bg-medieval-stone rounded-full border border-medieval-gold/30 flex items-center justify-center text-2xl">
@@ -194,6 +243,57 @@ export default function CharacterSelectPage() {
           </span>
         </motion.div>
       </div>
+      {/* Confirmation Modal */}
+      {characterToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-[#1e1e1e] border-2 border-medieval-iron p-8 rounded-2xl max-w-md w-full shadow-2xl"
+          >
+            <div className="flex items-center gap-4 text-red-500 mb-6 font-serif">
+              <AlertTriangle size={32} />
+              <h2 className="text-2xl font-bold">Apagar Herói?</h2>
+            </div>
+
+            <p className="text-parchment-DEFAULT mb-8 text-lg">
+              Tem certeza que deseja apagar{" "}
+              <span className="text-medieval-gold font-bold">
+                {characterToDelete.name}
+              </span>
+              ?
+              <br />
+              <span className="text-sm text-red-400/80 mt-2 block italic">
+                Esta ação é permanente e não pode ser desfeita.
+              </span>
+            </p>
+
+            <div className="flex gap-4">
+              <button
+                onClick={() => setCharacterToDelete(null)}
+                disabled={isDeleting}
+                className="flex-1 py-3 px-6 rounded-xl border border-medieval-iron text-parchment-DEFAULT hover:bg-white/5 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteCharacter}
+                disabled={isDeleting}
+                className="flex-1 py-3 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg shadow-red-900/20 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Trash2 size={18} />
+                    Apagar
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import {
   signOut,
   User,
 } from "firebase/auth";
-import { LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon, Edit } from "lucide-react";
 import { useCharacterStore } from "@/store/useCharacterStore";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store";
@@ -24,6 +24,8 @@ export default function UserMenu() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState("");
 
   useEffect(() => {
     let unsubscribe: any;
@@ -166,10 +168,47 @@ export default function UserMenu() {
             <UserIcon size={20} className="text-medieval-gold" />
           </div>
         )}
-        <div className="flex-1 overflow-hidden">
-          <p className="text-sm font-bold text-parchment-light truncate font-serif">
-            {user.displayName || user.email?.split("@")[0] || "Viajante"}
-          </p>
+        <div className="flex-1 overflow-hidden group">
+          <div className="flex justify-between items-center">
+            {isEditingName ? (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!auth) return;
+                  const { updateProfile } = await import("firebase/auth");
+                  try {
+                    await updateProfile(user, { displayName: newName });
+                    setIsEditingName(false);
+                    // Force refresh local state if needed or rely on auth listener
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }}
+                className="flex items-center gap-1 w-full"
+              >
+                <input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="w-full bg-black/60 border border-medieval-gold/50 rounded px-1 py-0.5 text-xs text-parchment-light outline-none"
+                  autoFocus
+                  onBlur={() => setIsEditingName(false)}
+                />
+              </form>
+            ) : (
+              <p className="text-sm font-bold text-parchment-light truncate font-serif flex items-center gap-2">
+                {user.displayName || user.email?.split("@")[0] || "Viajante"}
+                <button
+                  onClick={() => {
+                    setNewName(user.displayName || "");
+                    setIsEditingName(true);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 text-medieval-iron hover:text-medieval-gold transition-opacity"
+                >
+                  <Edit size={12} />
+                </button>
+              </p>
+            )}
+          </div>
           <p className="text-[10px] text-parchment-dark truncate opacity-70">
             {user.email}
           </p>

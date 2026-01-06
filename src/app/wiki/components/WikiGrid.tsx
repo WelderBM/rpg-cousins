@@ -46,11 +46,11 @@ export function WikiGrid({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar pb-32">
-      <div className="max-w-5xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:px-16 custom-scrollbar pb-32">
+      <div className="w-full mx-auto">
         <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-4"
         >
           <AnimatePresence mode="popLayout">
             {itemsToShow.map((item, idx) => {
