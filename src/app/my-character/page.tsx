@@ -211,7 +211,9 @@ const SectionSlider = ({
                     item.critico ? `(Crit: ${item.critico})` : ""
                   }`
                 : null) ||
-              item.value ||
+              (typeof item.value === "object"
+                ? item.value?.description || item.value?.name
+                : item.value) ||
               "Sem descrição detalhada."
             }
             quantity={item.quantidade}

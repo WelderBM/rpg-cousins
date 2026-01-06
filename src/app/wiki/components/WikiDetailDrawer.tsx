@@ -26,6 +26,8 @@ import {
   MapPin,
   Sparkles,
   Search,
+  ShoppingBag,
+  Book,
 } from "lucide-react";
 import { ItemBase } from "../types";
 import { CATEGORIES } from "../constants";
@@ -485,7 +487,11 @@ export function WikiDetailDrawer({
                                       key={j}
                                       className="px-3 py-1.5 bg-red-950/30 border border-red-500/30 text-red-400 text-xs rounded-lg font-bold"
                                     >
-                                      {req.description || req.name || req}
+                                      {req.description ||
+                                        req.name ||
+                                        (typeof req === "object"
+                                          ? req.value || "Requisito"
+                                          : req)}
                                     </span>
                                   ))}
                                   {i <
@@ -633,7 +639,10 @@ export function WikiDetailDrawer({
                                       key={idx}
                                       className="px-2 py-0.5 bg-cyan-950/30 border border-cyan-500/20 text-cyan-400 text-[10px] rounded font-bold uppercase"
                                     >
-                                      {req.name || req}
+                                      {req.name ||
+                                        (typeof req === "object"
+                                          ? req.value || "Requisito"
+                                          : req)}
                                     </span>
                                   ))}
                               </div>
@@ -770,7 +779,9 @@ export function WikiDetailDrawer({
                                             >
                                               {req.description ||
                                                 req.name ||
-                                                req}
+                                                (typeof req === "object"
+                                                  ? req.value || "Requisito"
+                                                  : req)}
                                             </span>
                                           ))}
                                       </div>
