@@ -2680,7 +2680,6 @@ export default function generateRandomSheet(
 export function generateEmptySheet(
   selectedOptions: SelectedOptions
 ): CharacterSheet {
-  // console.log(selectedOptions);
   const race = selectRace(selectedOptions);
   const size = getRaceSize(race);
   const generatedClass = CLASSES.find((classe) =>

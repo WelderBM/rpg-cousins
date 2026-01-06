@@ -158,7 +158,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
 
       // Success redirect after animation
       setTimeout(() => {
-        window.location.href = "/heroes"; // Correct path as per file structure
+        window.location.href = "/market"; // Redirect to market as requested
       }, 2000);
     } catch (err) {
       console.error(err);
