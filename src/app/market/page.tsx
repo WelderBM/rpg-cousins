@@ -13,7 +13,7 @@ import {
   Package,
   Shield,
   Sword,
-  FlaskConical,
+  FlaskRound,
   Shirt,
   Utensils,
   Scroll,
@@ -26,6 +26,10 @@ import {
   User,
   LogOut,
   AlertCircle,
+  Hammer,
+  Backpack,
+  Apple,
+  Crosshair,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,7 +38,7 @@ import Equipment from "../../interfaces/Equipment";
 import { getInitialMoney } from "../../functions/general";
 import Bag, { calcBagSpaces } from "../../interfaces/Bag";
 import { PurchaseModal } from "./PurchaseModal";
-import { FloatingBackButton } from "@/components/FloatingBackButton";
+import { getItemIcon, getFallbackIcon } from "../../utils/assetUtils";
 
 // Animation Variants
 const containerVariants = {
@@ -52,9 +56,430 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const ITEMS_PER_PAGE = 12;
+// Helper to get specialized icons for items
+const getItemSymbol = (item: any) => {
+  const group = (item.group || "").toLowerCase();
+  const subGroup = (item.subGroup || "").toLowerCase();
+  const name = (item.nome || "").toLowerCase();
+
+  if (
+    group.includes("armadura") ||
+    group.includes("escudo") ||
+    item.defenseBonus
+  ) {
+    return <Shield size={18} />;
+  }
+
+  if (group.includes("arma")) {
+    const isRanged =
+      item.alcance &&
+      item.alcance !== "-" &&
+      item.alcance.toLowerCase() !== "corpo a corpo";
+    if (
+      isRanged ||
+      name.includes("arco") ||
+      name.includes("besta") ||
+      name.includes("tiro") ||
+      name.includes("disparo")
+    )
+      return <Crosshair size={18} />;
+    if (name.includes("machado"))
+      return <Hammer size={18} className="rotate-45" />; // Closest to axe if Axe not imported
+    if (name.includes("adaga") || name.includes("faca"))
+      return <Sword size={16} />;
+    return <Sword size={18} />;
+  }
+
+  if (group.includes("alquimía") || group.includes("poção"))
+    return <FlaskRound size={18} />;
+  if (
+    group.includes("vestuário") ||
+    group.includes("veste") ||
+    group.includes("capa")
+  )
+    return <Shirt size={18} />;
+  if (group.includes("alimentação") || group.includes("comida"))
+    return <Apple size={18} />;
+  if (group.includes("ferramenta") || group.includes("ofício"))
+    return <Hammer size={18} />;
+  if (group.includes("mochila") || group.includes("saco"))
+    return <Backpack size={18} />;
+
+  return <Scroll size={18} />;
+};
+
+// Helper to get small category icons for filters
+const getCategoryIcon = (groupName: string, size = 12) => {
+  const n = groupName.toLowerCase();
+  const group = groupName.toLowerCase(); // Ensure 'group' variable is defined from groupName
+  if (
+    group.includes("defesa") ||
+    group.includes("proteção") ||
+    group.includes("armadura") ||
+    group.includes("escudo")
+  )
+    return <Shield size={size} />;
+  if (
+    group.includes("arma") ||
+    group.includes("ataque") ||
+    group.includes("combate")
+  )
+    return <Sword size={size} />;
+  if (
+    group.includes("alquimia") ||
+    group.includes("poção") ||
+    group.includes("elixir") ||
+    group.includes("mágico") ||
+    n.includes("mana")
+  )
+    return <FlaskRound size={size} />;
+  if (
+    group.includes("geral") ||
+    group.includes("itens") ||
+    group.includes("aventura") ||
+    group.includes("utensílio")
+  )
+    return <Package size={size} />;
+  if (
+    group.includes("veste") ||
+    group.includes("roupa") ||
+    group.includes("capa") ||
+    group.includes("vestuário")
+  )
+    return <Shirt size={size} />;
+  if (
+    group.includes("comida") ||
+    group.includes("bebida") ||
+    group.includes("alimentação") ||
+    group.includes("taverna") ||
+    n.includes("refeição")
+  )
+    return <Apple size={size} />;
+  if (
+    group.includes("ferramenta") ||
+    group.includes("ofício") ||
+    group.includes("trabalho") ||
+    n.includes("instrumento") ||
+    n.includes("kit")
+  )
+    return <Hammer size={size} />;
+  if (
+    group.includes("mochila") ||
+    group.includes("saco") ||
+    group.includes("transporte") ||
+    n.includes("carga")
+  )
+    return <Backpack size={size} />;
+
+  // Damage types
+  if (n.includes("corte") || n.includes("perfuração"))
+    return <Sword size={size} />;
+  if (n.includes("impacto")) return <Hammer size={size} />;
+
+  return null;
+};
+
+// Re-designed compact Item Card
+const ItemCard = ({ item, isInBag, isSuccess, canAfford, onBuy }: any) => {
+  return (
+    <motion.div
+      variants={itemVariants}
+      className={`relative group transition-all duration-300 ${
+        isInBag ? "z-10" : "z-0"
+      }`}
+    >
+      <div
+        className={`h-full border rounded-lg p-3 flex flex-col gap-2 shadow-sm transition-all duration-300 relative overflow-hidden backdrop-blur-sm ${
+          isInBag
+            ? "border-amber-500 bg-amber-950/20"
+            : "border-white/5 bg-[#141414] hover:border-amber-500/30 hover:bg-[#1a1a1a]"
+        } ${!canAfford && !isSuccess ? "opacity-75" : ""}`}
+      >
+        {/* Compact Header: Icon + Stats */}
+        <div className="flex items-center justify-between gap-2">
+          <div
+            className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-colors ${
+              isInBag
+                ? "bg-amber-900/30 border-amber-500/50 text-amber-500"
+                : "bg-black/40 border-white/10 text-neutral-400 group-hover:text-amber-500 group-hover:border-amber-500/30"
+            }`}
+          >
+            {getItemSymbol(item)}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-end gap-1 flex-1">
+            {(item as any).defenseBonus && (
+              <span className="text-[8px] font-bold text-blue-400 bg-blue-900/20 px-1 rounded border border-blue-500/10 flex items-center gap-0.5">
+                <Shield size={8} /> +{(item as any).defenseBonus}
+              </span>
+            )}
+            {item.dano && (
+              <span className="text-[8px] font-bold text-red-500 bg-red-950/20 px-1 rounded border border-red-500/10 whitespace-nowrap flex items-center gap-0.5">
+                <Sword size={8} /> {item.dano}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Item Info */}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-sans font-bold text-xs text-neutral-200 group-hover:text-amber-400 transition-colors leading-tight line-clamp-1 truncate">
+            {item.nome}
+          </h3>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[8px] text-neutral-500 uppercase tracking-tighter flex items-center gap-1">
+              {getCategoryIcon(item.subGroup || item.group, 8)}
+              {item.subGroup || item.group}
+            </span>
+            {item.spaces > 0 && (
+              <span className="text-[8px] text-neutral-600 flex items-center gap-0.5">
+                • <Package size={8} /> {item.spaces}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Action Row */}
+        <div className="flex items-center justify-between gap-2 mt-1">
+          <span
+            className={`font-cinzel font-bold text-xs ${
+              canAfford || !item.preco ? "text-amber-500" : "text-red-500"
+            }`}
+          >
+            {!item.preco ? "FREE" : `${item.preco} T$`}
+          </span>
+
+          <motion.button
+            onClick={onBuy}
+            whileTap={{ scale: 0.95 }}
+            disabled={isSuccess || (!canAfford && item.preco)}
+            className={`px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all shadow-sm ${
+              isSuccess
+                ? "bg-emerald-600/20 border border-emerald-500/50 text-emerald-500 cursor-default"
+                : !canAfford && item.preco
+                ? "bg-neutral-800 text-neutral-500 cursor-not-allowed border border-white/5"
+                : "bg-amber-600 hover:bg-amber-500 text-stone-950"
+            }`}
+          >
+            {isSuccess ? <Check size={10} /> : "Comprar"}
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const ITEMS_PER_PAGE = 48;
 
 type SortOrder = "name-asc" | "name-desc" | "price-asc" | "price-desc";
+
+const FilterPanelContent = ({
+  activeCharacter,
+  searchInput,
+  setSearchInput,
+  sortOrder,
+  setSortOrder,
+  canAffordOnly,
+  setCanAffordOnly,
+  priceRange,
+  setPriceRange,
+  dynamicFilters,
+  selectedSubGroups,
+  toggleSubGroup,
+  selectedDamageTypes,
+  toggleDamageType,
+  idPrefix,
+}: any) => (
+  <div className="space-y-6">
+    {/* Search (Sidebar version) */}
+    <div className="relative">
+      <Search
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+        size={16}
+      />
+      <input
+        type="text"
+        placeholder="Buscar..."
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+        className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm focus:border-amber-500/50 outline-none text-neutral-300"
+      />
+    </div>
+
+    {/* Sort */}
+    <div>
+      <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
+        <ArrowDownUp size={14} /> Ordenar
+      </h3>
+      <select
+        value={sortOrder}
+        onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+        className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+      >
+        <option value="name-asc">Nome (A-Z)</option>
+        <option value="name-desc">Nome (Z-A)</option>
+        <option value="price-asc">Preço (Menor)</option>
+        <option value="price-desc">Preço (Maior)</option>
+      </select>
+    </div>
+
+    {/* Can Afford Filter */}
+    {activeCharacter && (
+      <div>
+        <label
+          htmlFor={`${idPrefix}-can-afford`}
+          className="flex items-center gap-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20 cursor-pointer hover:bg-emerald-500/10 transition-all group/afford"
+        >
+          <div
+            className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${
+              canAffordOnly
+                ? "bg-emerald-600 border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                : "border-neutral-700 bg-neutral-900 group-hover/afford:border-neutral-500"
+            }`}
+          >
+            {canAffordOnly && <Check size={12} className="text-white" />}
+          </div>
+          <input
+            type="checkbox"
+            id={`${idPrefix}-can-afford`}
+            className="sr-only"
+            checked={canAffordOnly}
+            onChange={(e) => setCanAffordOnly(e.target.checked)}
+          />
+          <div className="flex flex-col">
+            <span
+              className={`text-sm font-bold transition-colors ${
+                canAffordOnly ? "text-emerald-400" : "text-neutral-300"
+              }`}
+            >
+              Posso Comprar
+            </span>
+            <span className="text-[10px] text-neutral-500 font-medium whitespace-nowrap">
+              Saldo: {activeCharacter.money} T$
+            </span>
+          </div>
+        </label>
+      </div>
+    )}
+
+    {/* Price Range */}
+    <div>
+      <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
+        <Coins size={14} /> Preço (T$)
+      </h3>
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          placeholder="Min"
+          value={priceRange.min}
+          onChange={(e) =>
+            setPriceRange({ ...priceRange, min: e.target.value })
+          }
+          className="w-1/2 bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+        />
+        <span className="text-neutral-600">-</span>
+        <input
+          type="number"
+          placeholder="Max"
+          value={priceRange.max}
+          onChange={(e) =>
+            setPriceRange({ ...priceRange, max: e.target.value })
+          }
+          className="w-1/2 bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+        />
+      </div>
+    </div>
+
+    {/* Dynamic Filters */}
+    {dynamicFilters.subGroups.length > 0 && (
+      <div>
+        <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
+          <Filter size={14} /> Categorias
+        </h3>
+        <div className="space-y-1">
+          {dynamicFilters.subGroups.map((group: string) => (
+            <label
+              key={group}
+              className="flex items-center gap-2 p-1.5 rounded hover:bg-white/5 cursor-pointer group/label"
+            >
+              <div
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                  selectedSubGroups.includes(group)
+                    ? "bg-amber-600 border-amber-500"
+                    : "border-neutral-700 group-hover/label:border-neutral-500"
+                }`}
+              >
+                {selectedSubGroups.includes(group) && (
+                  <Check size={10} className="text-white" />
+                )}
+              </div>
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={selectedSubGroups.includes(group)}
+                onChange={() => toggleSubGroup(group)}
+              />
+              <span
+                className={`text-[11px] flex items-center gap-1.5 ${
+                  selectedSubGroups.includes(group)
+                    ? "text-amber-500 font-medium"
+                    : "text-neutral-400"
+                }`}
+              >
+                {getCategoryIcon(group, 8)}
+                {group}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {dynamicFilters.damageTypes.length > 0 && (
+      <div>
+        <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
+          <Sword size={14} /> Tipo de Dano
+        </h3>
+        <div className="space-y-1">
+          {dynamicFilters.damageTypes.map((type: string) => (
+            <label
+              key={type}
+              className="flex items-center gap-2 p-1.5 rounded hover:bg-white/5 cursor-pointer group/label"
+            >
+              <div
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                  selectedDamageTypes.includes(type)
+                    ? "bg-amber-600 border-amber-500"
+                    : "border-neutral-700 group-hover/label:border-neutral-500"
+                }`}
+              >
+                {selectedDamageTypes.includes(type) && (
+                  <Check size={10} className="text-white" />
+                )}
+              </div>
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={selectedDamageTypes.includes(type)}
+                onChange={() => toggleDamageType(type)}
+              />
+              <span
+                className={`text-[11px] flex items-center gap-1.5 ${
+                  selectedDamageTypes.includes(type)
+                    ? "text-amber-500 font-medium"
+                    : "text-neutral-400"
+                }`}
+              >
+                {getCategoryIcon(type, 8)}
+                {type}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+);
 
 const MarketPage = () => {
   const router = useRouter();
@@ -69,8 +494,18 @@ const MarketPage = () => {
   const [loading, setLoading] = useState(true);
 
   // Search & Filter State
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+    }, 400); // 400ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // Advanced Filters
   const [sortOrder, setSortOrder] = useState<SortOrder>("name-asc");
@@ -83,6 +518,7 @@ const MarketPage = () => {
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showMobileCart, setShowMobileCart] = useState(false);
+  const [canAffordOnly, setCanAffordOnly] = useState(false);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,11 +530,25 @@ const MarketPage = () => {
 
   const [categories, setCategories] = useState<any>({});
 
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    searchTerm,
+    activeTab,
+    priceRange.min,
+    priceRange.max,
+    selectedSubGroups,
+    selectedDamageTypes,
+    canAffordOnly,
+  ]);
+
   const [myCharacters, setMyCharacters] = useState<any[]>([]);
   const [loadingChars, setLoadingChars] = useState(false);
 
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [purchasingItem, setPurchasingItem] = useState<Equipment | null>(null);
+  const [successItems, setSuccessItems] = useState<string[]>([]);
 
   // --- HOOKS REGISTRATION ---
 
@@ -174,10 +624,20 @@ const MarketPage = () => {
     return [];
   }, [activeCharacter]);
 
-  // All Items
+  // All Items (Deduplicated)
   const allItems = useMemo(() => {
     if (!categories) return [];
-    return Object.values(categories).flat() as Equipment[];
+    const all = Object.values(categories).flat() as Equipment[];
+
+    // Deduplicate by name
+    const uniqueItems = new Map();
+    all.forEach((item) => {
+      if (!uniqueItems.has(item.nome)) {
+        uniqueItems.set(item.nome, item);
+      }
+    });
+
+    return Array.from(uniqueItems.values());
   }, [categories]);
 
   // Internal helper for dynamic filter calculation logic (used inside useMemo to avoid duplication or circular deps if we were to separate it too much, but essentially part of filtering)
@@ -268,6 +728,13 @@ const MarketPage = () => {
       );
     }
 
+    // 5.5. Affordability Filter
+    if (canAffordOnly && activeCharacter) {
+      items = items.filter(
+        (item) => (item.preco || 0) <= activeCharacter.money
+      );
+    }
+
     // 6. Sorting
     items.sort((a, b) => {
       switch (sortOrder) {
@@ -293,6 +760,8 @@ const MarketPage = () => {
     selectedSubGroups,
     selectedDamageTypes,
     sortOrder,
+    canAffordOnly,
+    activeCharacter?.money,
   ]);
 
   const totalPages = Math.ceil(displayedItems.length / ITEMS_PER_PAGE);
@@ -451,6 +920,12 @@ const MarketPage = () => {
         msg: `Compra realizada para ${targetChar.name}!`,
         type: "success",
       });
+
+      // Show success animation on the button
+      setSuccessItems((prev) => [...prev, item.nome]);
+      setTimeout(() => {
+        setSuccessItems((prev) => prev.filter((n) => n !== item.nome));
+      }, 1500);
     } catch (e) {
       console.error(e);
       setFeedback({ msg: "Erro ao processar compra", type: "error" });
@@ -478,159 +953,6 @@ const MarketPage = () => {
     setCurrentPage(1);
   };
 
-  // --- RENDER HELPERS ---
-
-  const FilterPanelContent = () => (
-    <div className="space-y-6">
-      {/* Search (Sidebar version) */}
-      <div className="relative">
-        <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
-          size={16}
-        />
-        <input
-          type="text"
-          placeholder="Buscar..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm focus:border-amber-500/50 outline-none text-neutral-300"
-        />
-      </div>
-
-      {/* Sort */}
-      <div>
-        <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
-          <ArrowDownUp size={14} /> Ordenar
-        </h3>
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-          className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
-        >
-          <option value="name-asc">Nome (A-Z)</option>
-          <option value="name-desc">Nome (Z-A)</option>
-          <option value="price-asc">Preço (Menor)</option>
-          <option value="price-desc">Preço (Maior)</option>
-        </select>
-      </div>
-
-      {/* Price Range */}
-      <div>
-        <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
-          <Coins size={14} /> Preço (T$)
-        </h3>
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            placeholder="Min"
-            value={priceRange.min}
-            onChange={(e) =>
-              setPriceRange({ ...priceRange, min: e.target.value })
-            }
-            className="w-1/2 bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
-          />
-          <span className="text-neutral-600">-</span>
-          <input
-            type="number"
-            placeholder="Max"
-            value={priceRange.max}
-            onChange={(e) =>
-              setPriceRange({ ...priceRange, max: e.target.value })
-            }
-            className="w-1/2 bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
-          />
-        </div>
-      </div>
-
-      {/* Dynamic Filters */}
-      {dynamicFilters.subGroups.length > 0 && (
-        <div>
-          <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
-            <Filter size={14} /> Categorias
-          </h3>
-          <div className="space-y-1">
-            {dynamicFilters.subGroups.map((group) => (
-              <label
-                key={group}
-                className="flex items-center gap-2 p-1.5 rounded hover:bg-white/5 cursor-pointer group/label"
-              >
-                <div
-                  className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                    selectedSubGroups.includes(group)
-                      ? "bg-amber-600 border-amber-500"
-                      : "border-neutral-700 group-hover/label:border-neutral-500"
-                  }`}
-                >
-                  {selectedSubGroups.includes(group) && (
-                    <Check size={10} className="text-white" />
-                  )}
-                </div>
-                <input
-                  type="checkbox"
-                  className="hidden"
-                  checked={selectedSubGroups.includes(group)}
-                  onChange={() => toggleSubGroup(group)}
-                />
-                <span
-                  className={`text-sm ${
-                    selectedSubGroups.includes(group)
-                      ? "text-amber-500 font-medium"
-                      : "text-neutral-400"
-                  }`}
-                >
-                  {group}
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {dynamicFilters.damageTypes.length > 0 && (
-        <div>
-          <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
-            <Sword size={14} /> Tipo de Dano
-          </h3>
-          <div className="space-y-1">
-            {dynamicFilters.damageTypes.map((type) => (
-              <label
-                key={type}
-                className="flex items-center gap-2 p-1.5 rounded hover:bg-white/5 cursor-pointer group/label"
-              >
-                <div
-                  className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                    selectedDamageTypes.includes(type)
-                      ? "bg-amber-600 border-amber-500"
-                      : "border-neutral-700 group-hover/label:border-neutral-500"
-                  }`}
-                >
-                  {selectedDamageTypes.includes(type) && (
-                    <Check size={10} className="text-white" />
-                  )}
-                </div>
-                <input
-                  type="checkbox"
-                  className="hidden"
-                  checked={selectedDamageTypes.includes(type)}
-                  onChange={() => toggleDamageType(type)}
-                />
-                <span
-                  className={`text-sm ${
-                    selectedDamageTypes.includes(type)
-                      ? "text-amber-500 font-medium"
-                      : "text-neutral-400"
-                  }`}
-                >
-                  {type}
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
   // --- CONDITIONAL RENDERING ---
 
   let content;
@@ -649,10 +971,10 @@ const MarketPage = () => {
   } else if (!activeCharacter) {
     // Character Selection Screen
     content = (
-      <div className="min-h-screen bg-[#0c0c0c] text-neutral-200 font-sans selection:bg-amber-900/30 flex flex-col items-center justify-center p-6 relative overflow-hidden pb-20">
+      <div className="min-h-screen bg-[#0c0c0c] text-neutral-200 font-sans selection:bg-amber-900/30 flex flex-col items-center justify-center p-6 relative pb-20">
         <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-[#0c0c0c] to-[#0c0c0c] z-0" />
 
-        <div className="relative z-10 w-full max-w-5xl">
+        <div className="relative z-10 w-full max-w-[95vw]">
           <div className="text-center mb-12">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -694,7 +1016,7 @@ const MarketPage = () => {
               >
                 Quem vai às compras?
               </motion.h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                 {myCharacters.map((char, idx) => (
                   <motion.button
                     key={char.id}
@@ -764,8 +1086,8 @@ const MarketPage = () => {
   } else {
     // --- MARKET CONTENT ---
     content = (
-      <div className="min-h-screen bg-[#0c0c0c] text-neutral-200 font-sans selection:bg-amber-900/30">
-        <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/10 via-[#0c0c0c] to-[#0c0c0c] z-0" />
+      <div className="text-neutral-200 font-sans selection:bg-amber-900/30">
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/10 via-transparent to-transparent z-0" />
 
         {/* Toast Feedback */}
         <AnimatePresence>
@@ -792,11 +1114,9 @@ const MarketPage = () => {
           )}
         </AnimatePresence>
 
-        <FloatingBackButton />
-
         <div className="relative z-10 flex">
           {/* Desktop Sidebar */}
-          <aside className="hidden lg:flex w-72 h-screen sticky top-0 flex-col bg-[#111] border-r border-white/5 p-4 overflow-y-auto scrollbar-thin">
+          <aside className="hidden lg:flex w-72 h-[calc(100vh-2rem)] sticky top-4 flex-col bg-[#111] border border-white/5 rounded-2xl p-4 overflow-y-auto scrollbar-thin ml-4 my-4">
             <div className="space-y-6 mb-8">
               <div className="flex items-center gap-3 px-2">
                 {/* Floating Back Button added globally, hiding local one but keeping structure if needed for spacing, or just removing */}
@@ -814,15 +1134,9 @@ const MarketPage = () => {
               {/* Character Info Card */}
               <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 shadow-inner">
                 <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
-                  <div>
-                    <h2 className="text-sm font-bold text-neutral-300 line-clamp-1">
-                      {activeCharacter?.name}
-                    </h2>
-                    <p className="text-xs text-neutral-500">
-                      {activeCharacter?.race?.name} • Nvl{" "}
-                      {activeCharacter?.level || 1}
-                    </p>
-                  </div>
+                  <h2 className="text-sm font-bold text-neutral-300 line-clamp-1">
+                    {activeCharacter?.name}
+                  </h2>
                   <button
                     onClick={() => clearActiveCharacter()}
                     className="p-1.5 hover:bg-white/5 rounded-lg text-neutral-500 hover:text-red-400 transition-colors"
@@ -848,9 +1162,9 @@ const MarketPage = () => {
                   { id: "weapons", label: "Armas", icon: Sword },
                   { id: "defense", label: "Defesa", icon: Shield },
                   { id: "general", label: "Geral", icon: Scroll },
-                  { id: "alchemy", label: "Alquimia", icon: FlaskConical },
+                  { id: "alchemy", label: "Alquimia", icon: FlaskRound },
                   { id: "clothing", label: "Vestes", icon: Shirt },
-                  { id: "food", label: "Comida", icon: Utensils },
+                  { id: "food", label: "Comida", icon: Apple },
                 ].map((cat) => (
                   <button
                     key={cat.id}
@@ -861,7 +1175,7 @@ const MarketPage = () => {
                         : "bg-[#1a1a1a] border-transparent text-neutral-400 hover:bg-[#222] hover:text-neutral-200"
                     }`}
                   >
-                    <cat.icon size={18} />
+                    <cat.icon size={14} />
                     <span className="text-xs font-bold">{cat.label}</span>
                   </button>
                 ))}
@@ -869,16 +1183,32 @@ const MarketPage = () => {
             </div>
 
             <div className="border-t border-white/10 pt-6">
-              <FilterPanelContent />
+              <FilterPanelContent
+                activeCharacter={activeCharacter}
+                searchInput={searchInput}
+                setSearchInput={setSearchInput}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+                canAffordOnly={canAffordOnly}
+                setCanAffordOnly={setCanAffordOnly}
+                priceRange={priceRange}
+                setPriceRange={setPriceRange}
+                dynamicFilters={dynamicFilters}
+                selectedSubGroups={selectedSubGroups}
+                toggleSubGroup={toggleSubGroup}
+                selectedDamageTypes={selectedDamageTypes}
+                toggleDamageType={toggleDamageType}
+                idPrefix="desktop"
+              />
             </div>
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 p-4 md:p-8 overflow-x-hidden min-h-screen flex flex-col">
+          <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden flex flex-col">
             {/* Mobile Header */}
             <div className="flex flex-col gap-4 mb-6 lg:hidden">
               {/* Mobile Character Info Card */}
-              <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 shadow-inner mb-4">
+              <div className="sticky bg-[#1a1a1a] rounded-xl p-4 border border-white/5 shadow-inner mb-4 z-50">
                 <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-900/20 rounded-lg text-amber-500">
@@ -936,8 +1266,8 @@ const MarketPage = () => {
                   <input
                     type="text"
                     placeholder="Buscar..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                     className="w-full bg-[#111] border border-white/10 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:border-amber-500/50 outline-none"
                   />
                 </div>
@@ -999,12 +1329,16 @@ const MarketPage = () => {
             {/* Items Grid */}
             <motion.div
               key={
-                currentPage + activeTab + sortOrder + selectedSubGroups.join()
+                currentPage +
+                activeTab +
+                sortOrder +
+                selectedSubGroups.join() +
+                searchTerm
               }
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1 content-start"
+              className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3 flex-1 content-start"
             >
               {paginatedItems.length === 0 ? (
                 <div className="col-span-full py-20 text-center text-neutral-600 flex flex-col items-center">
@@ -1015,73 +1349,23 @@ const MarketPage = () => {
                   </p>
                 </div>
               ) : (
-                paginatedItems.map((item, idx) => (
-                  <motion.div
-                    key={`${item.nome}-${idx}`}
-                    variants={itemVariants}
-                    className="bg-[#111] border border-white/5 rounded-xl p-4 hover:border-amber-500/30 hover:bg-[#161616] transition-all duration-300 relative group overflow-hidden"
-                  >
-                    {/* Hover Action Gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                paginatedItems.map((item, idx) => {
+                  const isInBag = bagItems.some((i) => i.nome === item.nome);
+                  const isSuccess = successItems.includes(item.nome);
+                  const canAfford =
+                    (activeCharacter?.money || 0) >= (item.preco || 0);
 
-                    <div className="flex justify-between items-start mb-2 relative z-10">
-                      <div>
-                        <h3 className="font-bold text-neutral-200 group-hover:text-amber-400 transition-colors line-clamp-1">
-                          {item.nome}
-                        </h3>
-                        <span className="text-[10px] text-amber-500/70 uppercase tracking-widest font-bold">
-                          {item.subGroup || item.group}
-                        </span>
-                      </div>
-                      <div className="bg-[#0c0c0c] px-2 py-1 rounded text-[10px] text-neutral-400 border border-white/5 whitespace-nowrap">
-                        {item.spaces} {item.spaces === 1 ? "espaço" : "espaços"}
-                      </div>
-                    </div>
-
-                    {/* Tags/Stats */}
-                    <div className="flex flex-wrap gap-2 mb-8 relative z-10">
-                      {(item as any).defenseBonus && (
-                        <span className="text-[10px] bg-blue-950/30 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20 flex items-center gap-1">
-                          <Shield size={10} /> +{(item as any).defenseBonus} Def
-                        </span>
-                      )}
-                      {item.dano && (
-                        <span className="text-[10px] bg-red-950/30 text-red-400 px-1.5 py-0.5 rounded border border-red-500/20 flex items-center gap-1">
-                          <Sword size={10} /> {item.dano}
-                        </span>
-                      )}
-                      {item.tipo && !item.tipo.includes("-") && (
-                        <span className="text-[10px] text-neutral-500 px-1.5 py-0.5">
-                          {item.tipo}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Bottom Action */}
-                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
-                      <span className="font-cinzel font-bold text-amber-500 text-lg">
-                        {item.preco === undefined ||
-                        item.preco === null ? null : item.preco === 0 ? (
-                          <span className="text-emerald-500 uppercase text-sm tracking-tighter">
-                            Grátis
-                          </span>
-                        ) : (
-                          <>
-                            {item.preco} <span className="text-xs">T$</span>
-                          </>
-                        )}
-                      </span>
-                      <button
-                        onClick={() => handleTransaction(item, "buy")}
-                        className="bg-neutral-800 hover:bg-amber-600 text-white p-2 rounded-lg transition-all shadow-lg hover:shadow-amber-500/20 active:scale-95"
-                      >
-                        <span className="text-xs font-bold uppercase px-2">
-                          Comprar
-                        </span>
-                      </button>
-                    </div>
-                  </motion.div>
-                ))
+                  return (
+                    <ItemCard
+                      key={`${item.nome}-${idx}`}
+                      item={item}
+                      isInBag={isInBag}
+                      isSuccess={isSuccess}
+                      canAfford={canAfford}
+                      onBuy={() => handleTransaction(item, "buy")}
+                    />
+                  );
+                })
               )}
             </motion.div>
 
@@ -1113,7 +1397,7 @@ const MarketPage = () => {
           </main>
 
           {/* Right Inventory Panel (Desktop) */}
-          <aside className="hidden 2xl:block w-72 h-screen sticky top-0 bg-[#111]/50 border-l border-white/5 p-6 backdrop-blur-sm">
+          <aside className="hidden 2xl:block w-72 h-[calc(100vh-2rem)] sticky top-4 bg-[#111]/50 border border-white/5 rounded-2xl p-6 backdrop-blur-sm mr-4 my-4">
             <h2 className="font-cinzel text-lg text-neutral-300 mb-6 flex items-center gap-2">
               <ShoppingBag className="text-amber-500" size={18} /> Inventário
             </h2>
@@ -1130,7 +1414,7 @@ const MarketPage = () => {
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-bold text-neutral-200 truncate group-hover:text-amber-400">
+                        <div className="text-sm font-bold text-neutral-200 group-hover:text-amber-400">
                           {item.nome}
                         </div>
                         <div className="text-[10px] text-neutral-500 font-medium">
@@ -1211,7 +1495,23 @@ const MarketPage = () => {
                     <X size={24} className="text-neutral-400" />
                   </button>
                 </div>
-                <FilterPanelContent />
+                <FilterPanelContent
+                  activeCharacter={activeCharacter}
+                  searchInput={searchInput}
+                  setSearchInput={setSearchInput}
+                  sortOrder={sortOrder}
+                  setSortOrder={setSortOrder}
+                  canAffordOnly={canAffordOnly}
+                  setCanAffordOnly={setCanAffordOnly}
+                  priceRange={priceRange}
+                  setPriceRange={setPriceRange}
+                  dynamicFilters={dynamicFilters}
+                  selectedSubGroups={selectedSubGroups}
+                  toggleSubGroup={toggleSubGroup}
+                  selectedDamageTypes={selectedDamageTypes}
+                  toggleDamageType={toggleDamageType}
+                  idPrefix="mobile"
+                />
                 <button
                   onClick={() => setShowMobileFilters(false)}
                   className="mt-8 w-full bg-amber-600 text-white font-bold py-3 rounded-lg hover:bg-amber-500"
