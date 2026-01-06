@@ -7,7 +7,7 @@ import Origin, { OriginBenefits } from "../interfaces/Origin";
 import Divindade from "../interfaces/Divindade";
 import { GeneralPower } from "../interfaces/Poderes";
 import Bag from "../interfaces/Bag";
-import Equipment from "../interfaces/Equipment";
+import Equipment, { BagEquipments } from "../interfaces/Equipment";
 import { Character } from "../interfaces/Character";
 import {
   calculateTotalPointsSpent,
@@ -178,17 +178,42 @@ export const useCharacterStore = create<CharacterWizardState>()(
       },
 
       addToBag: (item) => {
-        const currentBag = get().bag;
+        const state = get();
+        const updates: Partial<CharacterWizardState> = {};
+
+        // Update Wizard Bag
+        const currentBag = state.bag;
         const newBag = new Bag(currentBag.getEquipments());
         const group = item.group || "Item Geral";
         const partial: any = {};
         partial[group] = [item];
         newBag.addEquipment(partial);
-        set({ bag: newBag });
+        updates.bag = newBag;
+
+        // Update Active Character Bag
+        if (state.activeCharacter) {
+          const charBag =
+            state.activeCharacter.bag instanceof Bag
+              ? state.activeCharacter.bag
+              : new Bag((state.activeCharacter.bag as any)?.equipments);
+
+          const newCharBag = new Bag(charBag.getEquipments());
+          newCharBag.addEquipment(partial);
+          updates.activeCharacter = {
+            ...state.activeCharacter,
+            bag: newCharBag,
+          };
+        }
+
+        set(updates);
       },
 
       removeFromBag: (item) => {
-        const currentBag = get().bag;
+        const state = get();
+        const updates: Partial<CharacterWizardState> = {};
+
+        // Update Wizard Bag
+        const currentBag = state.bag;
         const equips = cloneDeep(currentBag.getEquipments());
         const group = item.group || "Item Geral";
         const groupKey = group as keyof BagEquipments;
@@ -203,17 +228,50 @@ export const useCharacterStore = create<CharacterWizardState>()(
             } else {
               list.splice(idx, 1);
             }
-            const newBag = new Bag(equips);
-            set({ bag: newBag });
+            updates.bag = new Bag(equips);
           }
+        }
+
+        // Update Active Character Bag
+        if (state.activeCharacter) {
+          const charBag =
+            state.activeCharacter.bag instanceof Bag
+              ? state.activeCharacter.bag
+              : new Bag((state.activeCharacter.bag as any)?.equipments);
+          const charEquips = cloneDeep(charBag.getEquipments());
+
+          if (charEquips[groupKey]) {
+            const list = charEquips[groupKey];
+            const idx = list.findIndex((i) => i.nome === item.nome);
+            if (idx > -1) {
+              const existing = list[idx];
+              if ((existing.quantidade || 1) > 1) {
+                existing.quantidade = (existing.quantidade || 1) - 1;
+              } else {
+                list.splice(idx, 1);
+              }
+              updates.activeCharacter = {
+                ...state.activeCharacter,
+                bag: new Bag(charEquips),
+              };
+            }
+          }
+        }
+
+        if (Object.keys(updates).length > 0) {
+          set(updates);
         }
       },
 
       updateItemQuantity: (item, delta) => {
-        const currentBag = get().bag;
-        const equips = cloneDeep(currentBag.getEquipments());
+        const state = get();
+        const updates: Partial<CharacterWizardState> = {};
         const group = item.group || "Item Geral";
         const groupKey = group as keyof BagEquipments;
+
+        // Update Wizard Bag
+        const currentBag = state.bag;
+        const equips = cloneDeep(currentBag.getEquipments());
 
         if (equips[groupKey]) {
           const list = equips[groupKey];
@@ -226,15 +284,56 @@ export const useCharacterStore = create<CharacterWizardState>()(
             } else {
               list.splice(idx, 1);
             }
-            const newBag = new Bag(equips);
-            set({ bag: newBag });
+            updates.bag = new Bag(equips);
           } else if (delta > 0) {
             // If item not in bag and we are adding
             const newItem = { ...item, quantidade: delta };
-            list.push(newItem);
-            const newBag = new Bag(equips);
-            set({ bag: newBag });
+            list.push(newItem as any);
+            updates.bag = new Bag(equips);
           }
+        }
+
+        // Update Active Character Bag
+        if (state.activeCharacter) {
+          const charBag =
+            state.activeCharacter.bag instanceof Bag
+              ? state.activeCharacter.bag
+              : new Bag((state.activeCharacter.bag as any)?.equipments);
+          const charEquips = cloneDeep(charBag.getEquipments());
+
+          // Ensure group array exists
+          if (!charEquips[groupKey]) {
+            (charEquips as any)[groupKey] = [];
+          }
+
+          if (charEquips[groupKey]) {
+            const list = charEquips[groupKey];
+            const idx = list.findIndex((i) => i.nome === item.nome);
+            if (idx > -1) {
+              const existing = list[idx];
+              const newQty = (existing.quantidade || 1) + delta;
+              if (newQty > 0) {
+                existing.quantidade = newQty;
+              } else {
+                list.splice(idx, 1);
+              }
+              updates.activeCharacter = {
+                ...state.activeCharacter,
+                bag: new Bag(charEquips),
+              };
+            } else if (delta > 0) {
+              const newItem = { ...item, quantidade: delta };
+              list.push(newItem as any);
+              updates.activeCharacter = {
+                ...state.activeCharacter,
+                bag: new Bag(charEquips),
+              };
+            }
+          }
+        }
+
+        if (Object.keys(updates).length > 0) {
+          set(updates);
         }
       },
 

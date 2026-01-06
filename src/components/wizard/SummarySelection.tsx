@@ -24,6 +24,15 @@ import { CharacterService } from "../../lib/characterService";
 import { formatAssetName } from "../../utils/assetUtils";
 import { sanitizeForFirestore } from "../../utils/firestoreUtils";
 
+const ATTRIBUTES_LIST = [
+  Atributo.FORCA,
+  Atributo.DESTREZA,
+  Atributo.CONSTITUICAO,
+  Atributo.INTELIGENCIA,
+  Atributo.SABEDORIA,
+  Atributo.CARISMA,
+];
+
 const SummarySelection = () => {
   const {
     name,
@@ -126,12 +135,45 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
       setIsFinalizing(true);
       setError(null);
 
+      // Map final attributes to the complex interface structure
+      const mappedAttributes: any = {};
+
+      ATTRIBUTES_LIST.forEach((attr) => {
+        const base = baseAttributes[attr];
+
+        // Calculate racial bonus on the fly
+        let racial = 0;
+        if (selectedRace) {
+          selectedRace.attributes.attrs.forEach((a, idx) => {
+            if (a.attr === attr) racial += a.mod;
+            if (a.attr === "any" && flexibleAttributeChoices[idx] === attr)
+              racial += a.mod;
+          });
+        }
+
+        const total = base + racial;
+        const attrSources = [];
+        if (base !== 0) attrSources.push("Base");
+        if (racial !== 0) attrSources.push("Raça");
+
+        mappedAttributes[attr] = {
+          name: attr,
+          value: {
+            base,
+            bonus: racial,
+            sources: attrSources,
+            total,
+          },
+          mod: total,
+        };
+      });
+
       // Sanitize data for Firestore (must be plain objects)
       const characterData = {
         name,
         raceName: selectedRace?.name || "",
         className: selectedClass?.name || "",
-        attributes: finalAttributes,
+        attributes: mappedAttributes,
         baseAttributes, // Original points
         flexibleAttributeChoices,
         race: selectedRace ? JSON.parse(JSON.stringify(selectedRace)) : null,
@@ -159,16 +201,17 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
       const savedId = await CharacterService.saveCharacter(sanitizedData);
 
       // Set as active character immediately
-      // We construct a Character object. Note: grantedPower singular in interface vs array in store.
-      // We take the first granted power if any, or null, to satisfy strict interface if needed.
-      // However, for runtime usage, we ensure bag is the instance.
+      const hpBase = selectedClass?.pv || 16;
+      const pmBase = selectedClass?.pm || 4;
+      const conMod = mappedAttributes[Atributo.CONSTITUICAO].mod;
+
       const newActiveChar: any = {
         id: savedId,
         name,
         race: selectedRace,
         class: selectedClass,
         level: 1,
-        attributes: finalAttributes,
+        attributes: mappedAttributes,
         skills: selectedSkills,
         origin: selectedOrigin,
         originBenefits,
@@ -176,8 +219,8 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         grantedPower: selectedGrantedPowers[0] || null,
         bag: bag, // existing instance
         money: money,
-        currentPv: 20 + finalAttributes[Atributo.CONSTITUICAO],
-        currentPm: selectedClass?.pm || 0,
+        currentPv: hpBase + conMod,
+        currentPm: pmBase,
       };
 
       setActiveCharacter(newActiveChar);

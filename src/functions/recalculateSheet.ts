@@ -1,41 +1,41 @@
-import _ from 'lodash';
-import CharacterSheet from '@/interfaces/CharacterSheet';
+import _ from "lodash";
+import CharacterSheet from "@/interfaces/CharacterSheet";
 import Skill, {
   SkillsAttrs,
   SkillsWithArmorPenalty,
-} from '@/interfaces/Skills';
-import { Atributo } from '@/data/atributos';
-import { calcDefense } from '@/data/equipamentos';
-import { getRaceDisplacement } from '@/data/races/functions/functions';
-import Bag from '@/interfaces/Bag';
-import { CharacterAttributes } from '@/interfaces/Character';
-import Equipment from '@/interfaces/Equipment';
-import { ManualPowerSelections } from '@/interfaces/PowerSelections';
-import { applyRaceAbilities, applyPower } from './general';
-import { getRemovedPowers } from './reverseSheetActions';
+} from "@/interfaces/Skills";
+import { Atributo } from "@/data/atributos";
+import { calcDefense } from "@/data/equipamentos";
+import { getRaceDisplacement } from "@/data/races/functions/functions";
+import Bag from "@/interfaces/Bag";
+import { CharacterAttributes } from "@/interfaces/Character";
+import Equipment from "@/interfaces/Equipment";
+import { ManualPowerSelections } from "@/interfaces/PowerSelections";
+import { applyRaceAbilities, applyPower, getModValue } from "./general";
+import { getRemovedPowers } from "./reverseSheetActions";
 
 // We need to copy the applyStatModifiers function locally since it's not exported
 const calculateBonusValue = (
   sheet: CharacterSheet,
   bonus: { type: string; value?: number; attribute?: string; formula?: string }
 ): number => {
-  if (bonus.type === 'Level') {
+  if (bonus.type === "Level") {
     return sheet.nivel;
   }
-  if (bonus.type === 'HalfLevel') {
+  if (bonus.type === "HalfLevel") {
     return Math.floor(sheet.nivel / 2);
   }
-  if (bonus.type === 'Attribute') {
+  if (bonus.type === "Attribute") {
     const attr = bonus.attribute as Atributo;
     return sheet.atributos[attr]?.mod || 0;
   }
-  if (bonus.type === 'SpecialAttribute') {
-    if (bonus.attribute === 'spellKeyAttr') {
+  if (bonus.type === "SpecialAttribute") {
+    if (bonus.attribute === "spellKeyAttr") {
       const attr = sheet.classe.spellPath?.keyAttribute || Atributo.CARISMA;
       return sheet.atributos[attr].mod;
     }
   }
-  if (bonus.type === 'LevelCalc' && bonus.formula) {
+  if (bonus.type === "LevelCalc" && bonus.formula) {
     // Handle formulas like 'Math.floor(({level} + 3) / 4)'
     const formula = bonus.formula.replace(/{level}/g, sheet.nivel.toString());
     try {
@@ -45,7 +45,7 @@ const calculateBonusValue = (
       return 0;
     }
   }
-  if (bonus.type === 'Fixed') {
+  if (bonus.type === "Fixed") {
     return bonus.value || 0;
   }
   return 0;
@@ -95,9 +95,9 @@ const resetWeaponToBase = (weapon: Equipment): Equipment => {
   resetWeapon.atkBonus = 0;
 
   // Reset damage string to remove any added bonuses
-  if (resetWeapon.dano && resetWeapon.dano.includes('+')) {
+  if (resetWeapon.dano && resetWeapon.dano.includes("+")) {
     // Extract base damage (everything before the first '+')
-    [resetWeapon.dano] = resetWeapon.dano.split('+');
+    [resetWeapon.dano] = resetWeapon.dano.split("+");
   }
 
   // Reset critical to base value - this is more complex as we need to handle
@@ -114,10 +114,10 @@ const applyHPAttributeReplacement = (sheet: CharacterSheet): CharacterSheet => {
 
   // Check if there's an HP attribute replacement
   const hpReplacement = updatedSheet.sheetBonuses.find(
-    (bonus) => bonus.target.type === 'HPAttributeReplacement'
+    (bonus) => bonus.target.type === "HPAttributeReplacement"
   );
 
-  if (hpReplacement && hpReplacement.target.type === 'HPAttributeReplacement') {
+  if (hpReplacement && hpReplacement.target.type === "HPAttributeReplacement") {
     const { newAttribute } = hpReplacement.target;
 
     // Recalculate HP using the new attribute instead of Constitution
@@ -151,18 +151,18 @@ const applyWeaponBonuses = (
 
       updatedSheet.sheetBonuses.forEach((bonus) => {
         if (
-          (bonus.target.type === 'WeaponDamage' ||
-            bonus.target.type === 'WeaponAttack' ||
-            bonus.target.type === 'WeaponCritical') &&
+          (bonus.target.type === "WeaponDamage" ||
+            bonus.target.type === "WeaponAttack" ||
+            bonus.target.type === "WeaponCritical") &&
           weaponMatchesBonus(weapon, bonus.target, updatedSheet)
         ) {
           const bonusValue = calculateBonusValue(updatedSheet, bonus.modifier);
 
-          if (bonus.target.type === 'WeaponAttack') {
+          if (bonus.target.type === "WeaponAttack") {
             totalAttackBonus += bonusValue;
-          } else if (bonus.target.type === 'WeaponDamage') {
+          } else if (bonus.target.type === "WeaponDamage") {
             totalDamageBonus += bonusValue;
-          } else if (bonus.target.type === 'WeaponCritical') {
+          } else if (bonus.target.type === "WeaponCritical") {
             totalCriticalBonus += bonusValue;
           }
         }
@@ -181,20 +181,20 @@ const applyWeaponBonuses = (
 
       if (totalCriticalBonus > 0 && weaponCopy.critico) {
         // Apply critical bonus logic (simplified for now)
-        if (weaponCopy.critico.includes('x')) {
+        if (weaponCopy.critico.includes("x")) {
           const currentMult = parseInt(
-            weaponCopy.critico.match(/x(\d+)/)?.[1] || '2',
+            weaponCopy.critico.match(/x(\d+)/)?.[1] || "2",
             10
           );
           weaponCopy.critico = weaponCopy.critico.replace(
             /x\d+/,
             `x${currentMult + totalCriticalBonus}`
           );
-        } else if (weaponCopy.critico.includes('/')) {
-          const parts = weaponCopy.critico.split('/');
-          if (parts[1].includes('x')) {
+        } else if (weaponCopy.critico.includes("/")) {
+          const parts = weaponCopy.critico.split("/");
+          if (parts[1].includes("x")) {
             const currentMult = parseInt(
-              parts[1].match(/x(\d+)/)?.[1] || '2',
+              parts[1].match(/x(\d+)/)?.[1] || "2",
               10
             );
             weaponCopy.critico = `${parts[0]}/x${
@@ -238,7 +238,7 @@ const applyDefenseBonuses = (sheet: CharacterSheet): CharacterSheet => {
   const updatedSheet = _.cloneDeep(sheet);
 
   updatedSheet.sheetBonuses.forEach((bonus) => {
-    if (bonus.target.type === 'Defense') {
+    if (bonus.target.type === "Defense") {
       const bonusValue = calculateBonusValue(updatedSheet, bonus.modifier);
       updatedSheet.defesa += bonusValue;
     }
@@ -319,8 +319,8 @@ function recalculateCompleteSkills(sheet: CharacterSheet): CharacterSheet {
       })
       .filter(
         (skill) =>
-          !skill.name.startsWith('Of') ||
-          (skill.name.startsWith('Of') && skill.training > 0)
+          !skill.name.startsWith("Of") ||
+          (skill.name.startsWith("Of") && skill.training > 0)
       );
   }
 
@@ -457,21 +457,21 @@ export function recalculateSheet(
         historyEntry.changes.forEach((change) => {
           // Inline reversal logic to avoid circular imports
           switch (change.type) {
-            case 'Attribute': {
+            case "Attribute": {
               // Find the original modification to get the exact value that was added
               const relevantHistory = updatedSheet.sheetActionHistory.find(
                 (entry) =>
                   entry.powerName === powerName &&
                   entry.changes.some(
                     (c) =>
-                      c.type === 'Attribute' && c.attribute === change.attribute
+                      c.type === "Attribute" && c.attribute === change.attribute
                   )
               );
               if (relevantHistory) {
                 const attributeChange = relevantHistory.changes.find(
                   (c) =>
-                    c.type === 'Attribute' && c.attribute === change.attribute
-                ) as { type: 'Attribute'; attribute: Atributo; value: number };
+                    c.type === "Attribute" && c.attribute === change.attribute
+                ) as { type: "Attribute"; attribute: Atributo; value: number };
                 if (attributeChange) {
                   const originalValue =
                     updatedSheet.atributos[change.attribute].mod;
@@ -484,7 +484,7 @@ export function recalculateSheet(
               break;
             }
 
-            case 'ProficiencyAdded': {
+            case "ProficiencyAdded": {
               const profIndex = updatedSheet.classe.proficiencias.indexOf(
                 change.proficiency
               );
@@ -494,7 +494,7 @@ export function recalculateSheet(
               break;
             }
 
-            case 'SkillsAdded': {
+            case "SkillsAdded": {
               change.skills.forEach((skill: string) => {
                 const skillIndex = updatedSheet.skills.indexOf(skill as Skill);
                 if (skillIndex > -1) {
@@ -504,7 +504,7 @@ export function recalculateSheet(
               break;
             }
 
-            case 'SenseAdded': {
+            case "SenseAdded": {
               if (updatedSheet.sentidos) {
                 const senseIndex = updatedSheet.sentidos.indexOf(change.sense);
                 if (senseIndex > -1) {
@@ -514,7 +514,7 @@ export function recalculateSheet(
               break;
             }
 
-            case 'PowerAdded': {
+            case "PowerAdded": {
               if (updatedSheet.generalPowers) {
                 const powerIndex = updatedSheet.generalPowers.findIndex(
                   (power) => power.name === change.powerName
@@ -526,7 +526,7 @@ export function recalculateSheet(
               break;
             }
 
-            case 'SpellsLearned': {
+            case "SpellsLearned": {
               if (updatedSheet.spells) {
                 change.spellNames.forEach((spellName: string) => {
                   const spellIndex = updatedSheet.spells.findIndex(
@@ -540,7 +540,7 @@ export function recalculateSheet(
               break;
             }
 
-            case 'AttributeIncreasedByAumentoDeAtributo':
+            case "AttributeIncreasedByAumentoDeAtributo":
               updatedSheet.atributos[change.attribute].mod -= 1;
               break;
 
@@ -560,6 +560,14 @@ export function recalculateSheet(
 
   // Step 1: Clear existing bonuses to avoid accumulation
   updatedSheet.sheetBonuses = [];
+
+  // Reset attribute bonuses
+  Object.values(updatedSheet.atributos).forEach((attr) => {
+    attr.value.bonus = 0;
+    attr.value.sources = [];
+    attr.value.total = attr.value.base;
+    attr.mod = getModValue(attr.value.total);
+  });
 
   // Step 2: Apply general powers (most important for manual additions)
   updatedSheet = applyGeneralPowers(updatedSheet, manualSelections);
@@ -585,23 +593,36 @@ export function recalculateSheet(
   // Step 8: Apply non-defense bonuses (PV, PM, skills, etc.)
   updatedSheet.sheetBonuses.forEach((bonus) => {
     if (
-      bonus.target.type !== 'Defense' &&
-      bonus.target.type !== 'HPAttributeReplacement'
+      bonus.target.type !== "Defense" &&
+      bonus.target.type !== "HPAttributeReplacement"
     ) {
       const bonusValue = calculateBonusValue(updatedSheet, bonus.modifier);
 
-      if (bonus.target.type === 'PV') {
+      if (bonus.target.type === "Attribute") {
+        const attr = bonus.target.name;
+        const currentAttr = updatedSheet.atributos[attr];
+        currentAttr.value.bonus += bonusValue;
+        currentAttr.value.total += bonusValue;
+        if (bonus.source.type === "power") {
+          currentAttr.value.sources.push(bonus.source.name);
+        } else if (bonus.source.type === "class") {
+          currentAttr.value.sources.push(bonus.source.className);
+        } else if (bonus.source.type === "race") {
+          currentAttr.value.sources.push(bonus.source.raceName);
+        }
+        currentAttr.mod = getModValue(currentAttr.value.total);
+      } else if (bonus.target.type === "PV") {
         updatedSheet.pv += bonusValue;
-      } else if (bonus.target.type === 'PM') {
+      } else if (bonus.target.type === "PM") {
         updatedSheet.pm += bonusValue;
-      } else if (bonus.target.type === 'Skill') {
+      } else if (bonus.target.type === "Skill") {
         const skillName = bonus.target.name;
         addOtherBonusToSkill(updatedSheet, skillName, bonusValue);
-      } else if (bonus.target.type === 'PickSkill') {
+      } else if (bonus.target.type === "PickSkill") {
         // Re-apply PickSkill bonuses using manual selections
         // Find which power this bonus belongs to by checking the bonus source
         if (
-          bonus.source?.type === 'power' &&
+          bonus.source?.type === "power" &&
           manualSelections?.[bonus.source.name]
         ) {
           const powerName = bonus.source.name;
@@ -621,9 +642,9 @@ export function recalculateSheet(
             });
           }
         }
-      } else if (bonus.target.type === 'Displacement') {
+      } else if (bonus.target.type === "Displacement") {
         updatedSheet.displacement += bonusValue;
-      } else if (bonus.target.type === 'ArmorPenalty') {
+      } else if (bonus.target.type === "ArmorPenalty") {
         updatedSheet.extraArmorPenalty =
           (updatedSheet.extraArmorPenalty || 0) + bonusValue;
       }
@@ -639,7 +660,7 @@ export function recalculateSheet(
 
   // Step 11: Recalculate displacement from ground up
   const baseDisplacementBonuses = updatedSheet.sheetBonuses
-    .filter((bonus) => bonus.target.type === 'Displacement')
+    .filter((bonus) => bonus.target.type === "Displacement")
     .reduce(
       (acc, bonus) => acc + calculateBonusValue(updatedSheet, bonus.modifier),
       0

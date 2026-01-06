@@ -185,6 +185,21 @@ const combatPowers: Record<string, GeneralPower> = {
         },
       ],
     ],
+    sheetBonuses: [
+      {
+        source: {
+          type: "power",
+          name: "Encouraçado",
+        },
+        target: {
+          type: "Defense",
+        },
+        modifier: {
+          type: "Fixed",
+          value: 2,
+        },
+      },
+    ],
   },
   ESQUIVA: {
     name: "Esquiva",
