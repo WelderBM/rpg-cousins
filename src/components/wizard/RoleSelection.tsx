@@ -177,10 +177,11 @@ const RoleSelection = () => {
     const isHuman = selectedRace?.name === "Humano";
     const raceBonus = isHuman ? 1 : 0;
     return {
-      class: classQty + stats.intMod,
+      class: classQty,
+      extra: stats.intMod,
       raceBonus,
     };
-  }, [selectedPreview, selectedRace]);
+  }, [selectedPreview, selectedRace, stats]);
 
   // --- POOL CALCULATIONS ---
   const pickedInBasic = useMemo(() => {
@@ -217,9 +218,23 @@ const RoleSelection = () => {
     }
   };
 
+  const toggleGeneralSkill = (skill: Skill) => {
+    if (generalSkillChoices.includes(skill)) {
+      setGeneralSkillChoices(generalSkillChoices.filter((s) => s !== skill));
+    } else {
+      if (generalSkillChoices.length < limits.extra) {
+        setGeneralSkillChoices([...generalSkillChoices, skill]);
+      }
+    }
+  };
+
   const handleConfirm = () => {
     if (!selectedPreview) return;
-    const finalSkills = [...pickedInBasic, ...classSkillChoices];
+    const finalSkills = [
+      ...pickedInBasic,
+      ...classSkillChoices,
+      ...generalSkillChoices,
+    ];
     selectClass(selectedPreview);
     updateSkills(finalSkills);
     setStep(4);
@@ -231,7 +246,8 @@ const RoleSelection = () => {
       g.type === "or" ? !!basicSkillChoices[i] : true
     );
     const classDone = classSkillChoices.length === limits.class;
-    return basicDone && classDone;
+    const extraDone = generalSkillChoices.length === Math.max(0, limits.extra);
+    return basicDone && classDone && extraDone;
   }, [
     selectedPreview,
     basicSkillChoices,
@@ -471,6 +487,61 @@ const RoleSelection = () => {
                 })}
               </div>
             </section>
+
+            {/* SKILLS - EXTRA (INT) */}
+            {limits.extra > 0 && (
+              <section className="space-y-4">
+                <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
+                  <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
+                    <Sparkles size={18} /> Perícias Extras (Inteligência)
+                  </h3>
+                  <span
+                    className={`text-xs font-bold px-3 py-1 rounded-full ${
+                      generalSkillChoices.length === limits.extra
+                        ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50"
+                        : "bg-stone-800 text-stone-400 border border-stone-700"
+                    }`}
+                  >
+                    {generalSkillChoices.length} / {limits.extra}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {availableForGeneral.map((skill) => {
+                    const isSelected = generalSkillChoices.includes(skill);
+                    const isDisabled =
+                      !isSelected && generalSkillChoices.length >= limits.extra;
+                    return (
+                      <button
+                        key={skill}
+                        disabled={isDisabled}
+                        onClick={() => toggleGeneralSkill(skill)}
+                        className={`text-left px-3 py-3 rounded-lg border transition-all text-sm flex items-center gap-2 ${
+                          isSelected
+                            ? "bg-teal-900/30 border-teal-500 text-teal-100"
+                            : isDisabled
+                            ? "opacity-30 cursor-not-allowed border-transparent text-stone-600 bg-stone-900"
+                            : "bg-stone-900 border-stone-800 text-stone-400 hover:border-amber-900/50 hover:bg-stone-800"
+                        }`}
+                      >
+                        <div
+                          className={`w-4 h-4 rounded border flex items-center justify-center ${
+                            isSelected
+                              ? "bg-teal-500 border-teal-500"
+                              : "border-stone-600 bg-black/40"
+                          }`}
+                        >
+                          {isSelected && (
+                            <Check size={12} className="text-stone-950" />
+                          )}
+                        </div>
+                        {skill}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {/* ACTION FOOTER */}
             <div className="sticky bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">

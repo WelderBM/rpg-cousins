@@ -53,7 +53,7 @@ export const ImpactPanel = React.memo(
     }, [finalAttributes]);
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-black/40 p-4 rounded-xl border border-neutral-800/50">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-black/40 p-4 rounded-xl border border-neutral-800/50">
         {stats.map((stat) => (
           <div key={stat.label} className="text-center group">
             <stat.icon
