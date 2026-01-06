@@ -17,14 +17,14 @@ export function WikiSidebar({
   return (
     <nav className="hidden md:flex w-64 lg:w-72 bg-neutral-900/50 backdrop-blur-xl border-r border-amber-900/20 flex-col z-20 h-screen sticky top-0">
       <div className="p-6">
-        <Link href="/" className="flex items-center gap-3 group mb-8">
+        {/* <Link href="/" className="flex items-center gap-3 group mb-8">
           <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/20 group-hover:border-amber-500/50 transition-all">
             <ArrowLeft className="w-5 h-5 text-amber-500" />
           </div>
           <span className="font-cinzel text-lg text-amber-100 group-hover:text-amber-400 transition-colors">
             Voltar ao Início
           </span>
-        </Link>
+        </Link> */}
 
         <h1 className="text-3xl font-cinzel text-amber-500 mb-2 drop-shadow-[0_0_15px_rgba(251,191,36,0.2)]">
           Compêndio

@@ -34,6 +34,7 @@ import Equipment from "../../interfaces/Equipment";
 import { getInitialMoney } from "../../functions/general";
 import Bag, { calcBagSpaces } from "../../interfaces/Bag";
 import { PurchaseModal } from "./PurchaseModal";
+import { FloatingBackButton } from "@/components/FloatingBackButton";
 
 // Animation Variants
 const containerVariants = {
@@ -791,17 +792,20 @@ const MarketPage = () => {
           )}
         </AnimatePresence>
 
+        <FloatingBackButton />
+
         <div className="relative z-10 flex">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:flex w-72 h-screen sticky top-0 flex-col bg-[#111] border-r border-white/5 p-4 overflow-y-auto scrollbar-thin">
             <div className="space-y-6 mb-8">
               <div className="flex items-center gap-3 px-2">
-                <button
+                {/* Floating Back Button added globally, hiding local one but keeping structure if needed for spacing, or just removing */}
+                {/* <button
                   onClick={() => router.back()}
                   className="text-neutral-400 hover:text-white transition-colors"
                 >
                   <ArrowLeft size={20} />
-                </button>
+                </button> */}
                 <h1 className="text-xl font-cinzel text-amber-500 tracking-wider">
                   MERCADO
                 </h1>

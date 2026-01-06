@@ -313,7 +313,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
           selectedDeity: null,
           selectedGrantedPowers: [],
           bag: new Bag(),
-          money: 100,
+          money: 18,
           baseAttributes: { ...INITIAL_ATTRIBUTES },
           pointsRemaining: INITIAL_POINTS,
           flexibleAttributeChoices: {},

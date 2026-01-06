@@ -17,6 +17,7 @@ import { WikiCategoryNav } from "./components/WikiCategoryNav";
 import { WikiControls } from "./components/WikiControls";
 import { WikiGrid } from "./components/WikiGrid";
 import { WikiDetailDrawer } from "./components/WikiDetailDrawer";
+import { FloatingBackButton } from "@/components/FloatingBackButton";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -294,6 +295,7 @@ export default function WikiPage() {
 
   return (
     <div className="min-h-screen bg-stone-950 text-neutral-200 font-sans selection:bg-amber-500/30">
+      <FloatingBackButton />
       <div className="flex flex-col md:flex-row h-screen overflow-hidden">
         {/* Desktop Sidebar (hidden on mobile) */}
         <WikiSidebar
