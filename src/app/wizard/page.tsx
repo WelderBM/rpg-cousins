@@ -21,15 +21,10 @@ export default function WizardPage() {
   // We default to showing Hub so user can choose "Continue" (if data exists) or "New".
   const [showHub, setShowHub] = useState(true);
 
-  // Smooth scroll to top on step change
+  // Scroll to top on step change
   React.useEffect(() => {
-    const mainContainer = document.getElementById("main-scroll-container");
-    if (mainContainer) {
-      mainContainer.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [step, showHub, selectedOrigin]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step, showHub]);
 
   const handleReset = () => {
     resetWizard();

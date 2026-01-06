@@ -68,6 +68,11 @@ const DeitySelection = () => {
     null
   );
 
+  // Scroll to top when entering/leaving preview
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [selectedPreview]);
+
   const availableDeities = useMemo(() => {
     return [...DIVINDADES].sort((a, b) => a.name.localeCompare(b.name));
   }, []);

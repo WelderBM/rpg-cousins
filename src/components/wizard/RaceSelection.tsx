@@ -85,6 +85,11 @@ const RaceSelection = () => {
   const selectRace = useCharacterStore((state) => state.selectRace);
   const [selectedPreview, setSelectedPreview] = useState<Race | null>(null);
 
+  // Scroll to top when entering preview
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [selectedPreview]);
+
   return (
     <div className="w-full h-full min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-950 via-stone-950 to-neutral-950">
       <div className="absolute inset-0 opacity-5">

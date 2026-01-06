@@ -88,6 +88,11 @@ const OriginSelection = () => {
 
   const [selectedPreview, setSelectedPreview] = useState<Origin | null>(null);
 
+  // Scroll to top when entering/leaving preview
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [selectedPreview]);
+
   // Combine already known skills to prevent duplicates
   const knownSkills = useMemo(() => {
     return [...selectedSkills];

@@ -108,6 +108,8 @@ export default function MestreClient() {
       );
       const { db } = await import("@/firebaseConfig");
 
+      if (!db) return;
+
       const q = query(collection(db, "threats"), orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       const fetchedThreats = querySnapshot.docs.map((doc) => ({
@@ -179,6 +181,11 @@ export default function MestreClient() {
       );
       const { db } = await import("@/firebaseConfig");
 
+      if (!db) {
+        alert("Erro ao conectar com o banco de dados.");
+        return;
+      }
+
       const dataToSave = {
         ...formData,
         updatedAt: Timestamp.now(),
@@ -211,6 +218,8 @@ export default function MestreClient() {
     try {
       const { doc, deleteDoc } = await import("firebase/firestore");
       const { db } = await import("@/firebaseConfig");
+
+      if (!db) return;
 
       await deleteDoc(doc(db, "threats", id));
       fetchThreats();

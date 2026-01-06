@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCharacterStore } from "../../store/useCharacterStore";
 import { useStore } from "../../store";
@@ -32,6 +33,7 @@ const SummarySelection = () => {
     baseAttributes,
     flexibleAttributeChoices,
     selectedOrigin,
+    originBenefits,
     selectedDeity,
     selectedGrantedPowers,
     bag,
@@ -39,9 +41,11 @@ const SummarySelection = () => {
     selectedSkills,
     setStep,
     resetWizard,
+    setActiveCharacter,
   } = useCharacterStore();
 
   const { user } = useStore();
+  const router = useRouter();
 
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,6 +138,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         class: selectedClass ? JSON.parse(JSON.stringify(selectedClass)) : null,
         skills: selectedSkills,
         originName: selectedOrigin?.name || null,
+        originBenefits: originBenefits, // Persist benefits
         deityName: selectedDeity?.name || null,
         grantedPowers: selectedGrantedPowers.map((p) => ({
           name: p.name,
@@ -151,14 +156,37 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
 
       const sanitizedData = sanitizeForFirestore(characterData);
 
-      await CharacterService.saveCharacter(sanitizedData);
+      const savedId = await CharacterService.saveCharacter(sanitizedData);
 
-      // Clear the local draft to prevent duplication
-      resetWizard();
+      // Set as active character immediately
+      // We construct a Character object. Note: grantedPower singular in interface vs array in store.
+      // We take the first granted power if any, or null, to satisfy strict interface if needed.
+      // However, for runtime usage, we ensure bag is the instance.
+      const newActiveChar: any = {
+        id: savedId,
+        name,
+        race: selectedRace,
+        class: selectedClass,
+        level: 1,
+        attributes: finalAttributes,
+        skills: selectedSkills,
+        origin: selectedOrigin,
+        originBenefits,
+        deity: selectedDeity,
+        grantedPower: selectedGrantedPowers[0] || null,
+        bag: bag, // existing instance
+        money: money,
+        currentPv: 20 + finalAttributes[Atributo.CONSTITUICAO],
+        currentPm: selectedClass?.pm || 0,
+      };
+
+      setActiveCharacter(newActiveChar);
 
       // Success redirect after animation
       setTimeout(() => {
-        window.location.href = "/market"; // Redirect to market as requested
+        router.push("/market");
+        // Delay reset to prevent UI flash before navigation
+        setTimeout(() => resetWizard(), 100);
       }, 2000);
     } catch (err) {
       console.error(err);

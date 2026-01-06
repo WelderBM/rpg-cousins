@@ -133,6 +133,11 @@ const RoleSelection = () => {
     setRoleSelectionState,
   ]);
 
+  // Scroll to top when entering/leaving preview
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [selectedPreview]);
+
   const handlePreviewChange = (cls: ClassDescription | null) => {
     if (cls && cls.name !== selectedPreview?.name) {
       // Reset choices for new class

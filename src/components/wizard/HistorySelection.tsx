@@ -12,6 +12,10 @@ const HistorySelection = () => {
   // Store 'step' is global.
   const { selectedOrigin, selectedDeity } = useCharacterStore();
 
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [selectedOrigin]);
+
   // If no origin selected, show Origin Selection
   if (!selectedOrigin) {
     return <OriginSelection />;

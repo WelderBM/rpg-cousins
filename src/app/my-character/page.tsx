@@ -38,6 +38,7 @@ import { getRaceByName } from "@/data/racas";
 import CLASSES from "@/data/classes";
 import { formatAssetName } from "@/utils/assetUtils";
 import { calculateCarryCapacity } from "@/utils/inventoryUtils";
+import { FloatingBackButton } from "@/components/FloatingBackButton";
 
 // --- SUB-COMPONENTS ---
 
@@ -426,6 +427,7 @@ export default function MyCharacterPage() {
 
   return (
     <div className="min-h-screen bg-stone-950 text-neutral-200 pb-20 font-sans selection:bg-amber-900 selection:text-white">
+      <FloatingBackButton />
       {/* --- HERO HEADER --- */}
       <header className="relative w-full bg-gradient-to-b from-stone-900 to-stone-950 border-b border-stone-800 pb-8 pt-6 px-4 md:px-8 overflow-hidden">
         {/* Background Accents */}

@@ -346,7 +346,7 @@ export function getModValue(attr: number): number {
 
 export function getInitialMoney(level: number, className?: string): number {
   const moneyByLevel: Record<number, number> = {
-    1: rollDice(4, 6, 0), // 4d6 para nível 1
+    1: 18, // Fixed start as per user request
     2: 300,
     3: 600,
     4: 1000,
@@ -388,19 +388,9 @@ export function getInitialMoneyWithDetails(
   details?: string;
 } {
   if (level === 1) {
-    // Roll 4 individual dice to show the breakdown
-    const dice: number[] = [];
-    for (let i = 0; i < 4; i += 1) {
-      dice.push(Math.floor(Math.random() * 6) + 1);
-    }
-    const total = dice.reduce((sum, die) => sum + die, 0);
-
-    let finalAmount = total;
-    let details = `(${dice.join(", ")})`;
-
     return {
-      amount: finalAmount,
-      details,
+      amount: 18,
+      details: "(Inicial Fixo)",
     };
   }
 
@@ -427,7 +417,7 @@ export function getInitialMoneyWithDetails(
   };
 
   return {
-    amount: fixedAmounts[level] || rollDice(4, 6, 0),
+    amount: fixedAmounts[level] || 18,
   };
 }
 
