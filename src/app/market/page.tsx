@@ -13,44 +13,83 @@ import {
   Package,
   Shield,
   Sword,
-  Plus,
-  Minus,
+  FlaskConical,
+  Shirt,
+  Utensils,
+  Scroll,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal,
+  ArrowDownUp,
+  Check,
+  User,
+  LogOut,
   AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { getEquipmentsByCategory } from "../../lib/localData";
 import Equipment from "../../interfaces/Equipment";
+import { getInitialMoney } from "../../functions/general";
+
+// Animation Variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const ITEMS_PER_PAGE = 12;
+
+type SortOrder = "name-asc" | "name-desc" | "price-asc" | "price-desc";
 
 const MarketPage = () => {
   const router = useRouter();
-  const { activeCharacter, addToBag, removeFromBag, updateActiveCharacter } =
-    useCharacterStore();
+  const {
+    activeCharacter,
+    addToBag,
+    removeFromBag,
+    updateActiveCharacter,
+    setActiveCharacter,
+    clearActiveCharacter,
+  } = useCharacterStore();
   const [loading, setLoading] = useState(true);
+
+  // Search & Filter State
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+
+  // Advanced Filters
+  const [sortOrder, setSortOrder] = useState<SortOrder>("name-asc");
+  const [priceRange, setPriceRange] = useState<{ min: string; max: string }>({
+    min: "",
+    max: "",
+  });
+  const [selectedSubGroups, setSelectedSubGroups] = useState<string[]>([]);
+  const [selectedDamageTypes, setSelectedDamageTypes] = useState<string[]>([]);
+
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showMobileCart, setShowMobileCart] = useState(false);
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [feedback, setFeedback] = useState<{
     msg: string;
     type: "success" | "error";
   } | null>(null);
 
-  const [categories, setCategories] = useState<{
-    weapons: Equipment[];
-    armors: Equipment[];
-    shields: Equipment[];
-    general: Equipment[];
-    alchemy: Equipment[];
-    clothing: Equipment[];
-    food: Equipment[];
-  }>({
-    weapons: [],
-    armors: [],
-    shields: [],
-    general: [],
-    alchemy: [],
-    clothing: [],
-    food: [],
-  });
+  const [categories, setCategories] = useState<any>({});
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -58,11 +97,14 @@ const MarketPage = () => {
     const checkAuth = async () => {
       const { onAuthStateChanged } = await import("firebase/auth");
       if (!auth) return;
-      unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
         if (!user) {
           router.push("/characters");
-        } else if (!activeCharacter) {
-          router.push("/characters");
+        } else {
+          // User is logged in, check if we need to fetch characters
+          if (!activeCharacter) {
+            // Maybe fetch here or in another effect, but we need to stop the redirect
+          }
         }
       });
     };
@@ -74,6 +116,28 @@ const MarketPage = () => {
     };
   }, [activeCharacter, router]);
 
+  const [myCharacters, setMyCharacters] = useState<any[]>([]);
+  const [loadingChars, setLoadingChars] = useState(false);
+
+  useEffect(() => {
+    const fetchMyCharacters = async () => {
+      if (auth?.currentUser && !activeCharacter) {
+        setLoadingChars(true);
+        try {
+          const chars = await CharacterService.getCharacters(
+            auth.currentUser.uid
+          );
+          setMyCharacters(chars);
+        } catch (error) {
+          console.error("Failed to fetch characters", error);
+        } finally {
+          setLoadingChars(false);
+        }
+      }
+    };
+    fetchMyCharacters();
+  }, [auth?.currentUser, activeCharacter]);
+
   useEffect(() => {
     const loadData = async () => {
       const data = await getEquipmentsByCategory();
@@ -81,46 +145,245 @@ const MarketPage = () => {
       setLoading(false);
     };
     loadData();
-  }, [activeCharacter, router]);
+  }, []);
 
-  const marketItems = useMemo(() => {
+  // Initialize character money if not set or if it's the default value
+  useEffect(() => {
+    const initializeMoney = async () => {
+      if (activeCharacter && auth?.currentUser) {
+        // Check if money needs initialization (is 0 or undefined)
+        if (
+          activeCharacter.money === undefined ||
+          activeCharacter.money === 0
+        ) {
+          const initialMoney = getInitialMoney(
+            activeCharacter.level || 1,
+            activeCharacter.class?.name
+          );
+
+          try {
+            await CharacterService.updateCharacter(
+              auth.currentUser.uid,
+              activeCharacter.id!,
+              { money: initialMoney }
+            );
+
+            updateActiveCharacter({ money: initialMoney });
+
+            setFeedback({
+              msg: `Dinheiro inicial: ${initialMoney} T$`,
+              type: "success",
+            });
+            setTimeout(() => setFeedback(null), 2000);
+          } catch (error) {
+            console.error("Failed to initialize money:", error);
+          }
+        }
+      }
+    };
+
+    initializeMoney();
+  }, [activeCharacter?.id]); // Only run when character changes
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    activeTab,
+    searchTerm,
+    selectedSubGroups,
+    selectedDamageTypes,
+    priceRange,
+    sortOrder,
+  ]);
+
+  // Reset advanced filters when main tab changes
+  useEffect(() => {
+    setSelectedSubGroups([]);
+    setSelectedDamageTypes([]);
+    setPriceRange({ min: "", max: "" });
+    // Keep sort order
+  }, [activeTab]);
+
+  // --- Filter Logic ---
+
+  const displayedItems = useMemo(() => {
+    if (!categories || !categories.general) return [];
+
     let items: Equipment[] = [];
-    if (activeTab === "all") {
-      items = [
-        ...categories.weapons,
-        ...categories.armors,
-        ...categories.shields,
-        ...categories.general,
-        ...categories.alchemy,
-        ...categories.clothing,
-        ...categories.food,
-      ];
-    } else if (activeTab === "weapons") items = categories.weapons;
-    else if (activeTab === "armor")
-      items = [...categories.armors, ...categories.shields];
-    else if (activeTab === "general") items = categories.general;
-    else if (activeTab === "alchemy") items = categories.alchemy;
-    else if (activeTab === "clothing") items = categories.clothing;
-    else if (activeTab === "food") items = categories.food;
 
+    // 1. Initial Category Filter
+    switch (activeTab) {
+      case "weapons":
+        items = categories.weapons || [];
+        break;
+      case "defense":
+        items = [...(categories.armors || []), ...(categories.shields || [])];
+        break;
+      case "general":
+        items = categories.general || [];
+        break;
+      case "alchemy":
+        items = categories.alchemy || [];
+        break;
+      case "clothing":
+        items = categories.clothing || [];
+        break;
+      case "food":
+        items = categories.food || [];
+        break;
+      case "all":
+      default:
+        items = [
+          ...(categories.weapons || []),
+          ...(categories.armors || []),
+          ...(categories.shields || []),
+          ...(categories.general || []),
+          ...(categories.alchemy || []),
+          ...(categories.clothing || []),
+          ...(categories.food || []),
+        ];
+        break;
+    }
+
+    // 2. Search
     if (searchTerm) {
       const lower = searchTerm.toLowerCase();
       items = items.filter((i) => i.nome.toLowerCase().includes(lower));
     }
 
+    // 3. SubGroup Filter
+    if (selectedSubGroups.length > 0) {
+      items = items.filter(
+        (i) => i.subGroup && selectedSubGroups.includes(i.subGroup)
+      );
+    }
+
+    // 4. Damage Type Filter (Weapons)
+    if (selectedDamageTypes.length > 0) {
+      items = items.filter((i) => {
+        if (!i.tipo) return false;
+        // Check if any selected type matches the item's type string (e.g. "Corte/Perfuração")
+        return selectedDamageTypes.some((type) =>
+          i.tipo?.toLowerCase().includes(type.toLowerCase())
+        );
+      });
+    }
+
+    // 5. Price Range
+    if (priceRange.min !== "") {
+      items = items.filter((i) => (i.preco || 0) >= parseFloat(priceRange.min));
+    }
+    if (priceRange.max !== "") {
+      items = items.filter((i) => (i.preco || 0) <= parseFloat(priceRange.max));
+    }
+
+    // 6. Sorting
+    items.sort((a, b) => {
+      switch (sortOrder) {
+        case "name-asc":
+          return a.nome.localeCompare(b.nome);
+        case "name-desc":
+          return b.nome.localeCompare(a.nome);
+        case "price-asc":
+          return (a.preco || 0) - (b.preco || 0);
+        case "price-desc":
+          return (b.preco || 0) - (a.preco || 0);
+        default:
+          return 0;
+      }
+    });
+
     return items;
-  }, [categories, activeTab, searchTerm]);
+  }, [
+    categories,
+    activeTab,
+    searchTerm,
+    selectedSubGroups,
+    selectedDamageTypes,
+    priceRange,
+    sortOrder,
+  ]);
+
+  // --- Extract Dynamic Filter Options ---
+  const dynamicFilters = useMemo(() => {
+    if (!categories || !categories.general)
+      return { subGroups: [], damageTypes: [] };
+
+    let baseItems: Equipment[] = [];
+    switch (activeTab) {
+      case "weapons":
+        baseItems = categories.weapons || [];
+        break;
+      case "defense":
+        baseItems = [
+          ...(categories.armors || []),
+          ...(categories.shields || []),
+        ];
+        break;
+      case "general":
+        baseItems = categories.general || [];
+        break;
+      case "alchemy":
+        baseItems = categories.alchemy || [];
+        break;
+      case "clothing":
+        baseItems = categories.clothing || [];
+        break;
+      case "food":
+        baseItems = categories.food || [];
+        break;
+      case "all":
+        baseItems = [];
+        break; // Too many filters for All, maybe disable?
+    }
+
+    const subGroups = Array.from(
+      new Set(baseItems.map((i) => i.subGroup).filter(Boolean))
+    ) as string[];
+
+    // Normalize damage types: "Corte/Perfuração" -> ["Corte", "Perfuração"]
+    let damageTypes: string[] = [];
+    if (activeTab === "weapons") {
+      const rawTypes = baseItems.map((i) => i.tipo).filter(Boolean) as string[];
+      const normalized = new Set<string>();
+      rawTypes.forEach((t) => {
+        // Simple mapping based on your data: Perf., Corte, Impac. etc
+        if (t.toLowerCase().includes("corte")) normalized.add("Corte");
+        if (t.toLowerCase().includes("perf")) normalized.add("Perfuração");
+        if (t.toLowerCase().includes("impac")) normalized.add("Impacto");
+      });
+      damageTypes = Array.from(normalized);
+    }
+
+    return { subGroups, damageTypes };
+  }, [categories, activeTab]);
+
+  // --- Helper to toggle filters ---
+  const toggleSubGroup = (group: string) => {
+    setSelectedSubGroups((prev) =>
+      prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
+    );
+  };
+
+  const toggleDamageType = (type: string) => {
+    setSelectedDamageTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
+
+  // --- Pagination ---
+  const totalPages = Math.ceil(displayedItems.length / ITEMS_PER_PAGE);
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return displayedItems.slice(start, start + ITEMS_PER_PAGE);
+  }, [displayedItems, currentPage]);
 
   const handleTransaction = async (item: Equipment, type: "buy" | "sell") => {
     if (!auth || !auth.currentUser || !activeCharacter) return;
 
     const price = item.preco || 0;
     let newMoney = activeCharacter.money;
-    let newBag = activeCharacter.bag;
-
-    // We rely on store actions but need to sync manually to persistence because store actions
-    // usually just update local state, and Wizard persists at the end.
-    // For Active Character we need immediate persistence.
 
     if (type === "buy") {
       if (newMoney < price) {
@@ -128,43 +391,17 @@ const MarketPage = () => {
         return;
       }
       newMoney -= price;
-      addToBag(item); // Update store
+      addToBag(item);
       setFeedback({ msg: `Comprou ${item.nome}`, type: "success" });
     } else {
-      newMoney += price; // Sell price = Buy price? Usually half, but per request implies transaction. Using full price for now or same price.
-      removeFromBag(item); // Update store
+      newMoney += price;
+      removeFromBag(item);
       setFeedback({ msg: `Vendeu ${item.nome}`, type: "success" });
     }
 
-    // Now Sync with Firestore
     try {
-      // We need to grab the UPDATED bag from the store, but `addToBag` updates state asynchronously/reactively
-      // A better way is to construct the bag update payload manually or use the Store's bag state *after* update.
-      // However, we can just pass the new money and rely on the UI reflecting the Store's bag,
-      // BUT we need to persist the Bag changes too.
-      // The `addToBag` in store creates a new Bag instance.
-      // Let's force an updateActiveCharacter call which we can then persist.
-
-      // Wait a tick for store to update? No, that's flaky.
-      // Better: Create the persistence payload here.
-
-      // Since `addToBag` updates `activeCharacter.bag` inside the store if `activeCharacter` is set (Wait, does it?)
-      // Check store:
-      // `addToBag` updates `state.bag` (wizard state).
-      // It DOES NOT automatically update `activeCharacter.bag` unless we are in Wizard mode or logic connects them.
-      // Store line 228: `setActiveCharacter` sets `activeCharacter` and hydrated bag.
-      // Store line 144: `addToBag` updates `state.bag`. It does NOT update `state.activeCharacter.bag`.
-
-      // THIS IS A BUG/GAP. Buying in market while playing shouldn't use Wizard's `state.bag`.
-      // It should update `activeCharacter.bag`.
-
-      // FIX: I will implement local logic here to update Active Character directly, bypassing Wizard `addToBag`.
-
-      // Re-implementing simplified bag logic for Active Char:
-      const currentBagEquips = activeCharacter.bag.getEquipments(); // This gets the object { [group]: items }
+      const currentBagEquips = activeCharacter.bag.getEquipments();
       const group = item.group || "Item Geral";
-
-      // Deep clone to modify
       const newEquips = JSON.parse(JSON.stringify(currentBagEquips));
 
       if (type === "buy") {
@@ -179,13 +416,11 @@ const MarketPage = () => {
         }
       }
 
-      // Update Store locally
       updateActiveCharacter({
         money: newMoney,
-        bag: { ...activeCharacter.bag, equipments: newEquips } as any, // Hacky cast, but Bag class handles it on re-hydration
+        bag: { ...activeCharacter.bag, equipments: newEquips } as any,
       });
 
-      // Update Firestore
       await CharacterService.updateCharacter(
         auth.currentUser.uid,
         activeCharacter.id!,
@@ -193,10 +428,8 @@ const MarketPage = () => {
           money: newMoney,
           bag: {
             equipments: newEquips,
-            // spaces and penalty logic usually recalculated by class,
-            // but we need to save the DATA.
-            spaces: 0, // Placeholder, class calcs it
-            armorPenalty: 0, // Placeholder
+            spaces: 0,
+            armorPenalty: 0,
           } as any,
         }
       );
@@ -205,145 +438,618 @@ const MarketPage = () => {
       setFeedback({ msg: "Erro ao salvar transação", type: "error" });
     }
 
-    setTimeout(() => setFeedback(null), 3000);
+    setTimeout(() => setFeedback(null), 2000);
   };
 
-  if (loading || !activeCharacter) {
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="p-8 text-center text-amber-500">
-        Carregando Mercado...
+      <div className="min-h-screen flex items-center justify-center bg-stone-950 text-amber-500">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1 }}
+        >
+          <Coins size={48} />
+        </motion.div>
       </div>
     );
   }
 
-  // Flatten bag for inventory view
+  // Character Selection Screen
+  if (!activeCharacter) {
+    return (
+      <div className="min-h-screen bg-[#0c0c0c] text-neutral-200 font-sans selection:bg-amber-900/30 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-[#0c0c0c] to-[#0c0c0c] z-0" />
+
+        <div className="relative z-10 w-full max-w-5xl">
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-3 text-amber-500 mb-4"
+            >
+              <ShoppingBag size={32} />
+              <h1 className="text-4xl md:text-5xl font-cinzel font-bold tracking-wider">
+                MERCADO
+              </h1>
+            </motion.div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-neutral-400 text-lg max-w-lg mx-auto"
+            >
+              Selecione qual herói irá às compras hoje. Seus fundos e inventário
+              serão atualizados automaticamente.
+            </motion.p>
+          </div>
+
+          {loadingChars ? (
+            <div className="flex justify-center text-amber-500">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1 }}
+              >
+                <Coins size={32} />
+              </motion.div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {myCharacters.map((char, idx) => (
+                <motion.button
+                  key={char.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  onClick={() => {
+                    setActiveCharacter(char);
+                  }}
+                  className="group relative bg-[#1a1a1a] border border-white/5 hover:border-amber-500/50 rounded-xl p-6 text-left transition-all duration-300 hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.15)] overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                  <div className="relative z-10 flex items-start justify-between mb-4">
+                    <div className="p-3 bg-amber-900/20 rounded-lg text-amber-500 group-hover:scale-110 transition-transform duration-300">
+                      <User size={24} />
+                    </div>
+                    <div className="text-right">
+                      <span className="block text-xs text-neutral-500 uppercase tracking-widest font-bold">
+                        Nível
+                      </span>
+                      <span className="text-xl font-cinzel font-bold text-white">
+                        {char.level || 1}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="relative z-10">
+                    <h3 className="text-xl font-bold text-neutral-200 group-hover:text-amber-400 transition-colors mb-1 font-cinzel">
+                      {char.name}
+                    </h3>
+                    <p className="text-sm text-neutral-500 mb-4">
+                      {char.race?.name} — {char.class?.name}
+                    </p>
+
+                    <div className="flex items-center gap-2 text-amber-500/80 bg-black/40 p-2 rounded-lg border border-white/5">
+                      <Coins size={14} />
+                      <span className="font-bold">{char.money} T$</span>
+                    </div>
+                  </div>
+                </motion.button>
+              ))}
+
+              {myCharacters.length === 0 && (
+                <div className="col-span-full text-center py-12 border border-dashed border-white/10 rounded-xl">
+                  <p className="text-neutral-500 mb-4">
+                    Você ainda não tem personagens.
+                  </p>
+                  <button
+                    onClick={() => router.push("/wizard")}
+                    className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-bold transition-colors"
+                  >
+                    Criar Personagem
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   const bagItems = Object.values(activeCharacter.bag.getEquipments()).flat();
 
-  return (
-    <div className="min-h-screen bg-stone-950 text-neutral-200 pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-30 bg-stone-900 border-b border-amber-900/30 p-4 shadow-xl">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <button
-            onClick={() => router.back()}
-            className="text-neutral-400 hover:text-white"
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <h1 className="text-2xl font-cinzel text-amber-500 flex items-center gap-2">
-            <ShoppingBag /> Mercado de Arton
-          </h1>
-          <div className="flex items-center gap-2 bg-black/40 px-3 py-1 rounded-full border border-amber-900/40">
-            <Coins className="text-amber-500" size={16} />
-            <span className="font-bold text-amber-100">
-              {activeCharacter.money} T$
-            </span>
-          </div>
+  // --- Render Filter Panel Content ---
+  const FilterPanelContent = () => (
+    <div className="space-y-6">
+      {/* Search (Sidebar version) */}
+      <div className="relative">
+        <Search
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+          size={16}
+        />
+        <input
+          type="text"
+          placeholder="Buscar..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm focus:border-amber-500/50 outline-none text-neutral-300"
+        />
+      </div>
+
+      {/* Sort */}
+      <div>
+        <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
+          <ArrowDownUp size={14} /> Ordenar
+        </h3>
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+          className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+        >
+          <option value="name-asc">Nome (A-Z)</option>
+          <option value="name-desc">Nome (Z-A)</option>
+          <option value="price-asc">Preço (Menor)</option>
+          <option value="price-desc">Preço (Maior)</option>
+        </select>
+      </div>
+
+      {/* Price Range */}
+      <div>
+        <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
+          <Coins size={14} /> Preço (T$)
+        </h3>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            placeholder="Min"
+            value={priceRange.min}
+            onChange={(e) =>
+              setPriceRange({ ...priceRange, min: e.target.value })
+            }
+            className="w-1/2 bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+          />
+          <span className="text-neutral-600">-</span>
+          <input
+            type="number"
+            placeholder="Max"
+            value={priceRange.max}
+            onChange={(e) =>
+              setPriceRange({ ...priceRange, max: e.target.value })
+            }
+            className="w-1/2 bg-[#1a1a1a] border border-white/10 rounded-lg p-2 text-sm text-neutral-300 outline-none focus:border-amber-500/50"
+          />
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Market Listings */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Controls */}
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder="Buscar itens..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-stone-900 border border-stone-800 rounded-lg pl-10 pr-4 py-2 focus:border-amber-500 outline-none text-sm"
-              />
+      {/* Dynamic Filters */}
+      {dynamicFilters.subGroups.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
+            <Filter size={14} /> Categorias
+          </h3>
+          <div className="space-y-1">
+            {dynamicFilters.subGroups.map((group) => (
+              <label
+                key={group}
+                className="flex items-center gap-2 p-1.5 rounded hover:bg-white/5 cursor-pointer group/label"
+              >
+                <div
+                  className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                    selectedSubGroups.includes(group)
+                      ? "bg-amber-600 border-amber-500"
+                      : "border-neutral-700 group-hover/label:border-neutral-500"
+                  }`}
+                >
+                  {selectedSubGroups.includes(group) && (
+                    <Check size={10} className="text-white" />
+                  )}
+                </div>
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={selectedSubGroups.includes(group)}
+                  onChange={() => toggleSubGroup(group)}
+                />
+                <span
+                  className={`text-sm ${
+                    selectedSubGroups.includes(group)
+                      ? "text-amber-500 font-medium"
+                      : "text-neutral-400"
+                  }`}
+                >
+                  {group}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {dynamicFilters.damageTypes.length > 0 && (
+        <div>
+          <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2">
+            <Sword size={14} /> Tipo de Dano
+          </h3>
+          <div className="space-y-1">
+            {dynamicFilters.damageTypes.map((type) => (
+              <label
+                key={type}
+                className="flex items-center gap-2 p-1.5 rounded hover:bg-white/5 cursor-pointer group/label"
+              >
+                <div
+                  className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                    selectedDamageTypes.includes(type)
+                      ? "bg-amber-600 border-amber-500"
+                      : "border-neutral-700 group-hover/label:border-neutral-500"
+                  }`}
+                >
+                  {selectedDamageTypes.includes(type) && (
+                    <Check size={10} className="text-white" />
+                  )}
+                </div>
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={selectedDamageTypes.includes(type)}
+                  onChange={() => toggleDamageType(type)}
+                />
+                <span
+                  className={`text-sm ${
+                    selectedDamageTypes.includes(type)
+                      ? "text-amber-500 font-medium"
+                      : "text-neutral-400"
+                  }`}
+                >
+                  {type}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#0c0c0c] text-neutral-200 font-sans selection:bg-amber-900/30">
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/10 via-[#0c0c0c] to-[#0c0c0c] z-0" />
+
+      {/* Toast Feedback */}
+      <AnimatePresence>
+        {feedback && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: -50, x: "-50%" }}
+            className={`fixed top-6 left-1/2 z-50 px-6 py-3 rounded-full shadow-2xl backdrop-blur-md border flex items-center gap-3 ${
+              feedback.type === "success"
+                ? "bg-green-950/80 border-green-500/50 text-green-200"
+                : "bg-red-950/80 border-red-500/50 text-red-200"
+            }`}
+          >
+            {feedback.type === "success" ? (
+              <Coins size={18} />
+            ) : (
+              <AlertCircle size={18} />
+            )}
+            <span className="font-bold text-sm tracking-wide">
+              {feedback.msg}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="relative z-10 flex">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:flex w-72 h-screen sticky top-0 flex-col bg-[#111] border-r border-white/5 p-4 overflow-y-auto scrollbar-thin">
+          <div className="space-y-6 mb-8">
+            <div className="flex items-center gap-3 px-2">
+              <button
+                onClick={() => router.back()}
+                className="text-neutral-400 hover:text-white transition-colors"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <h1 className="text-xl font-cinzel text-amber-500 tracking-wider">
+                MERCADO
+              </h1>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+
+            {/* Character Info Card */}
+            <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 shadow-inner">
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
+                <div>
+                  <h2 className="text-sm font-bold text-neutral-300 line-clamp-1">
+                    {activeCharacter.name}
+                  </h2>
+                  <p className="text-xs text-neutral-500">
+                    {activeCharacter.race?.name} • Nvl{" "}
+                    {activeCharacter.level || 1}
+                  </p>
+                </div>
+                <button
+                  onClick={() => clearActiveCharacter()}
+                  className="p-1.5 hover:bg-white/5 rounded-lg text-neutral-500 hover:text-red-400 transition-colors"
+                  title="Trocar Personagem"
+                >
+                  <ArrowLeft size={14} />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 mb-2 text-neutral-400 text-xs uppercase tracking-wider font-bold">
+                <Coins size={12} /> Seus Fundos
+              </div>
+              <div className="text-2xl font-bold text-amber-500 font-cinzel">
+                {activeCharacter.money}{" "}
+                <span className="text-sm text-amber-700">T$</span>
+              </div>
+            </div>
+
+            {/* Tabs */}
+            <nav className="grid grid-cols-2 gap-2">
               {[
-                { id: "all", label: "Todos", icon: Filter },
+                { id: "all", label: "Tudo", icon: Package },
                 { id: "weapons", label: "Armas", icon: Sword },
-                { id: "armor", label: "Defesa", icon: Shield },
-                { id: "alchemy", label: "Alquimia", icon: Package },
-                { id: "clothing", label: "Vestes", icon: ShoppingBag },
-                { id: "general", label: "Geral", icon: Package },
+                { id: "defense", label: "Defesa", icon: Shield },
+                { id: "general", label: "Geral", icon: Scroll },
+                { id: "alchemy", label: "Alquimia", icon: FlaskConical },
+                { id: "clothing", label: "Vestes", icon: Shirt },
+                { id: "food", label: "Comida", icon: Utensils },
               ].map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => setActiveTab(cat.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap border transition-all ${
+                  className={`flex flex-col items-center justify-center gap-2 py-3 rounded-lg transition-all duration-300 border ${
                     activeTab === cat.id
-                      ? "bg-amber-600 border-amber-500 text-white"
-                      : "bg-stone-900 border-stone-800 text-neutral-400 hover:bg-stone-800"
+                      ? "bg-amber-900/20 border-amber-500/50 text-amber-500"
+                      : "bg-[#1a1a1a] border-transparent text-neutral-400 hover:bg-[#222] hover:text-neutral-200"
                   }`}
                 >
-                  <cat.icon size={14} /> {cat.label}
+                  <cat.icon size={18} />
+                  <span className="text-xs font-bold">{cat.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <div className="border-t border-white/10 pt-6">
+            <FilterPanelContent />
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden min-h-screen flex flex-col">
+          {/* Mobile Header */}
+          <div className="flex flex-col gap-4 mb-6 lg:hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => router.back()}
+                  className="p-2 bg-stone-800 rounded-lg text-neutral-400"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <h1 className="text-lg font-cinzel text-amber-500">Mercado</h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 bg-[#111] px-3 py-1.5 rounded-full border border-white/5">
+                  <Coins size={14} className="text-amber-500" />
+                  <span className="text-sm font-bold text-amber-100">
+                    {activeCharacter.money}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowMobileCart(true)}
+                  className="p-2 bg-stone-800 rounded-lg text-neutral-400 relative"
+                >
+                  <ShoppingBag size={20} />
+                  {bagItems.length > 0 && (
+                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Search & Filter Row */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+                  size={16}
+                />
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-[#111] border border-white/10 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:border-amber-500/50 outline-none"
+                />
+              </div>
+              <button
+                onClick={() => setShowMobileFilters(true)}
+                className="px-3 bg-[#111] border border-white/10 rounded-lg text-neutral-300 hover:border-amber-500/50 transition-colors"
+              >
+                <SlidersHorizontal size={18} />
+              </button>
+            </div>
+
+            {/* Mobile Horizontal Tabs */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+              {[
+                { id: "all", label: "Tudo" },
+                { id: "weapons", label: "Armas" },
+                { id: "defense", label: "Defesa" },
+                { id: "general", label: "Geral" },
+                { id: "alchemy", label: "Alquimia" },
+                { id: "clothing", label: "Vestuário" },
+                { id: "food", label: "Comida" },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveTab(cat.id)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-all ${
+                    activeTab === cat.id
+                      ? "bg-amber-600 border-amber-500 text-white"
+                      : "bg-[#111] border-white/10 text-neutral-400"
+                  }`}
+                >
+                  {cat.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Items Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {marketItems.map((item, i) => (
-              <div
-                key={`${item.nome}-${i}`}
-                className="bg-stone-900/50 border border-stone-800 p-3 rounded-xl flex justify-between items-center hover:border-amber-900/50 transition-colors"
-              >
-                <div>
-                  <div className="font-bold text-sm text-neutral-200">
-                    {item.nome}
-                  </div>
-                  <div className="text-xs text-neutral-500">
-                    {item.group} • {item.spaces} espaços
-                  </div>
-                  {item.dano && (
-                    <div className="text-[10px] text-red-400">
-                      Dano: {item.dano}
-                    </div>
-                  )}
-                  {(item as any).defenseBonus && (
-                    <div className="text-[10px] text-blue-400">
-                      Defesa: +{(item as any).defenseBonus}
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={() => handleTransaction(item, "buy")}
-                  className="flex flex-col items-center gap-1 min-w-[60px] p-2 rounded bg-stone-950 border border-stone-800 hover:border-amber-500 group active:scale-95 transition-all"
-                >
-                  <span className="text-amber-500 font-bold text-xs">
-                    {item.preco} T$
-                  </span>
-                  <span className="text-[10px] text-neutral-500 group-hover:text-green-400 font-bold">
-                    COMPRAR
-                  </span>
-                </button>
-              </div>
-            ))}
+          {/* Banner/Info - Optional, keeping it clean for now */}
+
+          {/* Results Header */}
+          <div className="flex justify-between items-end mb-4 border-b border-white/5 pb-2">
+            <div>
+              <h2 className="text-2xl font-cinzel text-white">
+                {activeTab === "all"
+                  ? "Todos os Itens"
+                  : activeTab === "weapons"
+                  ? "Arsenal"
+                  : activeTab === "defense"
+                  ? "Armaduras & Escudos"
+                  : activeTab === "general"
+                  ? "Equipamentos Gerais"
+                  : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+              </h2>
+              <p className="text-xs text-neutral-500 mt-1">
+                Mostrando {paginatedItems.length} de {displayedItems.length}{" "}
+                resultados
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Inventory Side Panel */}
-        <div className="lg:col-span-1">
-          <div className="bg-stone-900/80 border border-stone-800 rounded-xl p-4 sticky top-20">
-            <h2 className="text-lg font-cinzel text-neutral-300 mb-4 flex items-center gap-2">
-              <Package size={18} /> Seu Inventário
-            </h2>
-
-            <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-stone-700">
-              {bagItems.length === 0 && (
-                <p className="text-sm text-neutral-600 italic">
-                  Mochila vazia.
-                </p>
-              )}
-              {bagItems.map((item, i) => (
-                <div
-                  key={`${item.nome}-${i}`}
-                  className="flex justify-between items-center p-2 bg-stone-950 rounded border border-stone-800/50"
+          {/* Items Grid */}
+          <motion.div
+            key={currentPage + activeTab + sortOrder + selectedSubGroups.join()}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1 content-start"
+          >
+            {paginatedItems.length === 0 ? (
+              <div className="col-span-full py-20 text-center text-neutral-600 flex flex-col items-center">
+                <Package size={48} className="mb-4 opacity-20" />
+                <p className="text-lg font-medium">Nenhum item encontrado.</p>
+                <p className="text-sm">Tente ajustar seus filtros de busca.</p>
+              </div>
+            ) : (
+              paginatedItems.map((item, idx) => (
+                <motion.div
+                  key={`${item.nome}-${idx}`}
+                  variants={itemVariants}
+                  className="bg-[#111] border border-white/5 rounded-xl p-4 hover:border-amber-500/30 hover:bg-[#161616] transition-all duration-300 relative group overflow-hidden"
                 >
-                  <div className="truncate flex-1">
+                  {/* Hover Action Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+                  <div className="flex justify-between items-start mb-2 relative z-10">
+                    <div>
+                      <h3 className="font-bold text-neutral-200 group-hover:text-amber-400 transition-colors line-clamp-1">
+                        {item.nome}
+                      </h3>
+                      <span className="text-[10px] text-amber-500/70 uppercase tracking-widest font-bold">
+                        {item.subGroup || item.group}
+                      </span>
+                    </div>
+                    <div className="bg-[#0c0c0c] px-2 py-1 rounded text-[10px] text-neutral-400 border border-white/5 whitespace-nowrap">
+                      {item.spaces} {item.spaces === 1 ? "espaço" : "espaços"}
+                    </div>
+                  </div>
+
+                  {/* Tags/Stats */}
+                  <div className="flex flex-wrap gap-2 mb-8 relative z-10">
+                    {(item as any).defenseBonus && (
+                      <span className="text-[10px] bg-blue-950/30 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20 flex items-center gap-1">
+                        <Shield size={10} /> +{(item as any).defenseBonus} Def
+                      </span>
+                    )}
+                    {item.dano && (
+                      <span className="text-[10px] bg-red-950/30 text-red-400 px-1.5 py-0.5 rounded border border-red-500/20 flex items-center gap-1">
+                        <Sword size={10} /> {item.dano}
+                      </span>
+                    )}
+                    {item.tipo && !item.tipo.includes("-") && (
+                      <span className="text-[10px] text-neutral-500 px-1.5 py-0.5">
+                        {item.tipo}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Bottom Action */}
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
+                    <span className="font-cinzel font-bold text-amber-500 text-lg">
+                      {item.preco} <span className="text-xs">T$</span>
+                    </span>
+                    <button
+                      onClick={() => handleTransaction(item, "buy")}
+                      className="bg-neutral-800 hover:bg-amber-600 text-white p-2 rounded-lg transition-all shadow-lg hover:shadow-amber-500/20 active:scale-95"
+                    >
+                      <span className="text-xs font-bold uppercase px-2">
+                        Comprar
+                      </span>
+                    </button>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </motion.div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center items-center gap-4 py-4">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg bg-[#111] border border-white/10 text-neutral-400 hover:text-amber-500 hover:border-amber-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              <div className="text-sm font-bold text-neutral-400">
+                <span className="text-amber-500">{currentPage}</span> /{" "}
+                {totalPages}
+              </div>
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg bg-[#111] border border-white/10 text-neutral-400 hover:text-amber-500 hover:border-amber-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
+        </main>
+
+        {/* Right Inventory Panel (Desktop) */}
+        <aside className="hidden 2xl:block w-72 h-screen sticky top-0 bg-[#111]/50 border-l border-white/5 p-6 backdrop-blur-sm">
+          <h2 className="font-cinzel text-lg text-neutral-300 mb-6 flex items-center gap-2">
+            <ShoppingBag className="text-amber-500" size={18} /> Inventário
+          </h2>
+          <div className="space-y-2 h-[calc(100vh-120px)] overflow-y-auto pr-2 custom-scrollbar">
+            {bagItems.length === 0 ? (
+              <p className="text-sm text-neutral-600 text-center mt-10">
+                Vazio.
+              </p>
+            ) : (
+              bagItems.map((item, i) => (
+                <div
+                  key={`${item.nome}-${i}-inv`}
+                  className="group flex justify-between items-center bg-[#0c0c0c] border border-white/5 p-2 rounded hover:border-red-500/30 transition-colors"
+                >
+                  <div className="truncate">
                     <div className="text-xs font-bold text-neutral-300 truncate">
                       {item.nome}
                     </div>
@@ -353,31 +1059,100 @@ const MarketPage = () => {
                   </div>
                   <button
                     onClick={() => handleTransaction(item, "sell")}
-                    className="text-[10px] text-red-500 hover:bg-red-900/20 px-2 py-1 rounded border border-transparent hover:border-red-900/30 transition-all font-bold"
+                    className="opacity-0 group-hover:opacity-100 text-[10px] text-red-400 font-bold px-2"
                   >
                     VENDER
                   </button>
                 </div>
-              ))}
-            </div>
-
-            {feedback && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className={`mt-4 p-3 rounded-lg text-xs font-bold text-center ${
-                  feedback.type === "success"
-                    ? "bg-green-900/20 text-green-400 border border-green-900/50"
-                    : "bg-red-900/20 text-red-400 border border-red-900/50"
-                }`}
-              >
-                {feedback.msg}
-              </motion.div>
+              ))
             )}
           </div>
-        </div>
+        </aside>
       </div>
+
+      {/* Mobile Filters Drawer */}
+      <AnimatePresence>
+        {showMobileFilters && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMobileFilters(false)}
+              className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              className="fixed left-0 top-0 bottom-0 w-[80%] max-w-sm bg-[#111] z-50 p-6 border-r border-white/10 lg:hidden shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-cinzel text-xl text-amber-500">Filtros</h2>
+                <button onClick={() => setShowMobileFilters(false)}>
+                  <X size={24} className="text-neutral-400" />
+                </button>
+              </div>
+              <FilterPanelContent />
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className="mt-8 w-full bg-amber-600 text-white font-bold py-3 rounded-lg hover:bg-amber-500"
+              >
+                Ver Resultados
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile Cart Drawer */}
+      <AnimatePresence>
+        {showMobileCart && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMobileCart(false)}
+              className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              className="fixed right-0 top-0 bottom-0 w-[85%] max-w-sm bg-[#111] z-50 p-6 border-l border-white/10 lg:hidden"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-cinzel text-xl text-amber-500">Mochila</h2>
+                <button onClick={() => setShowMobileCart(false)}>
+                  <X size={24} className="text-neutral-400" />
+                </button>
+              </div>
+              <div className="space-y-3 overflow-y-auto h-[calc(100vh-100px)] pb-10">
+                {bagItems.map((item, i) => (
+                  <div
+                    key={`${item.nome}-${i}-mob`}
+                    className="bg-[#0c0c0c] border border-white/5 p-4 rounded-lg flex justify-between items-center"
+                  >
+                    <div>
+                      <p className="font-bold text-neutral-200">{item.nome}</p>
+                      <p className="text-xs text-amber-500/70">
+                        {item.preco} T$
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleTransaction(item, "sell")}
+                      className="text-xs font-bold text-red-500 border border-red-900/30 px-3 py-1.5 rounded bg-red-950/10"
+                    >
+                      VENDER
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

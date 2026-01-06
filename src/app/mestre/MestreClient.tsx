@@ -130,6 +130,11 @@ export default function MestreClient() {
     }
   }, [isAuthenticated]);
 
+  // Smooth scroll to top on step or tab change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step, activeTab]);
+
   // Handle Auto-calculation of Combat Stats
   useEffect(() => {
     if (formData.challengeLevel && formData.role) {
