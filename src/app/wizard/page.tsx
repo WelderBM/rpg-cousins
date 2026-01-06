@@ -9,17 +9,22 @@ import RaceSelection from "@/components/wizard/RaceSelection";
 import AttributeSelection from "@/components/wizard/AttributeSelection";
 import RoleSelection from "@/components/wizard/RoleSelection";
 import HistorySelection from "@/components/wizard/HistorySelection";
-import EquipmentSelection from "@/components/wizard/EquipmentSelection";
 import SummarySelection from "@/components/wizard/SummarySelection";
 import WizardHub from "@/components/wizard/WizardHub";
 
 export default function WizardPage() {
-  const { step, resetWizard, selectedRace } = useCharacterStore();
+  const { step, resetWizard, selectedRace, selectedOrigin } =
+    useCharacterStore();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   // Decide if we should show the hub initially
   // We default to showing Hub so user can choose "Continue" (if data exists) or "New".
   const [showHub, setShowHub] = useState(true);
+
+  // Smooth scroll to top on step change
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step, showHub, selectedOrigin]);
 
   const handleReset = () => {
     resetWizard();
@@ -119,11 +124,10 @@ export default function WizardPage() {
               {step === 2 && <AttributeSelection />}
               {step === 3 && <RoleSelection />}
               {step === 4 && <HistorySelection />}
-              {step === 5 && <EquipmentSelection />}
-              {step === 6 && <SummarySelection />}
+              {step === 5 && <SummarySelection />}
 
               {/* Placeholder for future steps */}
-              {step > 6 && (
+              {step > 5 && (
                 <div className="p-8 text-center pt-32">
                   <h2 className="text-2xl font-cinzel text-amber-500 mb-4">
                     Em Breve

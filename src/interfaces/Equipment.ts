@@ -1,15 +1,15 @@
 export type equipGroup =
-  | 'Arma'
-  | 'Armadura'
-  | 'Escudo'
-  | 'Item Geral'
-  | 'Alquimía'
-  | 'Vestuário'
-  | 'Hospedagem'
-  | 'Alimentação'
-  | 'Animal'
-  | 'Veículo'
-  | 'Serviço';
+  | "Arma"
+  | "Armadura"
+  | "Escudo"
+  | "Item Geral"
+  | "Alquimía"
+  | "Vestuário"
+  | "Hospedagem"
+  | "Alimentação"
+  | "Animal"
+  | "Veículo"
+  | "Serviço";
 export default interface Equipment {
   nome: string;
   dano?: string;
@@ -21,9 +21,10 @@ export default interface Equipment {
   atkBonus?: number;
   weaponTags?: string[];
   preco?: number;
+  subGroup?: string;
 }
 
-export type defenseEquipGroup = 'Armadura' | 'Escudo';
+export type defenseEquipGroup = "Armadura" | "Escudo";
 
 export interface DefenseEquipment extends Equipment {
   defenseBonus: number;
@@ -54,7 +55,7 @@ export interface BagEquipments {
   Arma: Equipment[];
   Armadura: DefenseEquipment[];
   Escudo: DefenseEquipment[];
-  'Item Geral': Equipment[];
+  "Item Geral": Equipment[];
   Alquimía: Equipment[];
   Vestuário: Equipment[];
   Hospedagem: Equipment[];

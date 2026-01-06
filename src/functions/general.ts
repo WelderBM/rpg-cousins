@@ -1,33 +1,33 @@
-import { v4 as uuid } from 'uuid';
-import _, { cloneDeep, isNumber } from 'lodash';
-import { SelectionOptions } from '@/interfaces/PowerSelections';
-import { Atributo } from '../data/atributos';
-import RACAS, { getRaceByName } from '../data/racas';
-import CLASSES from '../data/classes';
+import { v4 as uuid } from "uuid";
+import _, { cloneDeep, isNumber } from "lodash";
+import { SelectionOptions } from "@/interfaces/PowerSelections";
+import { Atributo } from "../data/atributos";
+import RACAS, { getRaceByName } from "../data/racas";
+import CLASSES from "../data/classes";
 import {
   getClassBaseSkills,
   getNotRepeatedSkillsByQtd,
   getRemainingSkills,
-} from '../data/pericias';
+} from "../data/pericias";
 import EQUIPAMENTOS, {
   calcDefense,
   Armaduras,
   Escudos,
   bardInstruments,
   Armas,
-} from '../data/equipamentos';
-import { FAMILIARS, FAMILIAR_NAMES } from '../data/familiars';
-import { ANIMAL_TOTEMS, ANIMAL_TOTEM_NAMES } from '../data/animalTotems';
-import { standardFaithProbability, DivindadeEnum } from '../data/divindades';
-import { generateRandomName } from '../data/nomes';
+} from "../data/equipamentos";
+import { FAMILIARS, FAMILIAR_NAMES } from "../data/familiars";
+import { ANIMAL_TOTEMS, ANIMAL_TOTEM_NAMES } from "../data/animalTotems";
+import { standardFaithProbability, DivindadeEnum } from "../data/divindades";
+import { generateRandomName } from "../data/nomes";
 import {
   CharacterAttribute,
   CharacterAttributes,
   CharacterReligion,
-} from '../interfaces/Character';
-import Race, { RaceAttributeAbility } from '../interfaces/Race';
-import { ClassDescription } from '../interfaces/Class';
-import SelectedOptions from '../interfaces/SelectedOptions';
+} from "../interfaces/Character";
+import Race, { RaceAttributeAbility } from "../interfaces/Race";
+import { ClassDescription } from "../interfaces/Class";
+import SelectedOptions from "../interfaces/SelectedOptions";
 import {
   countTormentaPowers,
   getRandomItemFromArray,
@@ -36,18 +36,18 @@ import {
   pickFromAllowed,
   pickFromArray,
   rollDice,
-} from './randomUtils';
-import todasProficiencias from '../data/proficiencias';
-import { generateEquipmentRewards } from './equipmentRewardGenerator';
-import { getOriginBenefits, ORIGINS, origins } from '../data/origins';
+} from "./randomUtils";
+import todasProficiencias from "../data/proficiencias";
+import { generateEquipmentRewards } from "./equipmentRewardGenerator";
+import { getOriginBenefits, ORIGINS, origins } from "../data/origins";
 import Equipment, {
   BagEquipments,
   DefenseEquipment,
-} from '../interfaces/Equipment';
-import Divindade, { DivindadeNames } from '../interfaces/Divindade';
-import GRANTED_POWERS from '../data/powers/grantedPowers';
-import { generateRandomGolpePessoal } from './powers/golpePessoal';
-import { GOLPE_PESSOAL_EFFECTS } from '../data/golpePessoal';
+} from "../interfaces/Equipment";
+import Divindade, { DivindadeNames } from "../interfaces/Divindade";
+import GRANTED_POWERS from "../data/powers/grantedPowers";
+import { generateRandomGolpePessoal } from "./powers/golpePessoal";
+import { GOLPE_PESSOAL_EFFECTS } from "../data/golpePessoal";
 import {
   allArcaneSpellsCircle1,
   allArcaneSpellsCircle2,
@@ -60,7 +60,7 @@ import {
   arcaneSpellsCircle4,
   arcaneSpellsCircle5,
   getArcaneSpellsOfCircle,
-} from '../data/magias/arcane';
+} from "../data/magias/arcane";
 import {
   allDivineSpellsCircle1,
   allDivineSpellsCircle2,
@@ -72,58 +72,58 @@ import {
   divineSpellsCircle3,
   divineSpellsCircle4,
   divineSpellsCircle5,
-} from '../data/magias/divine';
-import { Spell } from '../interfaces/Spells';
+} from "../data/magias/divine";
+import { Spell } from "../interfaces/Spells";
 import {
   getRaceDisplacement,
   getRaceSize,
-} from '../data/races/functions/functions';
-import Origin from '../interfaces/Origin';
+} from "../data/races/functions/functions";
+import Origin from "../interfaces/Origin";
 import {
   GeneralPower,
   OriginPower,
   PowerGetter,
   PowersGetters,
-} from '../interfaces/Poderes';
+} from "../interfaces/Poderes";
 import CharacterSheet, {
   SheetChangeSource,
   StatModifier,
   Step,
   SubStep,
-} from '../interfaces/CharacterSheet';
+} from "../interfaces/CharacterSheet";
 import Skill, {
   SkillsAttrs,
   SkillsWithArmorPenalty,
-} from '../interfaces/Skills';
-import Bag from '../interfaces/Bag';
-import roles from '../data/roles';
-import { RoleNames } from '../interfaces/Role';
+} from "../interfaces/Skills";
+import Bag from "../interfaces/Bag";
+import roles from "../data/roles";
+import { RoleNames } from "../interfaces/Role";
 import {
   getAllowedClassPowers,
   getPowersAllowedByRequirements,
   getWeightedInventorClassPowers,
-} from './powers';
+} from "./powers";
 import {
   addOrCheapenRandomSpells,
   getSpellsOfCircle,
   spellsCircle1,
-} from '../data/magias/generalSpells';
+} from "../data/magias/generalSpells";
 import {
   applyHumanoVersatil,
   applyLefouDeformidade,
   applyOsteonMemoriaPostuma,
-} from './powers/special';
-import { addOtherBonusToSkill } from './skills/general';
+} from "./powers/special";
+import { addOtherBonusToSkill } from "./skills/general";
 import {
   getAttributeIncreasesInSamePlateau,
   getCurrentPlateau,
-} from './powers/general';
+} from "./powers/general";
 
 // Inventor Specializations System
 export enum InventorSpecialization {
-  ALQUIMISTA = 'ALQUIMISTA',
-  ARMEIRO = 'ARMEIRO',
-  ENGENHOQUEIRO = 'ENGENHOQUEIRO',
+  ALQUIMISTA = "ALQUIMISTA",
+  ARMEIRO = "ARMEIRO",
+  ENGENHOQUEIRO = "ENGENHOQUEIRO",
 }
 
 export interface InventorSpecializationData {
@@ -138,42 +138,42 @@ export const INVENTOR_SPECIALIZATIONS: Record<
   [InventorSpecialization.ALQUIMISTA]: {
     skill: Skill.OFICIO_ALQUIMIA,
     relatedPowers: [
-      'Agite Antes de Usar',
-      'Alquimista Iniciado',
-      'Alquimista de Batalha',
-      'Catalisador Instável',
-      'Farmacêutico',
-      'Homúnculo',
-      'Conhecimento de Fórmulas',
-      'Mistura Fervilhante',
-      'Síntese Rápida',
-      'Granadeiro',
-      'Mestre Alquimista',
+      "Agite Antes de Usar",
+      "Alquimista Iniciado",
+      "Alquimista de Batalha",
+      "Catalisador Instável",
+      "Farmacêutico",
+      "Homúnculo",
+      "Conhecimento de Fórmulas",
+      "Mistura Fervilhante",
+      "Síntese Rápida",
+      "Granadeiro",
+      "Mestre Alquimista",
     ],
   },
   [InventorSpecialization.ARMEIRO]: {
     skill: Skill.OFICIO_ARMEIRO,
     relatedPowers: [
-      'Armeiro',
-      'Balística',
-      'Couraceiro',
-      'Ferreiro',
-      'Oficina de Campo',
-      'Pedra de Amolar',
-      'Ajuste de Mira.',
-      'Blindagem',
-      'Cano Raiado',
+      "Armeiro",
+      "Balística",
+      "Couraceiro",
+      "Ferreiro",
+      "Oficina de Campo",
+      "Pedra de Amolar",
+      "Ajuste de Mira.",
+      "Blindagem",
+      "Cano Raiado",
     ],
   },
   [InventorSpecialization.ENGENHOQUEIRO]: {
     skill: Skill.OFICIO_EGENHOQUEIRO,
     relatedPowers: [
-      'Engenhoqueiro',
-      'Ativação Rápida',
-      'Autômato',
-      'Autômato Prototipado',
-      'Chutes e Palavrões',
-      'Manutenção Eficiente',
+      "Engenhoqueiro",
+      "Ativação Rápida",
+      "Autômato",
+      "Autômato Prototipado",
+      "Chutes e Palavrões",
+      "Manutenção Eficiente",
     ],
   },
 };
@@ -344,7 +344,7 @@ export function getModValue(attr: number): number {
   return Math.floor(attr / 2) - 5;
 }
 
-export function getInitialMoney(level: number): number {
+export function getInitialMoney(level: number, className?: string): number {
   const moneyByLevel: Record<number, number> = {
     1: rollDice(4, 6, 0), // 4d6 para nível 1
     2: 300,
@@ -368,10 +368,22 @@ export function getInitialMoney(level: number): number {
     20: 260000,
   };
 
-  return moneyByLevel[level] || rollDice(4, 6, 0);
+  let amount = moneyByLevel[level] || rollDice(4, 6, 0);
+
+  // Bonus para certas classes se for nível 1
+  if (level === 1 && className === "Nobre") {
+    // Nobre começa com mais dinheiro ou itens, aqui podemos dar um bônus representativo
+    // Na regra oficial do T20 Jogo do Ano, nobre começa com 4d6 (igual a todos)
+    // mas tem a habilidade Espólio. Para simplificar no mercado, vamos dar um bônus fixo se o usuário preferir
+  }
+
+  return amount;
 }
 
-export function getInitialMoneyWithDetails(level: number): {
+export function getInitialMoneyWithDetails(
+  level: number,
+  className?: string
+): {
   amount: number;
   details?: string;
 } {
@@ -382,9 +394,13 @@ export function getInitialMoneyWithDetails(level: number): {
       dice.push(Math.floor(Math.random() * 6) + 1);
     }
     const total = dice.reduce((sum, die) => sum + die, 0);
+
+    let finalAmount = total;
+    let details = `(${dice.join(", ")})`;
+
     return {
-      amount: total,
-      details: `(${dice.join(', ')})`,
+      amount: finalAmount,
+      details,
     };
   }
 
@@ -441,7 +457,7 @@ function selectAttributeToChange(
   atributo: RaceAttributeAbility,
   priorityAttrs: Atributo[]
 ) {
-  if (atributo.attr === 'any') {
+  if (atributo.attr === "any") {
     const atributosPermitidos = Object.values(Atributo).filter(
       (attr) => !atributosModificados.includes(attr)
     );
@@ -491,7 +507,7 @@ export function modifyAttributesBasedOnRace(
       // Definir que atributo muda (se for any é um random ou escolha manual)
       let selectedAttrName: Atributo;
 
-      if (attrDaRaca.attr === 'any' && manualAttributeChoices) {
+      if (attrDaRaca.attr === "any" && manualAttributeChoices) {
         // Use manual choice if available
         selectedAttrName =
           manualAttributeChoices[manualChoiceIndex] ||
@@ -539,8 +555,8 @@ export function modifyAttributesBasedOnRace(
   );
 
   steps.push({
-    type: 'Atributos',
-    label: 'Atributos Modificados (raça)',
+    type: "Atributos",
+    label: "Atributos Modificados (raça)",
     value: values,
   });
 
@@ -588,8 +604,8 @@ function generateFinalAttributes(
   );
 
   steps.push({
-    label: 'Atributos iniciais',
-    type: 'Atributos',
+    label: "Atributos iniciais",
+    type: "Atributos",
     value: Object.values(sortedAttributes).map((attr) => ({
       name: attr.name,
       value: attr.mod,
@@ -614,7 +630,7 @@ export function selectRace(selectedOptions: SelectedOptions): Race {
 
 function getRaceAndName(
   selectedOptions: SelectedOptions,
-  sex: 'Homem' | 'Mulher'
+  sex: "Homem" | "Mulher"
 ) {
   // Passo 2.2: Escolher raça
   const race = selectRace(selectedOptions);
@@ -719,7 +735,7 @@ export function getSkillsAndPowersByClassAndOrigin(
     if (originSkills.length) {
       originSubSteps.push(
         ...originSkills.map((skill) => ({
-          name: 'Perícia',
+          name: "Perícia",
           value: `${skill}`,
         }))
       );
@@ -728,7 +744,7 @@ export function getSkillsAndPowersByClassAndOrigin(
     if (originPowers.origin.length) {
       originSubSteps.push(
         ...originPowers.origin.map((power) => ({
-          name: 'Poder Geral',
+          name: "Poder Geral",
           value: ` ${power.name}`,
         }))
       );
@@ -737,7 +753,7 @@ export function getSkillsAndPowersByClassAndOrigin(
     if (originSubSteps.length) {
       steps.push({
         label: `Benefícios da origem (${origin.name})`,
-        type: 'Poderes',
+        type: "Poderes",
         value: originSubSteps.map((substep) => ({
           name: substep.name,
           value: `${substep.value}`,
@@ -752,7 +768,7 @@ export function getSkillsAndPowersByClassAndOrigin(
   let remainingSkills = getRemainingSkills(usedSkills, classe);
 
   // Special handling for Inventor class to ensure synergy
-  if (classe.name === 'Inventor') {
+  if (classe.name === "Inventor") {
     const skillsWithSpecialization = ensureInventorSpecialization([
       ...usedSkills,
       ...remainingSkills,
@@ -784,8 +800,8 @@ export function getSkillsAndPowersByClassAndOrigin(
   );
 
   steps.push({
-    label: 'Perícias da classe',
-    type: 'Perícias',
+    label: "Perícias da classe",
+    type: "Perícias",
     value: classSkills.map((skill) => ({ value: `${skill}` })),
   });
 
@@ -799,8 +815,8 @@ export function getSkillsAndPowersByClassAndOrigin(
 
   if (attributesSkills.length) {
     steps.push({
-      label: 'Perícias (+INT)',
-      type: 'Perícias',
+      label: "Perícias (+INT)",
+      type: "Perícias",
       value: attributesSkills.map((skill) => ({ value: `${skill}` })),
     });
   }
@@ -855,7 +871,7 @@ function getArmors(classe: ClassDescription, currentBag?: Bag) {
   const armors = [];
   if (classe.proficiencias.includes(todasProficiencias.PESADAS)) {
     armors.push(Armaduras.BRUNEA);
-  } else if (classe.name !== 'Arcanista') {
+  } else if (classe.name !== "Arcanista") {
     armors.push(getRandomItemFromArray(EQUIPAMENTOS.armadurasLeves));
   }
 
@@ -865,17 +881,17 @@ function getArmors(classe: ClassDescription, currentBag?: Bag) {
 function getClassEquipments(
   classe: ClassDescription,
   currentBag?: Bag
-): Pick<BagEquipments, 'Arma' | 'Escudo' | 'Armadura' | 'Item Geral'> {
+): Pick<BagEquipments, "Arma" | "Escudo" | "Armadura" | "Item Geral"> {
   const weapons = getWeapons(classe);
   const shields = getShields(classe);
   const armors = getArmors(classe, currentBag);
 
   const instruments: Equipment[] = [];
-  if (classe.name === 'Bardo') {
+  if (classe.name === "Bardo") {
     const instrumentName = getRandomItemFromArray(bardInstruments);
     instruments.push({
       nome: instrumentName,
-      group: 'Item Geral',
+      group: "Item Geral",
     });
   }
 
@@ -883,18 +899,22 @@ function getClassEquipments(
     Arma: weapons,
     Escudo: shields,
     Armadura: armors,
-    'Item Geral': instruments,
+    "Item Geral": instruments,
   };
 }
 
-function getInitialBag(origin: Origin | undefined, level: number = 1): Bag {
+function getInitialBag(
+  origin: Origin | undefined,
+  level: number = 1,
+  className?: string
+): Bag {
   // 6.1 A depender da classe os itens podem variar
-  const initialMoney = getInitialMoney(level);
+  const initialMoney = getInitialMoney(level, className);
   const equipments: Partial<BagEquipments> = {
-    'Item Geral': [
+    "Item Geral": [
       {
         nome: `T$ ${initialMoney}`,
-        group: 'Item Geral',
+        group: "Item Geral",
       },
     ],
   };
@@ -902,12 +922,12 @@ function getInitialBag(origin: Origin | undefined, level: number = 1): Bag {
   const originItems = origin?.getItems();
 
   originItems?.forEach((equip) => {
-    if (typeof equip.equipment === 'string') {
+    if (typeof equip.equipment === "string") {
       const newEquip: Equipment = {
-        nome: `${equip.qtd ? `${equip.qtd}x ` : ''}${equip.equipment}`,
-        group: 'Item Geral',
+        nome: `${equip.qtd ? `${equip.qtd}x ` : ""}${equip.equipment}`,
+        group: "Item Geral",
       };
-      equipments['Item Geral']?.push(newEquip);
+      equipments["Item Geral"]?.push(newEquip);
     } else {
       // É uma arma
       equipments.Arma?.push(equip.equipment);
@@ -924,10 +944,10 @@ function getThyatisPowers(classe: ClassDescription) {
       poder.name !== GRANTED_POWERS.DOM_DA_RESSUREICAO.name
   );
 
-  if (classe.name === 'Paladino')
+  if (classe.name === "Paladino")
     return [...unrestrictedPowers, GRANTED_POWERS.DOM_DA_IMORTALIDADE];
 
-  if (classe.name === 'Clérigo')
+  if (classe.name === "Clérigo")
     return [...unrestrictedPowers, GRANTED_POWERS.DOM_DA_RESSUREICAO];
 
   return [...unrestrictedPowers];
@@ -962,7 +982,7 @@ function getReligiosidade(
   race: Race,
   selectedOption: string
 ): CharacterReligion | undefined {
-  if (selectedOption === '--') return undefined;
+  if (selectedOption === "--") return undefined;
 
   let isDevoto = Math.random() <= classe.probDevoto;
   if (selectedOption) isDevoto = true;
@@ -972,7 +992,7 @@ function getReligiosidade(
   }
 
   let divindade;
-  if (!selectedOption || selectedOption === '**') {
+  if (!selectedOption || selectedOption === "**") {
     const classFaithProbability =
       classe.faithProbability || standardFaithProbability;
     const raceFaithProbability =
@@ -990,7 +1010,7 @@ function getReligiosidade(
   }
 
   // Provavelmente uma merda de solução mas preguiça
-  const todosPoderes = classe.qtdPoderesConcedidos === 'all';
+  const todosPoderes = classe.qtdPoderesConcedidos === "all";
   const qtdPoderesConcedidos = isNumber(classe.qtdPoderesConcedidos)
     ? classe.qtdPoderesConcedidos
     : 0;
@@ -1024,7 +1044,7 @@ function getNewSpells(
   const qtySpellsLearn = qtySpellsLearnAtLevel(nivel);
 
   let spellList: Spell[] = [];
-  if (spellType === 'Arcane') {
+  if (spellType === "Arcane") {
     for (let index = 1; index < circle + 1; index += 1) {
       if (index === 1) spellList = allArcaneSpellsCircle1;
       if (index === 2) spellList = spellList.concat(allArcaneSpellsCircle2);
@@ -1043,7 +1063,7 @@ function getNewSpells(
   }
 
   if (schools) {
-    if (spellType === 'Arcane') {
+    if (spellType === "Arcane") {
       for (let index = 1; index < circle + 1; index += 1) {
         if (index === 1)
           spellList = schools.flatMap((school) => arcaneSpellsCircle1[school]);
@@ -1120,26 +1140,26 @@ function calcDisplacement(
 
 export const applyPower = (
   _sheet: CharacterSheet,
-  powerOrAbility: Pick<GeneralPower, 'sheetActions' | 'sheetBonuses' | 'name'>,
+  powerOrAbility: Pick<GeneralPower, "sheetActions" | "sheetBonuses" | "name">,
   manualSelections?: SelectionOptions
 ): [CharacterSheet, SubStep[]] => {
   const sheet = _.cloneDeep(_sheet);
   const subSteps: SubStep[] = [];
 
   const getSourceName = (source: SheetChangeSource) => {
-    if (source.type === 'power') {
+    if (source.type === "power") {
       return source.name;
     }
-    if (source.type === 'levelUp') {
+    if (source.type === "levelUp") {
       return `Nível ${source.level}`;
     }
-    return '';
+    return "";
   };
 
   // sheet action
   if (powerOrAbility.sheetActions) {
     powerOrAbility.sheetActions.forEach((sheetAction) => {
-      if (sheetAction.action.type === 'ModifyAttribute') {
+      if (sheetAction.action.type === "ModifyAttribute") {
         const { attribute, value } = sheetAction.action;
         const newValue = sheet.atributos[attribute].mod + value;
         sheet.atributos[attribute].mod = newValue;
@@ -1151,9 +1171,9 @@ export const applyPower = (
         sheet.sheetActionHistory.push({
           source: sheetAction.source,
           powerName: powerOrAbility.name,
-          changes: [{ type: 'Attribute', attribute, value: newValue }],
+          changes: [{ type: "Attribute", attribute, value: newValue }],
         });
-      } else if (sheetAction.action.type === 'addProficiency') {
+      } else if (sheetAction.action.type === "addProficiency") {
         // Ver Proficiência em combat powers e depois remove comment
         let { availableProficiencies } = sheetAction.action;
         if (!sheet.classe.proficiencias.includes(todasProficiencias.MARCIAIS)) {
@@ -1177,7 +1197,7 @@ export const applyPower = (
           source: sheetAction.source,
           powerName: powerOrAbility.name,
           changes: pickedProficiencies.map((prof) => ({
-            type: 'ProficiencyAdded',
+            type: "ProficiencyAdded",
             proficiency: prof,
           })),
         });
@@ -1188,7 +1208,7 @@ export const applyPower = (
             value: `Proficiência em ${prof}`,
           });
         });
-      } else if (sheetAction.action.type === 'learnSkill') {
+      } else if (sheetAction.action.type === "learnSkill") {
         // Use manual selections if provided, otherwise random
         const pickedSkills =
           (manualSelections?.skills as Skill[]) ||
@@ -1205,7 +1225,7 @@ export const applyPower = (
           powerName: powerOrAbility.name,
           changes: [
             {
-              type: 'SkillsAdded',
+              type: "SkillsAdded",
               skills: pickedSkills,
             },
           ],
@@ -1217,35 +1237,35 @@ export const applyPower = (
             value: `Aprende a perícia ${skill}`,
           });
         });
-      } else if (sheetAction.action.type === 'addSense') {
+      } else if (sheetAction.action.type === "addSense") {
         if (!sheet.sentidos) sheet.sentidos = [];
         if (!sheet.sentidos.includes(sheetAction.action.sense)) {
           sheet.sentidos.push(sheetAction.action.sense);
           sheet.sheetActionHistory.push({
             source: sheetAction.source,
             powerName: powerOrAbility.name,
-            changes: [{ type: 'SenseAdded', sense: sheetAction.action.sense }],
+            changes: [{ type: "SenseAdded", sense: sheetAction.action.sense }],
           });
           subSteps.push({
             name: getSourceName(sheetAction.source),
             value: `Recebe o sentido ${sheetAction.action.sense}`,
           });
         }
-      } else if (sheetAction.action.type === 'addEquipment') {
+      } else if (sheetAction.action.type === "addEquipment") {
         const { equipment } = sheetAction.action;
         sheet.bag.addEquipment(equipment);
 
         sheet.sheetActionHistory.push({
           source: sheetAction.source,
           powerName: powerOrAbility.name,
-          changes: [{ type: 'EquipmentAdded', equipment }],
+          changes: [{ type: "EquipmentAdded", equipment }],
         });
 
         subSteps.push({
           name: getSourceName(sheetAction.source),
           value: sheetAction.action.description,
         });
-      } else if (sheetAction.action.type === 'getGeneralPower') {
+      } else if (sheetAction.action.type === "getGeneralPower") {
         // Use manual selections if provided, otherwise random
         const pickedPowers =
           manualSelections?.powers ||
@@ -1261,7 +1281,7 @@ export const applyPower = (
           source: sheetAction.source,
           powerName: powerOrAbility.name,
           changes: pickedPowers.map((power) => ({
-            type: 'PowerAdded',
+            type: "PowerAdded",
             powerName: power.name,
           })),
         });
@@ -1272,7 +1292,7 @@ export const applyPower = (
             value: `Recebe o poder geral ${power.name}`,
           });
         });
-      } else if (sheetAction.action.type === 'learnSpell') {
+      } else if (sheetAction.action.type === "learnSpell") {
         let learnedSpells: Spell[];
 
         if (manualSelections?.spells && manualSelections.spells.length > 0) {
@@ -1306,19 +1326,19 @@ export const applyPower = (
           powerName: powerOrAbility.name,
           changes: [
             {
-              type: 'SpellsLearned',
+              type: "SpellsLearned",
               spellNames: learnedSpells.map((spell) => spell.nome),
             },
           ],
         });
-      } else if (sheetAction.action.type === 'learnAnySpellFromHighestCircle') {
+      } else if (sheetAction.action.type === "learnAnySpellFromHighestCircle") {
         const highestCircle =
           sheet.classe.spellPath?.spellCircleAvailableAtLevel(sheet.nivel) || 1;
 
         let allSpellsOfCircle: Spell[] = [];
-        if (sheetAction.action.allowedType === 'Arcane') {
+        if (sheetAction.action.allowedType === "Arcane") {
           allSpellsOfCircle = getArcaneSpellsOfCircle(highestCircle);
-        } else if (sheetAction.action.allowedType === 'Divine') {
+        } else if (sheetAction.action.allowedType === "Divine") {
           allSpellsOfCircle = getSpellsOfCircle(highestCircle);
         } else {
           allSpellsOfCircle = getSpellsOfCircle(highestCircle);
@@ -1361,12 +1381,12 @@ export const applyPower = (
           powerName: powerOrAbility.name,
           changes: [
             {
-              type: 'SpellsLearned',
+              type: "SpellsLearned",
               spellNames: learnedSpells.map((spell) => spell.nome),
             },
           ],
         });
-      } else if (sheetAction.action.type === 'increaseAttribute') {
+      } else if (sheetAction.action.type === "increaseAttribute") {
         const usedAttributes = getAttributeIncreasesInSamePlateau(sheet);
         const availableAttributes = Object.values(Atributo).filter(
           (attr) => !usedAttributes.includes(attr)
@@ -1398,7 +1418,7 @@ export const applyPower = (
           powerName: powerOrAbility.name,
           changes: [
             {
-              type: 'AttributeIncreasedByAumentoDeAtributo',
+              type: "AttributeIncreasedByAumentoDeAtributo",
               attribute: targetAttribute,
               plateau: getCurrentPlateau(sheet),
             },
@@ -1408,7 +1428,7 @@ export const applyPower = (
           name: getSourceName(sheetAction.source),
           value: `Aumenta o atributo ${targetAttribute} por +1`,
         });
-      } else if (sheetAction.action.type === 'selectWeaponSpecialization') {
+      } else if (sheetAction.action.type === "selectWeaponSpecialization") {
         // Get all available weapons
         const allWeaponNames = Object.values(Armas).map(
           (weapon) => weapon.nome
@@ -1427,11 +1447,11 @@ export const applyPower = (
         sheet.sheetBonuses.push({
           source: sheetAction.source,
           target: {
-            type: 'WeaponDamage' as const,
+            type: "WeaponDamage" as const,
             weaponName: selectedWeapon,
           },
           modifier: {
-            type: 'Fixed' as const,
+            type: "Fixed" as const,
             value: 2,
           },
         });
@@ -1440,7 +1460,7 @@ export const applyPower = (
           name: getSourceName(sheetAction.source),
           value: `Especialização em ${selectedWeapon} (+2 dano)`,
         });
-      } else if (sheetAction.action.type === 'selectFamiliar') {
+      } else if (sheetAction.action.type === "selectFamiliar") {
         // Get all available familiars
         const availableFamiliars = FAMILIAR_NAMES;
 
@@ -1460,15 +1480,15 @@ export const applyPower = (
         const familiar = FAMILIARS[selectedFamiliar];
 
         // Apply Cat bonus (+2 Stealth) if Gato is selected
-        if (selectedFamiliar === 'GATO') {
+        if (selectedFamiliar === "GATO") {
           sheet.sheetBonuses.push({
             source: sheetAction.source,
             target: {
-              type: 'Skill',
+              type: "Skill",
               name: Skill.FURTIVIDADE,
             },
             modifier: {
-              type: 'Fixed',
+              type: "Fixed",
               value: 2,
             },
           });
@@ -1477,7 +1497,7 @@ export const applyPower = (
         // Update power text to show selected familiar
         if (sheet.classPowers) {
           const powerIndex = sheet.classPowers.findIndex(
-            (power) => power.name === 'Familiar'
+            (power) => power.name === "Familiar"
           );
           if (powerIndex !== -1) {
             sheet.classPowers[
@@ -1490,7 +1510,7 @@ export const applyPower = (
           name: getSourceName(sheetAction.source),
           value: `Familiar selecionado: ${familiar.name}`,
         });
-      } else if (sheetAction.action.type === 'selectAnimalTotem') {
+      } else if (sheetAction.action.type === "selectAnimalTotem") {
         // Get all available totems
         const availableTotems = ANIMAL_TOTEM_NAMES;
         let selectedTotem: string;
@@ -1527,7 +1547,7 @@ export const applyPower = (
         // Update power text to show selected totem
         if (sheet.classPowers) {
           const powerIndex = sheet.classPowers.findIndex(
-            (power) => power.name === 'Totem Espiritual'
+            (power) => power.name === "Totem Espiritual"
           );
           if (powerIndex !== -1) {
             sheet.classPowers[
@@ -1540,7 +1560,7 @@ export const applyPower = (
           name: getSourceName(sheetAction.source),
           value: `Animal totêmico selecionado: ${totem.name}`,
         });
-      } else if (sheetAction.action.type === 'addTruqueMagicSpells') {
+      } else if (sheetAction.action.type === "addTruqueMagicSpells") {
         // Add the three truque magic spells
         const originalSpells = [
           spellsCircle1.explosaoDeChamas,
@@ -1556,7 +1576,7 @@ export const applyPower = (
             value: `Adicionando ${truqueSpell.nome} à sua lista de magias.`,
           });
         });
-      } else if (sheetAction.action.type === 'addVozCivilizacaoSpell') {
+      } else if (sheetAction.action.type === "addVozCivilizacaoSpell") {
         // Add the Compreensão spell with always active effect
         const compreensaoSpell = spellsCircle1.compreensao;
         const alwaysActiveSpell = createAlwaysActiveSpell(compreensaoSpell);
@@ -1565,13 +1585,13 @@ export const applyPower = (
           name: getSourceName(sheetAction.source),
           value: `Adicionando ${alwaysActiveSpell.nome} à sua lista de magias.`,
         });
-      } else if (sheetAction.action.type === 'buildGolpePessoal') {
+      } else if (sheetAction.action.type === "buildGolpePessoal") {
         // For automatic generation, create a random Golpe Pessoal
         const golpePessoalBuild = generateRandomGolpePessoal(sheet);
 
         // Store the build in the power's description
         const golpePessoalPower = sheet.classPowers?.find(
-          (p) => p.name === 'Golpe Pessoal'
+          (p) => p.name === "Golpe Pessoal"
         );
         if (golpePessoalPower) {
           // Update name to include weapon
@@ -1581,18 +1601,18 @@ export const applyPower = (
           const effectDescriptions = golpePessoalBuild.effects
             .map((effectData) => {
               const effect = GOLPE_PESSOAL_EFFECTS[effectData.effectName];
-              if (!effect) return '';
+              if (!effect) return "";
 
               let desc = `• ${effect.name}: ${effect.description}`;
               if (effectData.repeats > 1) {
                 desc += ` (${effectData.repeats}x)`;
               }
               if (effectData.choices && effectData.choices.length > 0) {
-                desc += ` [${effectData.choices.join(', ')}]`;
+                desc += ` [${effectData.choices.join(", ")}]`;
               }
               return desc;
             })
-            .join('\n');
+            .join("\n");
 
           golpePessoalPower.text = `${effectDescriptions}\n\n💠 Custo Total: ${golpePessoalBuild.totalCost} PM`;
         }
@@ -1601,14 +1621,14 @@ export const applyPower = (
           name: getSourceName(sheetAction.source),
           value: `Golpe Pessoal criado com ${golpePessoalBuild.weapon}`,
         });
-      } else if (sheetAction.action.type === 'special') {
+      } else if (sheetAction.action.type === "special") {
         let currentSteps: SubStep[];
-        if (sheetAction.action.specialAction === 'humanoVersatil') {
+        if (sheetAction.action.specialAction === "humanoVersatil") {
           currentSteps = applyHumanoVersatil(sheet);
-        } else if (sheetAction.action.specialAction === 'lefouDeformidade') {
+        } else if (sheetAction.action.specialAction === "lefouDeformidade") {
           currentSteps = applyLefouDeformidade(sheet);
         } else if (
-          sheetAction.action.specialAction === 'osteonMemoriaPostuma'
+          sheetAction.action.specialAction === "osteonMemoriaPostuma"
         ) {
           currentSteps = applyOsteonMemoriaPostuma(sheet);
         } else {
@@ -1632,12 +1652,12 @@ export const applyPower = (
 
     // Check if there's an HP attribute replacement and apply it immediately
     const hpReplacement = powerOrAbility.sheetBonuses.find(
-      (bonus) => bonus.target.type === 'HPAttributeReplacement'
+      (bonus) => bonus.target.type === "HPAttributeReplacement"
     );
 
     if (
       hpReplacement &&
-      hpReplacement.target.type === 'HPAttributeReplacement'
+      hpReplacement.target.type === "HPAttributeReplacement"
     ) {
       const { newAttribute } = hpReplacement.target;
       const baseHp = sheet.classe.pv;
@@ -1663,12 +1683,12 @@ export function applyRaceAbilities(sheet: CharacterSheet): CharacterSheet {
   // Adicionar habilidades da raça
   sheetClone.sheetActionHistory.push({
     source: {
-      type: 'race',
+      type: "race",
       raceName: sheetClone.raca.name,
     },
     changes:
       sheetClone.raca.abilities.map((ability) => ({
-        type: 'PowerAdded',
+        type: "PowerAdded",
         powerName: ability.name,
       })) || [],
   });
@@ -1681,8 +1701,8 @@ export function applyRaceAbilities(sheet: CharacterSheet): CharacterSheet {
 
   if (subSteps.length) {
     sheetClone.steps.push({
-      type: 'Poderes',
-      label: 'Habilidades de Raça',
+      type: "Poderes",
+      label: "Habilidades de Raça",
       value: subSteps,
     });
   }
@@ -1697,12 +1717,12 @@ function applyDivinePowers(sheet: CharacterSheet): CharacterSheet {
   // Adicionar poderes concedidos da divindade
   sheetClone.sheetActionHistory.push({
     source: {
-      type: 'divinity',
-      divinityName: sheetClone.devoto?.divindade.name || 'Divindade',
+      type: "divinity",
+      divinityName: sheetClone.devoto?.divindade.name || "Divindade",
     },
     changes:
       sheetClone.devoto?.poderes.map((power) => ({
-        type: 'PowerAdded',
+        type: "PowerAdded",
         powerName: power.name,
       })) || [],
   });
@@ -1715,8 +1735,8 @@ function applyDivinePowers(sheet: CharacterSheet): CharacterSheet {
 
   if (subSteps.length) {
     sheetClone.steps.push({
-      type: 'Poderes',
-      label: 'Poderes Concedidos',
+      type: "Poderes",
+      label: "Poderes Concedidos",
       value: subSteps,
     });
   }
@@ -1735,12 +1755,12 @@ function applyClassAbilities(sheet: CharacterSheet): CharacterSheet {
   // Adicionar habilidades da classe
   sheetClone.sheetActionHistory.push({
     source: {
-      type: 'class',
+      type: "class",
       className: sheetClone.classe.name,
     },
     changes:
       availableAbilities.map((ability) => ({
-        type: 'PowerAdded',
+        type: "PowerAdded",
         powerName: ability.name,
       })) || [],
   });
@@ -1753,8 +1773,8 @@ function applyClassAbilities(sheet: CharacterSheet): CharacterSheet {
 
   if (subSteps.length) {
     sheetClone.steps.push({
-      type: 'Poderes',
-      label: 'Habilidades de Classe',
+      type: "Poderes",
+      label: "Habilidades de Classe",
       value: subSteps,
     });
   }
@@ -1787,7 +1807,7 @@ function applyGeneralPowers(sheet: CharacterSheet): CharacterSheet {
     // Caso especial pra feiticeiros da linhagem rubra, eles nunca querem perder carisma
     if (
       sheetClone.classe.abilities.find(
-        (ability) => ability.name === 'Linhagem Rubra'
+        (ability) => ability.name === "Linhagem Rubra"
       )
     ) {
       let remainingPenalty = totalPenalty;
@@ -1795,7 +1815,7 @@ function applyGeneralPowers(sheet: CharacterSheet): CharacterSheet {
         // Ache o atributo com maior mod que não seja carisma
         const highestAttribute = Object.values(sheetClone.atributos).reduce(
           (prev, curr) => {
-            if (curr.name === 'Carisma') return prev;
+            if (curr.name === "Carisma") return prev;
             if (prev.mod > curr.mod) return prev;
             return curr;
           }
@@ -1812,7 +1832,7 @@ function applyGeneralPowers(sheet: CharacterSheet): CharacterSheet {
     } else {
       sheetClone.atributos.Carisma.mod -= totalPenalty;
       subSteps.push({
-        name: 'Carisma',
+        name: "Carisma",
         value: `-${totalPenalty} por ${tormentaPowersQtd} poderes da Tormenta`,
       });
     }
@@ -1820,8 +1840,8 @@ function applyGeneralPowers(sheet: CharacterSheet): CharacterSheet {
 
   if (subSteps.length) {
     sheetClone.steps.push({
-      type: 'Poderes',
-      label: 'Poderes Gerais',
+      type: "Poderes",
+      label: "Poderes Gerais",
       value: subSteps,
     });
   }
@@ -1842,12 +1862,12 @@ function applyPowerGetters(
   // Poderes de origem adicionados, adicionar no histórico de ações
   sheetClone.sheetActionHistory.push({
     source: {
-      type: 'origin',
-      originName: sheetClone.origin?.name || 'Origem',
+      type: "origin",
+      originName: sheetClone.origin?.name || "Origem",
     },
     changes:
       sheetClone.origin?.powers.map((power) => ({
-        type: 'PowerAdded',
+        type: "PowerAdded",
         powerName: power.name,
       })) || [],
   });
@@ -1860,7 +1880,7 @@ function applyPowerGetters(
 
   if (subSteps.length && sheet.origin) {
     sheetClone.steps.push({
-      type: 'Poderes',
+      type: "Poderes",
       label: `Benefícios da Origem (${sheet.origin.name})`,
       value: subSteps,
     });
@@ -1895,11 +1915,11 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 
   // Check if there's an HP attribute replacement (Dom da Esperança)
   const hpReplacement = updatedSheet.sheetBonuses.find(
-    (bonus) => bonus.target.type === 'HPAttributeReplacement'
+    (bonus) => bonus.target.type === "HPAttributeReplacement"
   );
 
   let hpAttribute = Atributo.CONSTITUICAO;
-  if (hpReplacement && hpReplacement.target.type === 'HPAttributeReplacement') {
+  if (hpReplacement && hpReplacement.target.type === "HPAttributeReplacement") {
     hpAttribute = hpReplacement.target.newAttribute;
   }
 
@@ -1966,19 +1986,19 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 
   updatedSheet.sheetActionHistory.push({
     source: {
-      type: 'levelUp',
+      type: "levelUp",
       level: updatedSheet.nivel,
     },
     changes: [
       {
-        type: 'SpellsLearned',
+        type: "SpellsLearned",
         spellNames: newSpells.map((spell) => spell.nome),
       },
     ],
   });
 
   updatedSheet.steps.push({
-    type: 'Poderes',
+    type: "Poderes",
     label: `Nível ${updatedSheet.nivel}`,
     value: subSteps,
   });
@@ -1986,7 +2006,7 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
   // Escolher novo poder aleatório (geral ou poder da classe)
   const randomNumber = Math.random();
   const allowedPowers =
-    updatedSheet.classe.name === 'Inventor'
+    updatedSheet.classe.name === "Inventor"
       ? getWeightedInventorClassPowers(updatedSheet)
       : getAllowedClassPowers(updatedSheet);
   const allowedGeneralPowers = getPowersAllowedByRequirements(updatedSheet);
@@ -2004,7 +2024,7 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 
       if (nSubSteps.length) {
         updatedSheet.steps.push({
-          type: 'Poderes',
+          type: "Poderes",
           label: `Novo poder de ${updatedSheet.classe.name}`,
           value: nSubSteps,
         });
@@ -2017,12 +2037,12 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 
       updatedSheet.sheetActionHistory.push({
         source: {
-          type: 'levelUp',
+          type: "levelUp",
           level: updatedSheet.nivel,
         },
         changes: [
           {
-            type: 'PowerAdded',
+            type: "PowerAdded",
             powerName: newPower.name,
           },
         ],
@@ -2041,7 +2061,7 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 
     if (nSubSteps.length) {
       updatedSheet.steps.push({
-        type: 'Poderes',
+        type: "Poderes",
         label: `Novo poder Geral`,
         value: nSubSteps,
       });
@@ -2054,12 +2074,12 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 
     updatedSheet.sheetActionHistory.push({
       source: {
-        type: 'levelUp',
+        type: "levelUp",
         level: updatedSheet.nivel,
       },
       changes: [
         {
-          type: 'PowerAdded',
+          type: "PowerAdded",
           powerName: newPower.name,
         },
       ],
@@ -2084,7 +2104,7 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 
     if (abilitySubSteps.length) {
       updatedSheet.steps.push({
-        type: 'Poderes',
+        type: "Poderes",
         label: `Novas habilidades de classe (Nível ${updatedSheet.nivel})`,
         value: abilitySubSteps,
       });
@@ -2092,11 +2112,11 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 
     updatedSheet.sheetActionHistory.push({
       source: {
-        type: 'levelUp',
+        type: "levelUp",
         level: updatedSheet.nivel,
       },
       changes: newlyAvailableAbilities.map((ability) => ({
-        type: 'PowerAdded',
+        type: "PowerAdded",
         powerName: ability.name,
       })),
     });
@@ -2112,32 +2132,32 @@ function levelUp(sheet: CharacterSheet): CharacterSheet {
 }
 
 const calculateBonusValue = (sheet: CharacterSheet, bonus: StatModifier) => {
-  if (bonus.type === 'Attribute') {
+  if (bonus.type === "Attribute") {
     return sheet.atributos[bonus.attribute].mod;
   }
-  if (bonus.type === 'LevelCalc') {
+  if (bonus.type === "LevelCalc") {
     const filledFormula = bonus.formula.replace(
-      '{level}',
+      "{level}",
       sheet.nivel.toString()
     );
     // eslint-disable-next-line no-eval
     return eval(filledFormula);
   }
-  if (bonus.type === 'TormentaPowersCalc') {
+  if (bonus.type === "TormentaPowersCalc") {
     const filledFormula = bonus.formula.replace(
-      '{tPowQtd}',
+      "{tPowQtd}",
       countTormentaPowers(sheet).toString()
     );
     // eslint-disable-next-line no-eval
     return eval(filledFormula);
   }
-  if (bonus.type === 'SpecialAttribute') {
-    if (bonus.attribute === 'spellKeyAttr') {
+  if (bonus.type === "SpecialAttribute") {
+    if (bonus.attribute === "spellKeyAttr") {
       const attr = sheet.classe.spellPath?.keyAttribute || Atributo.CARISMA;
       return sheet.atributos[attr].mod;
     }
   }
-  if (bonus.type === 'Fixed') {
+  if (bonus.type === "Fixed") {
     return bonus.value;
   }
   return 0;
@@ -2160,36 +2180,36 @@ const applyStatModifiers = (
   sheet.sheetBonuses.forEach((bonus) => {
     const bonusValue = calculateBonusValue(sheet, bonus.modifier);
     const getSubStepName = (source: SheetChangeSource) => {
-      if (source.type === 'power') {
+      if (source.type === "power") {
         return `${source.name}:`;
       }
-      if (source.type === 'levelUp') {
+      if (source.type === "levelUp") {
         return `Nível ${source.level}:`;
       }
       // Assumindo que as únicas fontes de bonus são poderes e levelUp
-      return '';
+      return "";
     };
     const subStepName: string = getSubStepName(bonus.source);
 
-    if (bonus.target.type === 'PV') {
+    if (bonus.target.type === "PV") {
       sheet.pv += bonusValue;
       pvSubSteps.push({
         name: subStepName,
         value: `${bonusValue}`,
       });
-    } else if (bonus.target.type === 'PM') {
+    } else if (bonus.target.type === "PM") {
       sheet.pm += bonusValue;
       pmSubSteps.push({
         name: subStepName,
         value: `${bonusValue}`,
       });
-    } else if (bonus.target.type === 'Defense') {
+    } else if (bonus.target.type === "Defense") {
       sheet.defesa += bonusValue;
       defSubSteps.push({
         name: subStepName,
         value: `${bonusValue}`,
       });
-    } else if (bonus.target.type === 'Skill') {
+    } else if (bonus.target.type === "Skill") {
       const skillName = bonus.target.name;
 
       // TODO: Adicionar bonus bom pra oficios
@@ -2203,28 +2223,28 @@ const applyStatModifiers = (
         name: subStepName,
         value: `${bonusValue} em ${skillName}`,
       });
-    } else if (bonus.target.type === 'Displacement') {
+    } else if (bonus.target.type === "Displacement") {
       sheet.displacement += bonusValue;
 
       displacementSubSteps.push({
         name: subStepName,
         value: `${bonusValue}m`,
       });
-    } else if (bonus.target.type === 'MaxSpaces') {
+    } else if (bonus.target.type === "MaxSpaces") {
       sheet.maxSpaces += bonusValue;
 
       displacementSubSteps.push({
         name: subStepName,
         value: `${bonusValue} espaços de carga`,
       });
-    } else if (bonus.target.type === 'ArmorPenalty') {
+    } else if (bonus.target.type === "ArmorPenalty") {
       sheet.extraArmorPenalty += bonusValue;
 
       armorPenaltySubSteps.push({
         name: subStepName,
         value: `${bonusValue}`,
       });
-    } else if (bonus.target.type === 'PickSkill') {
+    } else if (bonus.target.type === "PickSkill") {
       let pickedSkills: Skill[];
 
       // Use manual selections if provided
@@ -2246,7 +2266,7 @@ const applyStatModifiers = (
 
         addOtherBonusToSkill(sheet, skill, bonusValue);
       });
-    } else if (bonus.target.type === 'ModifySkillAttribute') {
+    } else if (bonus.target.type === "ModifySkillAttribute") {
       const { attribute } = bonus.target;
       const skillName = bonus.target.skill;
 
@@ -2273,56 +2293,56 @@ const applyStatModifiers = (
 
   if (pvSubSteps.length) {
     sheet.steps.push({
-      label: 'Bonus de PV',
-      type: 'Atributos Extras',
+      label: "Bonus de PV",
+      type: "Atributos Extras",
       value: pvSubSteps,
     });
   }
 
   if (pmSubSteps.length) {
     sheet.steps.push({
-      label: 'Bonus de PM',
-      type: 'Atributos Extras',
+      label: "Bonus de PM",
+      type: "Atributos Extras",
       value: pmSubSteps,
     });
   }
 
   if (defSubSteps.length) {
     sheet.steps.push({
-      label: 'Bonus de Defesa',
-      type: 'Atributos Extras',
+      label: "Bonus de Defesa",
+      type: "Atributos Extras",
       value: defSubSteps,
     });
   }
 
   if (skillSubSteps.length) {
     sheet.steps.push({
-      label: 'Bonus de Perícias',
-      type: 'Atributos Extras',
+      label: "Bonus de Perícias",
+      type: "Atributos Extras",
       value: skillSubSteps,
     });
   }
 
   if (displacementSubSteps.length) {
     sheet.steps.push({
-      label: 'Bonus de Deslocamento',
-      type: 'Atributos Extras',
+      label: "Bonus de Deslocamento",
+      type: "Atributos Extras",
       value: displacementSubSteps,
     });
   }
 
   if (armorPenaltySubSteps.length) {
     sheet.steps.push({
-      label: 'Bonus de Penalidade de Armadura',
-      type: 'Atributos Extras',
+      label: "Bonus de Penalidade de Armadura",
+      type: "Atributos Extras",
       value: armorPenaltySubSteps,
     });
   }
 
   if (modifySkillAttributeSubSteps.length) {
     sheet.steps.push({
-      label: 'Bonus de Modificação de Atributo de Perícia',
-      type: 'Modificação de Atributo de Perícia',
+      label: "Bonus de Modificação de Atributo de Perícia",
+      type: "Modificação de Atributo de Perícia",
       value: modifySkillAttributeSubSteps,
     });
   }
@@ -2342,26 +2362,26 @@ export default function generateRandomSheet(
   const steps: Step[] = [];
 
   // Passo 1: Definir gênero
-  const sexos = ['Homem', 'Mulher'] as ('Homem' | 'Mulher')[];
-  const sexo = getRandomItemFromArray<'Homem' | 'Mulher'>(sexos);
+  const sexos = ["Homem", "Mulher"] as ("Homem" | "Mulher")[];
+  const sexo = getRandomItemFromArray<"Homem" | "Mulher">(sexos);
 
   // Passo 2: Definir raça
   const { race, nome } = getRaceAndName(selectedOptions, sexo);
 
-  if (race.name !== 'Golem') {
+  if (race.name !== "Golem") {
     steps.push({
-      label: 'Gênero',
-      value: [{ value: `${sexo === 'Homem' ? 'Masculino' : 'Feminino'}` }],
+      label: "Gênero",
+      value: [{ value: `${sexo === "Homem" ? "Masculino" : "Feminino"}` }],
     });
   }
 
   steps.push(
     {
-      label: 'Raça',
+      label: "Raça",
       value: [{ value: race.name }],
     },
     {
-      label: 'Nome',
+      label: "Nome",
       value: [{ value: nome }],
     }
   );
@@ -2370,14 +2390,14 @@ export default function generateRandomSheet(
   const classe = selectClass(selectedOptions);
 
   steps.push({
-    label: 'Classe',
+    label: "Classe",
     value: [{ value: classe.name }],
   });
 
   // Passo 4: Definir origem (se houver)
   let origin: Origin | undefined;
 
-  if (race.name !== 'Golem') {
+  if (race.name !== "Golem") {
     if (selectedOptions.origin) {
       origin = ORIGINS[selectedOptions.origin as origins];
     } else {
@@ -2387,15 +2407,18 @@ export default function generateRandomSheet(
 
   if (origin) {
     steps.push({
-      label: 'Origem',
+      label: "Origem",
       value: [{ value: origin?.name }],
     });
   }
 
   // Passo 5: itens, feitiços, e valores iniciais
-  const initialBag = getInitialBag(origin, targetLevel);
-  let initialMoney = getInitialMoney(targetLevel);
-  const initialMoneyWithDetails = getInitialMoneyWithDetails(targetLevel);
+  const initialBag = getInitialBag(origin, targetLevel, classe.name);
+  let initialMoney = getInitialMoney(targetLevel, classe.name);
+  const initialMoneyWithDetails = getInitialMoneyWithDetails(
+    targetLevel,
+    classe.name
+  );
   const initialSpells: Spell[] = [];
   const initialPV = classe.pv;
   const initialPM = classe.pm;
@@ -2408,7 +2431,7 @@ export default function generateRandomSheet(
 
   if (
     selectedOptions.gerarItens &&
-    selectedOptions.gerarItens !== 'nao-gerar'
+    selectedOptions.gerarItens !== "nao-gerar"
   ) {
     const equipmentResult = generateEquipmentRewards(targetLevel, initialBag);
 
@@ -2423,13 +2446,13 @@ export default function generateRandomSheet(
       equipmentGenerationCost = equipmentResult.totalCost;
 
       // Se deve consumir dinheiro, reduzir do initial money
-      if (selectedOptions.gerarItens === 'consumir-dinheiro') {
+      if (selectedOptions.gerarItens === "consumir-dinheiro") {
         initialMoney = Math.max(0, initialMoney - equipmentGenerationCost);
       }
 
       // Adicionar resumo e itens individuais aos steps
       equipmentGenerationStep.push({
-        name: 'Resumo da Geração',
+        name: "Resumo da Geração",
         value: `${equipmentResult.generationDetails} (Custo total: ${equipmentGenerationCost} T$)`,
       });
 
@@ -2440,31 +2463,31 @@ export default function generateRandomSheet(
 
   steps.push(
     {
-      label: 'PV Inicial',
+      label: "PV Inicial",
       value: [{ value: initialPV }],
     },
     {
-      label: 'PM Inicial',
+      label: "PM Inicial",
       value: [{ value: initialPM }],
     },
     {
-      label: 'Defesa Inicial',
+      label: "Defesa Inicial",
       value: [{ value: initialDefense }],
     },
     {
-      label: 'Dinheiro Inicial',
+      label: "Dinheiro Inicial",
       value: [
         {
           value: `T$ ${initialMoneyWithDetails.amount}${
             initialMoneyWithDetails.details
               ? ` ${initialMoneyWithDetails.details}`
-              : ''
+              : ""
           }`,
         },
       ],
     },
     {
-      label: 'Equipamentos Iniciais e de Origem',
+      label: "Equipamentos Iniciais e de Origem",
       value: [],
     }
   );
@@ -2472,8 +2495,8 @@ export default function generateRandomSheet(
   // Adicionar step dos equipamentos gerados se houver
   if (equipmentGenerationStep.length > 0) {
     steps.push({
-      label: 'Equipamentos por Nível',
-      type: 'Equipamentos',
+      label: "Equipamentos por Nível",
+      type: "Equipamentos",
       value: equipmentGenerationStep,
     });
   }
@@ -2489,7 +2512,7 @@ export default function generateRandomSheet(
   const summedPV = initialPV + atributos.Constituição.mod;
 
   steps.push({
-    label: 'Vida máxima (+CON)',
+    label: "Vida máxima (+CON)",
     value: [{ value: summedPV }],
   });
 
@@ -2504,7 +2527,7 @@ export default function generateRandomSheet(
     });
   } else {
     steps.push({
-      label: 'Não será devoto',
+      label: "Não será devoto",
       value: [],
     });
   }
@@ -2528,7 +2551,7 @@ export default function generateRandomSheet(
   let charSheet: CharacterSheet = {
     id: uuid(),
     nome,
-    sexo: sexo === 'Homem' ? 'Masculino' : 'Feminino',
+    sexo: sexo === "Homem" ? "Masculino" : "Feminino",
     nivel: 1,
     atributos,
     maxSpaces,
@@ -2561,13 +2584,13 @@ export default function generateRandomSheet(
     generatedEquipments.forEach((equipment) => {
       const group = equipment.group as keyof BagEquipments;
       if (!generatedEquipmentsByGroup[group]) {
-        if (group === 'Armadura' || group === 'Escudo') {
+        if (group === "Armadura" || group === "Escudo") {
           generatedEquipmentsByGroup[group] = [] as DefenseEquipment[];
         } else {
           generatedEquipmentsByGroup[group] = [] as Equipment[];
         }
       }
-      if (group === 'Armadura' || group === 'Escudo') {
+      if (group === "Armadura" || group === "Escudo") {
         (generatedEquipmentsByGroup[group] as DefenseEquipment[]).push(
           equipment as DefenseEquipment
         );
@@ -2585,8 +2608,8 @@ export default function generateRandomSheet(
   charSheet.bag.addEquipment(classEquipments);
 
   charSheet.steps.push({
-    type: 'Equipamentos',
-    label: 'Equipamentos da classe',
+    type: "Equipamentos",
+    label: "Equipamentos da classe",
     value: [...Object.values(classEquipments).flat()].map((equip) => ({
       value: equip.nome,
     })),
@@ -2616,8 +2639,8 @@ export default function generateRandomSheet(
     })
     .filter(
       (skill) =>
-        !skill.name.startsWith('Of') ||
-        (skill.name.startsWith('Of') && skill.training > 0)
+        !skill.name.startsWith("Of") ||
+        (skill.name.startsWith("Of") && skill.training > 0)
     );
 
   // Passo 12:
@@ -2631,7 +2654,7 @@ export default function generateRandomSheet(
   if (newSpells.length) {
     charSheet.steps.push({
       label: `Magias Iniciais`,
-      type: 'Magias',
+      type: "Magias",
       value: newSpells.map((spell) => ({ value: spell.nome })),
     });
   }
@@ -2670,8 +2693,8 @@ export function generateEmptySheet(
 
   let emptySheet: CharacterSheet = {
     id: uuid(),
-    nome: '',
-    sexo: '',
+    nome: "",
+    sexo: "",
     nivel: selectedOptions.nivel,
     atributos: {
       Força: { name: Atributo.FORCA, mod: 0, value: 10 },
@@ -2699,13 +2722,13 @@ export function generateEmptySheet(
     steps: [],
     skills: [],
     spells: [],
-    dinheiro: getInitialMoney(selectedOptions.nivel),
+    dinheiro: getInitialMoney(selectedOptions.nivel, generatedClass?.name),
   };
 
   // Gerar equipamentos de recompensa para ficha vazia se solicitado
   if (
     selectedOptions.gerarItens &&
-    selectedOptions.gerarItens !== 'nao-gerar'
+    selectedOptions.gerarItens !== "nao-gerar"
   ) {
     const equipmentResult = generateEquipmentRewards(
       selectedOptions.nivel,
@@ -2719,13 +2742,13 @@ export function generateEmptySheet(
           equipmentArray.forEach((equipment) => {
             const group = equipment.group as keyof BagEquipments;
             if (!emptySheet.bag.equipments[group]) {
-              if (group === 'Armadura' || group === 'Escudo') {
+              if (group === "Armadura" || group === "Escudo") {
                 emptySheet.bag.equipments[group] = [] as DefenseEquipment[];
               } else {
                 emptySheet.bag.equipments[group] = [] as Equipment[];
               }
             }
-            if (group === 'Armadura' || group === 'Escudo') {
+            if (group === "Armadura" || group === "Escudo") {
               (emptySheet.bag.equipments[group] as DefenseEquipment[]).push(
                 equipment as DefenseEquipment
               );
@@ -2737,7 +2760,7 @@ export function generateEmptySheet(
       });
 
       // Se deve consumir dinheiro, reduzir
-      if (selectedOptions.gerarItens === 'consumir-dinheiro') {
+      if (selectedOptions.gerarItens === "consumir-dinheiro") {
         emptySheet.dinheiro = Math.max(
           0,
           (emptySheet.dinheiro || 0) - equipmentResult.totalCost
@@ -2748,7 +2771,7 @@ export function generateEmptySheet(
       const equipmentSteps: SubStep[] = [];
 
       equipmentSteps.push({
-        name: 'Resumo da Geração',
+        name: "Resumo da Geração",
         value: `${equipmentResult.generationDetails} (Custo total: ${equipmentResult.totalCost} T$)`,
       });
 
@@ -2757,8 +2780,8 @@ export function generateEmptySheet(
 
       // Adicionar step ao histórico
       emptySheet.steps.push({
-        label: 'Equipamentos por Nível',
-        type: 'Equipamentos',
+        label: "Equipamentos por Nível",
+        type: "Equipamentos",
         value: equipmentSteps,
       });
     }
@@ -2809,8 +2832,8 @@ export function generateEmptySheet(
     })
     .filter(
       (skill) =>
-        !skill.name.startsWith('Of') ||
-        (skill.name.startsWith('Of') && skill.training > 0)
+        !skill.name.startsWith("Of") ||
+        (skill.name.startsWith("Of") && skill.training > 0)
     );
 
   return emptySheet;
