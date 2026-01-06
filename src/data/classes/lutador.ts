@@ -8,7 +8,7 @@ const LUTADOR: ClassDescription = {
   name: "Lutador",
   description:
     "Especialistas em combate desarmado e força bruta, os lutadores são mestres da pancadaria. Eles não precisam de espadas ou machados para derrubar seus inimigos; seus punhos e pés são armas letais. Com uma resistência invejável e um espírito indomável, o lutador encara qualquer desafio cara a cara.",
-  detailedProficiencies: "Armas simples.",
+  detailedProficiencies: "Nenhuma.",
   pv: 20,
   addpv: 5,
   pm: 3,
@@ -35,7 +35,7 @@ const LUTADOR: ClassDescription = {
       Skill.REFLEXOS,
     ],
   },
-  proficiencias: [PROFICIENCIAS.LEVES, PROFICIENCIAS.SIMPLES],
+  proficiencias: [],
   abilities: [
     {
       name: "Briga",
@@ -231,7 +231,7 @@ const LUTADOR: ClassDescription = {
     },
     {
       name: "Trocação",
-      text: "Quando você começa a bater, não para mais. Ao acertar um ataque desarmado, pode fazer outro ataque desarmado contra o mesmo alvo, pagando uma quantidade de PM igual à quantidade de ataques já realizados no turno. Ou seja, pode fazer o primeiro ataque extra gastando 1 PM, um segundo ataque extra gastando mais 2 PM e assim por diante, até errar um ataque ou não ter mais pontos de mana.",
+      text: "Quando você começa a bater, não para mais. Ao acertar um ataque desarmado com a ação agredir, pode fazer outro ataque desarmado contra o mesmo alvo, pagando uma quantidade de PM igual à quantidade de ataques já realizados no turno. Ou seja, pode fazer o primeiro ataque extra gastando 1 PM, um segundo ataque extra gastando mais 2 PM e assim por diante, até errar um ataque ou não ter mais pontos de mana. Você não pode gastar mais PM por turno com esta habilidade do que o seu nível.",
       requirements: [[{ type: RequirementType.NIVEL, value: 6 }]],
     },
     {

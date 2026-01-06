@@ -9,7 +9,7 @@ const BUCANEIRO: ClassDescription = {
   name: "Bucaneiro",
   description:
     "Aventureiros dos mares e das tavernas, os bucaneiros vivem pela liberdade e pela emoção. Ágeis e carismáticos, eles combinam esgrima elegante com uma sorte insolente. Para um bucaneiro, não basta vencer; é preciso vencer com estilo, seja em um duelo de espadas ou em um jogo de cartas.",
-  detailedProficiencies: "Armas simples e marciais, armaduras leves.",
+  detailedProficiencies: "Armas marciais.",
   pv: 16,
   addpv: 4,
   pm: 3,
@@ -43,11 +43,7 @@ const BUCANEIRO: ClassDescription = {
       Skill.PONTARIA,
     ],
   },
-  proficiencias: [
-    PROFICIENCIAS.LEVES,
-    PROFICIENCIAS.MARCIAIS,
-    PROFICIENCIAS.SIMPLES,
-  ],
+  proficiencias: [PROFICIENCIAS.MARCIAIS],
   abilities: [
     {
       name: "Audácia",
@@ -61,7 +57,7 @@ const BUCANEIRO: ClassDescription = {
     },
     {
       name: "Evasão",
-      text: "Quando sofre um ataque que permite um teste de Reflexos para reduzir o dano à metade, você não sofre dano algum se passar. Você ainda sofre dano normal se falhar no teste de Reflexos. Esta habilidade exige liberdade de movimentos; você não pode usá-la se estiver de armadura pesada ou na condição imóvel.",
+      text: "Quando sofre um efeito que permite um teste de Reflexos para reduzir o dano à metade, você não sofre dano algum se passar. Você ainda sofre dano normal se falhar no teste de Reflexos. Esta habilidade exige liberdade de movimentos; você não pode usá-la se estiver de armadura pesada ou na condição imóvel.",
       nivel: 2,
     },
     {
@@ -105,7 +101,7 @@ const BUCANEIRO: ClassDescription = {
     },
     {
       name: "Evasão Aprimorada",
-      text: "Quando sofre um ataque que permite um teste de Reflexos para reduzir o dano à metade, você não sofre dano algum se passar e sofre apenas metade do dano se falhar. Esta habilidade exige liberdade de movimentos; você não pode usá-la se estiver de armadura pesada ou na condição imóvel.",
+      text: "Quando sofre um efeito que permite um teste de Reflexos para reduzir o dano à metade, você não sofre dano algum se passar e sofre apenas metade do dano se falhar. Esta habilidade exige liberdade de movimentos; você não pode usá-la se estiver de armadura pesada ou na condição imóvel.",
       nivel: 10,
     },
     {

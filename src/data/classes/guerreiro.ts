@@ -8,8 +8,7 @@ const GUERREIRO: ClassDescription = {
   name: "Guerreiro",
   description:
     "Mestres de armas e tácticos de combate, os guerreiros são a espinha dorsal de qualquer exército. Treinados na arte da guerra, eles buscam a perfeição física e técnica, sendo capazes de realizar manobras impressionantes no campo de batalha. Onde outros veem caos, o guerreiro vê oportunidades de vitória.",
-  detailedProficiencies:
-    "Armas simples e marciais, armaduras leves, médias e pesadas e escudos.",
+  detailedProficiencies: "Armas marciais e escudos.",
   pv: 20,
   addpv: 5,
   pm: 3,
@@ -40,13 +39,7 @@ const GUERREIRO: ClassDescription = {
       Skill.REFLEXOS,
     ],
   },
-  proficiencias: [
-    PROFICIENCIAS.LEVES,
-    PROFICIENCIAS.MARCIAIS,
-    PROFICIENCIAS.PESADAS,
-    PROFICIENCIAS.ESCUDOS,
-    PROFICIENCIAS.SIMPLES,
-  ],
+  proficiencias: [PROFICIENCIAS.MARCIAIS, PROFICIENCIAS.ESCUDOS],
   abilities: [
     {
       name: "Ataque Especial",
@@ -86,7 +79,7 @@ const GUERREIRO: ClassDescription = {
     },
     {
       name: "Ataque Reflexo",
-      text: "Se um alvo em alcance de seus ataques corpo a corpo ficar desprevenido ou se mover voluntariamente para fora do seu alcance, você pode gastar 1 PM para fazer um ataque corpo a corpo contra esse alvo (apenas uma vez por alvo a cada rodada).",
+      text: "Se um alvo em alcance de seus ataques corpo a corpo sofrer um ataque, você pode gastar 1 PM para fazer um ataque corpo a corpo contra ele (apenas uma vez por alvo a cada rodada).",
       requirements: [
         [{ type: RequirementType.ATRIBUTO, name: "Destreza", value: 1 }],
       ],

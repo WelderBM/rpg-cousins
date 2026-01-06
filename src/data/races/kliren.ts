@@ -17,8 +17,8 @@ const KLIREN: Race = {
   attributes: {
     attrs: [
       { attr: Atributo.INTELIGENCIA, mod: 2 },
-      { attr: "any", mod: 1 },
-      { attr: "any", mod: 1 },
+      { attr: Atributo.CARISMA, mod: 1 },
+      { attr: Atributo.FORCA, mod: -1 },
     ],
   },
   faithProbability: {

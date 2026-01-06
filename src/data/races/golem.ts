@@ -12,9 +12,9 @@ const GOLEM: Race = {
   commonReligions: "Geralmente nenhuma, ou a de seu criador.",
   attributes: {
     attrs: [
-      { attr: "any", mod: 2 },
-      { attr: "any", mod: 1 },
-      { attr: "any", mod: 1 },
+      { attr: Atributo.FORCA, mod: 2 },
+      { attr: Atributo.CONSTITUICAO, mod: 1 },
+      { attr: Atributo.CARISMA, mod: -1 },
     ],
   },
   faithProbability: {

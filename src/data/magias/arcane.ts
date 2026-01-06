@@ -4,9 +4,9 @@ import {
   spellsCircle3 as c3,
   spellsCircle4 as c4,
   spellsCircle5 as c5,
-} from './generalSpells';
+} from "./generalSpells";
 
-import { SpellCircle, Spell } from '../../interfaces/Spells';
+import { SpellCircle, Spell } from "../../interfaces/Spells";
 
 export const arcaneSpellsCircle1: SpellCircle = {
   Abjur: [
@@ -15,7 +15,7 @@ export const arcaneSpellsCircle1: SpellCircle = {
     c1.resistenciaAEnergia,
     c1.trancaArcana,
   ],
-  Adiv: [c1.aviso, c1.compreensao, c1.concentracaoDeCombate, c1.visaoMistica],
+  Adiv: [c1.aviso, c1.compreensao, c1.visaoMistica],
   Conv: [c1.areaEscorregadia, c1.conjurarMonstro, c1.nevoa, c1.teia],
   Encan: [c1.adagaMental, c1.enfeiticar, c1.hipnotismo, c1.sono],
   Evoc: [
@@ -36,12 +36,7 @@ export const arcaneSpellsCircle1: SpellCircle = {
     c1.raioDoEnfraquecimento,
     c1.vitalidadeFantasma,
   ],
-  Trans: [
-    c1.armaMagica,
-    c1.primorAtletico,
-    c1.quedaSuave,
-    c1.transmutarObjetos,
-  ],
+  Trans: [c1.armaMagica, c1.quedaSuave, c1.transmutarObjetos],
 };
 
 export const arcaneSpellsCircle2: SpellCircle = {
@@ -53,7 +48,7 @@ export const arcaneSpellsCircle2: SpellCircle = {
     c2.saltoDimensional,
     c2.servosInvisiveis,
   ],
-  Encan: [c2.desesperoEsmagador, c2.marcaDaObediencia, c2.sussurosInsanos],
+  Encan: [c2.desesperoEsmagador, c2.marcaDaObediencia, c2.sussurrosInsanos],
   Evoc: [c2.bolaDeFogo, c2.flechaAcida, c2.relampago, c2.soproDasUivantes],
   Ilusão: [
     c2.aparenciaPerfeita,
@@ -76,11 +71,11 @@ export const arcaneSpellsCircle3: SpellCircle = {
     c3.globoDeInvulnerabilidade,
   ],
   Adiv: [c3.contatoExtraplanar, c3.lendasEHistorias, c3.videncia],
-  Conv: [c3.convocacaoInstatanea, c3.enxameRubroDeIchabod, c3.teletransporte],
+  Conv: [c3.convocacaoInstantanea, c3.enxameRubroDeIchabod, c3.teletransporte],
   Encan: [c3.imobilizar, c3.seloDeMana],
   Evoc: [c3.erupcaoGlacial, c3.lancaIgneaDeAleph, c3.muralhaElemental],
   Ilusão: [c3.ilusaoLacerante, c3.mantoDeSombras, c3.miragem],
-  Necro: [c3.ferverSangue, c3.servoMortoVivo, c3.tentaculoDeTrevas],
+  Necro: [c3.ferverSangue, c3.servoMortoVivo, c3.tentaculosDeTrevas],
   Trans: [c3.peleDePedra, c3.telecinesia, c3.transformacaoDeGuerra, c3.voo],
 };
 
@@ -94,7 +89,7 @@ export const arcaneSpellsCircle4: SpellCircle = {
     c4.relampagoFlamejanteDeReynard,
     c4.talhoInvisivelDeEdauros,
   ],
-  Ilusão: [c4.duplicataIlusoria, c4.explosaoCaleidospica],
+  Ilusão: [c4.duplicataIlusoria, c4.explosaoCaleidoscopica],
   Necro: [c4.assassinoFantasmagorico, c4.muralhaDeOssos],
   Trans: [
     c4.animarObjetos,

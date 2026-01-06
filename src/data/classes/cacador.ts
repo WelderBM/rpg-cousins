@@ -9,8 +9,7 @@ const CACADOR: ClassDescription = {
   name: "Caçador",
   description:
     "Rastreadores impecáveis e mestres da sobrevivência, os caçadores são os olhos e ouvidos do grupo nas terras selvagens. Especialistas em abater presas específicas e em usar o terreno a seu favor, eles combinam furtividade, precisão e conhecimento da natureza para vencer desafios que outros nem sequer perceberiam.",
-  detailedProficiencies:
-    "Armas simples e marciais, armaduras leves e médias e escudos.",
+  detailedProficiencies: "Armas marciais e escudos.",
   pv: 16,
   addpv: 4,
   pm: 4,
@@ -43,12 +42,7 @@ const CACADOR: ClassDescription = {
       Skill.REFLEXOS,
     ],
   },
-  proficiencias: [
-    PROFICIENCIAS.LEVES,
-    PROFICIENCIAS.MARCIAIS,
-    PROFICIENCIAS.ESCUDOS,
-    PROFICIENCIAS.SIMPLES,
-  ],
+  proficiencias: [PROFICIENCIAS.MARCIAIS, PROFICIENCIAS.ESCUDOS],
   abilities: [
     {
       name: "Marca da Presa",
@@ -95,7 +89,7 @@ const CACADOR: ClassDescription = {
   powers: [
     {
       name: "Ambidestria",
-      text: "Se estiver usando duas armas (e pelo menos uma delas for leve) e fizer a ação atacar, você pode fazer dois ataques, um com cada arma. Se fizer isso, sofre –2 em todos os testes de ataque até o seu próximo turno.",
+      text: "Se estiver empunhando duas armas (e pelo menos uma delas for leve) e fizer a ação agredir, você pode fazer dois ataques, um com cada arma. Se fizer isso, sofre –2 em todos os testes de ataque até o seu próximo turno.",
       requirements: [
         [{ type: RequirementType.ATRIBUTO, name: "Destreza", value: 2 }],
       ],
@@ -144,7 +138,7 @@ const CACADOR: ClassDescription = {
     },
     {
       name: "Arqueiro",
-      text: "Se estiver usando uma arma de ataque à distância, você soma seu bônus de Sabedoria nas rolagens de dano (limitado pelo seu nível).",
+      text: "Se estiver usando uma arma de ataque à distância, você soma sua Sabedoria nas rolagens de dano (limitado pelo seu nível).",
       requirements: [
         [{ type: RequirementType.ATRIBUTO, name: "Sabedoria", value: 1 }],
       ],
@@ -199,7 +193,7 @@ const CACADOR: ClassDescription = {
     },
     {
       name: "Elo com a Natureza",
-      text: "Você soma seu bônus de Sabedoria em seu total de pontos de mana e aprende e pode lançar Caminhos da Natureza (atributo-chave Sabedoria).",
+      text: "Você soma sua Sabedoria em seu total de pontos de mana e aprende e pode lançar Caminhos da Natureza (atributo-chave Sabedoria).",
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Sabedoria", value: 1 },
@@ -248,7 +242,7 @@ const CACADOR: ClassDescription = {
     },
     {
       name: "Escaramuça",
-      text: "Quando se move 6m ou mais, você recebe +2 em Defesa e Reflexos e +1d8 nas rolagens de dano de ataques corpo a corpo e à distância em alcance curto até o início de seu próximo turno. Você não pode usar esta habilidade se estiver vestindo armadura pesada.",
+      text: "Quando se move 6m ou mais, você recebe +2 na Defesa e Reflexos e +1d8 nas rolagens de dano de ataques corpo a corpo e à distância em alcance curto até o início de seu próximo turno. Você não pode usar esta habilidade se estiver vestindo armadura pesada.",
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Destreza", value: 2 },
@@ -258,7 +252,7 @@ const CACADOR: ClassDescription = {
     },
     {
       name: "Escaramuça Superior",
-      text: "Quando usa Escaramuça, seus bônus aumentam para +5 em Defesa e Reflexos e +1d12 em rolagens de dano.",
+      text: "Quando usa Escaramuça, seus bônus aumentam para +5 na Defesa e Reflexos e +1d12 em rolagens de dano.",
       requirements: [
         [
           { type: RequirementType.PODER, name: "Escaramuça" },

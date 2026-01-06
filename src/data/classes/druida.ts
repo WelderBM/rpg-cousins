@@ -13,10 +13,10 @@ const DRUIDA: ClassDescription = {
     "Protetores do equilíbrio natural e vozes da terra, os druidas são os guardiões das florestas, montanhas e mares. Eles canalizam a fúria das tempestades e a resiliência das montanhas, sendo capazes de assumir formas selvagens para defender a natureza. Para um druida, a civilização é apenas uma fase; a natureza é eterna.",
   detailedProficiencies:
     "Armas simples e escudos. Não possui proficiência com armaduras (exceto se de materiais naturais).",
-  pv: 16,
-  addpv: 4,
-  pm: 4,
-  addpm: 4,
+  pv: 20,
+  addpv: 5,
+  pm: 3,
+  addpm: 3,
   periciasbasicas: [
     {
       type: "and",
@@ -243,7 +243,7 @@ const DRUIDA: ClassDescription = {
     },
     {
       name: "Força dos Penhascos",
-      text: "Você recebe +2 em Fortitude. Quando sofre dano enquanto em contato com o solo ou uma superfície de pedra, pode gastar uma quantidade de PM limitada por sua Sabedoria. Para cada PM gasto, reduz esse dano em 10.",
+      text: "Você recebe +1 em Fortitude. Quando sofre dano enquanto em contato com o solo ou uma superfície de pedra, pode gastar uma quantidade de PM limitada por sua Sabedoria. Para cada PM gasto, reduz esse dano em 10.",
       requirements: [[{ type: RequirementType.NIVEL, value: 4 }]],
       sheetBonuses: [
         {
@@ -257,7 +257,7 @@ const DRUIDA: ClassDescription = {
           },
           modifier: {
             type: "Fixed",
-            value: 2,
+            value: 1,
           },
         },
       ],
@@ -294,7 +294,7 @@ const DRUIDA: ClassDescription = {
     },
     {
       name: "Liberdade da Pradaria",
-      text: "Você recebe +2 em Reflexos. Se estiver ao ar livre, sempre que lança uma magia, pode gastar 1 PM para aumentar o alcance dela em um passo (de toque para curto, de curto para médio ou de médio para longo).",
+      text: "Você recebe +1 em Reflexos. Se estiver ao ar livre, sempre que lança uma magia, pode gastar 1 PM para aumentar o alcance dela em um passo (de toque para curto, de curto para médio ou de médio para longo).",
       requirements: [[]],
       sheetBonuses: [
         {
@@ -308,7 +308,7 @@ const DRUIDA: ClassDescription = {
           },
           modifier: {
             type: "Fixed",
-            value: 2,
+            value: 1,
           },
         },
       ],
@@ -330,7 +330,7 @@ const DRUIDA: ClassDescription = {
     },
     {
       name: "Tranquilidade dos Lagos",
-      text: "Você recebe +2 em Vontade. Se estiver portando um recipiente com água (não precisa estar empunhando), uma vez por rodada, quando faz um teste de resistência, pode pagar 1 PM para refazer a rolagem.",
+      text: "Você recebe +1 em Vontade. Se estiver portando um recipiente com água (não precisa estar empunhando), uma vez por rodada, quando faz um teste de resistência, pode pagar 1 PM para refazer a rolagem.",
       requirements: [[]],
       sheetBonuses: [
         {
@@ -344,7 +344,7 @@ const DRUIDA: ClassDescription = {
           },
           modifier: {
             type: "Fixed",
-            value: 2,
+            value: 1,
           },
         },
       ],
