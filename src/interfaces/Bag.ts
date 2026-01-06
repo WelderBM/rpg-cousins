@@ -1,21 +1,21 @@
-import { cloneDeep, differenceBy, isArray, merge, mergeWith } from 'lodash';
-import Equipment, { BagEquipments } from './Equipment';
+import { cloneDeep, differenceBy, isArray, merge, mergeWith } from "lodash";
+import Equipment, { BagEquipments } from "./Equipment";
 
 const defaultEquipments: BagEquipments = {
-  'Item Geral': [
+  "Item Geral": [
     {
-      nome: 'Mochila',
-      group: 'Item Geral',
+      nome: "Mochila",
+      group: "Item Geral",
       spaces: 0,
     },
     {
-      nome: 'Saco de dormir',
-      group: 'Item Geral',
+      nome: "Saco de dormir",
+      group: "Item Geral",
       spaces: 1,
     },
     {
-      nome: 'Traje de viajante',
-      group: 'Item Geral',
+      nome: "Traje de viajante",
+      group: "Item Geral",
       spaces: 0,
     },
   ],
@@ -31,20 +31,21 @@ const defaultEquipments: BagEquipments = {
   Veículo: [],
 };
 
-function calcBagSpaces(bagEquipments: BagEquipments): number {
+export function calcBagSpaces(bagEquipments: BagEquipments): number {
   const equipments = Object.values(bagEquipments).flat();
 
   let spaces = 0;
 
   equipments.forEach((equipment: Equipment) => {
     const equipamentSpaces = equipment.spaces || 0;
-    spaces += equipamentSpaces;
+    const quantity = equipment.quantidade || 1;
+    spaces += equipamentSpaces * quantity;
   });
 
   return spaces;
 }
 
-function calcArmorPenalty(equipments: BagEquipments): number {
+export function calcArmorPenalty(equipments: BagEquipments): number {
   const armorPenalty = equipments.Armadura.reduce(
     (acc, armor) => acc + armor.armorPenalty,
     0
@@ -91,16 +92,27 @@ export default class Bag {
   }
 
   public addEquipment(equipments: Partial<BagEquipments>): void {
-    const newEquipments = mergeWith(
-      this.equipments,
-      equipments,
-      (oldEquips: Equipment[], newEquips: Equipment[]) => {
-        if (isArray(oldEquips))
-          return newEquips.concat(differenceBy(oldEquips, newEquips, 'nome'));
+    const newEquipments = cloneDeep(this.equipments);
 
-        return undefined;
+    Object.entries(equipments).forEach(([group, items]) => {
+      const g = group as keyof BagEquipments;
+      if (items && Array.isArray(items)) {
+        items.forEach((newItem) => {
+          const existing = newEquipments[g].find(
+            (i) => i.nome === newItem.nome
+          );
+          if (existing) {
+            existing.quantidade =
+              (existing.quantidade || 1) + (newItem.quantidade || 1);
+          } else {
+            newEquipments[g].push({
+              ...newItem,
+              quantidade: newItem.quantidade || 1,
+            });
+          }
+        });
       }
-    );
+    });
 
     this.setEquipments(newEquipments);
   }

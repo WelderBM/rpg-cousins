@@ -22,6 +22,7 @@ export default interface Equipment {
   weaponTags?: string[];
   preco?: number;
   subGroup?: string;
+  quantidade?: number;
 }
 
 export type defenseEquipGroup = "Armadura" | "Escudo";

@@ -225,6 +225,8 @@ export async function getEquipmentsByCategory() {
       alchemyCatalysts: GENERAL_EQUIPMENT.alchemyCatalysts,
       alchemyPoisons: GENERAL_EQUIPMENT.alchemyPoisons,
     };
+
+    return cachedEquipmentsByCategory;
   } catch (error) {
     console.error("Erro ao carregar equipamentos por categoria:", error);
     return {
