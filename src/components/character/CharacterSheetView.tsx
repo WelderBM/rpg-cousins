@@ -1,0 +1,960 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Character } from "@/interfaces/Character";
+import {
+  Coins,
+  Heart,
+  Shield,
+  Zap,
+  Swords,
+  Brain,
+  Backpack,
+  Scroll,
+  Crown,
+  Ghost,
+  BookOpen,
+  Dna,
+  Edit,
+  Check,
+  X,
+  Package,
+  FlaskRound,
+  Shirt,
+  Apple,
+  Hammer,
+  Crosshair,
+  Star,
+  Upload,
+  Link as LinkIcon,
+  Wand2,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Atributo } from "@/data/atributos";
+import { generateCharacterPrompt } from "@/utils/promptGenerator";
+import { compressImage } from "@/utils/imageCompression";
+import Link from "next/link";
+
+// --- SUB-COMPONENTS ---
+
+const getItemSymbol = (item: any, size = 18) => {
+  const group = (item.group || "").toLowerCase();
+  const name = (item.nome || item.name || "").toLowerCase();
+
+  if (
+    group.includes("armadura") ||
+    group.includes("escudo") ||
+    item.defenseBonus
+  ) {
+    return <Shield size={size} />;
+  }
+
+  if (group.includes("arma")) {
+    const isRanged =
+      item.alcance &&
+      item.alcance !== "-" &&
+      item.alcance.toLowerCase() !== "corpo a corpo";
+    if (
+      isRanged ||
+      name.includes("arco") ||
+      name.includes("besta") ||
+      name.includes("tiro") ||
+      name.includes("disparo")
+    )
+      return <Crosshair size={size} />;
+    if (name.includes("machado"))
+      return <Hammer size={size} className="rotate-45" />;
+    if (name.includes("adaga") || name.includes("faca"))
+      return <Sword size={size - 2} />;
+    return <Swords size={size} />;
+  }
+
+  if (
+    group.includes("alquimia") ||
+    group.includes("poção") ||
+    group.includes("elixir") ||
+    group.includes("mágico")
+  )
+    return <FlaskRound size={size} />;
+  if (
+    group.includes("vestuário") ||
+    group.includes("veste") ||
+    group.includes("capa")
+  )
+    return <Shirt size={size} />;
+  if (group.includes("alimento") || group.includes("comida"))
+    return <Apple size={size} />;
+  if (
+    group.includes("ferramenta") ||
+    group.includes("ofício") ||
+    name.includes("kit") ||
+    name.includes("instrumento")
+  )
+    return <Hammer size={size} />;
+  if (
+    group.includes("mochila") ||
+    group.includes("saco") ||
+    group.includes("carga")
+  )
+    return <Backpack size={size} />;
+
+  return <Package size={size} />;
+};
+
+const Sword = ({ size, className }: { size: number; className?: string }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5" />
+    <line x1="13" y1="19" x2="19" y2="13" />
+    <line x1="16" y1="16" x2="20" y2="20" />
+    <line x1="19" y1="21" x2="20" y2="20" />
+  </svg>
+);
+
+const DetailRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) => (
+  <div className="flex justify-between items-center text-xs py-1 border-b border-white/5 last:border-0">
+    <span className="text-amber-600/80 font-black uppercase tracking-widest text-[10px]">
+      {label}
+    </span>
+    <span className="text-stone-100 font-bold text-right">{value}</span>
+  </div>
+);
+
+const ItemList = ({ title, items, icon: Icon }: any) => {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="mb-8">
+      <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
+        {Icon && <Icon size={14} />} {title}
+      </h3>
+      <div className="space-y-3">
+        {items.map((item: any, idx: number) => {
+          return (
+            <div
+              key={idx}
+              className="bg-stone-900/90 border border-stone-800/50 rounded-lg p-4 hover:border-amber-500/30 transition-all shadow-xl"
+            >
+              <div className="flex justify-between items-start mb-2">
+                <h4 className="font-bold text-stone-100 text-sm flex items-center gap-2">
+                  <span className="text-amber-500/60">
+                    {getItemSymbol(item, 16)}
+                  </span>
+                  {item.name || item.nome}
+                </h4>
+                <div className="flex items-center gap-2">
+                  {item.quantidade > 1 && (
+                    <span className="text-[10px] bg-stone-800 text-stone-300 px-1.5 py-0.5 rounded border border-stone-700 font-bold">
+                      x{item.quantidade}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-1 mb-2">
+                {item.dano && (
+                  <DetailRow
+                    label="Dano"
+                    value={`${item.dano} ${
+                      item.critico ? `/ ${item.critico}` : ""
+                    }`}
+                  />
+                )}
+                {item.defenseBonus > 0 && (
+                  <DetailRow
+                    label="Bônus Defesa"
+                    value={`+${item.defenseBonus}`}
+                  />
+                )}
+                {item.armorPenalty > 0 && (
+                  <DetailRow
+                    label="Penalidade"
+                    value={`-${item.armorPenalty}`}
+                  />
+                )}
+                {item.alcance && item.alcance !== "-" && (
+                  <DetailRow label="Alcance" value={item.alcance} />
+                )}
+                {item.spaces !== undefined && item.spaces !== null && (
+                  <DetailRow
+                    label="Espaço"
+                    value={
+                      item.spaces === 0 ? (
+                        <span className="text-emerald-400 font-bold">
+                          Grátis
+                        </span>
+                      ) : (
+                        item.spaces
+                      )
+                    }
+                  />
+                )}
+                {item.preco !== undefined && (
+                  <DetailRow
+                    label="Valor"
+                    value={item.preco === 0 ? "Grátis" : `${item.preco} T$`}
+                  />
+                )}
+              </div>
+
+              {(item.description || item.text || item.effect) && (
+                <p className="text-xs text-stone-400 line-clamp-4 italic border-t border-white/5 pt-3 mt-3 leading-relaxed">
+                  {item.description || item.text || item.effect}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const SimpleList = ({ title, items, icon: Icon }: any) => {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="mb-8">
+      <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
+        {Icon && <Icon size={14} />} {title}
+      </h3>
+      <ul className="space-y-2">
+        {items.map((item: any, idx: number) => {
+          const name = typeof item === "string" ? item : item.name || item.nome;
+          const desc =
+            typeof item === "string"
+              ? null
+              : item.text || item.description || item.effect;
+
+          return (
+            <li
+              key={idx}
+              className="bg-stone-900/90 border border-stone-800/50 rounded-lg px-4 py-3 text-sm text-stone-200 flex items-start gap-3 shadow-md"
+            >
+              <div className="mt-2 min-w-[6px] h-[6px] bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+              <div className="flex-1">
+                <span className="font-bold block text-stone-100 mb-1">
+                  {name}
+                </span>
+                {desc && (
+                  <span className="text-xs text-stone-400 block leading-relaxed italic">
+                    {desc}
+                  </span>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
+const SectionSlider = ({ title, items, icon: Icon }: any) => {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="mb-10 group">
+      <div className="flex items-center justify-between mb-4 px-1">
+        <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] flex items-center gap-2">
+          {Icon && <Icon size={14} />} {title}
+        </h3>
+        <span className="text-[10px] text-stone-600 font-bold uppercase tracking-wider animate-pulse">
+          Deslize &rarr;
+        </span>
+      </div>
+      <div className="flex gap-4 overflow-x-auto pb-6 -mx-4 px-4 scrollbar-none snap-x cursor-grab active:cursor-grabbing">
+        {items.map((item: any, idx: number) => {
+          const name = typeof item === "string" ? item : item.name || item.nome;
+          const desc =
+            typeof item === "string"
+              ? null
+              : item.text || item.description || item.effect;
+          return (
+            <div
+              key={idx}
+              className="min-w-[300px] md:min-w-[350px] bg-gradient-to-br from-stone-900 to-stone-950 border border-stone-800 rounded-xl p-6 snap-start shadow-2xl hover:border-amber-900/50 transition-all flex flex-col border-white/5"
+            >
+              <span className="font-serif font-bold text-amber-500 text-xl mb-4 block border-b border-white/5 pb-2">
+                {name}
+              </span>
+              {desc && (
+                <p className="text-sm text-stone-300 leading-relaxed italic line-clamp-6">
+                  {desc}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+interface CharacterSheetViewProps {
+  character: Character;
+  onUpdate: (updates: Partial<Character>) => Promise<void>;
+  isMestre?: boolean;
+}
+
+export function CharacterSheetView({
+  character: activeCharacter,
+  onUpdate,
+  isMestre = false,
+}: CharacterSheetViewProps) {
+  // --- STATES ---
+
+  // Money
+  const [isEditingMoney, setIsEditingMoney] = useState(false);
+  const [tempMoney, setTempMoney] = useState(0);
+
+  // PV/PM
+  const [isEditingPv, setIsEditingPv] = useState(false);
+  const [tempPv, setTempPv] = useState(0);
+  const [isEditingPm, setIsEditingPm] = useState(false);
+  const [tempPm, setTempPm] = useState(0);
+
+  // Traits
+  const [isEditingTraits, setIsEditingTraits] = useState(false);
+  const [tempTraits, setTempTraits] = useState({
+    gender: "",
+    hair: "",
+    eyes: "",
+    skin: "",
+    scars: "",
+    extra: "",
+    height: "",
+  });
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Sync temp states when character changes
+  useEffect(() => {
+    if (activeCharacter) {
+      setTempMoney(activeCharacter.money || 0);
+
+      const getAttrMod = (attr: any) => {
+        if (typeof attr === "object" && attr !== null) {
+          return attr.mod ?? attr.value?.total ?? 0;
+        }
+        return attr ?? 0;
+      };
+
+      const conMod = getAttrMod(activeCharacter.attributes.Constituição);
+      const hpBase = activeCharacter.class?.pv || 16;
+      const hpMax = hpBase + conMod;
+      const pmBase = activeCharacter.class?.pm || 4;
+      const pmMax = pmBase;
+
+      if (!isEditingPv) setTempPv(activeCharacter.currentPv ?? hpMax);
+      if (!isEditingPm) setTempPm(activeCharacter.currentPm ?? pmMax);
+
+      if (activeCharacter.physicalTraits) {
+        setTempTraits({
+          gender: activeCharacter.physicalTraits.gender || "",
+          hair: activeCharacter.physicalTraits.hair || "",
+          eyes: activeCharacter.physicalTraits.eyes || "",
+          skin: activeCharacter.physicalTraits.skin || "",
+          scars: activeCharacter.physicalTraits.scars || "",
+          extra: activeCharacter.physicalTraits.extra || "",
+          height: activeCharacter.physicalTraits.height || "",
+        });
+      }
+    }
+  }, [activeCharacter, isEditingMoney, isEditingPv, isEditingPm]);
+
+  const saveTraits = async () => {
+    await onUpdate({ physicalTraits: tempTraits });
+    setIsEditingTraits(false);
+  };
+
+  const copyPromptToClipboard = () => {
+    const prompt = generateCharacterPrompt({
+      ...activeCharacter,
+      physicalTraits: tempTraits,
+    });
+    navigator.clipboard.writeText(prompt);
+    alert("Prompt copiado!");
+  };
+
+  const toggleFavorite = async () => {
+    await onUpdate({ isFavorite: !activeCharacter.isFavorite });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+
+    setIsUploading(true);
+    try {
+      const compressed = await compressImage(file);
+      const { ref, uploadBytes, getDownloadURL } = await import(
+        "firebase/storage"
+      );
+      const { storage, auth } = await import("@/firebaseConfig");
+
+      if (!storage) throw new Error("Storage not ready");
+
+      let userId = (activeCharacter as any).userId;
+      if (!userId && (activeCharacter as any).path) {
+        userId = (activeCharacter as any).path.split("/")[1];
+      }
+      if (!userId && auth?.currentUser) {
+        userId = auth.currentUser.uid;
+      }
+
+      const storageRef = ref(
+        storage,
+        `character-images/${userId}/${activeCharacter.id}/${file.name}`
+      );
+      await uploadBytes(storageRef, compressed);
+      const url = await getDownloadURL(storageRef);
+
+      await onUpdate({ imageUrl: url });
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("Erro ao enviar imagem.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSaveMoney = async () => {
+    await onUpdate({ money: tempMoney });
+    setIsEditingMoney(false);
+  };
+
+  const handleSavePv = async () => {
+    await onUpdate({ currentPv: tempPv });
+    setIsEditingPv(false);
+  };
+
+  const handleSavePm = async () => {
+    await onUpdate({ currentPm: tempPm });
+    setIsEditingPm(false);
+  };
+
+  // Helper calculations
+  const getAttrMod = (attr: any) => {
+    if (typeof attr === "object" && attr !== null) {
+      return attr.mod ?? attr.value?.total ?? 0;
+    }
+    return attr ?? 0;
+  };
+
+  const conMod = getAttrMod(activeCharacter.attributes.Constituição);
+  const hpBase = activeCharacter.class?.pv || 16;
+  const hpMax = hpBase + conMod;
+
+  const pmBase = activeCharacter.class?.pm || 4;
+  const pmMax = pmBase;
+
+  const attributesList: { key: Atributo; label: string; icon: any }[] = [
+    { key: Atributo.FORCA, label: "Força", icon: Swords },
+    { key: Atributo.DESTREZA, label: "Destreza", icon: Ghost },
+    { key: Atributo.CONSTITUICAO, label: "Constituição", icon: Heart },
+    { key: Atributo.INTELIGENCIA, label: "Inteligência", icon: Brain },
+    { key: Atributo.SABEDORIA, label: "Sabedoria", icon: Scroll },
+    { key: Atributo.CARISMA, label: "Carisma", icon: Crown },
+  ];
+
+  return (
+    <div className="text-neutral-200 pb-20 font-sans selection:bg-amber-900 selection:text-white relative min-h-screen">
+      {/* Background Image */}
+      {activeCharacter.imageUrl && (
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/95 to-stone-950 z-10" />
+          <div className="absolute inset-0 bg-stone-950/60 z-[5]" />
+          <img
+            src={activeCharacter.imageUrl}
+            alt="Background"
+            className="w-full h-full object-cover opacity-15 scale-110 blur-[3px] transform-gpu"
+          />
+        </div>
+      )}
+
+      <div className="relative z-10">
+        <header className="relative w-full border-b border-stone-800 pb-8 pt-6 px-4 md:px-8 overflow-hidden bg-stone-950/40 backdrop-blur-sm">
+          <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
+            <Shield className="w-96 h-96 transform rotate-12" />
+          </div>
+          <div className="container mx-auto max-w-6xl relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col md:flex-row items-center gap-6"
+            >
+              {/* Avatar */}
+              <div
+                className="relative group perspective cursor-pointer"
+                onClick={() => setIsEditingTraits(true)}
+              >
+                <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-stone-800/80 bg-stone-900 flex items-center justify-center shadow-2xl relative z-10 group-hover:border-amber-700/80 transition-all overflow-hidden">
+                  {activeCharacter.imageUrl ? (
+                    <img
+                      src={activeCharacter.imageUrl}
+                      alt={activeCharacter.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-5xl md:text-6xl filter drop-shadow-lg">
+                      🧙‍♂️
+                    </span>
+                  )}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Edit className="text-white" size={24} />
+                  </div>
+                </div>
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-stone-800 border border-stone-700 rounded-full text-[10px] font-bold uppercase tracking-wider text-amber-500 whitespace-nowrap z-20 shadow-lg">
+                  Nível {activeCharacter.level}
+                </div>
+              </div>
+
+              {/* Name & Basic Info */}
+              <div className="flex-1 text-center md:text-left space-y-2 relative z-20">
+                <div className="flex items-center justify-center md:justify-start gap-4">
+                  <h1 className="text-4xl md:text-5xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 drop-shadow-sm">
+                    {activeCharacter.name}
+                  </h1>
+                  <button
+                    onClick={toggleFavorite}
+                    className={`p-2 transition-colors ${
+                      activeCharacter.isFavorite
+                        ? "text-yellow-400"
+                        : "text-stone-600"
+                    }`}
+                  >
+                    <Star
+                      size={24}
+                      fill={
+                        activeCharacter.isFavorite ? "currentColor" : "none"
+                      }
+                    />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center md:justify-start items-center text-sm text-stone-100 font-serif">
+                  <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30">
+                    <Dna size={14} className="text-amber-500" />
+                    {activeCharacter.race?.name}
+                  </span>
+                  <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30">
+                    <Swords size={14} className="text-amber-500" />
+                    {activeCharacter.class?.name}
+                  </span>
+                  {activeCharacter.origin && (
+                    <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30">
+                      <BookOpen size={14} className="text-amber-500" />
+                      {activeCharacter.origin.name}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* PV & PM */}
+              <div className="flex gap-4 w-full md:w-auto mt-4 md:mt-0 relative z-20">
+                {/* PV */}
+                <div className="flex-1 md:flex-none relative group min-w-[120px]">
+                  <div className="bg-gradient-to-br from-red-950/90 to-stone-900/90 backdrop-blur-md border border-red-900/50 rounded-2xl p-4 flex flex-col items-center relative overflow-hidden shadow-2xl">
+                    <div className="flex items-center justify-between w-full mb-1">
+                      <span className="text-xs font-bold text-red-400/80 uppercase tracking-widest">
+                        Vida (PV)
+                      </span>
+                      {!isEditingPv && (
+                        <button
+                          onClick={() => setIsEditingPv(true)}
+                          className="p-1 text-red-400/50 hover:text-red-300"
+                        >
+                          <Edit size={12} />
+                        </button>
+                      )}
+                    </div>
+                    {isEditingPv ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          value={tempPv}
+                          onChange={(e) => setTempPv(Number(e.target.value))}
+                          className="w-16 bg-black/40 border border-red-500/50 rounded text-center font-bold text-red-100 outline-none"
+                          autoFocus
+                        />
+                        <button
+                          onClick={handleSavePv}
+                          className="p-1 bg-green-900/20 text-green-500 rounded"
+                        >
+                          <Check size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        className="text-2xl font-black text-red-100 tabular-nums"
+                        onClick={() => setIsEditingPv(true)}
+                      >
+                        {activeCharacter.currentPv ?? hpMax}
+                        <span className="text-sm text-red-500/60 ml-1 font-medium">
+                          / {hpMax}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* PM */}
+                <div className="flex-1 md:flex-none relative group min-w-[120px]">
+                  <div className="bg-gradient-to-br from-blue-950/90 to-stone-900/90 backdrop-blur-md border border-blue-900/50 rounded-2xl p-4 flex flex-col items-center relative overflow-hidden shadow-2xl">
+                    <div className="flex items-center justify-between w-full mb-1">
+                      <span className="text-xs font-bold text-blue-400/80 uppercase tracking-widest">
+                        Mana (PM)
+                      </span>
+                      {!isEditingPm && (
+                        <button
+                          onClick={() => setIsEditingPm(true)}
+                          className="p-1 text-blue-400/50 hover:text-blue-300"
+                        >
+                          <Edit size={12} />
+                        </button>
+                      )}
+                    </div>
+                    {isEditingPm ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          value={tempPm}
+                          onChange={(e) => setTempPm(Number(e.target.value))}
+                          className="w-16 bg-black/40 border border-blue-500/50 rounded text-center font-bold text-blue-100 outline-none"
+                          autoFocus
+                        />
+                        <button
+                          onClick={handleSavePm}
+                          className="p-1 bg-green-900/20 text-green-500 rounded"
+                        >
+                          <Check size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        className="text-2xl font-black text-blue-100 tabular-nums"
+                        onClick={() => setIsEditingPm(true)}
+                      >
+                        {activeCharacter.currentPm ?? pmMax}
+                        <span className="text-sm text-blue-500/60 ml-1 font-medium">
+                          / {pmMax}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </header>
+
+        <main className="container mx-auto max-w-6xl px-4 md:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left - Attributes & Basic Stats */}
+            <div className="lg:col-span-4 space-y-8">
+              {/* Attributes */}
+              <section className="bg-stone-900/60 backdrop-blur-md border border-stone-800 rounded-3xl p-6 shadow-2xl">
+                <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                  <Swords size={16} /> Atributos
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {attributesList.map((attr) => {
+                    const value = activeCharacter.attributes[attr.key];
+                    const mod = getAttrMod(value);
+                    const bonus =
+                      typeof value === "object" && value !== null
+                        ? (value as any).bonus || 0
+                        : 0;
+                    return (
+                      <div
+                        key={attr.key}
+                        className={`bg-black/40 border ${
+                          bonus > 0 ? "border-amber-500/40" : "border-white/5"
+                        } rounded-2xl p-4 flex flex-col items-center group transition-all`}
+                      >
+                        <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">
+                          {attr.label}
+                        </span>
+                        <div className="text-3xl font-black text-stone-100 tabular-nums">
+                          {mod >= 0 ? `+${mod}` : mod}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* Defense & Money */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-stone-900/60 backdrop-blur-md border border-stone-800 rounded-3xl p-6 shadow-2xl flex flex-col items-center">
+                  <Shield size={24} className="text-amber-500 mb-2" />
+                  <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">
+                    Defesa
+                  </span>
+                  <div className="text-3xl font-black text-stone-100">
+                    {10 +
+                      getAttrMod(activeCharacter.attributes?.Destreza) +
+                      ((activeCharacter as any).bag?.armorPenalty || 0)}
+                  </div>
+                </div>
+                <div className="bg-stone-900/60 backdrop-blur-md border border-stone-800 rounded-3xl p-6 shadow-2xl flex flex-col items-center group">
+                  <Coins size={24} className="text-amber-500 mb-2" />
+                  <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">
+                    Tibares
+                  </span>
+                  {isEditingMoney ? (
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        value={tempMoney}
+                        onChange={(e) => setTempMoney(Number(e.target.value))}
+                        className="w-full bg-black/40 border border-amber-500/50 rounded text-center text-sm font-bold text-amber-100 outline-none"
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSaveMoney}
+                        className="text-green-500"
+                      >
+                        <Check size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className="text-2xl font-black text-stone-100 flex items-center gap-2 cursor-pointer"
+                      onClick={() => setIsEditingMoney(true)}
+                    >
+                      {activeCharacter.money || 0}
+                      <Link
+                        href="/market"
+                        className="ml-2 bg-amber-900/20 hover:bg-amber-900/40 p-1 rounded transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <LinkIcon size={12} className="text-amber-500" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Skills */}
+              <SimpleList
+                title="Perícias"
+                items={activeCharacter.skills || []}
+                icon={Brain}
+              />
+            </div>
+
+            {/* Right - Abilities & Inventory */}
+            <div className="lg:col-span-8 space-y-12">
+              <div className="pt-2">
+                <SectionSlider
+                  title="Benefícios de Origem"
+                  items={
+                    (activeCharacter as any).originBenefits ||
+                    activeCharacter.origin?.benefits
+                  }
+                  icon={BookOpen}
+                />
+                <SectionSlider
+                  title="Habilidades de Classe"
+                  items={activeCharacter.class?.abilities}
+                  icon={Zap}
+                />
+                <SectionSlider
+                  title="Poderes de Classe"
+                  items={
+                    activeCharacter.class?.powers ||
+                    (activeCharacter as any).classPowers
+                  }
+                  icon={Star}
+                />
+                <SimpleList
+                  title="Habilidades de Raça"
+                  items={activeCharacter.race?.abilities}
+                  icon={Dna}
+                />
+                {activeCharacter.grantedPower && (
+                  <SimpleList
+                    title="Poder Concedido"
+                    items={[activeCharacter.grantedPower]}
+                    icon={Crown}
+                  />
+                )}
+              </div>
+
+              {/* Inventory Split */}
+              {(() => {
+                const bag = (activeCharacter as any).bag;
+                const inventory = activeCharacter.inventory || [];
+
+                // If the character has a 'bag' object with equipments (legacy or helper-based)
+                const equips =
+                  bag && typeof bag.getEquipments === "function"
+                    ? bag.getEquipments()
+                    : bag?.equipments || {};
+
+                const weapons =
+                  equips["Arma"] ||
+                  inventory.filter((i: any) =>
+                    i.group?.toLowerCase().includes("arma")
+                  );
+                const others = inventory.filter(
+                  (i: any) => !i.group?.toLowerCase().includes("arma")
+                );
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <ItemList
+                      title="Armas & Ataques"
+                      items={weapons}
+                      icon={Swords}
+                    />
+                    <ItemList title="Mochila" items={others} icon={Backpack} />
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* Traits Modal */}
+      <AnimatePresence>
+        {isEditingTraits && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsEditingTraits(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full max-w-2xl bg-stone-900 border border-stone-800 rounded-3xl overflow-hidden shadow-2xl"
+            >
+              <div className="bg-stone-950 p-6 border-b border-stone-800 flex justify-between items-center">
+                <h2 className="text-2xl font-serif font-black text-amber-500">
+                  Estética do Herói
+                </h2>
+                <button
+                  onClick={() => setIsEditingTraits(false)}
+                  className="p-2 hover:bg-stone-800 rounded-full transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar space-y-8">
+                {/* Image */}
+                <div className="flex flex-col items-center p-6 bg-black/40 rounded-3xl border border-dashed border-stone-800 group">
+                  <div className="w-32 h-32 rounded-full border-4 border-stone-800 bg-stone-900 overflow-hidden mb-4 relative">
+                    {isUploading ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                        <Upload className="animate-bounce" />
+                      </div>
+                    ) : activeCharacter.imageUrl ? (
+                      <img
+                        src={activeCharacter.imageUrl}
+                        className="w-full h-full object-cover"
+                        alt="Avatar"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-4xl">
+                        🧙‍♂️
+                      </div>
+                    )}
+                  </div>
+                  <label className="cursor-pointer bg-amber-600 hover:bg-amber-500 text-black font-black px-6 py-2 rounded-xl transition-all shadow-lg text-sm uppercase tracking-widest flex items-center gap-2">
+                    <Upload size={16} /> Carregar Imagem
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={isUploading}
+                    />
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Fields */}
+                  {["gender", "hair", "eyes", "skin", "height", "scars"].map(
+                    (field) => (
+                      <div key={field}>
+                        <label className="text-[10px] font-black text-amber-600/60 uppercase tracking-widest block mb-1">
+                          {field}
+                        </label>
+                        <input
+                          type="text"
+                          value={(tempTraits as any)[field]}
+                          onChange={(e) =>
+                            setTempTraits({
+                              ...tempTraits,
+                              [field]: e.target.value,
+                            })
+                          }
+                          className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-2 focus:border-amber-500/50 outline-none"
+                        />
+                      </div>
+                    )
+                  )}
+                  <div className="md:col-span-2">
+                    <label className="text-[10px] font-black text-amber-600/60 uppercase tracking-widest block mb-1">
+                      Outros Detalhes
+                    </label>
+                    <textarea
+                      value={tempTraits.extra}
+                      onChange={(e) =>
+                        setTempTraits({ ...tempTraits, extra: e.target.value })
+                      }
+                      className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-3 focus:border-amber-500/50 outline-none min-h-[80px]"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-stone-950/50 p-4 rounded-xl border border-stone-800">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-bold text-amber-500 text-xs flex items-center gap-2">
+                      <Wand2 size={14} /> Gerador de Prompt IA
+                    </h4>
+                    <button
+                      onClick={copyPromptToClipboard}
+                      className="text-[10px] bg-stone-800 hover:bg-stone-700 px-2 py-1 rounded text-stone-300 transition-colors"
+                    >
+                      Copiar Prompt
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-stone-400 italic">
+                    {generateCharacterPrompt({
+                      ...activeCharacter,
+                      physicalTraits: tempTraits,
+                    })}
+                  </p>
+                </div>
+
+                <button
+                  onClick={saveTraits}
+                  className="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
+                >
+                  <Check size={20} /> Salvar Alterações
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

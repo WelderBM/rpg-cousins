@@ -86,6 +86,28 @@ export const CharacterService = {
     }
   },
 
+  // Update a character by its full path
+  async updateCharacterByPath(path: string, updates: Partial<Character>) {
+    try {
+      const { doc, updateDoc, serverTimestamp } = await import(
+        "firebase/firestore"
+      );
+      const { db } = await import("../firebaseConfig");
+
+      const charRef = doc(db!, path);
+
+      const dataToUpdate = sanitizeForFirestore({
+        ...updates,
+        updatedAt: serverTimestamp(),
+      });
+
+      await updateDoc(charRef, dataToUpdate);
+    } catch (error) {
+      console.error("Erro ao atualizar personagem por caminho:", error);
+      throw error;
+    }
+  },
+
   // Listar personagens
   async getCharacters(
     userId?: string,
