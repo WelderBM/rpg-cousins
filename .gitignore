@@ -52,3 +52,5 @@ tsc_output.txt
 tsc_output_2.txt
 AUDIT_REPORT.md
 final_tsc.txt
+venv/
+src/firebaseConfigOnly.ts
