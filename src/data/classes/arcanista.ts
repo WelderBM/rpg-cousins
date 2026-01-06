@@ -67,17 +67,17 @@ const spellPaths: Record<ArcanistaSubtypes, SpellPath> = {
 const classAbilities: Record<ArcanistaSubtypes, ClassAbility> = {
   Bruxo: {
     name: "Caminho do Arcanista",
-    text: "A magia é um poder incrível, capaz de alterar a realidade. Esse poder tem fontes distintas e cada uma opera conforme suas próprias regras. Você é um bruxo, capaz de lançar magias através de um foco como uma varinha, cajado, chapéu, etc.",
+    text: "A magia é um poder incrível, capaz de alterar a realidade. Esse poder tem fontes distintas e cada uma opera conforme suas próprias regras. Você é um bruxo, capaz de lançar magias através de um foco como uma varinha, cajado, chapéu, etc. Se o seu foco for destruído (reduzido a 0 PV), você fica atordoado por uma rodada. Você pode recuperar um foco destruído ou perdido com uma semana de trabalho e T$ 100.",
     nivel: 1,
   },
   Mago: {
     name: "Caminho do Arcanista",
-    text: "A magia é um poder incrível, capaz de alterar a realidade. Esse poder tem fontes distintas e cada uma opera conforme suas próprias regras. Você é um mago, capaz de lançar magia através de todo o seu estudo mágico. Seu livro de magias contém todas as suas magias, e a cada dia você pode preparar até metade de suas magias para usar durante o dia.",
+    text: "A magia é um poder incrível, capaz de alterar a realidade. Esse poder tem fontes distintas e cada uma opera conforme suas próprias regras. Você é um mago, capaz de lançar magia através de todo o seu estudo mágico. Seu livro de magias contém todas as suas magias, e a cada dia você pode preparar até metade de suas magias para usar durante o dia. Você começa com uma magia adicional (para um total de 4) e, sempre que ganha acesso a um novo círculo de magias, aprende uma magia adicional daquele círculo.",
     nivel: 1,
   },
   Feiticeiro: {
     name: "Caminho do Arcanista",
-    text: "A magia é um poder incrível, capaz de alterar a realidade. Esse poder tem fontes distintas e cada uma opera conforme suas próprias regras. Você é um feiticeiro, capaz de lançar magias atráves de um poder inato que corre no seu sangue.",
+    text: "A magia é um poder incrível, capaz de alterar a realidade. Esse poder tem fontes distintas e cada uma opera conforme suas próprias regras. Você é um feiticeiro, capaz de lançar magias atráves de um poder inato que corre no seu sangue. Você aprende uma magia nova a cada nível ímpar (3º, 5º, 7º etc.), em vez de a cada nível.",
     nivel: 1,
   },
 };
@@ -145,8 +145,7 @@ const ARCANISTA: ClassDescription = {
   name: "Arcanista",
   description:
     "Estudiosos dos mistérios arcanos ou abençoados com um dom inato, os arcanistas são os mestres da magia em Arton. Seja através de fórmulas complexas, linhagens ancestrais ou pactos com entidades, eles moldam a realidade de acordo com sua vontade. Embora fisicamente frágeis, um arcanista experiente pode aniquilar exércitos ou desvendar os segredos mais profundos do cosmos.",
-  detailedProficiencies:
-    "Armas simples e cajados. Não possui proficiência com armaduras ou escudos.",
+  detailedProficiencies: "Nenhuma.",
   pv: 8,
   addpv: 2,
   pm: 6,
@@ -173,7 +172,7 @@ const ARCANISTA: ClassDescription = {
       Skill.PERCEPCAO,
     ],
   },
-  proficiencias: [PROFICIENCIAS.SIMPLES, PROFICIENCIAS.LEVES],
+  proficiencias: [],
   abilities: [
     {
       name: "Magias",
@@ -375,7 +374,7 @@ const ARCANISTA: ClassDescription = {
     },
     {
       name: "Raio Elemental",
-      text: "Quando usa Raio Arcano, você pode pagar 1 PM para que ele cause dano de um tipo de energia a sua escolha, entre ácido, eletricidade, fogo, frio ou trevas. Se o alvo falhar no teste de Reflexos, sofre uma condição, de acordo com o tipo de energia. Veja a descrição das condições no Apêndice. Ácido: vulnerável por 1 rodada. Eletricidade: ofuscado por 1 rodada. Fogo: fica em chamas. Frio: lento por 1 rodada. Trevas: não pode curar PV por 1 uma rodada.",
+      text: "Quando usa Raio Arcano, você pode pagar 1 PM para que ele cause dano de ácido, eletricidade, fogo, frio ou trevas, a sua escolha. Se o alvo falhar no teste de Reflexos, sofre uma condição, de acordo com o tipo de dano. Ácido: vulnerável por 1 rodada. Eletricidade: ofuscado por 1 rodada. Fogo: fica em chamas. Frio: lento por 1 rodada. Trevas: não pode curar PV por 1 rodada.",
       requirements: [[{ type: RequirementType.PODER, name: "Raio Arcano" }]],
     },
     {

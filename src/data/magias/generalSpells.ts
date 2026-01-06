@@ -97,7 +97,7 @@ export enum spellsCircle2Names {
   alterarTamanho = "alterarTamanho",
   metamorfose = "metamorfose",
   velocidade = "velocidade",
-  sussurosInsanos = "sussurosInsanos",
+  sussurrosInsanos = "sussurrosInsanos",
   augurio = "augurio",
   circuloDaJustica = "circuloDaJustica",
   vestimentaDaFe = "vestimentaDaFe",
@@ -111,13 +111,13 @@ export enum spellsCircle2Names {
   controlarFogo = "controlarFogo",
   purificacao = "purificacao",
   raioSolar = "raioSolar",
-  tempestadaDivina = "tempestadaDivina",
+  tempestadeDivina = "tempestadeDivina",
   silencio = "silencio",
   miasmaMefitico = "miasmaMefitico",
   rogarMaldicao = "rogarMaldicao",
   controlarMadeira = "controlarMadeira",
   fisicoDivino = "fisicoDivino",
-  enxameDePestes = "exameDePestes",
+  enxameDePestes = "enxameDePestes",
 }
 
 export enum spellsCircle3Names {
@@ -127,7 +127,7 @@ export enum spellsCircle3Names {
   contatoExtraplanar = "contatoExtraplanar",
   lendasEHistorias = "lendasEHistorias",
   videncia = "videncia",
-  convocacaoInstantenea = "convocacaoInstatanea",
+  convocacaoInstantanea = "convocacaoInstantanea",
   enxameRubroDeIchabod = "enxameRubroDeIchabod",
   teletransporte = "teletransporte",
   imobilizar = "imobilizar",
@@ -172,7 +172,7 @@ export enum spellsCircle4Names {
   viagemPlanar = "viagemPlanar",
   concederMilagre = "concederMilagre",
   circuloDaRestauracao = "circuloDaRestauracao",
-  coleraDeAzguer = "coleraDeAzguer",
+  coleraDeAzgher = "coleraDeAzgher",
   mantoDoCruzado = "mantoDoCruzado",
   terremoto = "terremoto",
   ligacaoSombria = "ligacaoSombria",
@@ -188,7 +188,7 @@ export enum spellsCircle4Names {
   relampagoFlamejanteDeReynard = "relampagoFlamejanteDeReynard",
   talhoInvisivelDeEdauros = "talhoInvisivelDeEdauros",
   duplicataIlusoria = "duplicataIlusoria",
-  explosaoCaleidospica = "explosaoCaleidospica",
+  explosaoCaleidoscopica = "explosaoCaleidoscopica",
   assassinoFantasmagorico = "assassinoFantasmagorico",
   animarObjetos = "animarObjetos",
   controlarAGravidade = "controlarAGravidade",
@@ -201,7 +201,7 @@ export enum spellsCircle5Names {
   engenhoDeMana = "engenhoDeMana",
   invulnerabilidade = "invulnerabilidade",
   alterarDestino = "alterarDestino",
-  projetarCosciencia = "projetarConsciencia",
+  projetarConsciencia = "projetarConsciencia",
   buracoNegro = "buracoNegro",
   chuvaDeMeteoros = "chuvaDeMeteoros",
   semiplano = "semiplano",
@@ -1797,9 +1797,9 @@ export const spellsCircle2: Record<spellsCircle2Names, Spell> = {
       },
     ],
   },
-  [spellsCircle2Names.sussurosInsanos]: {
+  [spellsCircle2Names.sussurrosInsanos]: {
     spellCircle: spellsCircles.c2,
-    nome: "Sussuros Insanos",
+    nome: "Sussurros Insanos",
     execucao: "Padrão",
     alcance: "Curto",
     alvo: "1 humanoide",
@@ -2863,7 +2863,7 @@ export const spellsCircle2: Record<spellsCircle2Names, Spell> = {
       },
     ],
   },
-  [spellsCircle2Names.tempestadaDivina]: {
+  [spellsCircle2Names.tempestadeDivina]: {
     spellCircle: spellsCircles.c2,
     nome: "Tempestade Divina",
     execucao: "Completa",
@@ -3164,7 +3164,7 @@ export const spellsCircle3: Record<spellsCircle3Names, Spell> = {
     description:
       "Através de uma superfície reflexiva (bacia de água benta para clérigos, lago para druidas, bola de cristal para magos, espelho para feiticeiros etc.) você pode ver e ouvir uma criatura escolhida e seus arredores (cerca de 6m em qualquer direção), mesmo que ela se mova. O alvo pode estar a qualquer distância, mas se passar em um teste de Vontade, a magia falha. A vítima recebe bônus ou penalidades em seu teste de resistência, dependendo do conhecimento que você tiver dela.",
   },
-  [spellsCircle3Names.convocacaoInstantenea]: {
+  [spellsCircle3Names.convocacaoInstantanea]: {
     spellCircle: spellsCircles.c3,
     nome: "Convocação Instantânea",
     execucao: "Padrão",
@@ -4243,7 +4243,7 @@ export const spellsCircle4: Record<spellsCircle4Names, Spell> = {
       },
     ],
   },
-  [spellsCircle4Names.explosaoCaleidospica]: {
+  [spellsCircle4Names.explosaoCaleidoscopica]: {
     spellCircle: spellsCircles.c4,
     nome: "Explosão Caleidoscópica",
     execucao: "Padrão",
@@ -4447,7 +4447,7 @@ export const spellsCircle4: Record<spellsCircle4Names, Spell> = {
       },
     ],
   },
-  [spellsCircle4Names.coleraDeAzguer]: {
+  [spellsCircle4Names.coleraDeAzgher]: {
     spellCircle: spellsCircles.c4,
     nome: "Cólera de Azgher",
     execucao: "Padrão",
@@ -4594,7 +4594,7 @@ export const spellsCircle5: Record<spellsCircle5Names, Spell> = {
       },
     ],
   },
-  [spellsCircle5Names.projetarCosciencia]: {
+  [spellsCircle5Names.projetarConsciencia]: {
     spellCircle: spellsCircles.c5,
     nome: "Projetar Consciência",
     execucao: "Padrão",

@@ -9,6 +9,9 @@ import { Spell } from "@/interfaces/Spells";
 import Equipment from "@/interfaces/Equipment";
 import Race from "@/interfaces/Race";
 import { GeneralPower } from "@/interfaces/Poderes";
+import Origin from "@/interfaces/Origin";
+import Divindade from "@/interfaces/Divindade";
+import { ClassDescription } from "@/interfaces/Class";
 
 // ============================================
 // CACHE EM MEMÓRIA (Module-level singletons)
@@ -31,6 +34,9 @@ let cachedEquipmentsByCategory: any | null = null;
 
 let cachedRaces: Race[] | null = null;
 let cachedPowers: GeneralPower[] | null = null;
+let cachedOrigins: Origin[] | null = null;
+let cachedDivindades: Divindade[] | null = null;
+let cachedClasses: ClassDescription[] | null = null;
 
 // ============================================
 // FUNÇÕES PÚBLICAS COM CACHE E ASYNC
@@ -83,19 +89,78 @@ export async function getAllEquipments(): Promise<Equipment[]> {
 
   try {
     // Importação dinâmica dos arquivos de equipamentos
-    const {
-      default: EQUIPAMENTOS,
-      Armas,
-      Armaduras,
-      Escudos,
-    } = await import("@/data/equipamentos");
+    const { default: EQUIPAMENTOS } = await import("@/data/equipamentos");
     const { GENERAL_EQUIPMENT } = await import("@/data/equipamentos-gerais");
 
     cachedEquipments = [
-      ...Object.values(Armas),
-      ...Object.values(Armaduras),
-      ...Object.values(Escudos),
-      ...GENERAL_EQUIPMENT.generalItems,
+      // Armas
+      ...EQUIPAMENTOS.armasSimples.map((e) => ({
+        ...e,
+        subGroup: "Armas Simples",
+      })),
+      ...EQUIPAMENTOS.armasMarciais.map((e) => ({
+        ...e,
+        subGroup: "Armas Marciais",
+      })),
+      ...EQUIPAMENTOS.armasExoticas.map((e) => ({
+        ...e,
+        subGroup: "Armas Exóticas",
+      })),
+      ...EQUIPAMENTOS.armasDeFogo.map((e) => ({
+        ...e,
+        subGroup: "Armas de Fogo",
+      })),
+
+      // Armaduras e Escudos
+      ...EQUIPAMENTOS.armadurasLeves.map((e) => ({
+        ...e,
+        subGroup: "Armadura Leve",
+      })),
+      ...EQUIPAMENTOS.armaduraPesada.map((e) => ({
+        ...e,
+        subGroup: "Armadura Pesada",
+      })),
+      ...EQUIPAMENTOS.escudos.map((e) => ({ ...e, subGroup: "Escudo" })),
+
+      // Itens Gerais
+      ...GENERAL_EQUIPMENT.adventurerEquipment.map((e) => ({
+        ...e,
+        subGroup: "Aventureiro",
+      })),
+      ...GENERAL_EQUIPMENT.tools.map((e) => ({
+        ...e,
+        subGroup: "Ferramentas",
+      })),
+      ...GENERAL_EQUIPMENT.esoteric.map((e) => ({
+        ...e,
+        subGroup: "Esotérico",
+      })),
+
+      // Vestuário
+      ...GENERAL_EQUIPMENT.clothing.map((e) => ({
+        ...e,
+        subGroup: "Vestuário",
+      })),
+
+      // Alquimia
+      ...GENERAL_EQUIPMENT.alchemyPrepared.map((e) => ({
+        ...e,
+        subGroup: "Alquimia (Preparados)",
+      })),
+      ...GENERAL_EQUIPMENT.alchemyCatalysts.map((e) => ({
+        ...e,
+        subGroup: "Alquimia (Catalisadores)",
+      })),
+      ...GENERAL_EQUIPMENT.alchemyPoisons.map((e) => ({
+        ...e,
+        subGroup: "Alquimia (Venenos)",
+      })),
+
+      // Alimentação
+      ...GENERAL_EQUIPMENT.food.map((e) => ({
+        ...e,
+        subGroup: "Alimentação",
+      })),
     ];
 
     if (typeof window !== "undefined") {
@@ -151,13 +216,15 @@ export async function getEquipmentsByCategory() {
       alchemy: GENERAL_EQUIPMENT.alchemyItems,
       clothing: GENERAL_EQUIPMENT.clothingItems,
       food: GENERAL_EQUIPMENT.foodItems,
+
+      // Subcategorias detalhadas para filtros avançados
+      adventurer: GENERAL_EQUIPMENT.adventurerEquipment,
+      tools: GENERAL_EQUIPMENT.tools,
+      esoteric: GENERAL_EQUIPMENT.esoteric,
+      alchemyPrepared: GENERAL_EQUIPMENT.alchemyPrepared,
+      alchemyCatalysts: GENERAL_EQUIPMENT.alchemyCatalysts,
+      alchemyPoisons: GENERAL_EQUIPMENT.alchemyPoisons,
     };
-
-    if (typeof window !== "undefined") {
-      console.log("[LazyLoad] Equipamentos por categoria carregados");
-    }
-
-    return cachedEquipmentsByCategory;
   } catch (error) {
     console.error("Erro ao carregar equipamentos por categoria:", error);
     return {
@@ -168,6 +235,12 @@ export async function getEquipmentsByCategory() {
       alchemy: [],
       clothing: [],
       food: [],
+      adventurer: [],
+      tools: [],
+      esoteric: [],
+      alchemyPrepared: [],
+      alchemyCatalysts: [],
+      alchemyPoisons: [],
     };
   }
 }
@@ -217,6 +290,54 @@ export async function getAllPowers(): Promise<GeneralPower[]> {
 }
 
 /**
+ * Carrega todas as origens
+ */
+export async function getAllOrigins(): Promise<Origin[]> {
+  if (cachedOrigins) return cachedOrigins;
+
+  try {
+    const { ORIGINS } = await import("@/data/origins");
+    cachedOrigins = Object.values(ORIGINS);
+    return cachedOrigins;
+  } catch (error) {
+    console.error("Erro ao carregar origens:", error);
+    return [];
+  }
+}
+
+/**
+ * Carrega todas as divindades
+ */
+export async function getAllDivindades(): Promise<Divindade[]> {
+  if (cachedDivindades) return cachedDivindades;
+
+  try {
+    const { DIVINDADES } = await import("@/data/divindades");
+    cachedDivindades = DIVINDADES;
+    return cachedDivindades;
+  } catch (error) {
+    console.error("Erro ao carregar divindades:", error);
+    return [];
+  }
+}
+
+/**
+ * Carrega todas as classes
+ */
+export async function getAllClasses(): Promise<ClassDescription[]> {
+  if (cachedClasses) return cachedClasses;
+
+  try {
+    const { default: CLASSES } = await import("@/data/classes");
+    cachedClasses = CLASSES;
+    return cachedClasses;
+  } catch (error) {
+    console.error("Erro ao carregar classes:", error);
+    return [];
+  }
+}
+
+/**
  * Limpa todos os caches
  */
 export function clearAllCaches() {
@@ -225,6 +346,9 @@ export function clearAllCaches() {
   cachedEquipmentsByCategory = null;
   cachedRaces = null;
   cachedPowers = null;
+  cachedOrigins = null;
+  cachedDivindades = null;
+  cachedClasses = null;
 
   if (typeof window !== "undefined") {
     console.log("[Cache] Todos os caches limpos");

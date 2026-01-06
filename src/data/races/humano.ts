@@ -11,11 +11,7 @@ const HUMANO: Race = {
   commonReligions:
     "Qualquer divindade do Panteão, com destaque para Valkaria (Deusa da Ambição).",
   attributes: {
-    attrs: [
-      { attr: "any", mod: 1 },
-      { attr: "any", mod: 1 },
-      { attr: "any", mod: 1 },
-    ],
+    attrs: [{ attr: "any", mod: 2 }],
   },
   faithProbability: {
     AHARADAK: 1,

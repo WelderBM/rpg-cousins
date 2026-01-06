@@ -21,6 +21,7 @@ import { Atributo } from "../../data/atributos";
 import { CharacterService } from "../../lib/characterService";
 
 import { formatAssetName } from "../../utils/assetUtils";
+import { sanitizeForFirestore } from "../../utils/firestoreUtils";
 
 const SummarySelection = () => {
   const {
@@ -148,7 +149,9 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         level: 1,
       };
 
-      await CharacterService.saveCharacter(characterData);
+      const sanitizedData = sanitizeForFirestore(characterData);
+
+      await CharacterService.saveCharacter(sanitizedData);
 
       // Clear the local draft to prevent duplication
       resetWizard();
@@ -192,12 +195,12 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-neutral-100 pb-48 md:pb-32">
+    <div className="min-h-screen bg-stone-950 text-neutral-100 pb-48 md:pb-40">
       <div className="max-w-5xl mx-auto p-4 sm:p-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-12">
           <button
-            onClick={() => setStep(5)}
+            onClick={() => setStep(4)}
             className="p-3 bg-neutral-900 border border-neutral-800 rounded-xl text-neutral-500 hover:text-amber-500 transition-all"
           >
             <ChevronLeft size={24} />
@@ -463,7 +466,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         </div>
 
         {/* Final Action Button */}
-        <div className="fixed bottom-24 md:bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-40 border-t border-amber-900/10">
+        <div className="fixed bottom-24 md:bottom-0 left-0 md:left-64 right-0 p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-30 border-t border-amber-900/10">
           <div className="max-w-5xl mx-auto flex flex-col items-center gap-3">
             {!user ? (
               <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3 flex items-center gap-3 max-w-lg w-full">

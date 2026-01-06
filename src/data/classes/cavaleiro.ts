@@ -8,8 +8,7 @@ const CAVALEIRO: ClassDescription = {
   name: "Cavaleiro",
   description:
     "Defensores da honra e mestres da defesa, os cavaleiros são inabaláveis no campo de batalha. Seguindo códigos rigorosos, eles se colocam entre o perigo e seus protegidos, servindo como a barreira definitiva contra qualquer ameaça. Um cavaleiro não recua; ele resiste, inspirando confiança em todos ao seu redor.",
-  detailedProficiencies:
-    "Armas simples e marciais, armaduras leves, médias e pesadas e escudos.",
+  detailedProficiencies: "Armas marciais, armaduras pesadas e escudos.",
   pv: 20,
   addpv: 5,
   pm: 3,
@@ -36,11 +35,9 @@ const CAVALEIRO: ClassDescription = {
     ],
   },
   proficiencias: [
-    PROFICIENCIAS.LEVES,
     PROFICIENCIAS.MARCIAIS,
     PROFICIENCIAS.PESADAS,
     PROFICIENCIAS.ESCUDOS,
-    PROFICIENCIAS.SIMPLES,
   ],
   abilities: [
     {
@@ -124,7 +121,7 @@ const CAVALEIRO: ClassDescription = {
     },
     {
       name: "Etiqueta",
-      text: "Você recebe +2 em Diplomacia ou Nobreza e pode gastar 1 PM para rolar novamente um teste recém realizado de uma dessas perícias.",
+      text: "Você recebe +2 em Diplomacia e Nobreza e pode gastar 1 PM para rolar novamente um teste recém realizado de uma dessas perícias.",
       requirements: [],
       sheetBonuses: [
         {
@@ -133,9 +130,22 @@ const CAVALEIRO: ClassDescription = {
             name: "Etiqueta",
           },
           target: {
-            type: "PickSkill",
-            skills: [Skill.DIPLOMACIA, Skill.NOBREZA],
-            pick: 1,
+            type: "Skill",
+            name: Skill.DIPLOMACIA,
+          },
+          modifier: {
+            type: "Fixed",
+            value: 2,
+          },
+        },
+        {
+          source: {
+            type: "power",
+            name: "Etiqueta",
+          },
+          target: {
+            type: "Skill",
+            name: Skill.NOBREZA,
           },
           modifier: {
             type: "Fixed",

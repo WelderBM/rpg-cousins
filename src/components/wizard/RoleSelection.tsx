@@ -176,14 +176,11 @@ const RoleSelection = () => {
     const classQty = selectedPreview.periciasrestantes.qtd;
     const isHuman = selectedRace?.name === "Humano";
     const raceBonus = isHuman ? 1 : 0;
-    const generalQty = Math.max(0, stats.intMod) + raceBonus;
-
     return {
       class: classQty,
-      general: generalQty,
       raceBonus,
     };
-  }, [selectedPreview, stats, selectedRace]);
+  }, [selectedPreview, selectedRace]);
 
   // --- POOL CALCULATIONS ---
   const pickedInBasic = useMemo(() => {
@@ -220,23 +217,9 @@ const RoleSelection = () => {
     }
   };
 
-  const toggleGeneralSkill = (skill: Skill) => {
-    if (generalSkillChoices.includes(skill)) {
-      setGeneralSkillChoices(generalSkillChoices.filter((s) => s !== skill));
-    } else {
-      if (generalSkillChoices.length < limits.general) {
-        setGeneralSkillChoices([...generalSkillChoices, skill]);
-      }
-    }
-  };
-
   const handleConfirm = () => {
     if (!selectedPreview) return;
-    const finalSkills = [
-      ...pickedInBasic,
-      ...classSkillChoices,
-      ...generalSkillChoices,
-    ];
+    const finalSkills = [...pickedInBasic, ...classSkillChoices];
     selectClass(selectedPreview);
     updateSkills(finalSkills);
     setStep(4);
@@ -248,9 +231,7 @@ const RoleSelection = () => {
       g.type === "or" ? !!basicSkillChoices[i] : true
     );
     const classDone = classSkillChoices.length === limits.class;
-    const generalDone = generalSkillChoices.length === limits.general;
-
-    return basicDone && classDone && generalDone;
+    return basicDone && classDone;
   }, [
     selectedPreview,
     basicSkillChoices,
@@ -491,68 +472,8 @@ const RoleSelection = () => {
               </div>
             </section>
 
-            {/* SKILLS - GENERAL/INT */}
-            <section className="space-y-4">
-              <div className="flex justify-between items-end border-b border-blue-900/30 pb-2">
-                <h3 className="text-blue-400 font-cinzel text-lg flex items-center gap-2">
-                  <Brain size={18} /> Inteligência (+{limits.general})
-                </h3>
-                <span
-                  className={`text-xs font-bold px-3 py-1 rounded-full ${
-                    generalSkillChoices.length === limits.general
-                      ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50"
-                      : "bg-stone-800 text-stone-400 border border-stone-700"
-                  }`}
-                >
-                  {generalSkillChoices.length} / {limits.general}
-                </span>
-              </div>
-
-              {limits.general === 0 ? (
-                <div className="p-6 bg-stone-900/30 rounded-xl border border-dashed border-stone-800 text-center text-stone-500 italic text-sm">
-                  Sem bônus disponível (Inteligência baixa ou neutra).
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {availableForGeneral.map((skill) => {
-                    const isSelected = generalSkillChoices.includes(skill);
-                    const isDisabled =
-                      !isSelected &&
-                      generalSkillChoices.length >= limits.general;
-                    return (
-                      <button
-                        key={skill}
-                        disabled={isDisabled}
-                        onClick={() => toggleGeneralSkill(skill)}
-                        className={`text-left px-3 py-3 rounded-lg border transition-all text-sm flex items-center gap-2 ${
-                          isSelected
-                            ? "bg-blue-900/20 border-blue-500 text-blue-100"
-                            : isDisabled
-                            ? "opacity-30 cursor-not-allowed border-transparent text-stone-600 bg-stone-900"
-                            : "bg-stone-900 border-stone-800 text-stone-400 hover:border-blue-900/50 hover:bg-stone-800"
-                        }`}
-                      >
-                        <div
-                          className={`w-4 h-4 rounded border flex items-center justify-center ${
-                            isSelected
-                              ? "bg-blue-500 border-blue-500"
-                              : "border-stone-600 bg-black/40"
-                          }`}
-                        >
-                          {isSelected && (
-                            <Check size={12} className="text-stone-950" />
-                          )}
-                        </div>
-                        {skill}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-
             {/* ACTION FOOTER */}
-            <div className="fixed bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
+            <div className="sticky bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
               <div className="max-w-4xl mx-auto">
                 <button
                   onClick={handleConfirm}

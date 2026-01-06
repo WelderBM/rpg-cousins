@@ -10,12 +10,11 @@ const CLERIGO: ClassDescription = {
   name: "Clérigo",
   description:
     "Vozes dos deuses no mundo mortal, os clérigos são movidos por uma fé inabalável. Através de suas preces, eles curam ferimentos, protegem os inocentes e canalizam o poder divino para punir os infiéis. Cada clérigo é um pilar de sua comunidade e um representante dos dogmas de sua divindade, seja ela bondosa ou terrível.",
-  detailedProficiencies:
-    "Armas simples, armaduras leves, médias e pesadas e escudos.",
+  detailedProficiencies: "Armaduras pesadas e escudos.",
   pv: 16,
   addpv: 4,
-  pm: 5,
-  addpm: 5,
+  pm: 3,
+  addpm: 3,
   periciasbasicas: [
     {
       type: "and",
@@ -38,11 +37,7 @@ const CLERIGO: ClassDescription = {
       Skill.PERCEPCAO,
     ],
   },
-  proficiencias: [
-    PROFICIENCIAS.SIMPLES,
-    PROFICIENCIAS.LEVES,
-    PROFICIENCIAS.ESCUDOS,
-  ],
+  proficiencias: [PROFICIENCIAS.PESADAS, PROFICIENCIAS.ESCUDOS],
   abilities: [
     {
       name: "Devoto Fiel",
@@ -165,6 +160,7 @@ const CLERIGO: ClassDescription = {
       name: "Mestre Celebrante",
       text: "O número de pessoas que você afeta com uma missa aumenta em dez vezes e os benefícios que elas recebem dobram.",
       requirements: [
+        [{ type: RequirementType.NIVEL, value: 12 }],
         [{ type: RequirementType.PODER, name: "Missa: Bênção da Vida" }],
         [{ type: RequirementType.PODER, name: "Missa: Chamado às Armas" }],
         [{ type: RequirementType.PODER, name: "Missa: Elevação do Espírito" }],
@@ -203,7 +199,7 @@ const CLERIGO: ClassDescription = {
       requirements: [],
     },
     {
-      name: "Símbolo Sagrado Abençoado",
+      name: "Símbolo Sagrado Energizado",
       text: "Você pode gastar uma ação de movimento e 1 PM para fazer uma prece e energizar seu símbolo sagrado até o fim da cena. Um símbolo sagrado energizado emite uma luz dourada ou prateada (se sua divindade canaliza energia positiva) ou púrpura ou avermelhada (se canaliza energia negativa) que ilumina como uma tocha. Enquanto você estiver empunhando um símbolo sagrado energizado, o custo em PM para lançar suas magias divinas diminui em 1.",
       requirements: [],
     },

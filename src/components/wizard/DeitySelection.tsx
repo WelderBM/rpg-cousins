@@ -83,7 +83,7 @@ const DeitySelection = () => {
     if (!selectedPreview) return;
     selectDeity(selectedPreview);
     // Powers are already set in state by handleSelectDeityReview
-    setStep(5); // Go to EquipmentSelection
+    setStep(5); // Go to SummarySelection
   };
 
   const handleSkip = () => {
@@ -296,7 +296,7 @@ const DeitySelection = () => {
             </div>
 
             {/* ACTION FOOTER */}
-            <div className="fixed bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
+            <div className="sticky bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
               <div className="max-w-4xl mx-auto flex gap-4">
                 {!isMandatory && (
                   <button

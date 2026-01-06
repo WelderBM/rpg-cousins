@@ -175,7 +175,13 @@ const LADINO: ClassDescription = {
       name: "Mente Criminosa",
       text: "Você soma sua Inteligência em Ladinagem e Furtividade",
       requirements: [
-        [{ type: RequirementType.ATRIBUTO, name: "Destreza", value: 1 }],
+        [
+          {
+            type: RequirementType.ATRIBUTO,
+            name: Atributo.INTELIGENCIA,
+            value: 1,
+          },
+        ],
       ],
       sheetBonuses: [
         {

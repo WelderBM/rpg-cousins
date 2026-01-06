@@ -1,5 +1,6 @@
 import { Character } from "../interfaces/Character";
 import { auth } from "../firebaseConfig";
+import { sanitizeForFirestore } from "../utils/firestoreUtils";
 
 const COLLECTION_NAME = "characters";
 
@@ -13,10 +14,10 @@ export const CharacterService = {
       );
       const { db } = await import("../firebaseConfig");
 
-      const dataToSave = {
+      const dataToSave = sanitizeForFirestore({
         ...characterData,
         createdAt: serverTimestamp(),
-      };
+      });
 
       // If user is logged in, save to their subcollection
       const user = auth?.currentUser;
@@ -42,10 +43,10 @@ export const CharacterService = {
       );
       const { db } = await import("../firebaseConfig");
 
-      const dataToSave = {
+      const dataToSave = sanitizeForFirestore({
         ...characterData,
         createdAt: serverTimestamp(),
-      };
+      });
 
       const docRef = await addDoc(
         collection(db!, "users", uid, "characters"),
@@ -72,10 +73,10 @@ export const CharacterService = {
 
       const charRef = doc(db!, "users", uid, "characters", charId);
 
-      const dataToUpdate = {
+      const dataToUpdate = sanitizeForFirestore({
         ...updates,
         updatedAt: serverTimestamp(),
-      };
+      });
 
       await updateDoc(charRef, dataToUpdate);
     } catch (error) {

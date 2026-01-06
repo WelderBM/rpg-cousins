@@ -8,7 +8,7 @@ const INVENTOR: ClassDescription = {
   name: "Inventor",
   description:
     "Mentes brilhantes dedicadas a desvendar as leis da ciência e da magia, os inventores criam maravilhas tecnológicas. Através de engenhocas, poções e artefatos, eles resolvem problemas que desafiam a lógica e a força bruta. Para um inventor, o mundo é um grande quebra-cabeça aguardando a ferramenta certa para ser resolvido.",
-  detailedProficiencies: "Armas simples, armaduras leves e médias.",
+  detailedProficiencies: "Nenhuma.",
   pv: 12,
   addpv: 3,
   pm: 4,
@@ -36,7 +36,7 @@ const INVENTOR: ClassDescription = {
       Skill.PONTARIA,
     ],
   },
-  proficiencias: [PROFICIENCIAS.LEVES, PROFICIENCIAS.SIMPLES],
+  proficiencias: [],
   abilities: [
     {
       name: "Engenhosidade",
@@ -45,7 +45,7 @@ const INVENTOR: ClassDescription = {
     },
     {
       name: "Protótipo",
-      text: "Você começa o jogo com um item superior, ou com 10 itens alquímicos, com preço total de até T$ 500. Veja o Capítulo 3: Equipamento para a lista de itens.",
+      text: "Você começa o jogo com um item superior (com uma melhoria), ou com 10 itens alquímicos, com preço total de até T$ 500. Veja o Capítulo 3: Equipamento para a lista de itens.",
       nivel: 1,
     },
     {
@@ -285,7 +285,7 @@ const INVENTOR: ClassDescription = {
       requirements: [
         [
           { type: RequirementType.PODER, name: "Engenhoqueiro" },
-          { type: RequirementType.NIVEL, value: 5 },
+          { type: RequirementType.NIVEL, value: 10 },
         ],
       ],
     },

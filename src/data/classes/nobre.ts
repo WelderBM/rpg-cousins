@@ -10,8 +10,8 @@ const NOBRE: ClassDescription = {
     "Líderes natos e mestres da diplomacia, os nobres usam sua influência e carisma tanto quanto sua espada. Criados em cortes ou campos de batalha, eles sabem como inspirar seus aliados e como comandar o respeito de seus inimigos. Para um nobre, a palavra certa no momento certo pode ser mais poderosa que um golpe crítico.",
   detailedProficiencies:
     "Armas simples e marciais, armaduras leves, médias e pesadas e escudos.",
-  pv: 16,
-  addpv: 4,
+  pv: 12,
+  addpv: 3,
   pm: 4,
   addpm: 4,
   periciasbasicas: [
@@ -62,12 +62,12 @@ const NOBRE: ClassDescription = {
     },
     {
       name: "Espólio",
-      text: "Você recebe um item a sua escolha com preço de até T$ 2.000.",
+      text: "Você recebe um item a sua escolha com preço de até T$ 1.000.",
       nivel: 1,
     },
     {
       name: "Orgulho",
-      text: "Quando faz um teste de perícia, você pode gastar uma quantidade de PM a sua escolha (limitado pelo seu Carisma). Para cada PM que gastar, recebe +2 no teste.",
+      text: "Quando faz um teste de perícia, você pode gastar 1 PM para somar o seu Carisma no teste. Você não pode usar esta habilidade em testes de ataque.",
       nivel: 1,
     },
     {

@@ -12,9 +12,8 @@ const MEDUSA: Race = {
   commonReligions: "Tenebra (Trevas) ou Sszzaas (Traição).",
   attributes: {
     attrs: [
-      { attr: "any", mod: 1 },
-      { attr: "any", mod: 1 },
-      { attr: "any", mod: 1 },
+      { attr: Atributo.DESTREZA, mod: 2 },
+      { attr: Atributo.CARISMA, mod: 1 },
     ],
   },
   faithProbability: {

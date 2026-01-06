@@ -9,8 +9,7 @@ const PALADINO: ClassDescription = {
   name: "Paladino",
   description:
     "Guerreiros sagrados dedicados a uma causa superior, os paladinos são os campeões da justiça e do bem em Arton. Abençoados com poderes divinos, eles são o escudo contra as trevas e a espada que pune o mal. Um paladino não apenas luta; ele personifica os ideais de sua divindade, servindo como exemplo vivo de virtude.",
-  detailedProficiencies:
-    "Armas simples e marciais, armaduras leves, médias e pesadas e escudos.",
+  detailedProficiencies: "Armas marciais, armaduras pesadas e escudos.",
   pv: 20,
   addpv: 5,
   pm: 3,
@@ -39,11 +38,9 @@ const PALADINO: ClassDescription = {
     ],
   },
   proficiencias: [
-    PROFICIENCIAS.LEVES,
     PROFICIENCIAS.MARCIAIS,
     PROFICIENCIAS.PESADAS,
     PROFICIENCIAS.ESCUDOS,
-    PROFICIENCIAS.SIMPLES,
   ],
   abilities: [
     {

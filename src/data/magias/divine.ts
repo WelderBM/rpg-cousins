@@ -4,8 +4,8 @@ import {
   spellsCircle3 as c3,
   spellsCircle4 as c4,
   spellsCircle5 as c5,
-} from './generalSpells';
-import { SpellCircle, Spell } from '../../interfaces/Spells';
+} from "./generalSpells";
+import { SpellCircle, Spell } from "../../interfaces/Spells";
 
 export const divineSpellsCircle1: SpellCircle = {
   Abjur: [
@@ -49,9 +49,9 @@ export const divineSpellsCircle2: SpellCircle = {
     c2.menteDivina,
     c2.vozDivina,
   ],
-  Conv: [c2.exameDePestes, c2.socoDeArsenal],
+  Conv: [c2.enxameDePestes, c2.socoDeArsenal],
   Encan: [c2.aliadoAnimal, c2.marcaDaObediencia, c2.oracao],
-  Evoc: [c2.controlarFogo, c2.purificacao, c2.raioSolar, c2.tempestadaDivina],
+  Evoc: [c2.controlarFogo, c2.purificacao, c2.raioSolar, c2.tempestadeDivina],
   Ilusão: [c2.silencio],
   Necro: [c2.conjurarMortosVivos, c2.miasmaMefitico, c2.rogarMaldicao],
   Trans: [c2.controlarMadeira, c2.fisicoDivino],
@@ -86,7 +86,7 @@ export const divineSpellsCircle4: SpellCircle = {
   Encan: [c4.concederMilagre],
   Evoc: [
     c4.circuloDaRestauracao,
-    c4.coleraDeAzguer,
+    c4.coleraDeAzgher,
     c4.mantoDoCruzado,
     c4.terremoto,
   ],

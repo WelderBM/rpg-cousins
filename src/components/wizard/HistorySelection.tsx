@@ -23,7 +23,7 @@ const HistorySelection = () => {
   // OriginSelection sets 'selectedOrigin'.
 
   // We should probably allow going back from Deity to Origin visually?
-  // DeitySelection calls `setStep(5)` when done.
+  // DeitySelection calls `setStep(5)` to go to Summary.
 
   return <DeitySelection />;
 };

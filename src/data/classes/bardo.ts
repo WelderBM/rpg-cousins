@@ -214,7 +214,7 @@ const BARDO: ClassDescription = {
     },
     {
       name: "Mestre dos Sussurros",
-      text: "Você é dissimulado, atento para rumores e ótimo em espalhar fofocas. Quando faz um teste de Investigação para interrogar ou um teste de Enganação para intriga, você rola dois dados e usa o melhor resultado. Além disso, pode fazer esses testes em ambientes sociais (taverna, festival, corte...) sem custo e em apenas uma hora (em vez de um dia)",
+      text: "Você é dissimulado, atento para rumores e ótimo em espalhar fofocas. Quando faz um teste de Investigação para interrogar ou um teste de Enganação para intriga, você rola dois dados e usa o melhor resultado. Além disso, pode fazer esses testes em ambientes sociais (taverna, festival, corte...) sem custo e em apenas um minuto (em vez de um dia)",
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Carisma", value: 1 },

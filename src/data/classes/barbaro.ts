@@ -8,8 +8,7 @@ const BARBARO: ClassDescription = {
   name: "Bárbaro",
   description:
     "Para o bárbaro, não existem sutilezas, apenas a fúria. Habitantes das terras selvagens ou exilados da civilização, esses combatentes confiam em seus instintos e em sua força bruta para superar qualquer obstáculo. Em batalha, eles se tornam forças da natureza, ignorando a dor e a fadiga enquanto destroçam seus oponentes com golpes selvagens.",
-  detailedProficiencies:
-    "Armas simples e marciais, armaduras leves e médias e escudos.",
+  detailedProficiencies: "Armas marciais e escudos.",
   pv: 24,
   addpv: 6,
   pm: 3,
@@ -35,12 +34,7 @@ const BARBARO: ClassDescription = {
       Skill.VONTADE,
     ],
   },
-  proficiencias: [
-    PROFICIENCIAS.ESCUDOS,
-    PROFICIENCIAS.LEVES,
-    PROFICIENCIAS.MARCIAIS,
-    PROFICIENCIAS.SIMPLES,
-  ],
+  proficiencias: [PROFICIENCIAS.ESCUDOS, PROFICIENCIAS.MARCIAIS],
   abilities: [
     {
       name: "Furia",
@@ -96,8 +90,8 @@ const BARBARO: ClassDescription = {
       ],
     },
     {
-      name: "Resistência a Dano",
-      text: "Graças a seu vigor e força de vontade, você ignora parte de seus ferimentos. Você recebe resistência a dano 2 (todo dano que sofre é reduzido em 2). A cada três níveis, sua RD aumenta em 2, até um máximo de RD 10 no 17º nível.",
+      name: "Redução de Dano",
+      text: "Graças a seu vigor e força de vontade, você ignora parte de seus ferimentos. Você recebe redução de dano 2 (todo dano que sofre é reduzido em 2). A cada três níveis, sua Redução de Dano aumenta em 2, até um máximo de RD 10 no 17º nível.",
       nivel: 5,
     },
     {
@@ -230,7 +224,7 @@ const BARBARO: ClassDescription = {
     },
     {
       name: "Totem Espiritual",
-      text: "Você soma seu bônus de Sabedoria no seu total de pontos de mana. Escolha um animal totêmico. Você aprende e pode lançar uma magia definida pelo animal escolhido (atributo-chave Sabedoria) e pode lançá-la mesmo em fúria.",
+      text: "Você soma sua Sabedoria no seu total de pontos de mana. Escolha um animal totêmico. Você aprende e pode lançar uma magia definida pelo animal escolhido (atributo-chave Sabedoria) e pode lançá-la mesmo em fúria.",
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Sabedoria", value: 1 },

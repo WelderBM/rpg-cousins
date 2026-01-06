@@ -11,7 +11,9 @@ import {
   ShieldAlert,
   Wand2,
   Users,
+  User,
   ShoppingBag,
+  Home,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -21,7 +23,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 }
 
 const navItems = [
-  { name: "Home", href: "/", icon: Sword },
+  { name: "Home", href: "/", icon: Home },
   { name: "Novo Personagem", href: "/wizard", icon: Wand2 },
   { name: "Poderes", href: "/grimorio", icon: BookOpen },
   { name: "Meus Heróis", href: "/characters", icon: Users },
@@ -38,9 +40,32 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [showMobileMenu, setShowMobileMenu] = React.useState(false);
 
   return (
     <div className="flex h-screen w-full flex-col md:flex-row overflow-hidden bg-medieval-stone">
+      {/* Mobile Header */}
+      <header className="md:hidden flex items-center justify-between p-4 bg-medieval-stone/95 border-b border-medieval-iron/50 relative z-50 shrink-0">
+        <div className="flex items-center gap-2">
+          <h1 className="font-serif text-xl font-bold text-medieval-gold tracking-widest">
+            RPG <span className="text-parchment-DEFAULT">Cousins</span>
+          </h1>
+        </div>
+        <button
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          className="p-2 text-medieval-gold border border-medieval-gold/30 rounded-lg bg-black/20 active:scale-95 transition-transform"
+        >
+          <User className="h-5 w-5" />
+        </button>
+      </header>
+
+      {/* Mobile Menu Dropdown */}
+      {showMobileMenu && (
+        <div className="md:hidden absolute top-16 right-4 z-50 w-72 bg-medieval-stone border border-medieval-iron shadow-2xl rounded-xl overflow-hidden p-2 animate-in slide-in-from-top-2 fade-in duration-200">
+          <UserMenu />
+        </div>
+      )}
+
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex h-full w-64 flex-col border-r border-medieval-iron bg-medieval-stone/90 p-4 shadow-xl z-10 shrink-0">
         <div className="mb-10 mt-4 text-center">
@@ -91,7 +116,10 @@ export default function MainLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gradient-to-br from-medieval-stone to-[#12100e]">
+      <main
+        className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gradient-to-br from-medieval-stone to-[#12100e]"
+        onClick={() => setShowMobileMenu(false)}
+      >
         {/* Background Texture Overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] mix-blend-overlay"></div>
 
