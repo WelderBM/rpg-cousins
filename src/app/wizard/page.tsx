@@ -38,7 +38,7 @@ export default function WizardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-200">
+    <div className="min-h-screen b'g-neutral-950 text-neutral-200">
       {/* Reset Controls - Show only if NOT in Hub and NOT in Step 1 */}
       {!showHub && step > 1 && (
         <div className="fixed top-4 right-4 z-50">
