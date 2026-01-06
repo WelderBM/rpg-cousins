@@ -44,3 +44,9 @@ serviceAccountKey.json
 
 # User Content
 *.pdf
+
+# Logs & Reports
+build-log.txt
+tsc-errors.txt
+tsc_output.txt
+AUDIT_REPORT.md
