@@ -177,7 +177,7 @@ const RoleSelection = () => {
     const isHuman = selectedRace?.name === "Humano";
     const raceBonus = isHuman ? 1 : 0;
     return {
-      class: classQty,
+      class: classQty + stats.intMod,
       raceBonus,
     };
   }, [selectedPreview, selectedRace]);

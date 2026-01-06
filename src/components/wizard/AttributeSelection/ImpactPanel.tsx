@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Atributo } from "../../../data/atributos";
-import { Heart, Brain, Shield, Weight } from "lucide-react";
+import { Heart, Brain, Shield, Weight, Book } from "lucide-react";
 
 /**
  * Painel de Impacto Estimado
@@ -41,6 +41,13 @@ export const ImpactPanel = React.memo(
           icon: Weight,
           color: "text-neutral-500",
           desc: "Espaços de inventário",
+        },
+        {
+          label: "Perícias Extras",
+          value: Math.max(0, int),
+          icon: Book,
+          color: "text-emerald-500",
+          desc: "Bônus de Inteligência",
         },
       ];
     }, [finalAttributes]);
