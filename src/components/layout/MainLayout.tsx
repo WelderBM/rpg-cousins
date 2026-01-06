@@ -42,6 +42,14 @@ export default function MainLayout({
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
 
+  const mainRef = React.useRef<HTMLElement>(null);
+
+  React.useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [pathname]);
+
   return (
     <div className="flex h-screen w-full flex-col md:flex-row overflow-hidden bg-medieval-stone">
       {/* Mobile Header */}
@@ -117,6 +125,8 @@ export default function MainLayout({
 
       {/* Main Content */}
       <main
+        id="main-scroll-container"
+        ref={mainRef}
         className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gradient-to-br from-medieval-stone to-[#12100e]"
         onClick={() => setShowMobileMenu(false)}
       >

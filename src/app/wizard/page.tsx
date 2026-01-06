@@ -23,7 +23,12 @@ export default function WizardPage() {
 
   // Smooth scroll to top on step change
   React.useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const mainContainer = document.getElementById("main-scroll-container");
+    if (mainContainer) {
+      mainContainer.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, [step, showHub, selectedOrigin]);
 
   const handleReset = () => {

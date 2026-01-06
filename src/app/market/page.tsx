@@ -179,8 +179,6 @@ const MarketPage = () => {
     return Object.values(categories).flat() as Equipment[];
   }, [categories]);
 
-  console.log(allItems);
-
   // Internal helper for dynamic filter calculation logic (used inside useMemo to avoid duplication or circular deps if we were to separate it too much, but essentially part of filtering)
   const relevantItemsForFilters = useMemo(() => {
     let relevantItems = allItems;
