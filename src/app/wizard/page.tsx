@@ -95,7 +95,7 @@ export default function WizardPage() {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-5xl min-h-screen bg-stone-900/10 md:border-x md:border-stone-800/30 shadow-2xl relative">
+      <div className="mx-auto w-full max-w-7xl 2xl:max-w-[90vw] min-h-screen bg-stone-900/10 md:border-x md:border-stone-800/30 shadow-2xl relative">
         <AnimatePresence mode="wait">
           {showHub ? (
             <motion.div

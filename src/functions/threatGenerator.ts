@@ -146,17 +146,21 @@ export function calculateAllSkills(
   Object.entries(skillsAttrs).forEach(([skillName, attribute]) => {
     const existingSkill = existingSkills.find((s) => s.name === skillName);
     const trained = existingSkill?.trained || false;
-    let customBonus = existingSkill?.customBonus || 0;
+
+    // Safety: Ensure customBonus is a pure number and doesn't get accumulated from previous total
+    let customBonus = Number(existingSkill?.customBonus || 0);
+    if (Number.isNaN(customBonus)) customBonus = 0;
+
     const attributeValue = attributes[attribute] ?? 0;
     const attributeModifier = calculateAttributeModifier(attributeValue);
 
     // Apply resistance bonuses for Fortitude, Reflexos, Vontade
+    let resistanceBonus = 0;
     if (resistanceAssignments && combatStats) {
       const resistanceSkills = ["Fortitude", "Reflexos", "Vontade"];
       if (resistanceSkills.includes(skillName)) {
         const resistanceType =
           resistanceAssignments[skillName as keyof ResistanceAssignments];
-        let resistanceBonus = 0;
 
         switch (resistanceType) {
           case ResistanceType.STRONG:
@@ -171,9 +175,6 @@ export function calculateAllSkills(
           default:
             resistanceBonus = 0;
         }
-
-        // Apply the resistance bonus as a custom bonus
-        customBonus += resistanceBonus;
       }
     }
 
@@ -181,7 +182,7 @@ export function calculateAllSkills(
       challengeLevel,
       attributeModifier,
       trained,
-      customBonus
+      customBonus + resistanceBonus
     );
 
     skills.push({

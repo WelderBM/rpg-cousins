@@ -24,6 +24,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 
 const navItems = [
   { name: "Home", href: "/", icon: Home },
+  { name: "Meu Herói", href: "/my-character", icon: User },
   { name: "Novo Personagem", href: "/wizard", icon: Wand2 },
   { name: "Poderes", href: "/grimorio", icon: BookOpen },
   { name: "Meus Heróis", href: "/characters", icon: Users },
@@ -133,7 +134,7 @@ export default function MainLayout({
         {/* Background Texture Overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] mix-blend-overlay"></div>
 
-        <div className="relative z-10 p-4 md:p-8 pb-24 md:pb-8 min-h-full max-w-5xl mx-auto">
+        <div className="relative z-10 pb-24 md:pb-0 min-h-full w-full mx-auto">
           {children}
         </div>
       </main>

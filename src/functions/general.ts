@@ -469,11 +469,22 @@ function getModifiedAttribute(
   atributosModificados: CharacterAttributes,
   attrDaRaca: RaceAttributeAbility
 ): CharacterAttribute {
-  const newMod = atributosModificados[selectedAttrName].mod + attrDaRaca.mod;
+  const currentAttr = atributosModificados[selectedAttrName];
+  const currentBase = currentAttr.value.base;
+  const currentTotal = currentAttr.value.total;
+  // Races on T20 usually give +2 meaning +2 on modifier, which equals +4 on score roughly
+  // But here we are making valid T20 math where race gives modifier bonuses directly.
+  // However, since we are working with scores (base), we adapt: +1 mod = +2 score.
+  const changeInScore = attrDaRaca.mod * 2;
 
   return {
-    ...atributosModificados[selectedAttrName],
-    mod: newMod,
+    ...currentAttr,
+    value: {
+      ...currentAttr.value,
+      base: currentBase + changeInScore,
+      total: currentTotal + changeInScore,
+    },
+    mod: getModValue(currentTotal + changeInScore),
   };
 }
 
@@ -568,7 +579,12 @@ function generateFinalAttributes(
     const maxAttr = Math.max(...atributosNumericos);
     priorityGeneratedAttrs[attr] = {
       name: attr,
-      value: maxAttr,
+      value: {
+        base: maxAttr,
+        bonus: 0,
+        sources: [],
+        total: maxAttr,
+      },
       mod: getModValue(maxAttr),
     };
 
@@ -581,7 +597,16 @@ function generateFinalAttributes(
     const mod = getModValue(atributosNumericos[index]);
     return {
       ...acc,
-      [attr]: { name: attr, value: atributosNumericos[index], mod },
+      [attr]: {
+        name: attr,
+        value: {
+          base: atributosNumericos[index],
+          bonus: 0,
+          sources: [],
+          total: atributosNumericos[index],
+        },
+        mod,
+      },
     };
   }, priorityGeneratedAttrs) as CharacterAttributes;
 
@@ -1151,8 +1176,15 @@ export const applyPower = (
     powerOrAbility.sheetActions.forEach((sheetAction) => {
       if (sheetAction.action.type === "ModifyAttribute") {
         const { attribute, value } = sheetAction.action;
-        const newValue = sheet.atributos[attribute].mod + value;
-        sheet.atributos[attribute].mod = newValue;
+        // Assume 'value' is a Modifier increase (e.g. +1 Mod).
+        // Increase Score by value * 2 to keep consistency.
+        const scoreChange = value * 2;
+
+        const currentAttr = sheet.atributos[attribute];
+        currentAttr.value.base += scoreChange;
+        currentAttr.value.total += scoreChange;
+        const newMod = getModValue(currentAttr.value.total);
+        currentAttr.mod = newMod;
 
         subSteps.push({
           name: getSourceName(sheetAction.source),
@@ -1161,7 +1193,7 @@ export const applyPower = (
         sheet.sheetActionHistory.push({
           source: sheetAction.source,
           powerName: powerOrAbility.name,
-          changes: [{ type: "Attribute", attribute, value: newValue }],
+          changes: [{ type: "Attribute", attribute, value: value }], // value recorded is Mod change
         });
       } else if (sheetAction.action.type === "addProficiency") {
         // Ver Proficiência em combat powers e depois remove comment
@@ -1402,7 +1434,12 @@ export const applyPower = (
           targetAttribute = getRandomItemFromArray(availableAttributes);
         }
 
-        sheet.atributos[targetAttribute].mod += 1;
+        // Aumento de Atributo increases Mod by 1, so Score by 2
+        sheet.atributos[targetAttribute].value.base += 2;
+        sheet.atributos[targetAttribute].value.total += 2;
+        sheet.atributos[targetAttribute].mod = getModValue(
+          sheet.atributos[targetAttribute].value.total
+        );
         sheet.sheetActionHistory.push({
           source: sheetAction.source,
           powerName: powerOrAbility.name,
@@ -2686,12 +2723,36 @@ export function generateEmptySheet(
     sexo: "",
     nivel: selectedOptions.nivel,
     atributos: {
-      Força: { name: Atributo.FORCA, mod: 0, value: 10 },
-      Destreza: { name: Atributo.DESTREZA, mod: 0, value: 10 },
-      Constituição: { name: Atributo.CONSTITUICAO, mod: 0, value: 10 },
-      Inteligência: { name: Atributo.INTELIGENCIA, mod: 0, value: 10 },
-      Sabedoria: { name: Atributo.SABEDORIA, mod: 0, value: 10 },
-      Carisma: { name: Atributo.CARISMA, mod: 0, value: 10 },
+      Força: {
+        name: Atributo.FORCA,
+        mod: 0,
+        value: { base: 10, bonus: 0, sources: [], total: 10 },
+      },
+      Destreza: {
+        name: Atributo.DESTREZA,
+        mod: 0,
+        value: { base: 10, bonus: 0, sources: [], total: 10 },
+      },
+      Constituição: {
+        name: Atributo.CONSTITUICAO,
+        mod: 0,
+        value: { base: 10, bonus: 0, sources: [], total: 10 },
+      },
+      Inteligência: {
+        name: Atributo.INTELIGENCIA,
+        mod: 0,
+        value: { base: 10, bonus: 0, sources: [], total: 10 },
+      },
+      Sabedoria: {
+        name: Atributo.SABEDORIA,
+        mod: 0,
+        value: { base: 10, bonus: 0, sources: [], total: 10 },
+      },
+      Carisma: {
+        name: Atributo.CARISMA,
+        mod: 0,
+        value: { base: 10, bonus: 0, sources: [], total: 10 },
+      },
     },
     maxSpaces: 10,
     raca: race,

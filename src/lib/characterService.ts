@@ -45,6 +45,7 @@ export const CharacterService = {
 
       const dataToSave = sanitizeForFirestore({
         ...characterData,
+        ownerNickname: auth?.currentUser?.displayName || "Desconhecido",
         createdAt: serverTimestamp(),
       });
 
@@ -86,18 +87,29 @@ export const CharacterService = {
   },
 
   // Listar personagens
-  async getCharacters(userId?: string, isMestre: boolean = false) {
+  async getCharacters(
+    userId?: string,
+    isMestre: boolean = false,
+    onlyFavorites: boolean = false
+  ) {
     try {
-      const { collection, getDocs, query, collectionGroup } = await import(
-        "firebase/firestore"
-      );
+      const { collection, getDocs, query, collectionGroup, where } =
+        await import("firebase/firestore");
       const { db } = await import("../firebaseConfig");
 
       let q;
 
       if (isMestre) {
-        // Mestre vê TODOS os personagens de todas as subcoleções 'characters'
-        q = query(collectionGroup(db!, "characters"));
+        if (onlyFavorites) {
+          // Mestre vê apenas os personagens favoritos
+          q = query(
+            collectionGroup(db!, "characters"),
+            where("isFavorite", "==", true)
+          );
+        } else {
+          // Mestre vê TODOS os personagens de todas as subcoleções 'characters'
+          q = query(collectionGroup(db!, "characters"));
+        }
       } else if (userId) {
         // Usuário vê apenas os seus na subcoleção
         q = query(collection(db!, "users", userId, "characters"));
@@ -132,6 +144,40 @@ export const CharacterService = {
       }
     } catch (error) {
       console.error("Erro ao deletar personagem:", error);
+      throw error;
+    }
+  },
+
+  async setFavoriteCharacter(uid: string, charId: string) {
+    try {
+      const { collection, getDocs, writeBatch, doc } = await import(
+        "firebase/firestore"
+      );
+      const { db } = await import("../firebaseConfig");
+
+      const batch = writeBatch(db!);
+      const charsRef = collection(db!, "users", uid, "characters");
+      const snapshot = await getDocs(charsRef);
+
+      snapshot.docs.forEach((d) => {
+        if (d.id === charId) {
+          batch.update(doc(db!, "users", uid, "characters", d.id), {
+            isFavorite: true,
+          });
+        } else {
+          // Optimization: only update if currently true?
+          // But reading data inside loop is fine since we have snapshot
+          if (d.data().isFavorite) {
+            batch.update(doc(db!, "users", uid, "characters", d.id), {
+              isFavorite: false,
+            });
+          }
+        }
+      });
+
+      await batch.commit();
+    } catch (error) {
+      console.error("Error setting favorite character:", error);
       throw error;
     }
   },

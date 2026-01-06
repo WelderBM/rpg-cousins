@@ -66,8 +66,17 @@ export default class Bag {
 
   public armorPenalty: number;
 
-  constructor(equipments = {}) {
-    this.equipments = merge(equipments, cloneDeep(defaultEquipments));
+  constructor(equipments?: Partial<BagEquipments>) {
+    if (equipments && Object.keys(equipments).length > 0) {
+      // Use provided equipments, but ensure all groups exist
+      const keys = Object.keys(defaultEquipments) as Array<keyof BagEquipments>;
+      const baseStructure: any = {};
+      keys.forEach((k) => (baseStructure[k] = []));
+
+      this.equipments = merge(baseStructure, equipments);
+    } else {
+      this.equipments = cloneDeep(defaultEquipments);
+    }
 
     this.spaces = calcBagSpaces(this.equipments);
     this.armorPenalty = calcArmorPenalty(this.equipments);
@@ -105,7 +114,7 @@ export default class Bag {
             existing.quantidade =
               (existing.quantidade || 1) + (newItem.quantidade || 1);
           } else {
-            newEquipments[g].push({
+            (newEquipments[g] as any).push({
               ...newItem,
               quantidade: newItem.quantidade || 1,
             });

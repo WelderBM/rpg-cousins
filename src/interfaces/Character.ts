@@ -9,7 +9,12 @@ import Bag from "./Bag";
 
 export interface CharacterAttribute {
   name: Atributo;
-  value: number;
+  value: {
+    base: number;
+    bonus: number;
+    sources: string[];
+    total: number;
+  };
   mod: number;
 }
 
@@ -24,11 +29,23 @@ export interface CharacterReligion {
 
 export interface Character {
   id?: string;
+  ownerNickname?: string; // For Master View grouping
+  isFavorite?: boolean; // For Master View filtering
+  imageUrl?: string; // Custom character art
+  physicalTraits?: {
+    gender?: string;
+    hair?: string;
+    eyes?: string;
+    skin?: string;
+    scars?: string;
+    height?: string;
+    extra?: string;
+  };
   name: string;
   race: Race | null;
   class: ClassDescription | null;
   level: number;
-  attributes: Record<Atributo, number>;
+  attributes: CharacterAttributes;
   skills: Skill[];
   origin: Origin | null;
   originBenefits: {

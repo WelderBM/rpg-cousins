@@ -22,11 +22,19 @@ import {
   X,
   ShoppingBag,
   Package,
-  FlaskConical,
+  FlaskRound,
   Shirt,
   Utensils,
   Hammer,
+  User,
+  Wand2,
+  Star,
+  Upload,
+  Apple,
+  Crosshair,
 } from "lucide-react";
+import { generateCharacterPrompt } from "@/utils/promptGenerator";
+import { compressImage } from "@/utils/imageCompression";
 import { doc, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebaseConfig";
@@ -38,190 +46,252 @@ import { getRaceByName } from "@/data/racas";
 import CLASSES from "@/data/classes";
 import { formatAssetName } from "@/utils/assetUtils";
 import { calculateCarryCapacity } from "@/utils/inventoryUtils";
-import { FloatingBackButton } from "@/components/FloatingBackButton";
 
 // --- SUB-COMPONENTS ---
 
-const AbilityCard = ({
-  title,
-  type,
-  description,
-  icon: Icon,
-  colorClass = "amber",
-  quantity,
-  item,
-}: any) => {
-  const colors: any = {
-    amber: "amber",
-    blue: "blue",
-    red: "red",
-    emerald: "emerald",
-    violet: "violet",
-    stone: "stone",
-    orange: "orange",
-    indigo: "indigo",
-    pink: "pink",
-    teal: "teal",
-  };
-  const c = colors[colorClass] || "amber";
+// Helper to get specialized icons for items
+const getItemSymbol = (item: any, size = 18) => {
+  const group = (item.group || "").toLowerCase();
+  const name = (item.nome || item.name || "").toLowerCase();
 
-  // Helper to render stats if they exist
-  const hasStats =
-    item?.dano ||
-    item?.defenseBonus ||
-    item?.armorPenalty ||
-    item?.alcance ||
-    (item?.spaces !== undefined && item?.spaces !== null);
+  if (
+    group.includes("armadura") ||
+    group.includes("escudo") ||
+    item.defenseBonus
+  ) {
+    return <Shield size={size} />;
+  }
 
+  if (group.includes("arma")) {
+    const isRanged =
+      item.alcance &&
+      item.alcance !== "-" &&
+      item.alcance.toLowerCase() !== "corpo a corpo";
+    if (
+      isRanged ||
+      name.includes("arco") ||
+      name.includes("besta") ||
+      name.includes("tiro") ||
+      name.includes("disparo")
+    )
+      return <Crosshair size={size} />;
+    if (name.includes("machado"))
+      return <Hammer size={size} className="rotate-45" />;
+    if (name.includes("adaga") || name.includes("faca"))
+      return <Sword size={size - 2} />;
+    return <Swords size={size} />;
+  }
+
+  if (
+    group.includes("alquimia") ||
+    group.includes("poção") ||
+    group.includes("elixir") ||
+    group.includes("mágico")
+  )
+    return <FlaskRound size={size} />;
+  if (
+    group.includes("vestuário") ||
+    group.includes("veste") ||
+    group.includes("capa")
+  )
+    return <Shirt size={size} />;
+  if (group.includes("alimento") || group.includes("comida"))
+    return <Apple size={size} />;
+  if (
+    group.includes("ferramenta") ||
+    group.includes("ofício") ||
+    name.includes("kit") ||
+    name.includes("instrumento")
+  )
+    return <Hammer size={size} />;
+  if (
+    group.includes("mochila") ||
+    group.includes("saco") ||
+    group.includes("carga")
+  )
+    return <Backpack size={size} />;
+
+  return <Package size={size} />;
+};
+
+const DetailRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) => (
+  <div className="flex justify-between items-center text-xs py-1 border-b border-white/5 last:border-0">
+    <span className="text-amber-600/80 font-black uppercase tracking-widest text-[10px]">
+      {label}
+    </span>
+    <span className="text-stone-100 font-bold text-right">{value}</span>
+  </div>
+);
+
+const ItemList = ({ title, items, icon: Icon }: any) => {
+  if (!items || items.length === 0) return null;
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      className={`flex-shrink-0 w-72 h-[320px] bg-stone-900 border border-stone-800 hover:border-${c}-500/50 p-5 rounded-2xl transition-all flex flex-col shadow-xl relative overflow-hidden group`}
-    >
-      <div
-        className={`absolute top-0 right-0 p-3 opacity-[0.03] group-hover:opacity-10 transition-opacity text-${c}-500`}
-      >
-        {Icon && <Icon size={80} />}
+    <div className="mb-8">
+      <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
+        {Icon && <Icon size={14} />} {title}
+      </h3>
+      <div className="space-y-3">
+        {items.map((item: any, idx: number) => {
+          return (
+            <div
+              key={idx}
+              className="bg-stone-900/90 border border-stone-800/50 rounded-lg p-4 hover:border-amber-500/30 transition-all shadow-xl"
+            >
+              <div className="flex justify-between items-start mb-2">
+                <h4 className="font-bold text-stone-100 text-sm flex items-center gap-2">
+                  <span className="text-amber-500/60">
+                    {getItemSymbol(item, 16)}
+                  </span>
+                  {item.name || item.nome}
+                </h4>
+                <div className="flex items-center gap-2">
+                  {item.quantidade > 1 && (
+                    <span className="text-[10px] bg-stone-800 text-stone-300 px-1.5 py-0.5 rounded border border-stone-700 font-bold">
+                      x{item.quantidade}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-1 mb-2">
+                {item.dano && (
+                  <DetailRow
+                    label="Dano"
+                    value={`${item.dano} ${
+                      item.critico ? `/ ${item.critico}` : ""
+                    }`}
+                  />
+                )}
+                {item.defenseBonus > 0 && (
+                  <DetailRow
+                    label="Bônus Defesa"
+                    value={`+${item.defenseBonus}`}
+                  />
+                )}
+                {item.armorPenalty > 0 && (
+                  <DetailRow
+                    label="Penalidade"
+                    value={`-${item.armorPenalty}`}
+                  />
+                )}
+                {item.alcance && item.alcance !== "-" && (
+                  <DetailRow label="Alcance" value={item.alcance} />
+                )}
+                {item.spaces !== undefined && item.spaces !== null && (
+                  <DetailRow
+                    label="Espaço"
+                    value={
+                      item.spaces === 0 ? (
+                        <span className="text-emerald-400 font-bold">
+                          Grátis
+                        </span>
+                      ) : (
+                        item.spaces
+                      )
+                    }
+                  />
+                )}
+                {item.preco !== undefined && (
+                  <DetailRow
+                    label="Valor"
+                    value={item.preco === 0 ? "Grátis" : `${item.preco} T$`}
+                  />
+                )}
+              </div>
+
+              {(item.description || item.text || item.effect) && (
+                <p className="text-xs text-stone-400 line-clamp-4 italic border-t border-white/5 pt-3 mt-3 leading-relaxed">
+                  {item.description || item.text || item.effect}
+                </p>
+              )}
+            </div>
+          );
+        })}
       </div>
-
-      {/* Header */}
-      <div className="flex justify-between items-start mb-3 relative z-10 shrink-0">
-        <div className="flex-1 min-w-0 pr-2">
-          <h4
-            className={`text-${c}-100 font-serif font-bold text-lg leading-tight group-hover:text-${c}-400 transition-colors truncate`}
-          >
-            {title}
-          </h4>
-          <span
-            className={`text-[10px] uppercase tracking-widest font-bold text-${c}-500/70 block truncate`}
-          >
-            {type}
-          </span>
-        </div>
-        {quantity && quantity > 1 && (
-          <div
-            className={`bg-${c}-500/20 text-${c}-500 px-2 py-1 rounded text-xs font-bold border border-${c}-500/30 shrink-0`}
-          >
-            x{quantity}
-          </div>
-        )}
-      </div>
-
-      {/* Stats Row */}
-      {hasStats && (
-        <div className="flex flex-wrap gap-1.5 mb-3 relative z-10 shrink-0">
-          {item.dano && (
-            <span className="text-[10px] bg-red-950/40 text-red-400 px-1.5 py-0.5 rounded border border-red-500/20 font-mono">
-              {item.dano} {item.critico ? `/ ${item.critico}` : ""}
-            </span>
-          )}
-          {item.defenseBonus > 0 && (
-            <span className="text-[10px] bg-blue-950/40 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20 font-mono">
-              +{item.defenseBonus} Def
-            </span>
-          )}
-          {item.armorPenalty > 0 && (
-            <span className="text-[10px] bg-stone-950/40 text-stone-400 px-1.5 py-0.5 rounded border border-stone-500/20 font-mono">
-              -{item.armorPenalty} Pen
-            </span>
-          )}
-          {item.alcance && item.alcance !== "-" && (
-            <span className="text-[10px] bg-emerald-950/40 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">
-              {item.alcance}
-            </span>
-          )}
-          {item.spaces !== undefined &&
-            item.spaces !== null &&
-            (item.spaces === 0 ? (
-              <span className="text-[10px] bg-emerald-950/40 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">
-                (não ocupa espaço)
-              </span>
-            ) : (
-              <span className="text-[10px] bg-amber-950/40 text-amber-500 px-1.5 py-0.5 rounded border border-amber-500/20 font-mono">
-                {item.spaces} {item.spaces === 1 ? "slot" : "slots"}
-              </span>
-            ))}
-        </div>
-      )}
-
-      {/* Description */}
-      <div className="flex-1 relative z-10 min-h-0">
-        <p className="text-sm text-neutral-400 leading-relaxed overflow-hidden text-ellipsis line-clamp-[6]">
-          {description}
-        </p>
-      </div>
-
-      {/* Footer Price/Extra */}
-      {item?.preco !== undefined && (
-        <div className="mt-3 pt-3 border-t border-white/5 relative z-10 flex justify-between items-center shrink-0">
-          <span className="text-xs text-stone-500 font-bold uppercase tracking-wider">
-            Valor
-          </span>
-          <span className={`text-sm font-cinzel font-bold text-${c}-500/90`}>
-            {item.preco === 0 ? "Grátis" : `${item.preco} T$`}
-          </span>
-        </div>
-      )}
-
-      <div
-        className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r from-transparent via-${c}-500/20 to-transparent w-full opacity-0 group-hover:opacity-100 transition-opacity`}
-      />
-    </motion.div>
+    </div>
   );
 };
 
-const SectionSlider = ({
-  title,
-  items,
-  icon: Icon,
-  colorClass = "amber",
-}: any) => {
+const SimpleList = ({ title, items, icon: Icon }: any) => {
   if (!items || items.length === 0) return null;
-
   return (
-    <div className="mb-10 last:mb-0">
-      <div className="flex items-center justify-between border-b border-stone-800 pb-3 mb-5">
-        <h3
-          className={`text-${colorClass}-500 font-serif text-xl flex items-center gap-3`}
-        >
-          {Icon && <Icon size={22} className={`text-${colorClass}-500`} />}
-          {title}
+    <div className="mb-8">
+      <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
+        {Icon && <Icon size={14} />} {title}
+      </h3>
+      <ul className="space-y-2">
+        {items.map((item: any, idx: number) => {
+          const name = typeof item === "string" ? item : item.name || item.nome;
+          const desc =
+            typeof item === "string"
+              ? null
+              : item.text || item.description || item.effect;
+
+          return (
+            <li
+              key={idx}
+              className="bg-stone-900/90 border border-stone-800/50 rounded-lg px-4 py-3 text-sm text-stone-200 flex items-start gap-3 shadow-md"
+            >
+              <div className="mt-2 min-w-[6px] h-[6px] bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+              <div className="flex-1">
+                <span className="font-bold block text-stone-100 mb-1">
+                  {name}
+                </span>
+                {desc && (
+                  <span className="text-xs text-stone-400 block leading-relaxed italic">
+                    {desc}
+                  </span>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
+const SectionSlider = ({ title, items, icon: Icon }: any) => {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="mb-10 group">
+      <div className="flex items-center justify-between mb-4 px-1">
+        <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] flex items-center gap-2">
+          {Icon && <Icon size={14} />} {title}
         </h3>
-        <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest bg-stone-900/50 px-3 py-1 rounded-full border border-stone-800 flex items-center gap-2">
-          <span
-            className={`w-1.5 h-1.5 rounded-full bg-${colorClass}-500 animate-pulse`}
-          />
-          {items.length} {items.length === 1 ? "Item" : "Itens"}
+        <span className="text-[10px] text-stone-600 font-bold uppercase tracking-wider animate-pulse">
+          Deslize &rarr;
         </span>
       </div>
-
-      <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-2 -mx-2 scrollbar-thin scrollbar-thumb-stone-800 scrollbar-track-transparent snap-x mask-fade-edges">
-        {items.map((item: any, idx: number) => (
-          <AbilityCard
-            key={idx}
-            type={item.subGroup || item.tipo || title.split(" ").pop()}
-            title={item.name || item.nome}
-            // Use logical ORs to find the best description available
-            description={
-              item.text ||
-              item.description ||
-              item.effect ||
-              (item.dano
-                ? `Dano: ${item.dano} ${
-                    item.critico ? `(Crit: ${item.critico})` : ""
-                  }`
-                : null) ||
-              (typeof item.value === "object"
-                ? item.value?.description || item.value?.name
-                : item.value) ||
-              "Sem descrição detalhada."
-            }
-            quantity={item.quantidade}
-            icon={Icon}
-            colorClass={colorClass}
-            item={item} // Pass full item for advanced stats rendering
-          />
-        ))}
+      <div className="flex gap-4 overflow-x-auto pb-6 -mx-4 px-4 scrollbar-none snap-x cursor-grab active:cursor-grabbing">
+        {items.map((item: any, idx: number) => {
+          const name = typeof item === "string" ? item : item.name || item.nome;
+          const desc =
+            typeof item === "string"
+              ? null
+              : item.text || item.description || item.effect;
+          return (
+            <div
+              key={idx}
+              className="min-w-[300px] md:min-w-[350px] bg-gradient-to-br from-stone-900 to-stone-950 border border-stone-800 rounded-xl p-6 snap-start shadow-2xl hover:border-amber-900/50 transition-all flex flex-col border-white/5"
+            >
+              <span className="font-serif font-bold text-amber-500 text-xl mb-4 block border-b border-white/5 pb-2">
+                {name}
+              </span>
+              {desc && (
+                <p className="text-sm text-stone-300 leading-relaxed italic line-clamp-6">
+                  {desc}
+                </p>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -241,6 +311,141 @@ export default function MyCharacterPage() {
   const [tempPv, setTempPv] = useState(0);
   const [isEditingPm, setIsEditingPm] = useState(false);
   const [tempPm, setTempPm] = useState(0);
+
+  // States for Traits & Image
+  const [isEditingTraits, setIsEditingTraits] = useState(false);
+  const [tempTraits, setTempTraits] = useState<{
+    gender: string;
+    hair: string;
+    eyes: string;
+    skin: string;
+    scars: string;
+    extra: string;
+    height: string;
+  }>({
+    gender: "",
+    hair: "",
+    eyes: "",
+    skin: "",
+    extra: "",
+    scars: "",
+    height: "",
+  });
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Load existing traits when opening modal
+  useEffect(() => {
+    if (activeCharacter?.physicalTraits) {
+      setTempTraits({
+        gender: activeCharacter.physicalTraits.gender || "",
+        hair: activeCharacter.physicalTraits.hair || "",
+        eyes: activeCharacter.physicalTraits.eyes || "",
+        skin: activeCharacter.physicalTraits.skin || "",
+        scars: activeCharacter.physicalTraits.scars || "",
+        extra: activeCharacter.physicalTraits.extra || "",
+        height: activeCharacter.physicalTraits.height || "",
+      });
+    }
+  }, [activeCharacter, isEditingTraits]);
+
+  const saveTraits = async () => {
+    if (!auth?.currentUser || !activeCharacter) return;
+
+    // Optimistic update
+    const updatedChar = { ...activeCharacter, physicalTraits: tempTraits };
+    updateActiveCharacter(updatedChar);
+    setIsEditingTraits(false);
+
+    try {
+      await CharacterService.updateCharacter(
+        auth.currentUser.uid,
+        activeCharacter.id!,
+        {
+          physicalTraits: tempTraits,
+        }
+      );
+    } catch (error) {
+      console.error("Failed to save traits", error);
+      alert("Erro ao salvar características.");
+    }
+  };
+
+  const copyPromptToClipboard = () => {
+    if (!activeCharacter) return;
+
+    const prompt = generateCharacterPrompt({
+      ...activeCharacter,
+      physicalTraits: tempTraits,
+    });
+    navigator.clipboard.writeText(prompt);
+    alert("Prompt copiado!");
+  };
+
+  const toggleFavorite = async () => {
+    if (!auth?.currentUser || !activeCharacter) return;
+    const char = activeCharacter;
+    const newVal = !char.isFavorite;
+
+    // Optimistic UI
+    updateActiveCharacter({ isFavorite: newVal });
+
+    try {
+      if (newVal) {
+        // Use the Master Favorite System service to ensure exclusivity
+        await CharacterService.setFavoriteCharacter(
+          auth.currentUser.uid,
+          char.id!
+        );
+      } else {
+        // Just untoggle
+        await CharacterService.updateCharacter(auth.currentUser.uid, char.id!, {
+          isFavorite: false,
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      // Revert on error
+      updateActiveCharacter({ isFavorite: !newVal });
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0 || !activeCharacter)
+      return;
+    const file = e.target.files[0];
+
+    setIsUploading(true);
+    try {
+      const compressed = await compressImage(file);
+      const { ref, uploadBytes, getDownloadURL } = await import(
+        "firebase/storage"
+      );
+      const { storage } = await import("@/firebaseConfig");
+
+      if (!storage || !auth?.currentUser)
+        throw new Error("Storage/Auth not ready");
+
+      const storageRef = ref(
+        storage,
+        `character-images/${auth.currentUser.uid}/${activeCharacter.id}/${file.name}`
+      );
+      await uploadBytes(storageRef, compressed);
+      const url = await getDownloadURL(storageRef);
+
+      // Update DB
+      await CharacterService.updateCharacter(
+        auth.currentUser.uid,
+        activeCharacter.id!,
+        { imageUrl: url }
+      );
+      updateActiveCharacter({ imageUrl: url });
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("Erro ao enviar imagem.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   // Authentication and Character Check
   useEffect(() => {
@@ -267,7 +472,8 @@ export default function MyCharacterPage() {
         setTempMoney(activeCharacter.money);
 
         // Derive max values first to safeguard defaults
-        const conMod = activeCharacter.attributes.Constituição;
+        const conAttr = (activeCharacter.attributes as any).Constituição;
+        const conMod = conAttr?.mod ?? conAttr ?? 0;
         const hpBase = activeCharacter.class?.pv || 16;
         const hpMax = hpBase + conMod;
         const pmBase = activeCharacter.class?.pm || 4;
@@ -324,7 +530,8 @@ export default function MyCharacterPage() {
         updateActiveCharacter(data);
 
         // Recalculate maxes for defaults
-        const conMod = (data.attributes as any)?.Constituição || 0;
+        const rawCon = (data.attributes as any)?.Constituição;
+        const conMod = typeof rawCon === "number" ? rawCon : rawCon?.mod || 0;
         const hpBase = data.class?.pv || 16;
         const hpMax = hpBase + conMod;
         const pmBase = data.class?.pm || 4;
@@ -409,7 +616,8 @@ export default function MyCharacterPage() {
   }
 
   // Calculate generic HP/MP if not stored explicitly (fallback)
-  const conMod = activeCharacter.attributes.Constituição;
+  const getAttrMod = (attr: any) => attr?.mod ?? attr ?? 0;
+  const conMod = getAttrMod(activeCharacter.attributes.Constituição);
   const hpBase = activeCharacter.class?.pv || 16;
   const hpMax = hpBase + conMod;
   const currentHp = activeCharacter.currentPv ?? hpMax;
@@ -428,10 +636,21 @@ export default function MyCharacterPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-stone-950 text-neutral-200 pb-20 font-sans selection:bg-amber-900 selection:text-white">
-      <FloatingBackButton />
+    <div className="text-neutral-200 pb-20 font-sans selection:bg-amber-900 selection:text-white">
+      {/* Full Page Background Image */}
+      {activeCharacter.imageUrl && (
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/95 to-stone-950 z-10" />
+          <div className="absolute inset-0 bg-stone-950/60 z-[5]" />
+          <img
+            src={activeCharacter.imageUrl}
+            alt="Background"
+            className="w-full h-full object-cover opacity-15 scale-110 blur-[3px] transform-gpu"
+          />
+        </div>
+      )}
       {/* --- HERO HEADER --- */}
-      <header className="relative w-full bg-gradient-to-b from-stone-900 to-stone-950 border-b border-stone-800 pb-8 pt-6 px-4 md:px-8 overflow-hidden">
+      <header className="relative w-full border-b border-stone-800 pb-8 pt-6 px-4 md:px-8 overflow-hidden z-10 bg-stone-950/40 backdrop-blur-sm">
         {/* Background Accents */}
         <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
           <Shield className="w-96 h-96 transform rotate-12" />
@@ -445,11 +664,26 @@ export default function MyCharacterPage() {
             className="flex flex-col md:flex-row items-center gap-6"
           >
             {/* Avatar */}
-            <div className="relative group perspective">
-              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-stone-800 bg-stone-900 flex items-center justify-center shadow-2xl relative z-10 group-hover:border-amber-700 transition-colors">
-                <span className="text-5xl md:text-6xl filter drop-shadow-lg">
-                  🧙‍♂️
-                </span>
+            <div
+              className="relative group perspective cursor-pointer"
+              onClick={() => setIsEditingTraits(true)}
+            >
+              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-stone-800/80 bg-stone-900 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)] relative z-10 group-hover:border-amber-700/80 transition-all overflow-hidden">
+                {activeCharacter.imageUrl ? (
+                  <img
+                    src={activeCharacter.imageUrl}
+                    alt={activeCharacter.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-5xl md:text-6xl filter drop-shadow-lg">
+                    🧙‍♂️
+                  </span>
+                )}
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Edit className="text-white" size={24} />
+                </div>
               </div>
               <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl group-hover:bg-amber-500/30 transition-all" />
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-stone-800 border border-stone-700 rounded-full text-[10px] font-bold uppercase tracking-wider text-amber-500 whitespace-nowrap z-20 shadow-lg">
@@ -458,24 +692,52 @@ export default function MyCharacterPage() {
             </div>
 
             {/* Character Info */}
-            <div className="flex-1 text-center md:text-left space-y-2">
-              <h1 className="text-4xl md:text-5xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 drop-shadow-sm">
-                {activeCharacter.name}
-              </h1>
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start items-center text-sm text-neutral-400 font-serif">
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-lg border border-white/5 hover:border-amber-500/30 hover:text-amber-200 transition-colors cursor-help">
+            <div className="flex-1 text-center md:text-left space-y-2 relative z-20">
+              <div className="flex items-center justify-center md:justify-start gap-4">
+                <h1 className="text-4xl md:text-5xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 drop-shadow-sm">
+                  {activeCharacter.name}
+                </h1>
+                <button
+                  onClick={() => setIsEditingTraits(true)}
+                  className="p-2 text-stone-500 hover:text-amber-500 transition-colors"
+                  title="Editar Aparência e Avatar"
+                >
+                  <Edit size={20} />
+                </button>
+                <button
+                  onClick={toggleFavorite}
+                  className={`p-2 transition-colors ${
+                    activeCharacter.isFavorite
+                      ? "text-yellow-400 hover:text-yellow-200"
+                      : "text-stone-600 hover:text-stone-400"
+                  }`}
+                  title={
+                    activeCharacter.isFavorite
+                      ? "Remover dos Favoritos"
+                      : "Marcar como Favorito"
+                  }
+                >
+                  <Star
+                    size={24}
+                    fill={activeCharacter.isFavorite ? "currentColor" : "none"}
+                  />
+                </button>
+              </div>
+
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start items-center text-sm text-stone-100 font-serif">
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30 hover:bg-amber-900/20 hover:text-amber-200 transition-colors cursor-help">
                   <Dna size={14} className="text-amber-500" />
                   {activeCharacter.race?.name || "Raça Desconhecida"}
                 </span>
                 <span className="w-1 h-1 bg-stone-700 rounded-full" />
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-lg border border-white/5 hover:border-amber-500/30 hover:text-amber-200 transition-colors cursor-help">
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30 hover:bg-amber-900/20 hover:text-amber-200 transition-colors cursor-help">
                   <Swords size={14} className="text-amber-500" />
                   {activeCharacter.class?.name || "Classe Desconhecida"}
                 </span>
                 {activeCharacter.origin && (
                   <>
                     <span className="w-1 h-1 bg-stone-700 rounded-full" />
-                    <span className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-lg border border-white/5 hover:border-amber-500/30 hover:text-amber-200 transition-colors cursor-help">
+                    <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30 hover:bg-amber-900/20 hover:text-amber-200 transition-colors cursor-help">
                       <BookOpen size={14} className="text-amber-500" />
                       {activeCharacter.origin.name}
                     </span>
@@ -485,11 +747,11 @@ export default function MyCharacterPage() {
             </div>
 
             {/* Resources (HP/MP) */}
-            <div className="flex gap-4 w-full md:w-auto mt-4 md:mt-0">
+            <div className="flex gap-4 w-full md:w-auto mt-4 md:mt-0 relative z-20">
               {/* HP Box */}
               <div className="flex-1 md:flex-none relative group min-w-[120px]">
                 <div className="absolute inset-x-4 bottom-0 h-10 bg-red-500/20 blur-xl group-hover:bg-red-500/30 transition-all" />
-                <div className="bg-gradient-to-br from-red-950/80 to-stone-900 border border-red-900/50 rounded-2xl p-4 flex flex-col items-center relative overflow-hidden">
+                <div className="bg-gradient-to-br from-red-950/90 to-stone-900/90 backdrop-blur-md border border-red-900/50 rounded-2xl p-4 flex flex-col items-center relative overflow-hidden shadow-2xl">
                   <div className="absolute top-0 right-0 p-2 opacity-10">
                     <Heart size={40} />
                   </div>
@@ -555,7 +817,7 @@ export default function MyCharacterPage() {
               {/* Mana Box */}
               <div className="flex-1 md:flex-none relative group min-w-[120px]">
                 <div className="absolute inset-x-4 bottom-0 h-10 bg-blue-500/20 blur-xl group-hover:bg-blue-500/30 transition-all" />
-                <div className="bg-gradient-to-br from-blue-950/80 to-stone-900 border border-blue-900/50 rounded-2xl p-4 flex flex-col items-center relative overflow-hidden">
+                <div className="bg-gradient-to-br from-blue-950/90 to-stone-900/90 backdrop-blur-md border border-blue-900/50 rounded-2xl p-4 flex flex-col items-center relative overflow-hidden shadow-2xl">
                   <div className="absolute top-0 right-0 p-2 opacity-10">
                     <Zap size={40} />
                   </div>
@@ -622,7 +884,220 @@ export default function MyCharacterPage() {
         </div>
       </header>
 
-      <main className="container mx-auto max-w-6xl px-4 md:px-8 -mt-6">
+      {/* --- TRAITS & IMAGE MODAL --- */}
+      <AnimatePresence>
+        {isEditingTraits && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-stone-900 border border-amber-900/50 rounded-2xl p-6 w-full max-w-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+            >
+              <div className="flex justify-between items-center mb-6 border-b border-stone-800 pb-4">
+                <h3 className="text-xl font-serif text-amber-500 flex items-center gap-2">
+                  <User size={24} /> Aparência do Personagem
+                </h3>
+                <button
+                  onClick={() => setIsEditingTraits(false)}
+                  className="text-stone-500 hover:text-white"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Image Upload Section */}
+                <div className="flex flex-col items-center gap-4 p-4 bg-stone-950/50 rounded-xl border border-stone-800">
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-stone-800 relative bg-stone-900">
+                    {activeCharacter.imageUrl ? (
+                      <img
+                        src={activeCharacter.imageUrl}
+                        alt="Avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-4xl absolute inset-0 flex items-center justify-center">
+                        🧙‍♂️
+                      </span>
+                    )}
+                    {isUploading && (
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col items-center gap-2">
+                    <label className="cursor-pointer bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+                      <Upload size={16} />
+                      Carregar Imagem
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                        disabled={isUploading}
+                      />
+                    </label>
+                    <p className="text-xs text-stone-500">
+                      A imagem será comprimida automaticamente.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Traits Form */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase font-bold text-stone-500">
+                      Gênero
+                    </label>
+                    <input
+                      value={tempTraits.gender}
+                      onChange={(e) =>
+                        setTempTraits({ ...tempTraits, gender: e.target.value })
+                      }
+                      placeholder="Ex: Masculino, Feminino, Fluido..."
+                      className="w-full bg-black/40 border border-stone-800 rounded p-2 text-stone-200 focus:border-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase font-bold text-stone-500">
+                      Altura
+                    </label>
+                    <input
+                      value={tempTraits.height}
+                      onChange={(e) =>
+                        setTempTraits({ ...tempTraits, height: e.target.value })
+                      }
+                      placeholder="Ex: 1.75m"
+                      className="w-full bg-black/40 border border-stone-800 rounded p-2 text-stone-200 focus:border-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase font-bold text-stone-500">
+                      Cabelo
+                    </label>
+                    <input
+                      value={tempTraits.hair}
+                      onChange={(e) =>
+                        setTempTraits({ ...tempTraits, hair: e.target.value })
+                      }
+                      placeholder="Ex: Longo, prateado..."
+                      className="w-full bg-black/40 border border-stone-800 rounded p-2 text-stone-200 focus:border-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase font-bold text-stone-500">
+                      Olhos
+                    </label>
+                    <input
+                      value={tempTraits.eyes}
+                      onChange={(e) =>
+                        setTempTraits({ ...tempTraits, eyes: e.target.value })
+                      }
+                      placeholder="Ex: Castanhos, brilhantes..."
+                      className="w-full bg-black/40 border border-stone-800 rounded p-2 text-stone-200 focus:border-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase font-bold text-stone-500">
+                      Pele
+                    </label>
+                    <input
+                      value={tempTraits.skin}
+                      onChange={(e) =>
+                        setTempTraits({ ...tempTraits, skin: e.target.value })
+                      }
+                      placeholder="Ex: Pálida, esverdeada..."
+                      className="w-full bg-black/40 border border-stone-800 rounded p-2 text-stone-200 focus:border-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="col-span-1 md:col-span-2 space-y-2">
+                    <label className="text-xs uppercase font-bold text-stone-500">
+                      Cicatrizes / Marcas
+                    </label>
+                    <input
+                      value={tempTraits.scars}
+                      onChange={(e) =>
+                        setTempTraits({ ...tempTraits, scars: e.target.value })
+                      }
+                      placeholder="Ex: Cicatriz no olho esquerdo, tatuagem de dragão..."
+                      className="w-full bg-black/40 border border-stone-800 rounded p-2 text-stone-200 focus:border-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="col-span-1 md:col-span-2 space-y-2">
+                    <label className="text-xs uppercase font-bold text-stone-500">
+                      Características Extras
+                    </label>
+                    <textarea
+                      value={tempTraits.extra}
+                      onChange={(e) =>
+                        setTempTraits({ ...tempTraits, extra: e.target.value })
+                      }
+                      placeholder="Cicatrizes, tatuagens, chifres..."
+                      className="w-full bg-black/40 border border-stone-800 rounded p-2 text-stone-200 focus:border-amber-500 outline-none h-20 resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Prompt Generator */}
+                <div className="bg-stone-950/50 p-4 rounded-xl border border-stone-800">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-bold text-amber-500 text-sm flex items-center gap-2">
+                      <Wand2 size={16} /> Gerador de Prompt AI
+                    </h4>
+                    {(tempTraits.gender ||
+                      tempTraits.hair ||
+                      tempTraits.eyes ||
+                      tempTraits.skin) && (
+                      <button
+                        onClick={copyPromptToClipboard}
+                        className="text-xs bg-stone-800 hover:bg-stone-700 px-2 py-1 rounded text-stone-300 transition-colors flex items-center gap-1.5"
+                      >
+                        <Edit size={12} />
+                        Copiar Prompt
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-stone-400 italic bg-black/40 p-2 rounded border border-stone-800/50 min-h-[60px]">
+                    {generateCharacterPrompt({
+                      ...activeCharacter,
+                      physicalTraits: tempTraits,
+                    })}
+                  </p>
+                  <p className="text-[10px] text-stone-600 mt-2">
+                    Use este prompt em ferramentas como Midjourney ou DALL-E
+                    para gerar o avatar do seu personagem.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end gap-3">
+                <button
+                  onClick={() => setIsEditingTraits(false)}
+                  className="px-4 py-2 text-stone-400 hover:text-white transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={saveTraits}
+                  className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-lg hover:shadow-amber-500/20 transition-all"
+                >
+                  Salvar Alterações
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <main className="container mx-auto max-w-6xl px-4 md:px-8 mt-6">
         {/* --- ATTRIBUTES ROW --- */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -631,11 +1106,29 @@ export default function MyCharacterPage() {
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8"
         >
           {attributesList.map(({ key, label, icon: Icon }) => {
-            const value = activeCharacter.attributes[key];
+            const attrData = activeCharacter.attributes?.[key];
+            if (attrData === undefined || attrData === null) return null;
+
+            // Handle both new object structure and legacy number structure
+            const isComplex =
+              typeof attrData === "object" && "value" in attrData;
+
+            const val = isComplex ? (attrData as any).value : attrData;
+            const isObject = typeof val === "object" && val !== null;
+
+            const total = isObject ? val.total : val;
+            const bonus = isObject ? val.bonus : 0;
+            const sources = isObject ? val.sources || [] : [];
+
             return (
               <div
                 key={key}
-                className="bg-stone-900/90 border border-stone-800 p-4 rounded-xl flex flex-col items-center justify-center relative group hover:border-amber-900/50 transition-colors shadow-lg"
+                title={
+                  sources.length > 0 ? `Fontes: ${sources.join(", ")}` : ""
+                }
+                className={`bg-stone-900/60 backdrop-blur-md border ${
+                  bonus > 0 ? "border-amber-500/40" : "border-stone-800"
+                } p-4 rounded-xl flex flex-col items-center justify-center relative group hover:border-amber-700/50 transition-all shadow-2xl cursor-help`}
               >
                 <div className="absolute top-2 left-2 text-stone-700 group-hover:text-amber-900/40 transition-colors">
                   <Icon size={16} />
@@ -643,382 +1136,237 @@ export default function MyCharacterPage() {
                 <span className="text-xs text-stone-500 uppercase font-bold tracking-wider mb-2">
                   {label.slice(0, 3)}
                 </span>
-                <span className="text-4xl font-serif font-bold text-neutral-200">
-                  {value}
-                </span>
+                <div className="flex items-baseline gap-1">
+                  <span
+                    className={`text-4xl font-serif font-bold ${
+                      bonus > 0 ? "text-amber-400" : "text-neutral-200"
+                    }`}
+                  >
+                    {total ?? 0}
+                  </span>
+                  {bonus > 0 && (
+                    <span className="text-sm font-bold text-amber-600/80">
+                      (+{bonus})
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* --- LEFT COLUMN: CORE INFO --- */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="space-y-6 lg:col-span-2"
-          >
-            {/* Class Essence */}
-            <section
-              aria-label="Essência da Classe"
-              className="bg-stone-900/50 border border-amber-900/20 rounded-2xl p-6 relative overflow-hidden group"
-            >
-              {activeCharacter.class?.name && (
-                <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <img
-                    src={`/assets/classes/${formatAssetName(
-                      activeCharacter.class.name
-                    )}.webp`}
-                    alt={activeCharacter.class.name}
-                    className="w-full h-full object-cover grayscale mix-blend-overlay"
-                  />
-                </div>
-              )}
-
-              <div className="relative z-10">
-                <h3 className="text-amber-500 font-serif text-lg mb-3 flex items-center gap-2">
-                  <Scroll size={18} /> Essência da Classe
-                </h3>
-                <p className="text-neutral-400 italic leading-relaxed text-sm md:text-base">
-                  {activeCharacter.class?.description ||
-                    "Aventureiros variam, mas cada classe possui uma centelha única que define sua jornada, seus poderes e seu destino no mundo."}
-                </p>
+        {/* --- 2. DEFENSE & MONEY --- */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          {/* Defense Card */}
+          <div className="bg-stone-900/60 backdrop-blur-md border border-stone-800/50 p-4 rounded-xl flex items-center justify-between shadow-xl">
+            <div className="flex items-center gap-4">
+              <Shield size={24} className="text-blue-500" />
+              <div>
+                <h4 className="text-xs uppercase font-bold text-stone-500">
+                  Defesa
+                </h4>
+                <span className="text-3xl font-bold text-stone-200">
+                  {10 +
+                    getAttrMod(activeCharacter.attributes?.Destreza) +
+                    (activeCharacter.bag?.armorPenalty || 0)}
+                </span>
               </div>
-            </section>
-
-            {/* Origin Essence */}
-            {activeCharacter.origin && (
-              <section
-                aria-label="Sua Origem"
-                className="bg-stone-900/50 border border-stone-800 rounded-2xl p-6 relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <img
-                    src={`https://source.unsplash.com/featured/?fantasy,${activeCharacter.origin.name}`}
-                    alt={activeCharacter.origin.name}
-                    className="w-full h-full object-cover grayscale mix-blend-overlay"
-                  />
-                </div>
-
-                <div className="relative z-10">
-                  <h3 className="text-amber-500 font-serif text-lg mb-3 flex items-center gap-2">
-                    <BookOpen size={18} /> Origem: {activeCharacter.origin.name}
-                  </h3>
-                  <p className="text-neutral-400 italic leading-relaxed text-sm md:text-base mb-3">
-                    {/* Placeholder description if none exists in model */}
-                    As raízes de um herói definem até onde seus galhos podem
-                    alcançar.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {activeCharacter.originBenefits?.map((benefit, i) => (
-                      <span
-                        key={i}
-                        className="px-2 py-1 bg-stone-950/80 border border-stone-700 rounded text-xs text-stone-300 shadow-sm"
-                      >
-                        {benefit.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {/* Proficiencies */}
-            <section
-              aria-label="Treinamento e Equipamento"
-              className="bg-stone-900/50 border border-stone-800 rounded-2xl p-6"
-            >
-              <h3 className="text-amber-500 font-serif text-lg mb-4 flex items-center gap-2">
-                <Swords size={18} /> Treinamento & Proficiências
-              </h3>
-              <div className="flex flex-wrap text-sm text-neutral-400 gap-y-2">
-                <p className="w-full mb-3">
-                  {activeCharacter.class?.detailedProficiencies ||
-                    (activeCharacter.class?.proficiencias?.length
-                      ? activeCharacter.class.proficiencias.join(", ")
-                      : "Nenhuma proficiência registrada.")}
-                </p>
-                <div className="flex gap-2 flex-wrap">
-                  {activeCharacter.class?.proficiencias?.map((prof) => (
-                    <span
-                      key={prof}
-                      className="px-3 py-1 bg-stone-800 rounded-md border border-stone-700 text-xs font-medium uppercase tracking-wide text-neutral-300"
-                    >
-                      {prof}
-                    </span>
-                  ))}
-                </div>
+            </div>
+            <div className="h-8 w-px bg-stone-800 mx-2"></div>
+            <div className="flex items-center gap-4 text-right">
+              <div>
+                <h4 className="text-xs uppercase font-bold text-stone-500">
+                  Deslocamento
+                </h4>
+                <span className="text-xl font-bold text-stone-200">
+                  9m <span className="text-sm text-stone-500">(6q)</span>
+                </span>
               </div>
-            </section>
+            </div>
+          </div>
 
-            {/* Abilities & Powers Sliders */}
-            <section aria-label="Habilidades e Poderes" className="space-y-2">
-              <SectionSlider
-                title="Habilidades de Raça"
-                items={activeCharacter.race?.abilities}
-                icon={Ghost}
-                colorClass="blue"
-              />
-
-              <SectionSlider
-                title="Habilidades de Classe"
-                items={activeCharacter.class?.abilities}
-                icon={Zap}
-                colorClass="amber"
-              />
-
-              <SectionSlider
-                title="Poderes de Classe"
-                items={activeCharacter.class?.powers}
-                icon={Swords}
-                colorClass="red"
-              />
-
-              <SectionSlider
-                title="Habilidades de Origem"
-                items={activeCharacter.originBenefits}
-                icon={BookOpen}
-                colorClass="emerald"
-              />
-
-              {activeCharacter.grantedPower && (
-                <SectionSlider
-                  title="Poderes Concedidos"
-                  items={[activeCharacter.grantedPower]}
-                  icon={Crown}
-                  colorClass="violet"
-                />
-              )}
-
-              {/* Empty State if no abilities */}
-              {!activeCharacter.class?.abilities?.length &&
-                !activeCharacter.class?.powers?.length &&
-                !activeCharacter.race?.abilities?.length &&
-                !activeCharacter.originBenefits?.length && (
-                  <div className="text-center p-12 bg-stone-900/30 rounded-2xl border border-dashed border-stone-800 text-stone-600 flex flex-col items-center gap-3">
-                    <Ghost size={40} className="opacity-20" />
-                    <p className="font-serif">
-                      Nenhuma habilidade manifestada ainda.
-                    </p>
-                  </div>
-                )}
-            </section>
-
-            {/* --- INVENTORY SLIDERS --- */}
-            <section
-              aria-label="Inventário Detalhado"
-              className="space-y-2 pt-8 border-t border-stone-900"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-serif text-amber-500 flex items-center gap-3">
-                  <Backpack size={26} /> Seu Inventário
-                </h2>
-                <div className="flex items-center gap-4 text-xs text-stone-500 font-bold uppercase tracking-widest">
-                  {(() => {
-                    const bag = activeCharacter.bag;
-                    if (!bag) return null;
-
-                    const currentSpaces =
-                      typeof bag.getSpaces === "function"
-                        ? bag.getSpaces()
-                        : (bag as any).spaces || 0;
-
-                    const maxCapacity = calculateCarryCapacity(activeCharacter);
-                    const isOverloaded = currentSpaces > maxCapacity;
-
-                    return (
-                      <span
-                        className={`flex items-center gap-2 ${
-                          isOverloaded ? "text-red-500 animate-pulse" : ""
-                        }`}
-                      >
-                        <Package
-                          size={14}
-                          className={
-                            isOverloaded ? "text-red-500" : "text-stone-700"
-                          }
-                        />
-                        Ocupado: {currentSpaces} / {maxCapacity} espaços
-                      </span>
-                    );
-                  })()}
-                </div>
-              </div>
-
-              {(() => {
-                const bag = activeCharacter.bag;
-                if (!bag) return null;
-
-                const equips =
-                  typeof bag.getEquipments === "function"
-                    ? bag.getEquipments()
-                    : (bag as any).equipments || {};
-
-                return (
-                  <>
-                    <SectionSlider
-                      title="Armas"
-                      items={equips["Arma"]}
-                      icon={Swords}
-                      colorClass="orange"
-                    />
-                    <SectionSlider
-                      title="Defesa"
-                      items={[
-                        ...(equips["Armadura"] || []),
-                        ...(equips["Escudo"] || []),
-                      ]}
-                      icon={Shield}
-                      colorClass="blue"
-                    />
-                    <SectionSlider
-                      title="Itens Gerais"
-                      items={equips["Item Geral"]}
-                      icon={Package}
-                      colorClass="stone"
-                    />
-                    <SectionSlider
-                      title="Alquimia"
-                      items={equips["Alquimía"]}
-                      icon={FlaskConical}
-                      colorClass="emerald"
-                    />
-                    <SectionSlider
-                      title="Vestuário"
-                      items={equips["Vestuário"]}
-                      icon={Shirt}
-                      colorClass="amber"
-                    />
-                    <SectionSlider
-                      title="Alimentação"
-                      items={equips["Alimentação"]}
-                      icon={Utensils}
-                      colorClass="orange"
-                    />
-                  </>
-                );
-              })()}
-
-              {/* Trained Skills Slider */}
-              <SectionSlider
-                title="Perícias Treinadas"
-                items={(activeCharacter.skills || []).map((s) => ({
-                  name: s,
-                  text: "Perícia treinada que concede bônus em testes relacionados.",
-                }))}
-                icon={Brain}
-                colorClass="indigo"
-              />
-            </section>
-          </motion.div>
-
-          {/* --- RIGHT COLUMN: SIDEBAR --- */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-6"
-          >
-            {/* Money Pouch */}
-            <div className="bg-gradient-to-br from-stone-900 to-stone-950 border border-amber-900/30 p-5 rounded-2xl shadow-lg relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Coins size={80} />
-              </div>
-
-              <div className="relative z-10">
-                <h4 className="text-xs uppercase font-bold text-stone-500 mb-2 flex justify-between items-center">
-                  <span>Tibares (T$)</span>
+          {/* Money Card */}
+          <div className="bg-stone-900/60 backdrop-blur-md border border-stone-800/50 p-4 rounded-xl flex items-center justify-between relative overflow-hidden shadow-xl">
+            <div className="flex items-center gap-4 relative z-10 w-full">
+              <Coins size={24} className="text-amber-500" />
+              <div className="flex-1">
+                <h4 className="text-xs uppercase font-bold text-stone-500 flex items-center gap-2">
+                  Tibares
                   {!isEditingMoney && (
                     <button
                       onClick={() => setIsEditingMoney(true)}
-                      className="text-stone-600 hover:text-amber-500 transition-colors bg-stone-800/50 p-1.5 rounded-lg"
-                      title="Editar Dinheiro"
+                      className="text-stone-600 hover:text-amber-500"
                     >
-                      <Edit size={14} />
+                      <Edit size={12} />
                     </button>
                   )}
                 </h4>
-
                 {isEditingMoney ? (
-                  <div className="flex items-center gap-2 animate-in fade-in zoom-in duration-200">
+                  <div className="flex items-center gap-2 mt-1 w-full text-right h-8">
                     <input
                       type="number"
                       value={tempMoney}
                       onChange={(e) => setTempMoney(Number(e.target.value))}
-                      className="w-full bg-black/40 border border-amber-500/50 rounded-lg p-2 text-xl font-bold text-amber-100 font-cinzel outline-none focus:ring-2 focus:ring-amber-500/30"
+                      className="w-full bg-black/40 border border-amber-500/50 rounded px-2 py-1 text-sm font-bold text-amber-100 outline-none"
                       autoFocus
                     />
                     <button
                       onClick={handleSaveMoney}
-                      className="p-2 bg-green-900/20 text-green-500 hover:bg-green-900/40 rounded-lg"
+                      className="text-green-500 p-1"
                     >
-                      <Check size={20} />
+                      <Check size={16} />
                     </button>
                     <button
                       onClick={() => setIsEditingMoney(false)}
-                      className="p-2 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded-lg"
+                      className="text-red-500 p-1"
                     >
-                      <X size={20} />
+                      <X size={16} />
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-amber-500/10 rounded-lg text-amber-500">
-                        <Coins size={24} />
-                      </div>
-                      <span className="text-2xl font-black font-cinzel text-amber-100">
-                        {activeCharacter.money}
-                      </span>
-                    </div>
+                  <div className="flex justify-between items-center w-full">
+                    <span className="text-2xl font-bold text-amber-100">
+                      {activeCharacter.money} T$
+                    </span>
+                    <Link
+                      href="/market"
+                      className="px-3 py-1 bg-amber-900/20 hover:bg-amber-900/40 text-amber-500 text-[10px] font-bold uppercase rounded border border-amber-900/30 transition-colors"
+                    >
+                      COMPRAR
+                    </Link>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </section>
 
-                <div className="mt-4 pt-4 border-t border-white/5">
-                  <Link
-                    href="/market"
-                    className="flex items-center justify-center gap-2 w-full py-2 bg-amber-900/20 hover:bg-amber-900/40 text-amber-500 font-bold rounded-lg transition-all text-xs uppercase tracking-wider border border-amber-900/30 hover:border-amber-500/50"
+        {/* --- 3. SKILLS --- */}
+        <SimpleList
+          title="Perícias"
+          icon={Brain}
+          items={activeCharacter.skills || []}
+        />
+
+        {/* Class Proficiencies (Bonus) */}
+        {(activeCharacter.class?.proficiencias?.length ?? 0) > 0 && (
+          <div className="mb-6 px-1">
+            <h4 className="text-xs font-bold text-stone-500 uppercase mb-2">
+              Proficiências de Classe
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {(activeCharacter.class?.proficiencias ?? []).map(
+                (p: string, i: number) => (
+                  <span
+                    key={i}
+                    className="px-2 py-1 bg-stone-900 border border-stone-800 rounded text-xs text-stone-400"
                   >
-                    <ShoppingBag size={14} /> Ir para o Mercado
-                  </Link>
-                </div>
-              </div>
+                    {p}
+                  </span>
+                )
+              )}
             </div>
+          </div>
+        )}
 
-            {/* Quick Stats / Mini Cards for Sidebar */}
-            <div className="grid grid-cols-1 gap-4">
-              <div className="bg-stone-900/50 border border-stone-800 p-4 rounded-xl flex items-center gap-4">
-                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
-                  <Shield size={20} />
-                </div>
-                <div>
-                  <h5 className="text-[10px] uppercase font-bold text-stone-500">
-                    Defesa Total
-                  </h5>
-                  <p className="text-xl font-bold text-stone-200">
-                    {10 +
-                      (activeCharacter.attributes?.Destreza || 0) +
-                      (activeCharacter.bag?.armorPenalty || 0)}
-                  </p>
-                </div>
-              </div>
+        {/* --- 4. WEAPONS --- */}
+        {(() => {
+          const bag = activeCharacter.bag;
+          const equips =
+            bag && typeof bag.getEquipments === "function"
+              ? bag.getEquipments()
+              : (bag as any)?.equipments || {};
+          return (
+            <ItemList
+              title="Armas & Ofensiva"
+              icon={Swords}
+              items={equips["Arma"]}
+            />
+          );
+        })()}
 
-              <div className="bg-stone-900/50 border border-stone-800 p-4 rounded-xl flex items-center gap-4">
-                <div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
-                  <Ghost size={20} />
-                </div>
-                <div>
-                  <h5 className="text-[10px] uppercase font-bold text-stone-500">
-                    Deslocamento
-                  </h5>
-                  <p className="text-xl font-bold text-stone-200">
-                    9m <span className="text-xs text-stone-500">(6q)</span>
-                  </p>
-                </div>
-              </div>
+        {/* --- 5. BACKPACK (Other Items) --- */}
+        {(() => {
+          const bag = activeCharacter.bag;
+          const equips =
+            bag && typeof bag.getEquipments === "function"
+              ? bag.getEquipments()
+              : (bag as any)?.equipments || {};
+
+          // Combine other categories
+          const defenseItems = [
+            ...(equips["Armadura"] || []),
+            ...(equips["Escudo"] || []),
+          ];
+          const generalItems = equips["Item Geral"];
+          const alchemyItems = equips["Alquimía"];
+          const clothingItems = equips["Vestuário"];
+          const foodItems = equips["Alimentação"];
+
+          return (
+            <div className="space-y-1">
+              <ItemList
+                title="Defesa & Escudos"
+                icon={Shield}
+                items={defenseItems}
+              />
+              <ItemList
+                title="Itens Gerais"
+                icon={Package}
+                items={generalItems}
+              />
+              <ItemList
+                title="Alquimia & Poções"
+                icon={FlaskRound}
+                items={alchemyItems}
+              />
+              <ItemList
+                title="Vestuário & Acessórios"
+                icon={Shirt}
+                items={clothingItems}
+              />
+              <ItemList title="Alimentação" icon={Apple} items={foodItems} />
             </div>
-          </motion.div>
+          );
+        })()}
+
+        {/* --- 6. ABILITIES & POWERS --- */}
+        <div className="pt-10 border-t border-stone-900">
+          <h2 className="text-xs font-black text-stone-500 mb-8 font-serif uppercase tracking-[0.3em] text-center">
+            Poderes & Habilidades
+          </h2>
+
+          <SectionSlider
+            title="Benefícios de Origem"
+            icon={BookOpen}
+            items={activeCharacter.originBenefits}
+          />
+
+          <SectionSlider
+            title="Habilidades de Classe"
+            icon={Zap}
+            items={activeCharacter.class?.abilities}
+          />
+
+          <SectionSlider
+            title="Poderes de Classe"
+            icon={Swords}
+            items={activeCharacter.class?.powers}
+          />
+
+          <SimpleList
+            title="Habilidades de Raça"
+            icon={Dna}
+            items={activeCharacter.race?.abilities}
+          />
+
+          {activeCharacter.grantedPower && (
+            <SimpleList
+              title="Poder Concedido"
+              icon={Crown}
+              items={[activeCharacter.grantedPower]}
+            />
+          )}
         </div>
       </main>
     </div>

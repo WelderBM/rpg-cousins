@@ -162,6 +162,7 @@ export interface ThreatSheet {
   imageUrl?: string;
 
   // Metadados
+  isFavorite?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
