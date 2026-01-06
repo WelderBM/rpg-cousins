@@ -21,6 +21,11 @@ import {
   Check,
   X,
   ShoppingBag,
+  Package,
+  FlaskConical,
+  Shirt,
+  Utensils,
+  Hammer,
 } from "lucide-react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
@@ -32,6 +37,192 @@ import { CharacterService } from "@/lib/characterService";
 import { getRaceByName } from "@/data/racas";
 import CLASSES from "@/data/classes";
 import { formatAssetName } from "@/utils/assetUtils";
+import { calculateCarryCapacity } from "@/utils/inventoryUtils";
+
+// --- SUB-COMPONENTS ---
+
+const AbilityCard = ({
+  title,
+  type,
+  description,
+  icon: Icon,
+  colorClass = "amber",
+  quantity,
+  item,
+}: any) => {
+  const colors: any = {
+    amber: "amber",
+    blue: "blue",
+    red: "red",
+    emerald: "emerald",
+    violet: "violet",
+    stone: "stone",
+    orange: "orange",
+    indigo: "indigo",
+    pink: "pink",
+    teal: "teal",
+  };
+  const c = colors[colorClass] || "amber";
+
+  // Helper to render stats if they exist
+  const hasStats =
+    item?.dano ||
+    item?.defenseBonus ||
+    item?.armorPenalty ||
+    item?.alcance ||
+    (item?.spaces !== undefined && item?.spaces !== null);
+
+  return (
+    <motion.div
+      whileHover={{ y: -5 }}
+      className={`flex-shrink-0 w-72 h-[320px] bg-stone-900 border border-stone-800 hover:border-${c}-500/50 p-5 rounded-2xl transition-all flex flex-col shadow-xl relative overflow-hidden group`}
+    >
+      <div
+        className={`absolute top-0 right-0 p-3 opacity-[0.03] group-hover:opacity-10 transition-opacity text-${c}-500`}
+      >
+        {Icon && <Icon size={80} />}
+      </div>
+
+      {/* Header */}
+      <div className="flex justify-between items-start mb-3 relative z-10 shrink-0">
+        <div className="flex-1 min-w-0 pr-2">
+          <h4
+            className={`text-${c}-100 font-serif font-bold text-lg leading-tight group-hover:text-${c}-400 transition-colors truncate`}
+          >
+            {title}
+          </h4>
+          <span
+            className={`text-[10px] uppercase tracking-widest font-bold text-${c}-500/70 block truncate`}
+          >
+            {type}
+          </span>
+        </div>
+        {quantity && quantity > 1 && (
+          <div
+            className={`bg-${c}-500/20 text-${c}-500 px-2 py-1 rounded text-xs font-bold border border-${c}-500/30 shrink-0`}
+          >
+            x{quantity}
+          </div>
+        )}
+      </div>
+
+      {/* Stats Row */}
+      {hasStats && (
+        <div className="flex flex-wrap gap-1.5 mb-3 relative z-10 shrink-0">
+          {item.dano && (
+            <span className="text-[10px] bg-red-950/40 text-red-400 px-1.5 py-0.5 rounded border border-red-500/20 font-mono">
+              {item.dano} {item.critico ? `/ ${item.critico}` : ""}
+            </span>
+          )}
+          {item.defenseBonus > 0 && (
+            <span className="text-[10px] bg-blue-950/40 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20 font-mono">
+              +{item.defenseBonus} Def
+            </span>
+          )}
+          {item.armorPenalty > 0 && (
+            <span className="text-[10px] bg-stone-950/40 text-stone-400 px-1.5 py-0.5 rounded border border-stone-500/20 font-mono">
+              -{item.armorPenalty} Pen
+            </span>
+          )}
+          {item.alcance && item.alcance !== "-" && (
+            <span className="text-[10px] bg-emerald-950/40 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">
+              {item.alcance}
+            </span>
+          )}
+          {item.spaces !== undefined &&
+            item.spaces !== null &&
+            (item.spaces === 0 ? (
+              <span className="text-[10px] bg-emerald-950/40 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">
+                (não ocupa espaço)
+              </span>
+            ) : (
+              <span className="text-[10px] bg-amber-950/40 text-amber-500 px-1.5 py-0.5 rounded border border-amber-500/20 font-mono">
+                {item.spaces} {item.spaces === 1 ? "slot" : "slots"}
+              </span>
+            ))}
+        </div>
+      )}
+
+      {/* Description */}
+      <div className="flex-1 relative z-10 min-h-0">
+        <p className="text-sm text-neutral-400 leading-relaxed overflow-hidden text-ellipsis line-clamp-[6]">
+          {description}
+        </p>
+      </div>
+
+      {/* Footer Price/Extra */}
+      {item?.preco !== undefined && (
+        <div className="mt-3 pt-3 border-t border-white/5 relative z-10 flex justify-between items-center shrink-0">
+          <span className="text-xs text-stone-500 font-bold uppercase tracking-wider">
+            Valor
+          </span>
+          <span className={`text-sm font-cinzel font-bold text-${c}-500/90`}>
+            {item.preco === 0 ? "Grátis" : `${item.preco} T$`}
+          </span>
+        </div>
+      )}
+
+      <div
+        className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r from-transparent via-${c}-500/20 to-transparent w-full opacity-0 group-hover:opacity-100 transition-opacity`}
+      />
+    </motion.div>
+  );
+};
+
+const SectionSlider = ({
+  title,
+  items,
+  icon: Icon,
+  colorClass = "amber",
+}: any) => {
+  if (!items || items.length === 0) return null;
+
+  return (
+    <div className="mb-10 last:mb-0">
+      <div className="flex items-center justify-between border-b border-stone-800 pb-3 mb-5">
+        <h3
+          className={`text-${colorClass}-500 font-serif text-xl flex items-center gap-3`}
+        >
+          {Icon && <Icon size={22} className={`text-${colorClass}-500`} />}
+          {title}
+        </h3>
+        <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest bg-stone-900/50 px-3 py-1 rounded-full border border-stone-800 flex items-center gap-2">
+          <span
+            className={`w-1.5 h-1.5 rounded-full bg-${colorClass}-500 animate-pulse`}
+          />
+          {items.length} {items.length === 1 ? "Item" : "Itens"}
+        </span>
+      </div>
+
+      <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-2 -mx-2 scrollbar-thin scrollbar-thumb-stone-800 scrollbar-track-transparent snap-x mask-fade-edges">
+        {items.map((item: any, idx: number) => (
+          <AbilityCard
+            key={idx}
+            type={item.subGroup || item.tipo || title.split(" ").pop()}
+            title={item.name || item.nome}
+            // Use logical ORs to find the best description available
+            description={
+              item.text ||
+              item.description ||
+              item.effect ||
+              (item.dano
+                ? `Dano: ${item.dano} ${
+                    item.critico ? `(Crit: ${item.critico})` : ""
+                  }`
+                : null) ||
+              item.value ||
+              "Sem descrição detalhada."
+            }
+            quantity={item.quantidade}
+            icon={Icon}
+            colorClass={colorClass}
+            item={item} // Pass full item for advanced stats rendering
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default function MyCharacterPage() {
   const router = useRouter();
@@ -314,23 +505,39 @@ export default function MyCharacterPage() {
 
                   {isEditingPv ? (
                     <div className="flex items-center gap-1 animate-in fade-in zoom-in">
-                      <input
-                        type="number"
-                        value={tempPv}
-                        onChange={(e) => setTempPv(Number(e.target.value))}
-                        className="w-16 bg-black/40 border border-red-500/50 rounded text-center font-bold text-red-100"
-                        autoFocus
-                      />
-                      <button onClick={handleSavePv}>
-                        <Check size={16} className="text-green-500" />
-                      </button>
-                      <button onClick={() => setIsEditingPv(false)}>
-                        <X size={16} className="text-red-500" />
-                      </button>
+                      <div className="flex items-baseline gap-1">
+                        <input
+                          type="number"
+                          value={tempPv}
+                          onChange={(e) => setTempPv(Number(e.target.value))}
+                          className="w-16 bg-black/40 border border-red-500/50 rounded text-center font-bold text-red-100 outline-none focus:ring-1 focus:ring-red-500/30"
+                          autoFocus
+                        />
+                        <span className="text-xs text-red-500/60 font-medium whitespace-nowrap">
+                          / {hpMax}
+                        </span>
+                      </div>
+                      <div className="flex gap-1 ml-1">
+                        <button
+                          onClick={handleSavePv}
+                          className="p-1 bg-green-900/20 text-green-500 hover:bg-green-900/40 rounded"
+                        >
+                          <Check size={14} />
+                        </button>
+                        <button
+                          onClick={() => setIsEditingPv(false)}
+                          className="p-1 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-red-100">
+                    <div
+                      className="flex items-baseline gap-1 cursor-pointer group/value"
+                      onClick={() => setIsEditingPv(true)}
+                    >
+                      <span className="text-3xl font-black text-red-100 group-hover/value:text-red-400 transition-colors">
                         {currentHp}
                       </span>
                       <span className="text-xs text-red-500/60 font-medium">
@@ -355,7 +562,7 @@ export default function MyCharacterPage() {
                     {!isEditingPm && (
                       <button
                         onClick={() => setIsEditingPm(true)}
-                        className="p-1 text-blue-400/50 hover:text-blue-300"
+                        className="p-1 text-blue-400/50 hover:text-blue-300 transition-colors"
                       >
                         <Edit size={12} />
                       </button>
@@ -364,23 +571,39 @@ export default function MyCharacterPage() {
 
                   {isEditingPm ? (
                     <div className="flex items-center gap-1 animate-in fade-in zoom-in">
-                      <input
-                        type="number"
-                        value={tempPm}
-                        onChange={(e) => setTempPm(Number(e.target.value))}
-                        className="w-16 bg-black/40 border border-blue-500/50 rounded text-center font-bold text-blue-100"
-                        autoFocus
-                      />
-                      <button onClick={handleSavePm}>
-                        <Check size={16} className="text-green-500" />
-                      </button>
-                      <button onClick={() => setIsEditingPm(false)}>
-                        <X size={16} className="text-red-500" />
-                      </button>
+                      <div className="flex items-baseline gap-1">
+                        <input
+                          type="number"
+                          value={tempPm}
+                          onChange={(e) => setTempPm(Number(e.target.value))}
+                          className="w-16 bg-black/40 border border-blue-500/50 rounded text-center font-bold text-blue-100 outline-none focus:ring-1 focus:ring-blue-500/30"
+                          autoFocus
+                        />
+                        <span className="text-xs text-blue-500/60 font-medium whitespace-nowrap">
+                          / {pmMax}
+                        </span>
+                      </div>
+                      <div className="flex gap-1 ml-1">
+                        <button
+                          onClick={handleSavePm}
+                          className="p-1 bg-green-900/20 text-green-500 hover:bg-green-900/40 rounded"
+                        >
+                          <Check size={14} />
+                        </button>
+                        <button
+                          onClick={() => setIsEditingPm(false)}
+                          className="p-1 bg-red-900/20 text-red-500 hover:bg-red-900/40 rounded"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-blue-100">
+                    <div
+                      className="flex items-baseline gap-1 cursor-pointer group/value"
+                      onClick={() => setIsEditingPm(true)}
+                    >
+                      <span className="text-3xl font-black text-blue-100 group-hover/value:text-blue-400 transition-colors">
                         {currentPm}
                       </span>
                       <span className="text-xs text-blue-500/60 font-medium">
@@ -525,68 +748,164 @@ export default function MyCharacterPage() {
               </div>
             </section>
 
-            {/* Abilities & Powers */}
-            <section aria-label="Habilidades e Poderes" className="space-y-4">
-              <div className="flex items-center justify-between border-b border-stone-800 pb-2">
-                <h3 className="text-amber-500 font-serif text-xl flex items-center gap-2">
-                  <Zap size={20} /> Habilidades de Classe
-                </h3>
-                <span className="text-xs text-stone-500 uppercase font-bold">
-                  Nível {activeCharacter.level}
-                </span>
+            {/* Abilities & Powers Sliders */}
+            <section aria-label="Habilidades e Poderes" className="space-y-2">
+              <SectionSlider
+                title="Habilidades de Raça"
+                items={activeCharacter.race?.abilities}
+                icon={Ghost}
+                colorClass="blue"
+              />
+
+              <SectionSlider
+                title="Habilidades de Classe"
+                items={activeCharacter.class?.abilities}
+                icon={Zap}
+                colorClass="amber"
+              />
+
+              <SectionSlider
+                title="Poderes de Classe"
+                items={activeCharacter.class?.powers}
+                icon={Swords}
+                colorClass="red"
+              />
+
+              <SectionSlider
+                title="Habilidades de Origem"
+                items={activeCharacter.originBenefits}
+                icon={BookOpen}
+                colorClass="emerald"
+              />
+
+              {activeCharacter.grantedPower && (
+                <SectionSlider
+                  title="Poderes Concedidos"
+                  items={[activeCharacter.grantedPower]}
+                  icon={Crown}
+                  colorClass="violet"
+                />
+              )}
+
+              {/* Empty State if no abilities */}
+              {!activeCharacter.class?.abilities?.length &&
+                !activeCharacter.class?.powers?.length &&
+                !activeCharacter.race?.abilities?.length &&
+                !activeCharacter.originBenefits?.length && (
+                  <div className="text-center p-12 bg-stone-900/30 rounded-2xl border border-dashed border-stone-800 text-stone-600 flex flex-col items-center gap-3">
+                    <Ghost size={40} className="opacity-20" />
+                    <p className="font-serif">
+                      Nenhuma habilidade manifestada ainda.
+                    </p>
+                  </div>
+                )}
+            </section>
+
+            {/* --- INVENTORY SLIDERS --- */}
+            <section
+              aria-label="Inventário Detalhado"
+              className="space-y-2 pt-8 border-t border-stone-900"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-serif text-amber-500 flex items-center gap-3">
+                  <Backpack size={26} /> Seu Inventário
+                </h2>
+                <div className="flex items-center gap-4 text-xs text-stone-500 font-bold uppercase tracking-widest">
+                  {(() => {
+                    const bag = activeCharacter.bag;
+                    if (!bag) return null;
+
+                    const currentSpaces =
+                      typeof bag.getSpaces === "function"
+                        ? bag.getSpaces()
+                        : (bag as any).spaces || 0;
+
+                    const maxCapacity = calculateCarryCapacity(activeCharacter);
+                    const isOverloaded = currentSpaces > maxCapacity;
+
+                    return (
+                      <span
+                        className={`flex items-center gap-2 ${
+                          isOverloaded ? "text-red-500 animate-pulse" : ""
+                        }`}
+                      >
+                        <Package
+                          size={14}
+                          className={
+                            isOverloaded ? "text-red-500" : "text-stone-700"
+                          }
+                        />
+                        Ocupado: {currentSpaces} / {maxCapacity} espaços
+                      </span>
+                    );
+                  })()}
+                </div>
               </div>
 
-              <div className="grid gap-4">
-                {activeCharacter.class?.abilities?.map((ability: any) => (
-                  <div
-                    key={ability.name}
-                    className="group bg-stone-900/80 border border-stone-800 hover:border-amber-900/40 p-5 rounded-xl transition-all"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="text-amber-100 font-serif font-bold text-lg group-hover:text-amber-400 transition-colors">
-                        {ability.name}
-                      </h4>
-                      <span className="px-2 py-0.5 bg-stone-950 rounded text-[10px] items-center text-stone-600 font-bold uppercase border border-stone-800">
-                        Passiva
-                      </span>
-                    </div>
-                    {ability.text && (
-                      <p className="text-sm text-neutral-400 leading-relaxed">
-                        {ability.text}
-                      </p>
-                    )}
-                  </div>
-                ))}
-                {(activeCharacter.class?.powers || []).map((power: any) => (
-                  <div
-                    key={power.name}
-                    className="group bg-stone-900/80 border border-stone-800 hover:border-amber-900/40 p-5 rounded-xl transition-all"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="text-amber-100 font-serif font-bold text-lg group-hover:text-amber-400 transition-colors">
-                        {power.name}
-                      </h4>
-                      <span className="px-2 py-0.5 bg-violet-950/20 text-violet-400 rounded text-[10px] items-center font-bold uppercase border border-violet-900/30">
-                        Poder
-                      </span>
-                    </div>
-                    {power.text && (
-                      <p className="text-sm text-neutral-400 leading-relaxed">
-                        {power.text}
-                      </p>
-                    )}
-                  </div>
-                ))}
+              {(() => {
+                const bag = activeCharacter.bag;
+                if (!bag) return null;
 
-                {(!activeCharacter.class?.abilities ||
-                  activeCharacter.class.abilities.length === 0) &&
-                  (!activeCharacter.class?.powers ||
-                    activeCharacter.class.powers.length === 0) && (
-                    <div className="text-center p-8 bg-stone-900/30 rounded-xl border border-dashed border-stone-800 text-stone-600">
-                      Nenhuma habilidade desbloqueada ainda.
-                    </div>
-                  )}
-              </div>
+                const equips =
+                  typeof bag.getEquipments === "function"
+                    ? bag.getEquipments()
+                    : (bag as any).equipments || {};
+
+                return (
+                  <>
+                    <SectionSlider
+                      title="Armas"
+                      items={equips["Arma"]}
+                      icon={Swords}
+                      colorClass="orange"
+                    />
+                    <SectionSlider
+                      title="Defesa"
+                      items={[
+                        ...(equips["Armadura"] || []),
+                        ...(equips["Escudo"] || []),
+                      ]}
+                      icon={Shield}
+                      colorClass="blue"
+                    />
+                    <SectionSlider
+                      title="Itens Gerais"
+                      items={equips["Item Geral"]}
+                      icon={Package}
+                      colorClass="stone"
+                    />
+                    <SectionSlider
+                      title="Alquimia"
+                      items={equips["Alquimía"]}
+                      icon={FlaskConical}
+                      colorClass="emerald"
+                    />
+                    <SectionSlider
+                      title="Vestuário"
+                      items={equips["Vestuário"]}
+                      icon={Shirt}
+                      colorClass="amber"
+                    />
+                    <SectionSlider
+                      title="Alimentação"
+                      items={equips["Alimentação"]}
+                      icon={Utensils}
+                      colorClass="orange"
+                    />
+                  </>
+                );
+              })()}
+
+              {/* Trained Skills Slider */}
+              <SectionSlider
+                title="Perícias Treinadas"
+                items={(activeCharacter.skills || []).map((s) => ({
+                  name: s,
+                  text: "Perícia treinada que concede bônus em testes relacionados.",
+                }))}
+                icon={Brain}
+                colorClass="indigo"
+              />
             </section>
           </motion.div>
 
@@ -597,7 +916,7 @@ export default function MyCharacterPage() {
             transition={{ delay: 0.3 }}
             className="space-y-6"
           >
-            {/* Money Pouch - REDESIGNED */}
+            {/* Money Pouch */}
             <div className="bg-gradient-to-br from-stone-900 to-stone-950 border border-amber-900/30 p-5 rounded-2xl shadow-lg relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Coins size={80} />
@@ -663,92 +982,36 @@ export default function MyCharacterPage() {
               </div>
             </div>
 
-            {/* Selected Skills */}
-            <div className="bg-stone-900/80 border border-stone-800 p-6 rounded-2xl">
-              <h3 className="text-amber-500 font-serif text-lg mb-4 flex items-center gap-2">
-                <BookOpen size={18} /> Perícias Treinadas
-              </h3>
-              <ul className="space-y-2">
-                {(activeCharacter.skills || []).map((skill) => (
-                  <li
-                    key={skill}
-                    className="flex items-center justify-between p-2 rounded-lg bg-stone-950/50 border border-stone-800/50"
-                  >
-                    <span className="text-sm font-medium text-neutral-300">
-                      {skill}
-                    </span>
-                    <span className="text-xs font-bold text-amber-500 bg-amber-950/20 px-2 py-0.5 rounded">
-                      Treinado
-                    </span>
-                  </li>
-                ))}
-                {(!activeCharacter.skills ||
-                  activeCharacter.skills.length === 0) && (
-                  <li className="text-xs text-stone-600 italic">
-                    Nenhuma perícia treinada.
-                  </li>
-                )}
-              </ul>
-            </div>
-
-            {/* Inventory / Bag */}
-            <div className="bg-stone-900/80 border border-stone-800 p-6 rounded-2xl">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-amber-500 font-serif text-lg flex items-center gap-2">
-                  <Backpack size={18} /> Inventário
-                </h3>
-                {activeCharacter.bag &&
-                  typeof activeCharacter.bag.getSpaces === "function" && (
-                    <span className="text-xs text-stone-500">
-                      {activeCharacter.bag.getSpaces()} slots
-                    </span>
-                  )}
+            {/* Quick Stats / Mini Cards for Sidebar */}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="bg-stone-900/50 border border-stone-800 p-4 rounded-xl flex items-center gap-4">
+                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                  <Shield size={20} />
+                </div>
+                <div>
+                  <h5 className="text-[10px] uppercase font-bold text-stone-500">
+                    Defesa Total
+                  </h5>
+                  <p className="text-xl font-bold text-stone-200">
+                    {10 +
+                      (activeCharacter.attributes?.Destreza || 0) +
+                      (activeCharacter.bag?.armorPenalty || 0)}
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                {(() => {
-                  // Defensive coding for bag format
-                  const equipments =
-                    activeCharacter.bag &&
-                    typeof activeCharacter.bag.getEquipments === "function"
-                      ? Object.values(
-                          activeCharacter.bag.getEquipments()
-                        ).flat()
-                      : (activeCharacter.bag as any)?.equipments // Fallback for plain object structure
-                      ? Object.values(
-                          (activeCharacter.bag as any).equipments
-                        ).flat()
-                      : [];
-
-                  if (equipments.length === 0)
-                    return (
-                      <p className="text-xs text-stone-600 italic">
-                        Mochila vazia.
-                      </p>
-                    );
-
-                  return equipments
-                    .slice(0, 8)
-                    .map((item: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-3 p-2 bg-stone-950/30 rounded border border-stone-800/50"
-                      >
-                        <div className="w-8 h-8 rounded bg-stone-900 flex items-center justify-center border border-stone-800">
-                          {/* Icon placeholder logic */}
-                          <Shield size={14} className="text-stone-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-neutral-300 truncate">
-                            {item.nome}
-                          </p>
-                          <p className="text-[10px] text-stone-500 capitalize">
-                            {item.tipo || "Item"}
-                          </p>
-                        </div>
-                      </div>
-                    ));
-                })()}
+              <div className="bg-stone-900/50 border border-stone-800 p-4 rounded-xl flex items-center gap-4">
+                <div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
+                  <Ghost size={20} />
+                </div>
+                <div>
+                  <h5 className="text-[10px] uppercase font-bold text-stone-500">
+                    Deslocamento
+                  </h5>
+                  <p className="text-xl font-bold text-stone-200">
+                    9m <span className="text-xs text-stone-500">(6q)</span>
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { cloneDeep } from "lodash";
 import { Atributo } from "../data/atributos";
 import Race from "../interfaces/Race";
 import Origin, { OriginBenefits } from "../interfaces/Origin";
@@ -88,6 +89,7 @@ interface CharacterWizardState {
   setFlexibleAttributeChoice: (index: number, attr: Atributo) => void;
   addToBag: (item: Equipment) => void;
   removeFromBag: (item: Equipment) => void;
+  updateItemQuantity: (item: Equipment, delta: number) => void;
   updateMoney: (value: number) => void;
   setName: (name: string) => void;
 
@@ -187,14 +189,49 @@ export const useCharacterStore = create<CharacterWizardState>()(
 
       removeFromBag: (item) => {
         const currentBag = get().bag;
-        const equips = { ...currentBag.getEquipments() };
+        const equips = cloneDeep(currentBag.getEquipments());
         const group = item.group || "Item Geral";
+        const groupKey = group as keyof BagEquipments;
 
-        if (equips[group as keyof typeof equips]) {
-          const list = equips[group as keyof typeof equips];
+        if (equips[groupKey]) {
+          const list = equips[groupKey];
           const idx = list.findIndex((i) => i.nome === item.nome);
           if (idx > -1) {
-            list.splice(idx, 1);
+            const existing = list[idx];
+            if ((existing.quantidade || 1) > 1) {
+              existing.quantidade = (existing.quantidade || 1) - 1;
+            } else {
+              list.splice(idx, 1);
+            }
+            const newBag = new Bag(equips);
+            set({ bag: newBag });
+          }
+        }
+      },
+
+      updateItemQuantity: (item, delta) => {
+        const currentBag = get().bag;
+        const equips = cloneDeep(currentBag.getEquipments());
+        const group = item.group || "Item Geral";
+        const groupKey = group as keyof BagEquipments;
+
+        if (equips[groupKey]) {
+          const list = equips[groupKey];
+          const idx = list.findIndex((i) => i.nome === item.nome);
+          if (idx > -1) {
+            const existing = list[idx];
+            const newQty = (existing.quantidade || 1) + delta;
+            if (newQty > 0) {
+              existing.quantidade = newQty;
+            } else {
+              list.splice(idx, 1);
+            }
+            const newBag = new Bag(equips);
+            set({ bag: newBag });
+          } else if (delta > 0) {
+            // If item not in bag and we are adding
+            const newItem = { ...item, quantidade: delta };
+            list.push(newItem);
             const newBag = new Bag(equips);
             set({ bag: newBag });
           }

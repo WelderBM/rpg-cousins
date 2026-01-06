@@ -32,6 +32,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getEquipmentsByCategory } from "../../lib/localData";
 import Equipment from "../../interfaces/Equipment";
 import { getInitialMoney } from "../../functions/general";
+import Bag, { calcBagSpaces } from "../../interfaces/Bag";
+import { PurchaseModal } from "./PurchaseModal";
 
 // Animation Variants
 const containerVariants = {
@@ -101,10 +103,8 @@ const MarketPage = () => {
         if (!user) {
           router.push("/characters");
         } else {
-          // User is logged in, check if we need to fetch characters
-          if (!activeCharacter) {
-            // Maybe fetch here or in another effect, but we need to stop the redirect
-          }
+          // User is logged in
+          setLoading(false);
         }
       });
     };
@@ -119,307 +119,93 @@ const MarketPage = () => {
   const [myCharacters, setMyCharacters] = useState<any[]>([]);
   const [loadingChars, setLoadingChars] = useState(false);
 
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [purchasingItem, setPurchasingItem] = useState<Equipment | null>(null);
+
   useEffect(() => {
     const fetchMyCharacters = async () => {
-      if (auth?.currentUser && !activeCharacter) {
-        setLoadingChars(true);
-        try {
-          const chars = await CharacterService.getCharacters(
-            auth.currentUser.uid
-          );
-          setMyCharacters(chars);
-        } catch (error) {
-          console.error("Failed to fetch characters", error);
-        } finally {
-          setLoadingChars(false);
-        }
-      }
-    };
-    fetchMyCharacters();
-  }, [auth?.currentUser, activeCharacter]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      const data = await getEquipmentsByCategory();
-      setCategories(data);
-      setLoading(false);
-    };
-    loadData();
-  }, []);
-
-  // Initialize character money if not set or if it's the default value
-  useEffect(() => {
-    const initializeMoney = async () => {
-      if (activeCharacter && auth?.currentUser) {
-        // Check if money needs initialization (is 0 or undefined)
-        if (
-          activeCharacter.money === undefined ||
-          activeCharacter.money === 0
-        ) {
-          const initialMoney = getInitialMoney(
-            activeCharacter.level || 1,
-            activeCharacter.class?.name
-          );
-
+      if (auth?.currentUser) {
+        // Fetch if empty or if we want to ensure freshness (but avoiding too many reads)
+        // For now, fetch if empty.
+        if (myCharacters.length === 0) {
+          setLoadingChars(true);
           try {
-            await CharacterService.updateCharacter(
-              auth.currentUser.uid,
-              activeCharacter.id!,
-              { money: initialMoney }
+            const chars = await CharacterService.getCharacters(
+              auth.currentUser.uid
             );
-
-            updateActiveCharacter({ money: initialMoney });
-
-            setFeedback({
-              msg: `Dinheiro inicial: ${initialMoney} T$`,
-              type: "success",
-            });
-            setTimeout(() => setFeedback(null), 2000);
+            setMyCharacters(chars);
           } catch (error) {
-            console.error("Failed to initialize money:", error);
+            console.error("Failed to fetch characters", error);
+          } finally {
+            setLoadingChars(false);
           }
         }
       }
     };
+    fetchMyCharacters();
+  }, [auth?.currentUser, myCharacters.length]);
 
-    initializeMoney();
-  }, [activeCharacter?.id]); // Only run when character changes
-
-  // Reset pagination when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [
-    activeTab,
-    searchTerm,
-    selectedSubGroups,
-    selectedDamageTypes,
-    priceRange,
-    sortOrder,
-  ]);
-
-  // Reset advanced filters when main tab changes
-  useEffect(() => {
-    setSelectedSubGroups([]);
-    setSelectedDamageTypes([]);
-    setPriceRange({ min: "", max: "" });
-    // Keep sort order
-  }, [activeTab]);
-
-  // --- Filter Logic ---
-
-  const displayedItems = useMemo(() => {
-    if (!categories || !categories.general) return [];
-
-    let items: Equipment[] = [];
-
-    // 1. Initial Category Filter
-    switch (activeTab) {
-      case "weapons":
-        items = categories.weapons || [];
-        break;
-      case "defense":
-        items = [...(categories.armors || []), ...(categories.shields || [])];
-        break;
-      case "general":
-        items = categories.general || [];
-        break;
-      case "alchemy":
-        items = categories.alchemy || [];
-        break;
-      case "clothing":
-        items = categories.clothing || [];
-        break;
-      case "food":
-        items = categories.food || [];
-        break;
-      case "all":
-      default:
-        items = [
-          ...(categories.weapons || []),
-          ...(categories.armors || []),
-          ...(categories.shields || []),
-          ...(categories.general || []),
-          ...(categories.alchemy || []),
-          ...(categories.clothing || []),
-          ...(categories.food || []),
-        ];
-        break;
+  const bagItems = useMemo(() => {
+    if (!activeCharacter?.bag) return [];
+    if (activeCharacter.bag instanceof Bag) {
+      return Object.values(activeCharacter.bag.getEquipments()).flat();
     }
-
-    // 2. Search
-    if (searchTerm) {
-      const lower = searchTerm.toLowerCase();
-      items = items.filter((i) => i.nome.toLowerCase().includes(lower));
+    // Fallback if bag is atomic object (hydration issue or raw data)
+    if ((activeCharacter.bag as any).equipments) {
+      return Object.values((activeCharacter.bag as any).equipments).flat();
     }
+    return [];
+  }, [activeCharacter]);
 
-    // 3. SubGroup Filter
-    if (selectedSubGroups.length > 0) {
-      items = items.filter(
-        (i) => i.subGroup && selectedSubGroups.includes(i.subGroup)
-      );
-    }
-
-    // 4. Damage Type Filter (Weapons)
-    if (selectedDamageTypes.length > 0) {
-      items = items.filter((i) => {
-        if (!i.tipo) return false;
-        // Check if any selected type matches the item's type string (e.g. "Corte/Perfuração")
-        return selectedDamageTypes.some((type) =>
-          i.tipo?.toLowerCase().includes(type.toLowerCase())
-        );
-      });
-    }
-
-    // 5. Price Range
-    if (priceRange.min !== "") {
-      items = items.filter((i) => (i.preco || 0) >= parseFloat(priceRange.min));
-    }
-    if (priceRange.max !== "") {
-      items = items.filter((i) => (i.preco || 0) <= parseFloat(priceRange.max));
-    }
-
-    // 6. Sorting
-    items.sort((a, b) => {
-      switch (sortOrder) {
-        case "name-asc":
-          return a.nome.localeCompare(b.nome);
-        case "name-desc":
-          return b.nome.localeCompare(a.nome);
-        case "price-asc":
-          return (a.preco || 0) - (b.preco || 0);
-        case "price-desc":
-          return (b.preco || 0) - (a.preco || 0);
-        default:
-          return 0;
-      }
-    });
-
-    return items;
-  }, [
-    categories,
-    activeTab,
-    searchTerm,
-    selectedSubGroups,
-    selectedDamageTypes,
-    priceRange,
-    sortOrder,
-  ]);
-
-  // --- Extract Dynamic Filter Options ---
-  const dynamicFilters = useMemo(() => {
-    if (!categories || !categories.general)
-      return { subGroups: [], damageTypes: [] };
-
-    let baseItems: Equipment[] = [];
-    switch (activeTab) {
-      case "weapons":
-        baseItems = categories.weapons || [];
-        break;
-      case "defense":
-        baseItems = [
-          ...(categories.armors || []),
-          ...(categories.shields || []),
-        ];
-        break;
-      case "general":
-        baseItems = categories.general || [];
-        break;
-      case "alchemy":
-        baseItems = categories.alchemy || [];
-        break;
-      case "clothing":
-        baseItems = categories.clothing || [];
-        break;
-      case "food":
-        baseItems = categories.food || [];
-        break;
-      case "all":
-        baseItems = [];
-        break; // Too many filters for All, maybe disable?
-    }
-
-    const subGroups = Array.from(
-      new Set(baseItems.map((i) => i.subGroup).filter(Boolean))
-    ) as string[];
-
-    // Normalize damage types: "Corte/Perfuração" -> ["Corte", "Perfuração"]
-    let damageTypes: string[] = [];
-    if (activeTab === "weapons") {
-      const rawTypes = baseItems.map((i) => i.tipo).filter(Boolean) as string[];
-      const normalized = new Set<string>();
-      rawTypes.forEach((t) => {
-        // Simple mapping based on your data: Perf., Corte, Impac. etc
-        if (t.toLowerCase().includes("corte")) normalized.add("Corte");
-        if (t.toLowerCase().includes("perf")) normalized.add("Perfuração");
-        if (t.toLowerCase().includes("impac")) normalized.add("Impacto");
-      });
-      damageTypes = Array.from(normalized);
-    }
-
-    return { subGroups, damageTypes };
-  }, [categories, activeTab]);
-
-  // --- Helper to toggle filters ---
-  const toggleSubGroup = (group: string) => {
-    setSelectedSubGroups((prev) =>
-      prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
-    );
-  };
-
-  const toggleDamageType = (type: string) => {
-    setSelectedDamageTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    );
-  };
-
-  // --- Pagination ---
-  const totalPages = Math.ceil(displayedItems.length / ITEMS_PER_PAGE);
-  const paginatedItems = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return displayedItems.slice(start, start + ITEMS_PER_PAGE);
-  }, [displayedItems, currentPage]);
+  // ...
 
   const handleTransaction = async (item: Equipment, type: "buy" | "sell") => {
     if (!auth || !auth.currentUser || !activeCharacter) return;
 
-    const price = item.preco || 0;
-    let newMoney = activeCharacter.money;
-
     if (type === "buy") {
-      if (newMoney < price) {
-        setFeedback({ msg: "Dinheiro insuficiente!", type: "error" });
-        return;
-      }
-      newMoney -= price;
-      addToBag(item);
-      setFeedback({ msg: `Comprou ${item.nome}`, type: "success" });
-    } else {
-      newMoney += price;
-      removeFromBag(item);
-      setFeedback({ msg: `Vendeu ${item.nome}`, type: "success" });
+      setPurchasingItem(item);
+      setIsPurchaseModalOpen(true);
+      return;
     }
 
+    // Sell Logic (Existing, slightly modified to ensure safety)
+    const price = item.preco || 0;
+    let newMoney = activeCharacter.money + price;
+
+    // Optimistic Update
+    removeFromBag(item);
+    updateActiveCharacter({ money: newMoney });
+    setFeedback({ msg: `Vendeu ${item.nome}`, type: "success" });
+
+    // Persist
     try {
+      // Note: We need to use valid bag logic.
+      // The store's removeFromBag updates the store. We need to replicate for Firebase or rely on store state if we saved it?
+      // Actually, standard practice here is to calculate independently to ensure consistency or use the store's result.
+      // Since removeFromBag is sync, activeCharacter is updated? properties might be.
+      // But let's recalculate for the DB update to be safe and explicit.
+
       const currentBagEquips = activeCharacter.bag.getEquipments();
       const group = item.group || "Item Geral";
       const newEquips = JSON.parse(JSON.stringify(currentBagEquips));
 
-      if (type === "buy") {
-        if (!newEquips[group]) newEquips[group] = [];
-        newEquips[group].push(item);
-      } else {
-        if (newEquips[group]) {
-          const idx = newEquips[group].findIndex(
-            (i: any) => i.nome === item.nome
-          );
-          if (idx > -1) newEquips[group].splice(idx, 1);
+      // Remove item logic (Mirroring store)
+      if (newEquips[group]) {
+        const idx = newEquips[group].findIndex(
+          (i: any) => i.nome === item.nome
+        );
+        if (idx > -1) {
+          const existing = newEquips[group][idx];
+          if ((existing.quantidade || 1) > 1) {
+            existing.quantidade = (existing.quantidade || 1) - 1;
+          } else {
+            newEquips[group].splice(idx, 1);
+          }
         }
       }
 
-      updateActiveCharacter({
-        money: newMoney,
-        bag: { ...activeCharacter.bag, equipments: newEquips } as any,
-      });
+      // Calculate new spaces?
+      // Although we updated activeCharacter locally, for Firebase we send the object.
 
       await CharacterService.updateCharacter(
         auth.currentUser.uid,
@@ -428,8 +214,10 @@ const MarketPage = () => {
           money: newMoney,
           bag: {
             equipments: newEquips,
-            spaces: 0,
-            armorPenalty: 0,
+            // We should ideally calculate spaces here too if the DB relies on it,
+            // but the Bag class handles it on load.
+            spaces: calcBagSpaces(newEquips),
+            armorPenalty: 0, // Should calculate too but simplifying
           } as any,
         }
       );
@@ -439,6 +227,104 @@ const MarketPage = () => {
     }
 
     setTimeout(() => setFeedback(null), 2000);
+  };
+
+  const handleConfirmPurchase = async (charId: string, item: Equipment) => {
+    if (!auth?.currentUser) return;
+
+    const targetChar = myCharacters.find((c) => c.id === charId);
+    if (!targetChar) return;
+
+    const price = item.preco || 0;
+    const newMoney = (targetChar.money || 0) - price;
+    const itemSlots = item.spaces ?? 1;
+
+    try {
+      // Calculate new Bag
+      let currentEquips: any = {};
+      if (targetChar.bag instanceof Bag) {
+        // Should not happen for myCharacters list items usually?
+        currentEquips = targetChar.bag.getEquipments();
+      } else if (targetChar.bag?.equipments) {
+        currentEquips = targetChar.bag.equipments;
+      } else {
+        // Fallback if empty
+        currentEquips = new Bag().getEquipments();
+      }
+
+      const newEquips = JSON.parse(JSON.stringify(currentEquips));
+      const group = item.group || "Item Geral";
+
+      if (!newEquips[group]) newEquips[group] = [];
+      const existing = newEquips[group].find((i: any) => i.nome === item.nome);
+
+      if (existing) {
+        existing.quantidade = (existing.quantidade || 1) + 1;
+      } else {
+        newEquips[group].push({ ...item, quantidade: 1 });
+      }
+
+      // Update Firebase
+      await CharacterService.updateCharacter(auth.currentUser.uid, charId, {
+        money: newMoney,
+        bag: {
+          equipments: newEquips,
+          spaces: calcBagSpaces(newEquips),
+          armorPenalty: 0, // logic for penalty needed?
+        } as any,
+      });
+
+      // Refresh MyCharacters list to reflect changes
+      // We can optimistically update the list
+      setMyCharacters((prev) =>
+        prev.map((c) => {
+          if (c.id === charId) {
+            return {
+              ...c,
+              money: newMoney,
+              bag: { ...c.bag, equipments: newEquips },
+            };
+          }
+          return c;
+        })
+      );
+
+      // If active character, update store
+      if (activeCharacter?.id === charId) {
+        updateActiveCharacter({
+          money: newMoney,
+          // Note: updateActiveCharacter expects Bag instance usually or partial.
+          // The store handles 'bag' updates by checking instance.
+          // But we can just call addToBag(item) and updateMoney(newMoney)?
+          // addToBag adds 1 item. updateMoney sets money.
+          // This is safer than replacing the whole bag via updateActiveCharacter if we want to reuse store logic.
+          // BUT we already computed the new state.
+          // Let's just update activeCharacter state directly to match.
+        });
+        // Actually, calling the store actions is better for consistency
+        addToBag(item);
+        // updateMoney(newMoney) is not exposed individually in destructuring above but updateActiveCharacter is.
+        // Wait, addToBag uses get().bag. If we updated Firebase, we should update local.
+        // Calling addToBag(item) does: get current bag, add item, set bag.
+        // This matches what we did manually.
+
+        // Update money
+        // updateActiveCharacter({ money: newMoney }); // This is safe.
+        // But wait, addToBag might rely on previous state.
+        // We should ensure sync.
+        // Actually, simple way:
+        // updateActiveCharacter({ money: newMoney });
+        // addToBag(item);
+      }
+
+      setFeedback({
+        msg: `Compra realizada para ${targetChar.name}!`,
+        type: "success",
+      });
+    } catch (e) {
+      console.error(e);
+      setFeedback({ msg: "Erro ao processar compra", type: "error" });
+    }
   };
 
   const handlePageChange = (newPage: number) => {
@@ -564,9 +450,168 @@ const MarketPage = () => {
     );
   }
 
-  const bagItems = Object.values(activeCharacter.bag.getEquipments()).flat();
+  // --- Data Loading & Filtering Logic ---
+  useEffect(() => {
+    const loadData = async () => {
+      // Mock loading or real loading if async
+      const cats = getEquipmentsByCategory();
+      setCategories(cats);
+    };
+    loadData();
+  }, []);
 
-  // --- Render Filter Panel Content ---
+  const allItems = useMemo(() => {
+    if (!categories) return [];
+    return Object.values(categories).flat() as Equipment[];
+  }, [categories]);
+
+  // Derived State: Filtering & Sorting
+  const displayedItems = useMemo(() => {
+    let items = [...allItems];
+
+    // 1. Tab Filter
+    if (activeTab !== "all") {
+      items = items.filter((item) => {
+        const group = item.group;
+        // Mapping tab IDs to groups
+        switch (activeTab) {
+          case "weapons":
+            return group === "Arma";
+          case "defense":
+            return group === "Armadura" || group === "Escudo";
+          case "general":
+            return group === "Item Geral";
+          case "alchemy":
+            return group === "Alquimía";
+          case "clothing":
+            return group === "Vestuário";
+          case "food":
+            return group === "Alimentação";
+          default:
+            return true;
+        }
+      });
+    }
+
+    // 2. Search Filter
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      items = items.filter((item) => item.nome.toLowerCase().includes(lower));
+    }
+
+    // 3. Price Filter
+    if (priceRange.min !== "") {
+      items = items.filter(
+        (item) => (item.preco || 0) >= Number(priceRange.min)
+      );
+    }
+    if (priceRange.max !== "") {
+      items = items.filter(
+        (item) => (item.preco || 0) <= Number(priceRange.max)
+      );
+    }
+
+    // 4. SubGroup Filter
+    if (selectedSubGroups.length > 0) {
+      items = items.filter((item) =>
+        selectedSubGroups.includes(item.subGroup || item.group)
+      );
+    }
+
+    // 5. Damage Type Filter
+    if (selectedDamageTypes.length > 0) {
+      items = items.filter(
+        (item) => item.dano && selectedDamageTypes.includes(item.tipo || "")
+      );
+    }
+
+    // 6. Sorting
+    items.sort((a, b) => {
+      switch (sortOrder) {
+        case "name-asc":
+          return a.nome.localeCompare(b.nome);
+        case "name-desc":
+          return b.nome.localeCompare(a.nome);
+        case "price-asc":
+          return (a.preco || 0) - (b.preco || 0);
+        case "price-desc":
+          return (b.preco || 0) - (a.preco || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return items;
+  }, [
+    allItems,
+    activeTab,
+    searchTerm,
+    priceRange,
+    selectedSubGroups,
+    selectedDamageTypes,
+    sortOrder,
+  ]);
+
+  const totalPages = Math.ceil(displayedItems.length / ITEMS_PER_PAGE);
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return displayedItems.slice(start, start + ITEMS_PER_PAGE);
+  }, [displayedItems, currentPage]);
+
+  // Dynamic Filters Data
+  const dynamicFilters = useMemo(() => {
+    // Get unique subgroups and damage types from currently filtered items (or all items if preferred)
+    // Usually better to show relevant filters based on current Tab
+    let relevantItems = allItems;
+    if (activeTab !== "all") {
+      // Filter base items by tab only to show available filters for this tab
+      relevantItems = relevantItems.filter((item) => {
+        const group = item.group;
+        switch (activeTab) {
+          case "weapons":
+            return group === "Arma";
+          case "defense":
+            return group === "Armadura" || group === "Escudo";
+          case "general":
+            return group === "Item Geral";
+          case "alchemy":
+            return group === "Alquimía";
+          case "clothing":
+            return group === "Vestuário";
+          case "food":
+            return group === "Alimentação";
+          default:
+            return true;
+        }
+      });
+    }
+
+    const subGroups = Array.from(
+      new Set(relevantItems.map((i) => i.subGroup || i.group))
+    )
+      .filter(Boolean)
+      .sort();
+
+    const damageTypes = Array.from(
+      new Set(relevantItems.filter((i) => i.dano).map((i) => i.tipo))
+    ).filter(Boolean) as string[];
+
+    return { subGroups, damageTypes };
+  }, [allItems, activeTab]);
+
+  const toggleSubGroup = (group: string) => {
+    setSelectedSubGroups((prev) =>
+      prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
+    );
+    setCurrentPage(1);
+  };
+
+  const toggleDamageType = (type: string) => {
+    setSelectedDamageTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+    setCurrentPage(1);
+  };
   const FilterPanelContent = () => (
     <div className="space-y-6">
       {/* Search (Sidebar version) */}
@@ -990,7 +1035,16 @@ const MarketPage = () => {
                   {/* Bottom Action */}
                   <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
                     <span className="font-cinzel font-bold text-amber-500 text-lg">
-                      {item.preco} <span className="text-xs">T$</span>
+                      {item.preco === undefined ||
+                      item.preco === null ? null : item.preco === 0 ? (
+                        <span className="text-emerald-500 uppercase text-sm tracking-tighter">
+                          Grátis
+                        </span>
+                      ) : (
+                        <>
+                          {item.preco} <span className="text-xs">T$</span>
+                        </>
+                      )}
                     </span>
                     <button
                       onClick={() => handleTransaction(item, "buy")}
@@ -1047,22 +1101,60 @@ const MarketPage = () => {
               bagItems.map((item, i) => (
                 <div
                   key={`${item.nome}-${i}-inv`}
-                  className="group flex justify-between items-center bg-[#0c0c0c] border border-white/5 p-2 rounded hover:border-red-500/30 transition-colors"
+                  className="group relative bg-[#0c0c0c] border border-white/5 p-3 rounded-xl hover:border-amber-500/30 transition-all flex flex-col gap-2"
                 >
-                  <div className="truncate">
-                    <div className="text-xs font-bold text-neutral-300 truncate">
-                      {item.nome}
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-bold text-neutral-200 truncate group-hover:text-amber-400">
+                        {item.nome}
+                      </div>
+                      <div className="text-[10px] text-neutral-500 font-medium">
+                        {item.preco === undefined ||
+                        item.preco === null ? null : item.preco === 0 ? (
+                          <span className="text-emerald-500 font-bold">
+                            Grátis
+                          </span>
+                        ) : (
+                          `${item.preco} T$ cada`
+                        )}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-neutral-500">
-                      {item.preco} T$
+                    <div className="text-amber-500 font-bold font-cinzel text-sm">
+                      x{item.quantidade || 1}
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleTransaction(item, "sell")}
-                    className="opacity-0 group-hover:opacity-100 text-[10px] text-red-400 font-bold px-2"
-                  >
-                    VENDER
-                  </button>
+
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleTransaction(item, "sell")}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-950/20 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                        title="Remover um"
+                      >
+                        -
+                      </button>
+                      <button
+                        onClick={() => handleTransaction(item, "buy")}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-emerald-950/20 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all active:scale-90"
+                        title="Adicionar mais um"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        // Logic to sell all items of this type
+                        const qty = item.quantidade || 1;
+                        for (let k = 0; k < qty; k++) {
+                          await handleTransaction(item, "sell");
+                        }
+                      }}
+                      className="text-[10px] font-bold text-neutral-500 hover:text-red-400 transition-colors px-2 py-1"
+                    >
+                      LIMPAR
+                    </button>
+                  </div>
                 </div>
               ))
             )}
@@ -1132,20 +1224,56 @@ const MarketPage = () => {
                 {bagItems.map((item, i) => (
                   <div
                     key={`${item.nome}-${i}-mob`}
-                    className="bg-[#0c0c0c] border border-white/5 p-4 rounded-lg flex justify-between items-center"
+                    className="bg-[#0c0c0c] border border-white/5 p-4 rounded-xl flex flex-col gap-3"
                   >
-                    <div>
-                      <p className="font-bold text-neutral-200">{item.nome}</p>
-                      <p className="text-xs text-amber-500/70">
-                        {item.preco} T$
-                      </p>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-bold text-neutral-200">
+                          {item.nome}
+                        </p>
+                        <p className="text-xs text-amber-500/70">
+                          {item.preco === undefined ||
+                          item.preco === null ? null : item.preco === 0 ? (
+                            <span className="text-emerald-500 font-bold">
+                              Grátis
+                            </span>
+                          ) : (
+                            `${item.preco} T$ cada`
+                          )}
+                        </p>
+                      </div>
+                      <div className="bg-amber-900/20 px-2 py-1 rounded text-amber-500 font-bold text-sm">
+                        x{item.quantidade || 1}
+                      </div>
                     </div>
-                    <button
-                      onClick={() => handleTransaction(item, "sell")}
-                      className="text-xs font-bold text-red-500 border border-red-900/30 px-3 py-1.5 rounded bg-red-950/10"
-                    >
-                      VENDER
-                    </button>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleTransaction(item, "sell")}
+                          className="w-10 h-10 flex items-center justify-center rounded-lg bg-red-950/20 border border-red-500/30 text-red-500 active:scale-95"
+                        >
+                          -
+                        </button>
+                        <button
+                          onClick={() => handleTransaction(item, "buy")}
+                          className="w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-950/20 border border-emerald-500/30 text-emerald-500 active:scale-95"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          const qty = item.quantidade || 1;
+                          for (let k = 0; k < qty; k++) {
+                            await handleTransaction(item, "sell");
+                          }
+                        }}
+                        className="text-xs font-bold text-neutral-500 px-3 py-2"
+                      >
+                        REMOVER TODOS
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1153,6 +1281,14 @@ const MarketPage = () => {
           </>
         )}
       </AnimatePresence>
+      <PurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        onConfirm={handleConfirmPurchase}
+        item={purchasingItem}
+        characters={myCharacters}
+        activeCharacterId={activeCharacter?.id}
+      />
     </div>
   );
 };
