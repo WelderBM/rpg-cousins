@@ -23,6 +23,9 @@ import { CharacterService } from "../../lib/characterService";
 
 import { formatAssetName, getRaceImageName } from "../../utils/assetUtils";
 import { sanitizeForFirestore } from "../../utils/firestoreUtils";
+import Bag from "../../interfaces/Bag";
+import { Armas, Armaduras, Escudos } from "../../data/equipamentos";
+import { GENERAL_EQUIPMENT } from "../../data/equipamentos-gerais";
 
 const ATTRIBUTES_LIST = [
   Atributo.FORCA,
@@ -168,7 +171,79 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         };
       });
 
-      // Sanitize data for Firestore (must be plain objects)
+      // Process Origin Items
+      // Get all available items into a flat list for searching
+      const allGeneralItems = [
+        ...GENERAL_EQUIPMENT.adventurerEquipment,
+        ...GENERAL_EQUIPMENT.tools,
+        ...GENERAL_EQUIPMENT.esoteric,
+        ...GENERAL_EQUIPMENT.clothing,
+        ...GENERAL_EQUIPMENT.alchemyPrepared,
+        ...GENERAL_EQUIPMENT.alchemyCatalysts,
+        ...GENERAL_EQUIPMENT.alchemyPoisons,
+        ...GENERAL_EQUIPMENT.food,
+      ];
+
+      const finalBag = new Bag(bag.getEquipments()); // Start with current bag
+
+      if (selectedOrigin?.getItems) {
+        const originItems = selectedOrigin.getItems();
+
+        originItems.forEach((item) => {
+          let equipmentToAdd: any = null;
+
+          if (typeof item.equipment === "string") {
+            // Try to find in all databases
+            const found =
+              Object.values(Armas).find(
+                (a) =>
+                  a.nome.toLowerCase() ===
+                  (item.equipment as string).toLowerCase()
+              ) ||
+              Object.values(Armaduras).find(
+                (a) =>
+                  a.nome.toLowerCase() ===
+                  (item.equipment as string).toLowerCase()
+              ) ||
+              Object.values(Escudos).find(
+                (a) =>
+                  a.nome.toLowerCase() ===
+                  (item.equipment as string).toLowerCase()
+              ) ||
+              allGeneralItems.find(
+                (a) =>
+                  a.nome.toLowerCase() ===
+                  (item.equipment as string).toLowerCase()
+              );
+
+            if (found) {
+              equipmentToAdd = { ...found };
+            } else {
+              // Generic item if not found
+              equipmentToAdd = {
+                nome: item.equipment,
+                description: item.description || "Item de Origem",
+                spaces: 1, // Default to 1 if unknown
+                group: "Item Geral",
+              };
+            }
+          } else {
+            // It's already an object
+            equipmentToAdd = { ...(item.equipment as any) };
+          }
+
+          if (equipmentToAdd) {
+            equipmentToAdd.quantidade = item.qtd || 1;
+            if (item.description) equipmentToAdd.description = item.description;
+
+            const group = equipmentToAdd.group || "Item Geral";
+            const payload: any = {};
+            payload[group] = [equipmentToAdd];
+            finalBag.addEquipment(payload);
+          }
+        });
+      }
+
       const characterData = {
         name,
         raceName: selectedRace?.name || "",
@@ -189,9 +264,9 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         money,
         // Convert class instance to plain object
         bag: {
-          equipments: bag.getEquipments(),
-          spaces: bag.getSpaces(),
-          armorPenalty: bag.getArmorPenalty(),
+          equipments: finalBag.getEquipments(),
+          spaces: finalBag.getSpaces(),
+          armorPenalty: finalBag.getArmorPenalty(),
         },
         level: 1,
         // Initialize physical traits with empty values
@@ -459,6 +534,26 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
                         {selectedDeity?.name || "Ateu / Sem Divindade"}
                       </span>
                     </div>
+                    {selectedDeity && (
+                      <div className="mt-4 space-y-3">
+                        <div className="bg-black/20 p-3 rounded-lg border border-white/5">
+                          <p className="text-[10px] text-amber-500/60 uppercase font-bold mb-1">
+                            Crenças & Objetivos
+                          </p>
+                          <p className="text-xs text-stone-400 italic leading-relaxed">
+                            {selectedDeity.crencasObjetivos}
+                          </p>
+                        </div>
+                        <div className="bg-red-950/10 p-3 rounded-lg border border-red-900/20">
+                          <p className="text-[10px] text-red-500/60 uppercase font-bold mb-1">
+                            Obrigações & Restrições
+                          </p>
+                          <p className="text-xs text-stone-400 italic leading-relaxed">
+                            {selectedDeity.obrigacoesRestricoes}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

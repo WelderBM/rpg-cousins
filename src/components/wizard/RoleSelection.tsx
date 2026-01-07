@@ -17,6 +17,12 @@ import {
 import { ClassDescription } from "../../interfaces/Class";
 import Skill from "../../interfaces/Skills";
 import { Atributo } from "../../data/atributos";
+import ARCANISTA, {
+  allArcanistaSubtypes,
+  feiticeiroPaths,
+  draconicDamageTypes,
+  ArcanistaSubtypes,
+} from "../../data/classes/arcanista";
 
 import { formatAssetName } from "../../utils/assetUtils";
 
@@ -99,6 +105,14 @@ const RoleSelection = () => {
   >({});
   const [classSkillChoices, setClassSkillChoices] = useState<Skill[]>([]);
   const [generalSkillChoices, setGeneralSkillChoices] = useState<Skill[]>([]);
+
+  // --- CONFIG MODAL STATE ---
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [arcanistConfig, setArcanistConfig] = useState<{
+    subtype: ArcanistaSubtypes | null;
+    lineage: string | null;
+    damageType: string | null;
+  }>({ subtype: null, lineage: null, damageType: null });
 
   // Sync LOCAL state with STORE when initialized or when Store changes
   useEffect(() => {
@@ -235,14 +249,53 @@ const RoleSelection = () => {
 
   const handleConfirm = () => {
     if (!selectedPreview) return;
+
+    // Check if class requires configuration
+    if (selectedPreview.name === "Arcanista") {
+      setIsConfigModalOpen(true);
+      return;
+    }
+
+    // Default fast-path for classes without options
+    proceedWithSelection(selectedPreview);
+  };
+
+  const proceedWithSelection = (finalClass: ClassDescription) => {
     const finalSkills = [
       ...pickedInBasic,
       ...classSkillChoices,
       ...generalSkillChoices,
     ];
-    selectClass(selectedPreview);
+
+    // If the class has a setup function but we haven't run it (not Arcanist), run it with defaults
+    // This covers classes like Cleric that might have a setup but no choices
+    if (finalClass.setup && finalClass.name !== "Arcanista") {
+      const setupClass = finalClass.setup(finalClass);
+      selectClass(setupClass);
+    } else {
+      selectClass(finalClass);
+    }
+
     updateSkills(finalSkills);
     setStep(4);
+  };
+
+  const handleConfigConfirm = () => {
+    if (!selectedPreview) return;
+
+    if (selectedPreview.name === "Arcanista") {
+      if (!arcanistConfig.subtype) return; // Should be disabled if not selected
+
+      // Apply setup with options
+      const finalClass = ARCANISTA.setup!(selectedPreview, {
+        subtype: arcanistConfig.subtype,
+        lineage: arcanistConfig.lineage || undefined,
+        damageType: arcanistConfig.damageType || undefined,
+      });
+
+      proceedWithSelection(finalClass);
+      setIsConfigModalOpen(false);
+    }
   };
 
   const isValid = useMemo(() => {
@@ -260,6 +313,21 @@ const RoleSelection = () => {
     generalSkillChoices,
     limits,
   ]);
+
+  const isConfigValid = useMemo(() => {
+    if (selectedPreview?.name === "Arcanista") {
+      if (!arcanistConfig.subtype) return false;
+      if (arcanistConfig.subtype === "Feiticeiro") {
+        if (!arcanistConfig.lineage) return false;
+        if (
+          arcanistConfig.lineage === "Linhagem Dracônica" &&
+          !arcanistConfig.damageType
+        )
+          return false;
+      }
+    }
+    return true;
+  }, [selectedPreview, arcanistConfig]);
 
   return (
     <div className="w-full min-h-screen relative bg-stone-950 pb-32">
@@ -380,6 +448,35 @@ const RoleSelection = () => {
                   </span>
                 </div>
               </div>
+              {/* SKILLS - BASIC */}
+              <section className="space-y-4 pt-4 border-t border-stone-800 md:col-span-3 w-full">
+                <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
+                  <Sparkles size={18} /> Habilidades de 1º Nível
+                </h3>
+                <div className="grid gap-3">
+                  {selectedPreview.abilities
+                    .filter((a) => a.nivel === 1)
+                    .map((ability, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-stone-900/50 p-4 rounded-xl border border-stone-800 space-y-2"
+                      >
+                        <h4 className="font-ciszel font-bold text-amber-100">
+                          {ability.name}
+                        </h4>
+                        <p className="text-sm text-stone-400 leading-relaxed">
+                          {ability.text}
+                        </p>
+                      </div>
+                    ))}
+                  {selectedPreview.abilities.filter((a) => a.nivel === 1)
+                    .length === 0 && (
+                    <p className="text-stone-500 italic">
+                      Nenhuma habilidade inicial específica.
+                    </p>
+                  )}
+                </div>
+              </section>
             </div>
 
             {/* SKILLS - BASIC */}
@@ -565,6 +662,144 @@ const RoleSelection = () => {
               </div>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CONFIG MODAL */}
+      <AnimatePresence>
+        {isConfigModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-stone-900 border border-amber-900/50 rounded-2xl p-8 max-w-xl w-full shadow-2xl space-y-6"
+            >
+              <h3 className="text-2xl font-cinzel text-amber-500 text-center border-b border-amber-900/30 pb-4">
+                Caminho do Arcanista
+              </h3>
+
+              <div className="space-y-6">
+                {/* SUBTYPE */}
+                <div className="space-y-2">
+                  <label className="text-xs text-stone-400 uppercase tracking-widest font-bold">
+                    Escolha seu Caminho
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {allArcanistaSubtypes.map((sub) => (
+                      <button
+                        key={sub}
+                        onClick={() =>
+                          setArcanistConfig({
+                            ...arcanistConfig,
+                            subtype: sub,
+                            // Reset dependent fields if changing main type
+                            lineage:
+                              sub === "Feiticeiro"
+                                ? arcanistConfig.lineage
+                                : null,
+                            damageType:
+                              sub === "Feiticeiro"
+                                ? arcanistConfig.damageType
+                                : null,
+                          })
+                        }
+                        className={`p-3 rounded-lg border text-sm font-bold transition-all ${
+                          arcanistConfig.subtype === sub
+                            ? "bg-amber-600 text-stone-950 border-amber-500"
+                            : "bg-stone-800 text-stone-400 border-stone-700 hover:border-amber-500/50"
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* LINEAGE (Feiticeiro only) */}
+                {arcanistConfig.subtype === "Feiticeiro" && (
+                  <div className="space-y-2">
+                    <label className="text-xs text-stone-400 uppercase tracking-widest font-bold">
+                      Linhagem Sobrenatural
+                    </label>
+                    <select
+                      value={arcanistConfig.lineage || ""}
+                      onChange={(e) =>
+                        setArcanistConfig({
+                          ...arcanistConfig,
+                          lineage: e.target.value,
+                          // Reset damage if not Draconic
+                          damageType:
+                            e.target.value === "Linhagem Dracônica"
+                              ? arcanistConfig.damageType
+                              : null,
+                        })
+                      }
+                      className="w-full bg-black/40 border border-stone-700 text-stone-200 rounded-lg p-3 outline-none focus:border-amber-500"
+                    >
+                      <option value="" disabled>
+                        Selecione uma Linhagem
+                      </option>
+                      {feiticeiroPaths.map((path) => (
+                        <option key={path.name} value={path.name}>
+                          {path.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* DAMAGE TYPE (Draconic only) */}
+                {arcanistConfig.lineage === "Linhagem Dracônica" && (
+                  <div className="space-y-2">
+                    <label className="text-xs text-stone-400 uppercase tracking-widest font-bold">
+                      Elemento Dracônico
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {draconicDamageTypes.map((type) => (
+                        <button
+                          key={type}
+                          onClick={() =>
+                            setArcanistConfig({
+                              ...arcanistConfig,
+                              damageType: type,
+                            })
+                          }
+                          className={`p-2 rounded border text-xs font-bold transition-all ${
+                            arcanistConfig.damageType === type
+                              ? "bg-red-500/80 text-white border-red-500"
+                              : "bg-stone-800 text-stone-400 border-stone-700 hover:border-red-500/50"
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 mt-8 pt-4 border-t border-stone-800">
+                <button
+                  onClick={() => setIsConfigModalOpen(false)}
+                  className="flex-1 py-3 bg-stone-800 text-stone-400 rounded-xl font-bold hover:bg-stone-700 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfigConfirm}
+                  disabled={!isConfigValid}
+                  className={`flex-1 py-3 rounded-xl font-bold transition-all flex justify-center items-center gap-2 ${
+                    isConfigValid
+                      ? "bg-amber-600 text-stone-950 hover:bg-amber-500 shadow-lg shadow-amber-900/20"
+                      : "bg-stone-800 text-stone-600 cursor-not-allowed"
+                  }`}
+                >
+                  Confirmar Escolhas
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
