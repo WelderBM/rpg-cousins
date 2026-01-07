@@ -68,12 +68,14 @@ const CLERIGO: ClassDescription = {
       name: "Mão da Divindade",
       text: "No 20º nível, você pode gastar uma ação completa e 15 PM para canalizar energia divina. Ao fazer isso, você lança três magias divinas quaisquer (de qualquer círculo, incluindo magias que você não conhece), como uma ação livre e sem gastar PM (mas ainda precisa pagar outros custos). Você pode aplicar aprimoramentos, mas precisa pagar por eles. Após usar esta habilidade, você fica atordoado por 1d4 rodadas (mesmo se for imune a esta condição). Corpos mortais não foram feitos para lidar com tanto poder.",
       nivel: 20,
+      pmCost: 15,
     },
   ],
   powers: [
     {
       name: "Abençoar Arma",
       text: "Você se torna proficiente na arma preferida de sua divindade. Se estiver empunhando essa arma, pode gastar uma ação de movimento e 3 PM para infundi-la com poder divino. Até o final da cena, a arma é considerada mágica e emite luz dourada ou púrpura (como uma tocha). Além disso, o dano da arma aumenta em um passo e você pode usar sua Sabedoria em testes de ataque e rolagens de dano com ela, em vez do atributo padrão (não cumulativo com efeitos que somam este atributo).",
+      pmCost: 3,
       requirements: [],
     },
     {
@@ -101,6 +103,7 @@ const CLERIGO: ClassDescription = {
     {
       name: "Canalizar Amplo",
       text: "Quando você usa a habilidade Canalizar Energia, pode gastar +2 PM para aumentar o alcance dela para médio.",
+      pmCost: 2,
       requirements: [
         [
           {
@@ -113,6 +116,7 @@ const CLERIGO: ClassDescription = {
     {
       name: "Comunhão Vital",
       text: "Quando lança uma magia que cure uma criatura, você pode pagar +2 PM para que outra criatura em alcance curto (incluindo você mesmo) recupere uma quantidade de pontos de vida igual à metade dos PV da cura original.",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -154,6 +158,7 @@ const CLERIGO: ClassDescription = {
     {
       name: "Magia Sagrada/Profana",
       text: "Quando lança uma magia divina que causa dano, você pode gastar +1 PM. Se fizer isso, muda o tipo de dano da magia para luz (se sua divindade canaliza energia positiva) ou trevas (se canaliza energia negativa).",
+      pmCost: 1,
       requirements: [],
     },
     {
@@ -196,11 +201,13 @@ const CLERIGO: ClassDescription = {
     {
       name: "Prece de Combate",
       text: "Quando lança uma magia divina com tempo de conjuração de uma ação padrão em si mesmo, você pode gastar +2 PM para lançá-la como uma ação de movimento.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Símbolo Sagrado Energizado",
       text: "Você pode gastar uma ação de movimento e 1 PM para fazer uma prece e energizar seu símbolo sagrado até o fim da cena. Um símbolo sagrado energizado emite uma luz dourada ou prateada (se sua divindade canaliza energia positiva) ou púrpura ou avermelhada (se canaliza energia negativa) que ilumina como uma tocha. Enquanto você estiver empunhando um símbolo sagrado energizado, o custo em PM para lançar suas magias divinas diminui em 1.",
+      pmCost: 1,
       requirements: [],
     },
   ],

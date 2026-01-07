@@ -25,11 +25,6 @@ const GOLEM: Race = {
   getDisplacement: () => 6,
   abilities: [
     {
-      name: "Canalizar Reparos",
-      description:
-        "Como uma ação completa, você pode gastar pontos de mana para recuperar pontos de vida, à taxa de 5 PV por PM.",
-    },
-    {
       name: "Chassi",
       description:
         "Seu corpo artificial é resistente, mas rígido. Você recebe +2 na Defesa, mas possui penalidade de armadura –2 e seu deslocamento é 6m. Você leva um dia para vestir ou remover uma armadura (pois precisa acoplar as peças dela a seu chassi).",
@@ -103,9 +98,26 @@ const GOLEM: Race = {
       ],
     },
     {
-      name: "Espírito Elemental",
+      name: "Fonte Elemental",
       description:
-        "Escolha entre água (frio), ar (eletricidade), fogo (fogo) e terra (ácido). Você é imune a dano causado por essa energia. Se fosse sofrer dano mágico dessa energia, em vez disso cura PV em quantidade igual à metade do dano. Por exemplo, se um golem com espírito elemental do fogo é atingido por uma Bola de Fogo que causa 30 pontos de dano, em vez de sofrer esse dano, ele recupera 15 PV.",
+        "Você possui um espírito elemental preso em seu corpo. Escolha entre água (frio), ar (eletricidade), fogo (fogo) e terra (ácido). Você é imune a dano desse tipo. Se fosse sofrer dano mágico desse tipo, em vez disso cura PV em quantidade igual à metade do dano. Por exemplo, se um golem com espírito elemental do fogo é atingido por uma Bola de Fogo que causa 30 pontos de dano, em vez de sofrer esse dano, ele recupera 15 PV.",
+    },
+    {
+      name: "Propósito de Criação",
+      description:
+        "Você foi construído “pronto” para um propósito específico e não teve uma infância. Você não tem direito a escolher uma origem, mas recebe um poder geral a sua escolha.",
+      sheetActions: [
+        {
+          source: {
+            type: "power",
+            name: "Propósito de Criação",
+          },
+          action: {
+            type: "getGeneralPower",
+            pick: 1,
+          },
+        },
+      ],
     },
   ],
 };

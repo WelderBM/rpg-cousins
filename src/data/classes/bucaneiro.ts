@@ -49,6 +49,7 @@ const BUCANEIRO: ClassDescription = {
       name: "Audácia",
       text: "Quando faz um teste de perícia, você pode gastar 2 PM para somar seu Carisma no teste. Você não pode usar esta habilidade em testes de ataque.",
       nivel: 1,
+      pmCost: 2,
     },
     {
       name: "Insolência",
@@ -108,6 +109,7 @@ const BUCANEIRO: ClassDescription = {
       name: "Sorte de Nimb",
       text: "O bucaneiro está acostumado a encarar os piores desafios e rir na cara deles — pois sabe que tem a sorte ao seu lado. Você pode gastar 5 PM para rolar novamente um teste recém realizado. Qualquer resultado 11 ou mais na segunda rolagem será considerado um 20 natural.",
       nivel: 20,
+      pmCost: 5,
     },
   ],
   powers: [
@@ -131,7 +133,8 @@ const BUCANEIRO: ClassDescription = {
     {
       name: "Aparar",
       text: " Uma vez por rodada, quando é atingido por um ataque, você pode gastar 1 PM para fazer um teste de ataque com bônus igual ao seu nível (além do normal). Se o resultado do seu teste for maior que o do oponente, você evita o ataque. Você só pode usar este poder se estiver usando uma arma corpo a corpo leve ou ágil.",
-      requirements: [[{ type: RequirementType.PODER, name: "Esgrimia" }]],
+      pmCost: 1,
+      requirements: [[{ type: RequirementType.PODER, name: "Esgrimista" }]],
     },
     {
       name: "Apostador",
@@ -158,6 +161,7 @@ const BUCANEIRO: ClassDescription = {
     {
       name: "Aventureiro Ávido",
       text: "Uma vez por rodada, você pode gastar 5 PM para realizar uma ação padrão ou de movimento adicional. Se possuir o poder Surto Heroico, em vez disso seu custo diminui em –2 PM.",
+      pmCost: 5,
       requirements: [],
     },
     {
@@ -173,6 +177,7 @@ const BUCANEIRO: ClassDescription = {
     {
       name: "En Garde",
       text: "Você pode gastar uma ação de movimento e 1 PM para assumir postura de luta. Até o fim da cena, se estiver usando uma arma corpo a corpo leve ou ágil, você recebe +2 na margem de ameaça com essas armas e +2 na Defesa.",
+      pmCost: 1,
       requirements: [[{ type: RequirementType.PODER, name: "Esgrimista" }]],
     },
     {
@@ -316,6 +321,7 @@ const BUCANEIRO: ClassDescription = {
     {
       name: "Ripostar",
       text: "Quando usa a habilidade aparar e evita o ataque, você pode gastar 1 PM. Se fizer isso, pode fazer um ataque corpo a corpo imediato contra o inimigo que o atacou (se ele estiver em alcance).",
+      pmCost: 1,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Aparar" },
@@ -326,6 +332,7 @@ const BUCANEIRO: ClassDescription = {
     {
       name: "Touché",
       text: "Quando se aproxima de um inimigo e o ataca com uma arma leve ou ágil no mesmo turno, você pode gastar 2 PM para aumentar seu dano em um passo e receber +5 na margem de ameaça.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Esgrimista" },

@@ -46,6 +46,7 @@ const LUTADOR: ClassDescription = {
       name: "Golpe Relâmpago",
       text: "Quando usa a ação agredir para fazer um ataque desarmado, você pode gastar 1 PM para realizar um ataque desarmado adicional.",
       nivel: 1,
+      pmCost: 1,
     },
     {
       name: "Casca Grossa",
@@ -99,6 +100,7 @@ const LUTADOR: ClassDescription = {
     {
       name: "Cabeçada",
       text: "Quando faz um ataque desarmado, você pode gastar 2 PM. Se fizer isso, o oponente fica desprevenido contra este ataque. Você só pode usar este poder uma vez por cena contra um mesmo alvo.",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -125,6 +127,7 @@ const LUTADOR: ClassDescription = {
     {
       name: "Golpe Baixo",
       text: "Quando faz um ataque desarmado, você pode gastar 2 PM. Se fizer isso e acertar o ataque, o oponente deve fazer um teste de Fortitude (CD For). Se ele falhar, fica atordoado por uma rodada (apenas uma vez por cena).",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -145,6 +148,7 @@ const LUTADOR: ClassDescription = {
     {
       name: "Língua dos Becos",
       text: "Você pode pagar 1 PM para usar sua Força no lugar de Carisma em um teste de perícia baseada em Carisma.",
+      pmCost: 1,
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Força", value: 1 },
@@ -155,6 +159,7 @@ const LUTADOR: ClassDescription = {
     {
       name: "Lutador de Chão",
       text: "Você recebe +2 em testes de ataque para agarrar e derrubar. Quando agarra uma criatura, pode gastar 1 PM para fazer uma manobra derrubar contra ela como uma ação livre.",
+      pmCost: 1,
       requirements: [],
     },
     {
@@ -170,6 +175,7 @@ const LUTADOR: ClassDescription = {
     {
       name: "Rasteira",
       text: "Quando faz um ataque desarmado contra uma criatura até uma categoria de tamanho maior que a sua, você pode gastar 2 PM. Se fizer isso e acertar o ataque, a criatura fica caída.",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -211,6 +217,7 @@ const LUTADOR: ClassDescription = {
     {
       name: "Sequência Destruidora",
       text: "No início do seu turno, você pode gastar 2 PM para dizer um número (no mínimo 2). Se fizer e acertar uma quantidade de ataques igual ao número dito, o último recebe um bônus cumulativo de +4 na rolagem de dano por ataque feito. Por exemplo, se você falar “três” e fizer e acertar três ataques, o último ataque (o terceiro) receberá +12 na rolagem de dano.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Trocação" },
@@ -232,11 +239,13 @@ const LUTADOR: ClassDescription = {
     {
       name: "Trocação",
       text: "Quando você começa a bater, não para mais. Ao acertar um ataque desarmado com a ação agredir, pode fazer outro ataque desarmado contra o mesmo alvo, pagando uma quantidade de PM igual à quantidade de ataques já realizados no turno. Ou seja, pode fazer o primeiro ataque extra gastando 1 PM, um segundo ataque extra gastando mais 2 PM e assim por diante, até errar um ataque ou não ter mais pontos de mana. Você não pode gastar mais PM por turno com esta habilidade do que o seu nível.",
+      pmCost: 1, // Minimum cost, scales
       requirements: [[{ type: RequirementType.NIVEL, value: 6 }]],
     },
     {
       name: "Trocação Tumultuosa",
       text: "Quando usa a ação agredir para fazer um ataque desarmado, você pode gastar 2 PM para atingir todas as criaturas adjacentes — incluindo aliados! Você deve usar este poder antes de rolar o ataque e compara o resultado de seu teste contra a Defesa de cada criatura.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Trocação" },
@@ -252,6 +261,7 @@ const LUTADOR: ClassDescription = {
     {
       name: "Voadora",
       text: "Quando faz uma investida desarmada, você pode gastar 2 PM. Se fizer isso, recebe +1d6 no dano para cada 3m que se deslocar até chegar ao oponente, limitado pelo seu nível.",
+      pmCost: 2,
       requirements: [],
     },
   ],

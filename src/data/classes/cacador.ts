@@ -48,6 +48,7 @@ const CACADOR: ClassDescription = {
       name: "Marca da Presa",
       text: "Você pode gastar uma ação de movimento e 1 PM para analisar uma criatura em alcance curto. Até o fim da cena, você recebe +1d4 nas rolagens de dano contra essa criatura. A cada quatro níveis, você pode gastar +1 PM para aumentar o bônus de dano (veja a tabela da classe).",
       nivel: 1,
+      pmCost: 1,
     },
     {
       name: "Rastreador",
@@ -84,6 +85,7 @@ const CACADOR: ClassDescription = {
       name: "Mestre Caçador",
       text: "No 20º nível, você pode usar a habilidade Marca da Presa como uma ação livre. Além disso, quando usa a habilidade, pode gastar 5 PM para aumentar sua margem de ameaça contra a criatura em +2. Se você reduz uma criatura contra a qual usou Marca da Presa a 0 pontos de vida, recupera 5 PM.",
       nivel: 20,
+      pmCost: 5,
     },
   ],
   powers: [
@@ -158,6 +160,7 @@ const CACADOR: ClassDescription = {
     {
       name: "Bote",
       text: "Se estiver empunhando duas armas e fizer uma investida, você pode pagar 1 PM para fazer um ataque adicional com sua arma secundária.",
+      pmCost: 1,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Ambidestria" },
@@ -168,11 +171,13 @@ const CACADOR: ClassDescription = {
     {
       name: "Camuflagem",
       text: "Você pode gastar 2 PM para se esconder mesmo sem camuflagem ou cobertura disponível.",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.NIVEL, value: 6 }]],
     },
     {
       name: "Chuva de Lâminas",
       text: "Uma vez por rodada, quando usa Ambidestria, você pode pagar 2 PM para fazer um ataque adicional com sua arma primária.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Destreza", value: 4 },
@@ -233,6 +238,7 @@ const CACADOR: ClassDescription = {
     {
       name: "Emboscar",
       text: "Você pode gastar 2 PM para realizar uma ação padrão adicional em seu turno. Você só pode usar este poder na primeira rodada de um combate.",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.PERICIA, name: "Furtividade" }]],
     },
     {
@@ -273,6 +279,7 @@ const CACADOR: ClassDescription = {
     {
       name: "Ímpeto",
       text: "Você pode gastar 1 PM para aumentar seu deslocamento em +6m por uma rodada.",
+      pmCost: 1,
       requirements: [],
     },
     {

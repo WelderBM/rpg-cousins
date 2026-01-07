@@ -49,6 +49,12 @@ const KLIREN: Race = {
       name: "Engenhosidade",
       description:
         "Quando faz um teste de perícia, você pode gastar 2 PM para somar sua Inteligência no teste. Você não pode usar esta habilidade em testes de ataque. Caso receba esta habilidade novamente, seu custo é reduzido em –1 PM.",
+      pmCost: 2,
+    },
+    {
+      name: "Ossos Frágeis",
+      description:
+        "Você sofre 1 ponto de dano adicional por dado de dano de impacto.",
     },
     {
       name: "Vanguardista",

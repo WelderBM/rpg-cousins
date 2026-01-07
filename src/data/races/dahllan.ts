@@ -51,6 +51,7 @@ const DAHLLAN: Race = {
       name: "Armadura de Allihanna",
       description:
         "Você pode gastar uma ação de movimento e 1 PM para transformar sua pele em casca de árvore, recebendo +2 na Defesa até o fim da cena.",
+      pmCost: 1,
     },
     {
       name: "Empatia Selvagem",

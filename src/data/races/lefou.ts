@@ -14,9 +14,9 @@ const LEFOU: Race = {
   attributes: {
     attrs: [
       { attr: Atributo.CARISMA, mod: -1 },
-      { attr: "any", mod: 2 },
-      { attr: "any", mod: 2 },
-      { attr: "any", mod: 2 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
     ],
   },
   faithProbability: {

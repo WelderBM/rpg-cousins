@@ -61,4 +61,5 @@ export interface Character {
   currentPv?: number;
   currentPm?: number;
   spells?: any[]; // Placeholder if needed
+  classPowers?: any[];
 }

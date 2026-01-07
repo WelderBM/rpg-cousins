@@ -54,6 +54,7 @@ const LADINO: ClassDescription = {
       name: "Especialista",
       text: "Escolha um número de perícias treinadas igual a sua Inteligência, exceto bônus temporários (mínimo 1). Ao fazer um teste de uma dessas perícias, você pode gastar 1 PM para dobrar seu bônus de treinamento. Você não pode usar esta habilidade em testes de ataque.",
       nivel: 1,
+      pmCost: 1,
     },
     {
       name: "Evasão",
@@ -79,12 +80,14 @@ const LADINO: ClassDescription = {
       name: "A Pessoa Certa para o Trabalho",
       text: "No 20º nível, você se torna um mestre da ladinagem. Ao fazer um ataque furtivo ou usar uma perícia da lista de ladino, você pode gastar 5 PM para receber +10 no teste.",
       nivel: 20,
+      pmCost: 5,
     },
   ],
   powers: [
     {
       name: "Assassinar",
       text: "Você pode gastar uma ação de movimento e 3 PM para analisar uma criatura em alcance curto. Até o fim de seu próximo turno, seu primeiro Ataque Furtivo que causar dano a ela tem seus dados de dano extras dessa habilidade dobrados.",
+      pmCost: 3,
       requirements: [[{ type: RequirementType.NIVEL, value: 5 }]],
     },
     {
@@ -102,11 +105,13 @@ const LADINO: ClassDescription = {
     {
       name: "Contatos no Submundo",
       text: "Quando chega em uma comunidade equivalente a uma vila ou maior, você pode gastar 2 PM para fazer um teste de Carisma (CD 10). Se passar, enquanto estiver nessa comunidade, recebe +5 em testes de Investigação para interrogar, pode comprar itens mundanos, poções e pergaminhos com 20% de desconto (não cumulativo com barganha e outros descontos) e, de acordo com o mestre, tem acesso a itens e serviços proibidos (como armas de pólvora e venenos).",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Emboscar",
       text: "Na primeira rodada de cada combate, você pode gastar 2 PM para executar uma ação padrão adicional em seu turno.",
+      pmCost: 2,
       requirements: [
         [{ type: RequirementType.PERICIA, name: Skill.FURTIVIDADE }],
       ],
@@ -119,6 +124,7 @@ const LADINO: ClassDescription = {
     {
       name: "Fuga Formidável",
       text: "Você pode gastar uma ação completa e 1 PM para analisar o lugar no qual está (um castelo, um porto, a praça de uma cidade...). Até o fim da cena, recebe +3m em seu deslocamento, +5 em Acrobacia e Atletismo e ignora penalidades em movimento por terreno difícil. Você perde esses benefícios se fizer uma ação que não seja diretamente relacionada a fugir. Por exemplo, você só pode atacar um inimigo se ele estiver bloqueando seu caminho, agarrando-o etc. Você pode fazer ações para ajudar seus aliados, mas apenas se eles estiverem tentando escapar.",
+      pmCost: 1,
       requirements: [
         [{ type: RequirementType.ATRIBUTO, name: "Inteligência", value: 1 }],
       ],
@@ -149,6 +155,7 @@ const LADINO: ClassDescription = {
     {
       name: "Ladrão Arcano",
       text: "Quando causa dano com um ataque furtivo em uma criatura capaz de lançar magias, você pode “roubar” uma magia que já a tenha visto lançar. Você precisa pagar 1 PM por círculo da magia e pode roubar magias de até 4º círculo. Até o fim da cena, você pode lançar a magia roubada (atributo-chave Inteligência).",
+      pmCost: 1, // 1 PM per circle
       requirements: [
         [
           { type: RequirementType.PODER, name: "Roubo de Mana" },
@@ -164,6 +171,7 @@ const LADINO: ClassDescription = {
     {
       name: "Mãos Rápidas",
       text: "Uma vez por rodada, ao fazer um teste de Ladinagem para abrir fechaduras, ocultar item, punga ou sabotar, você pode pagar 1 PM para fazê-lo como uma ação livre.",
+      pmCost: 1,
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Destreza", value: 2 },
@@ -217,11 +225,13 @@ const LADINO: ClassDescription = {
     {
       name: "Oportunismo",
       text: "Uma vez por rodada, quando um inimigo adjacente sofre dano de um de seus aliados, você pode gastar 2 PM para fazer um ataque corpo a corpo contra este inimigo.",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.NIVEL, value: 6 }]],
     },
     {
       name: "Rolamento Defensivo",
       text: "Sempre que sofre dano, você pode gastar 2 PM para reduzir esse dano à metade. Após usar este poder, você fica caído.",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.PERICIA, name: Skill.REFLEXOS }]],
     },
     {
@@ -286,6 +296,7 @@ const LADINO: ClassDescription = {
     {
       name: "Velocidade Ladina",
       text: "Uma vez por rodada, você pode gastar 2 PM para realizar uma ação de movimento adicional em seu turno.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Destreza", value: 2 },

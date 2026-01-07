@@ -87,6 +87,7 @@ const HYNNE: Race = {
       name: "Sorte Salvadora",
       description:
         "Quando faz um teste de resistência, você pode gastar 1 PM para rolar este teste novamente.",
+      pmCost: 1,
     },
   ],
 };

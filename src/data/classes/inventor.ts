@@ -42,6 +42,7 @@ const INVENTOR: ClassDescription = {
       name: "Engenhosidade",
       text: "Quando faz um teste de perícia, você pode gastar 2 PM para somar a sua Inteligência no teste. Você não pode usar esta habilidade em testes de ataque.",
       nivel: 1,
+      pmCost: 2,
     },
     {
       name: "Protótipo",
@@ -62,6 +63,7 @@ const INVENTOR: ClassDescription = {
       name: "Encontrar Fraqueza",
       text: "A partir do 7º nível, você pode gastar uma ação de movimento e 2 PM para analisar um objeto em alcance curto. Se fizer isso, ignora a redução de dano dele. Você também pode usar esta habilidade para encontrar uma fraqueza em um inimigo. Se ele estiver de armadura ou for um construto, você recebe +2 em seus testes de ataque contra ele. Os benefícios desta habilidade duram até o fim da cena.",
       nivel: 7,
+      pmCost: 2,
     },
     {
       name: "Fabricar Item Mágico",
@@ -123,6 +125,7 @@ const INVENTOR: ClassDescription = {
     {
       name: "Ativação Rápida",
       text: "Ao ativar uma engenhoca com ação padrão, você pode pagar 2 PM para ativá-la com uma ação de movimento, em vez disto.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Engenhoqueiro" },
@@ -150,6 +153,7 @@ const INVENTOR: ClassDescription = {
     {
       name: "Autômato Prototipado",
       text: "Você pode gastar uma ação padrão e 2 PM para ativar uma melhoria experimental em seu autômato. Role 1d6. Em um resultado 2 a 6, você aumenta o nível de parceiro do autômato em um passo (até mestre), ou concede a ele a habilidade iniciante de outro de seus tipos, até o fim da cena. Em um resultado 1, o autômato enguiça como uma engenhoca.",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.PODER, name: "Autômato" }]],
     },
     {
@@ -201,6 +205,7 @@ const INVENTOR: ClassDescription = {
     {
       name: "Catalisador Instável",
       text: "Você pode gastar uma ação completa e 3 PM para fabricar um preparado alquímico ou poção cuja fórmula conheça instantaneamente. O custo do item é reduzido à metade e você não precisa fazer o teste de Ofício (alquimista), mas ele só dura até o fim da cena.",
+      pmCost: 3,
       requirements: [
         [{ type: RequirementType.PODER, name: "Alquimista Iniciado" }],
       ],
@@ -208,6 +213,7 @@ const INVENTOR: ClassDescription = {
     {
       name: "Chutes e Palavrões",
       text: "Uma vez por rodada, você pode pagar 1 PM para repetir um teste de Ofício (engenhoqueiro) recém realizado para ativar uma engenhoca.",
+      pmCost: 1,
       requirements: [[{ type: RequirementType.PODER, name: "Engenhoqueiro" }]],
     },
     {
@@ -272,11 +278,13 @@ const INVENTOR: ClassDescription = {
     {
       name: "Invenção Potente",
       text: "Quando usa um item ou engenhoca fabricado por você mesmo, você pode pagar 1 PM para aumentar em +2 a CD para resistir a ele.",
+      pmCost: 1,
       requirements: [[]],
     },
     {
       name: "Maestria em Perícia",
       text: "Escolha um número de perícias treinadas igual a sua Inteligência, exceto bônus temporários. Com essas perícias, você pode gastar 1 PM para escolher 10 em qualquer situação, exceto testes de ataque.",
+      pmCost: 1,
       requirements: [[]],
     },
     {
@@ -311,6 +319,7 @@ const INVENTOR: ClassDescription = {
     {
       name: "Mistura Fervilhante",
       text: "Quando usa um item alquímico ou poção, você pode gastar 2 PM para dobrar a área de efeito dele.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Alquimista Iniciado" },
@@ -321,6 +330,7 @@ const INVENTOR: ClassDescription = {
     {
       name: "Oficina de Campo",
       text: "Você pode gastar uma hora e 2 PM para fazer a manutenção do equipamento de seu grupo. Cada membro do grupo escolhe uma arma, armadura ou escudo para manutenção. Armas recebem +1 em testes de ataque, armaduras e escudos aumentam seu bônus na Defesa em +1. Os benefícios duram um dia.",
+      pmCost: 2,
       requirements: [
         [{ type: RequirementType.PERICIA, name: Skill.OFICIO_ARMEIRO }],
       ],

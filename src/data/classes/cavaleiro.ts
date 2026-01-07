@@ -44,16 +44,19 @@ const CAVALEIRO: ClassDescription = {
       name: "Código de Honra",
       text: "Cavaleiros distinguem-se de meros combatentes por seguir um código de conduta. Fazem isto para mostrar que estão acima dos mercenários e bandoleiros que infestam os campos de batalha. Você não pode atacar um oponente pelas costas (em termos de jogo, não pode se beneficiar do bônus de flanquear), caído, desprevenido ou incapaz de lutar. Se violar o código, você perde todos os seus PM e só pode recuperá-los a partir do próximo dia. Rebaixar-se ao nível dos covardes e desesperados abala a autoconfiança que eleva o cavaleiro.",
       nivel: 1,
+      // Penalidade de perda de PM, não custo
     },
     {
       name: "Baluarte",
       text: "Quando sofre um ataque ou faz um teste de resistência, você pode gastar 1 PM para receber +2 na Defesa e nos testes de resistência até o início do seu próximo turno. A cada quatro níveis, pode gastar +1 PM para aumentar o bônus em +2. A partir do 7º nível, quando usa esta habilidade, você pode gastar 2 PM adicionais para fornecer o mesmo bônus a todos os aliados adjacentes. Por exemplo, pode gastar 4 PM ao todo para receber +4 na Defesa e nos testes de resistência e fornecer este mesmo bônus aos outros. A partir do 15º nível, você pode gastar 5 PM adicionais para fornecer o mesmo bônus a todos os aliados em alcance curto.",
       nivel: 1,
+      pmCost: 1,
     },
     {
       name: "Duelo",
       text: "A partir do 2º nível, você pode gastar 2 PM para escolher um oponente em alcance curto e receber +2 em testes de ataque e rolagens de dano contra ele até o fim da cena. Se atacar outro oponente, o bônus termina. A cada cinco níveis, você pode gastar +1 PM para aumentar o bônus em +1.",
       nivel: 2,
+      pmCost: 2,
     },
     {
       name: "Caminho do Cavaleiro",
@@ -64,11 +67,13 @@ const CAVALEIRO: ClassDescription = {
       name: "Resoluto",
       text: "Você pode gastar 1 PM para refazer um teste de resistência contra uma condição (como abalado, paralisado etc.) que esteja o afetando. O segundo teste recebe um bônus de +5 e, se você passar, cancela o efeito. Você só pode usar esta habilidade uma vez por efeito.",
       nivel: 11,
+      pmCost: 1,
     },
     {
       name: "Bravura Final",
       text: "Sua virtude vence a morte. Se for reduzido a 0 ou menos PV, pode gastar 3 PM para continuar consciente e de pé. Esta habilidade tem duração sustentada. Quando se encerra, você sofre os efeitos de seus PV atuais, podendo cair inconsciente ou mesmo morrer",
       nivel: 20,
+      pmCost: 3,
     },
   ],
   powers: [
@@ -92,6 +97,7 @@ const CAVALEIRO: ClassDescription = {
     {
       name: "Autoridade Feudal",
       text: "Você pode gastar uma hora e 2 PM para conclamar o povo a ajudá-lo (qualquer pessoa sem um título de nobreza ou uma posição numa igreja reconhecida pelo seu reino). Em termos de jogo, essas pessoas contam como um parceiro iniciante de um tipo a sua escolha (aprovado pelo mestre) que lhe acompanha até o fim da aventura. Esta habilidade só pode ser usada em locais onde sua posição carregue alguma influência (a critério do mestre).",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.NIVEL, value: 6 }]],
     },
     {
@@ -102,6 +108,7 @@ const CAVALEIRO: ClassDescription = {
     {
       name: "Escudeiro",
       text: "Você recebe os serviços de um escudeiro, um parceiro especial que cuida de seu equipamento. Suas armas fornecem +1 em rolagens de dano e sua armadura concede +1 na Defesa. Além disso, você pode pagar 1 PM para receber ajuda do escudeiro em combate. Você recebe uma ação de movimento que pode usar para se levantar, sacar um item ou trazer sua montaria. O escudeiro não conta em seu limite de parceiros. Caso ele morra, você pode treinar outro com um mês de trabalho.",
+      pmCost: 1,
       requirements: [],
     },
     {
@@ -122,6 +129,7 @@ const CAVALEIRO: ClassDescription = {
     {
       name: "Etiqueta",
       text: "Você recebe +2 em Diplomacia e Nobreza e pode gastar 1 PM para rolar novamente um teste recém realizado de uma dessas perícias.",
+      pmCost: 1,
       requirements: [],
       sheetBonuses: [
         {
@@ -157,6 +165,7 @@ const CAVALEIRO: ClassDescription = {
     {
       name: "Investida Destruidora",
       text: "Quando faz a ação investida, você pode gastar 2 PM. Se fizer isso, causa +2d8 pontos de dano. Você deve usar esta habilidade antes de rolar o ataque.",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -172,31 +181,37 @@ const CAVALEIRO: ClassDescription = {
     {
       name: "Postura de Combate: Aríete Implacável",
       text: "Ao assumir esta postura, você aumenta o bônus de ataque em investidas em +2. Para cada 2 PM adicionais que gastar quando assumir a postura, aumenta o bônus de ataque em +1. Além disso, se fizer uma investida contra um construto ou objeto, causa +2d8 de dano. Você precisa se deslocar todos os turnos para manter esta postura ativa.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Postura de Combate: Castigo de Ferro",
       text: "Sempre que um aliado adjacente sofrer um ataque corpo a corpo, você pode gastar 1 PM para fazer um ataque na criatura que o atacou.",
+      pmCost: 2, // 2 PM to activate stance + 1 PM per use
       requirements: [],
     },
     {
       name: "Postura de Combate: Foco de Batalha",
       text: "Sempre que um inimigo atacá-lo, você recebe 1 PM temporário (cumulativos). Você pode ganhar um máximo de PM temporários por cena igual ao seu nível. Esses pontos temporários desaparecem no final da cena.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Postura de Combate: Muralha Intransponível.",
       text: "Para assumir esta postura você precisa estar empunhando um escudo. Você recebe +1 na Defesa e em Reflexos. Além disso, quando sofre um efeito que permite um teste de Reflexos para reduzir o dano à metade, não sofre nenhum dano se passar. Para cada 2 PM adicionais que gastar quando assumir a postura, aumente esse bônus em +1. Por fim, enquanto mantiver esta postura, seu deslocamento é reduzido para 3m.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Postura de Combate: Provocação Petulante",
       text: "Enquanto esta postura estiver ativa, todos os inimigos que iniciarem seus turnos em alcance curto devem fazer um teste de Vontade (CD Car). Se falharem, qualquer ação hostil que realizarem deve ter você como alvo (mas suas outras ações não têm esta restrição). Ações hostis incluem ataques e outras ações que causem dano e/ou condições negativas. Mental.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Postura de Combate: Torre Inabalável",
       text: "Você assume uma postura defensiva que o torna imune a qualquer tentativa de tirá-lo do lugar, de forma mundana ou mágica. Enquanto mantiver a postura, você não pode se deslocar, mas soma sua Constituição na Defesa e pode substituir testes de Reflexos e Vontade por testes de Fortitude.",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -217,6 +232,7 @@ const CAVALEIRO: ClassDescription = {
     {
       name: "Torre Armada",
       text: "Quando um inimigo erra um ataque contra você, você pode gastar 1 PM. Se fizer isso, recebe +5 em rolagens de dano contra esse inimigo até o fim de seu próximo turno.",
+      pmCost: 1,
       requirements: [],
     },
   ],

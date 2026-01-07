@@ -34,6 +34,7 @@ export type ClassAbility = {
   name: string;
   text: string;
   nivel: number;
+  pmCost?: number;
   sheetActions?: SheetAction[];
   sheetBonuses?: SheetBonus[];
 };
@@ -42,6 +43,7 @@ export type ClassPower = {
   name: string;
   text: string;
   requirements?: Requirement[][];
+  pmCost?: number;
   sheetActions?: SheetAction[];
   sheetBonuses?: SheetBonus[];
   canRepeat?: boolean;
