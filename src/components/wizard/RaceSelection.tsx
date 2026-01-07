@@ -21,6 +21,18 @@ import {
 
 import { formatAssetName } from "../../utils/assetUtils";
 
+const getRaceImageName = (raceName: string) => {
+  // Special case for Suraggel variants (Aggelus/Sulfure)
+  // We want to use the inner name: "Suraggel (Aggelus)" -> "aggelus"
+  if (raceName.includes("Suraggel") && raceName.includes("(")) {
+    const match = raceName.match(/\(([^)]+)\)/);
+    if (match) {
+      return formatAssetName(match[1]);
+    }
+  }
+  return formatAssetName(raceName);
+};
+
 /**
  * Componente de Card de Raça Visual
  */
@@ -29,7 +41,8 @@ const RaceCard = React.memo(
     const [imageLoaded, setImageLoaded] = useState(false);
 
     // Use the new automated asset path
-    const assetName = formatAssetName(race.name);
+    // Use the new automated asset path
+    const assetName = getRaceImageName(race.name);
     const imagePath = `/assets/races/${assetName}.webp`;
 
     return (
@@ -175,7 +188,7 @@ const RaceSelection = () => {
             {/* Header com imagem de fundo */}
             <div className="relative h-72 md:h-[500px] overflow-hidden">
               <Image
-                src={`/assets/races/${formatAssetName(
+                src={`/assets/races/${getRaceImageName(
                   selectedPreview.name
                 )}.webp`}
                 alt={selectedPreview.name}
