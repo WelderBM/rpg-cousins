@@ -28,12 +28,19 @@ import {
   Upload,
   Link as LinkIcon,
   Wand2,
+  Trash2,
+  Download,
+  Search,
+  MapPin,
+  Dices,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Atributo } from "@/data/atributos";
 import { generateCharacterPrompt } from "@/utils/promptGenerator";
 import { compressImage } from "@/utils/imageCompression";
+import { exportCharacterToPDF } from "@/utils/pdfExport";
 import Link from "next/link";
+import Skill from "@/interfaces/Skills";
 
 // --- SUB-COMPONENTS ---
 
@@ -128,7 +135,7 @@ const DetailRow = ({
   value: React.ReactNode;
 }) => (
   <div className="flex justify-between items-center text-xs py-1 border-b border-white/5 last:border-0">
-    <span className="text-amber-600/80 font-black uppercase tracking-widest text-[10px]">
+    <span className="text-amber-500/90 font-black uppercase tracking-widest text-[10px]">
       {label}
     </span>
     <span className="text-stone-100 font-bold text-right">{value}</span>
@@ -137,9 +144,25 @@ const DetailRow = ({
 
 const ItemList = ({ title, items, icon: Icon }: any) => {
   if (!items || items.length === 0) return null;
+
+  // Function to create intelligent Google search query
+  const handleGoogleSearch = (item: any) => {
+    const itemName = item.name || item.nome;
+    const category = item.subGroup || item.group || "";
+
+    // Build intelligent search query targeted for RPG/Fantasy images
+    const searchQuery = `"${itemName}" medieval fantasy`;
+    const encodedQuery = encodeURIComponent(searchQuery);
+    // Use tbm=isch for Image Search
+    const googleUrl = `https://www.google.com/search?tbm=isch&q=${encodedQuery}`;
+
+    // Open in new tab
+    window.open(googleUrl, "_blank");
+  };
+
   return (
     <div className="mb-8">
-      <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
+      <h3 className="text-xs font-black text-amber-500/90 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
         {Icon && <Icon size={14} />} {title}
       </h3>
       <div className="space-y-3">
@@ -147,16 +170,27 @@ const ItemList = ({ title, items, icon: Icon }: any) => {
           return (
             <div
               key={idx}
-              className="bg-stone-900/90 border border-stone-800/50 rounded-lg p-4 hover:border-amber-500/30 transition-all shadow-xl"
+              className="bg-stone-900/95 backdrop-blur-sm border border-stone-800/70 rounded-lg p-4 hover:border-amber-500/30 transition-all shadow-xl"
             >
               <div className="flex justify-between items-start mb-2">
-                <h4 className="font-bold text-stone-100 text-sm flex items-center gap-2">
+                <h4 className="font-bold text-stone-100 text-sm flex items-center gap-2 flex-1">
                   <span className="text-amber-500/60">
                     {getItemSymbol(item, 16)}
                   </span>
                   {item.name || item.nome}
                 </h4>
                 <div className="flex items-center gap-2">
+                  {/* Google Search Button */}
+                  <button
+                    onClick={() => handleGoogleSearch(item)}
+                    className="flex-shrink-0 w-7 h-7 rounded-md bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 hover:border-blue-500/60 flex items-center justify-center transition-all group/search"
+                    title="Pesquisar no Google"
+                  >
+                    <Search
+                      size={14}
+                      className="text-blue-400 group-hover/search:text-blue-300"
+                    />
+                  </button>
                   {item.quantidade > 1 && (
                     <span className="text-[10px] bg-stone-800 text-stone-300 px-1.5 py-0.5 rounded border border-stone-700 font-bold">
                       x{item.quantidade}
@@ -167,11 +201,44 @@ const ItemList = ({ title, items, icon: Icon }: any) => {
 
               <div className="space-y-1 mb-2">
                 {item.dano && (
+                  <>
+                    <DetailRow label="Dano" value={item.dano} />
+                    {item.critico && item.critico !== "-" && (
+                      <DetailRow
+                        label=""
+                        value={
+                          <div className="flex items-center gap-1.5 justify-end">
+                            {item.critico
+                              .split("/")
+                              .map((part: string, i: number) => (
+                                <React.Fragment key={i}>
+                                  {i > 0 && <span>/</span>}
+                                  {part.includes("x") ? (
+                                    <span>{part}</span>
+                                  ) : (
+                                    <span className="flex items-center gap-1">
+                                      <Dices
+                                        size={10}
+                                        className="text-amber-500/60"
+                                      />
+                                      {part}
+                                    </span>
+                                  )}
+                                </React.Fragment>
+                              ))}
+                          </div>
+                        }
+                      />
+                    )}
+                    {item.tipo && (
+                      <DetailRow label="Tipo de Dano" value={item.tipo} />
+                    )}
+                  </>
+                )}
+                {item.weaponTags && item.weaponTags.length > 0 && (
                   <DetailRow
-                    label="Dano"
-                    value={`${item.dano} ${
-                      item.critico ? `/ ${item.critico}` : ""
-                    }`}
+                    label="Propriedades"
+                    value={item.weaponTags.join(", ")}
                   />
                 )}
                 {item.defenseBonus > 0 && (
@@ -224,30 +291,53 @@ const ItemList = ({ title, items, icon: Icon }: any) => {
   );
 };
 
-const SimpleList = ({ title, items, icon: Icon }: any) => {
+const SimpleList = ({
+  title,
+  items,
+  icon: Icon,
+  highlightedItems,
+  highlightIcon: HighlightIcon,
+}: any) => {
   if (!items || items.length === 0) return null;
   return (
     <div className="mb-8">
-      <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
+      <h3 className="text-xs font-black text-amber-500/90 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
         {Icon && <Icon size={14} />} {title}
       </h3>
       <ul className="space-y-2">
         {items.map((item: any, idx: number) => {
           const name = typeof item === "string" ? item : item.name || item.nome;
-          const desc =
+          let desc =
             typeof item === "string"
               ? null
-              : item.text || item.description || item.effect;
+              : item.text ||
+                item.description ||
+                item.effect ||
+                item.desc ||
+                item.value?.text ||
+                item.value?.description ||
+                item.value?.effect ||
+                item.value?.desc;
+
+          if (!desc && Object.values(Skill).includes(name as Skill)) {
+            desc = "Treinamento em perícia.";
+          }
+
+          const isHighlighted =
+            highlightedItems && highlightedItems.includes(name);
 
           return (
             <li
               key={idx}
-              className="bg-stone-900/90 border border-stone-800/50 rounded-lg px-4 py-3 text-sm text-stone-200 flex items-start gap-3 shadow-md"
+              className="bg-stone-900/95 backdrop-blur-sm border border-stone-800/70 rounded-lg px-4 py-3 text-sm text-stone-200 flex items-start gap-3 shadow-xl"
             >
               <div className="mt-2 min-w-[6px] h-[6px] bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
               <div className="flex-1">
-                <span className="font-bold block text-stone-100 mb-1">
+                <span className="font-bold block text-stone-100 mb-1 flex items-center gap-2">
                   {name}
+                  {isHighlighted && HighlightIcon && (
+                    <HighlightIcon size={14} className="text-amber-500" />
+                  )}
                 </span>
                 {desc && (
                   <span className="text-xs text-stone-400 block leading-relaxed italic">
@@ -268,7 +358,7 @@ const SectionSlider = ({ title, items, icon: Icon }: any) => {
   return (
     <div className="mb-10 group">
       <div className="flex items-center justify-between mb-4 px-1">
-        <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] flex items-center gap-2">
+        <h3 className="text-xs font-black text-amber-500/90 uppercase tracking-[0.2em] flex items-center gap-2">
           {Icon && <Icon size={14} />} {title}
         </h3>
         <span className="text-[10px] text-stone-600 font-bold uppercase tracking-wider animate-pulse">
@@ -278,10 +368,21 @@ const SectionSlider = ({ title, items, icon: Icon }: any) => {
       <div className="flex gap-4 overflow-x-auto pb-6 -mx-4 px-4 scrollbar-none snap-x cursor-grab active:cursor-grabbing">
         {items.map((item: any, idx: number) => {
           const name = typeof item === "string" ? item : item.name || item.nome;
-          const desc =
+          let desc =
             typeof item === "string"
               ? null
-              : item.text || item.description || item.effect;
+              : item.description ||
+                item.text ||
+                item.effect ||
+                item.desc ||
+                item.value?.description ||
+                item.value?.text ||
+                item.value?.effect ||
+                item.value?.desc;
+
+          if (!desc && Object.values(Skill).includes(name as Skill)) {
+            desc = "Você recebe treinamento nesta perícia pela sua origem.";
+          }
           return (
             <div
               key={idx}
@@ -338,6 +439,7 @@ export function CharacterSheetView({
     height: "",
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   // Sync temp states when character changes
   useEffect(() => {
@@ -430,6 +532,34 @@ export function CharacterSheetView({
     }
   };
 
+  const handleDeleteImage = async () => {
+    if (!activeCharacter.imageUrl) return;
+
+    const confirmed = confirm(
+      "Tem certeza que deseja apagar a imagem do personagem?"
+    );
+    if (!confirmed) return;
+
+    try {
+      await onUpdate({ imageUrl: "" });
+    } catch (error) {
+      console.error("Failed to delete image", error);
+      alert("Erro ao deletar imagem.");
+    }
+  };
+
+  const handleExportPDF = async () => {
+    setIsExportingPDF(true);
+    try {
+      await exportCharacterToPDF(activeCharacter);
+    } catch (error) {
+      console.error("Failed to export PDF", error);
+      alert("Erro ao exportar PDF. Tente novamente.");
+    } finally {
+      setIsExportingPDF(false);
+    }
+  };
+
   const handleSaveMoney = async () => {
     await onUpdate({ money: tempMoney });
     setIsEditingMoney(false);
@@ -469,17 +599,47 @@ export function CharacterSheetView({
     { key: Atributo.CARISMA, label: "Carisma", icon: Crown },
   ];
 
+  // Process Origin Benefits logic
+  const rawBenefits =
+    (activeCharacter as any).originBenefits ||
+    activeCharacter.origin?.benefits ||
+    [];
+  let originPowers: any[] = [];
+  let originSkillsList: string[] = [];
+
+  if (rawBenefits.skills || rawBenefits.powers) {
+    if (Array.isArray(rawBenefits.powers?.origin)) {
+      originPowers = [...rawBenefits.powers.origin];
+    }
+    if (Array.isArray(rawBenefits.skills)) {
+      originSkillsList = rawBenefits.skills.map((s: any) =>
+        typeof s === "string" ? s : s.name
+      );
+    }
+  } else if (Array.isArray(rawBenefits)) {
+    rawBenefits.forEach((item: any) => {
+      const name = typeof item === "string" ? item : item.name;
+      const isSkill =
+        Object.values(Skill).includes(name as Skill) || item.type === "skill";
+      if (isSkill) {
+        originSkillsList.push(name);
+      } else {
+        originPowers.push(item);
+      }
+    });
+  }
+
   return (
     <div className="text-neutral-200 pb-20 font-sans selection:bg-amber-900 selection:text-white relative min-h-screen">
       {/* Background Image */}
       {activeCharacter.imageUrl && (
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-950/95 to-stone-950 z-10" />
-          <div className="absolute inset-0 bg-stone-950/60 z-[5]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/90 via-stone-950/95 to-stone-950 z-10" />
+          <div className="absolute inset-0 bg-stone-950/40 z-[5]" />
           <img
             src={activeCharacter.imageUrl}
             alt="Background"
-            className="w-full h-full object-cover opacity-15 scale-110 blur-[3px] transform-gpu"
+            className="w-full h-full object-cover opacity-12 scale-110 blur-[3px] transform-gpu"
           />
         </div>
       )}
@@ -527,20 +687,43 @@ export function CharacterSheetView({
                   <h1 className="text-4xl md:text-5xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 drop-shadow-sm">
                     {activeCharacter.name}
                   </h1>
+                  {!isMestre && (
+                    <button
+                      onClick={toggleFavorite}
+                      className={`p-2 transition-colors ${
+                        activeCharacter.isFavorite
+                          ? "text-yellow-400"
+                          : "text-stone-600"
+                      }`}
+                    >
+                      <Star
+                        size={24}
+                        fill={
+                          activeCharacter.isFavorite ? "currentColor" : "none"
+                        }
+                      />
+                    </button>
+                  )}
                   <button
-                    onClick={toggleFavorite}
-                    className={`p-2 transition-colors ${
-                      activeCharacter.isFavorite
-                        ? "text-yellow-400"
-                        : "text-stone-600"
-                    }`}
+                    onClick={handleExportPDF}
+                    disabled={isExportingPDF}
+                    className="p-2 transition-colors text-amber-500 hover:text-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Exportar ficha em PDF"
                   >
-                    <Star
-                      size={24}
-                      fill={
-                        activeCharacter.isFavorite ? "currentColor" : "none"
-                      }
-                    />
+                    {isExportingPDF ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1,
+                          ease: "linear",
+                        }}
+                      >
+                        <Download size={24} />
+                      </motion.div>
+                    ) : (
+                      <Download size={24} />
+                    )}
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2 justify-center md:justify-start items-center text-sm text-stone-100 font-serif">
@@ -557,6 +740,26 @@ export function CharacterSheetView({
                       <BookOpen size={14} className="text-amber-500" />
                       {activeCharacter.origin.name}
                     </span>
+                  )}
+                  {activeCharacter.deity && (
+                    <>
+                      <span
+                        className="flex items-center gap-1.5 px-3 py-1 bg-cyan-900/10 rounded-lg border border-cyan-900/30 text-cyan-100"
+                        title={`Símbolo: ${activeCharacter.deity.simboloSagrado}`}
+                      >
+                        <Star size={14} className="text-cyan-500" />
+                        {activeCharacter.deity.name}
+                      </span>
+                      {activeCharacter.deity.canalizacaoEnergia && (
+                        <span
+                          className="flex items-center gap-1.5 px-3 py-1 bg-purple-900/10 rounded-lg border border-purple-900/30 text-purple-100"
+                          title="Canalização de Energia"
+                        >
+                          <Zap size={14} className="text-purple-500" />
+                          {activeCharacter.deity.canalizacaoEnergia}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -663,7 +866,7 @@ export function CharacterSheetView({
             {/* Left - Attributes & Basic Stats */}
             <div className="lg:col-span-4 space-y-8">
               {/* Attributes */}
-              <section className="bg-stone-900/60 backdrop-blur-md border border-stone-800 rounded-3xl p-6 shadow-2xl">
+              <section className="bg-stone-900/90 backdrop-blur-md border border-stone-800/70 rounded-3xl p-6 shadow-2xl">
                 <h3 className="text-xs font-black text-amber-600/80 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                   <Swords size={16} /> Atributos
                 </h3>
@@ -678,8 +881,8 @@ export function CharacterSheetView({
                     return (
                       <div
                         key={attr.key}
-                        className={`bg-black/40 border ${
-                          bonus > 0 ? "border-amber-500/40" : "border-white/5"
+                        className={`bg-black/60 backdrop-blur-sm border ${
+                          bonus > 0 ? "border-amber-500/40" : "border-white/10"
                         } rounded-2xl p-4 flex flex-col items-center group transition-all`}
                       >
                         <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">
@@ -696,7 +899,7 @@ export function CharacterSheetView({
 
               {/* Defense & Money */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-stone-900/60 backdrop-blur-md border border-stone-800 rounded-3xl p-6 shadow-2xl flex flex-col items-center">
+                <div className="bg-stone-900/90 backdrop-blur-md border border-stone-800/70 rounded-3xl p-6 shadow-2xl flex flex-col items-center">
                   <Shield size={24} className="text-amber-500 mb-2" />
                   <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">
                     Defesa
@@ -707,7 +910,7 @@ export function CharacterSheetView({
                       ((activeCharacter as any).bag?.armorPenalty || 0)}
                   </div>
                 </div>
-                <div className="bg-stone-900/60 backdrop-blur-md border border-stone-800 rounded-3xl p-6 shadow-2xl flex flex-col items-center group">
+                <div className="bg-stone-900/90 backdrop-blur-md border border-stone-800/70 rounded-3xl p-6 shadow-2xl flex flex-col items-center group">
                   <Coins size={24} className="text-amber-500 mb-2" />
                   <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">
                     Tibares
@@ -751,6 +954,8 @@ export function CharacterSheetView({
                 title="Perícias"
                 items={activeCharacter.skills || []}
                 icon={Brain}
+                highlightedItems={originSkillsList}
+                highlightIcon={MapPin}
               />
             </div>
 
@@ -759,23 +964,21 @@ export function CharacterSheetView({
               <div className="pt-2">
                 <SectionSlider
                   title="Benefícios de Origem"
-                  items={
-                    (activeCharacter as any).originBenefits ||
-                    activeCharacter.origin?.benefits
-                  }
+                  items={originPowers}
                   icon={BookOpen}
                 />
                 <SectionSlider
                   title="Habilidades de Classe"
-                  items={activeCharacter.class?.abilities}
+                  items={activeCharacter.class?.abilities?.filter(
+                    (a: any) =>
+                      // Se não tiver nível definido, assume 1. Se tiver, respeita o nível do personagem.
+                      (a.nivel || 1) <= (activeCharacter.level || 1)
+                  )}
                   icon={Zap}
                 />
                 <SectionSlider
                   title="Poderes de Classe"
-                  items={
-                    activeCharacter.class?.powers ||
-                    (activeCharacter as any).classPowers
-                  }
+                  items={(activeCharacter as any).classPowers || []}
                   icon={Star}
                 />
                 <SimpleList
@@ -783,6 +986,32 @@ export function CharacterSheetView({
                   items={activeCharacter.race?.abilities}
                   icon={Dna}
                 />
+                {activeCharacter.deity && (
+                  <div className="mb-10">
+                    <h3 className="text-xs font-black text-amber-500/90 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
+                      <Sparkles size={14} /> Devoção:{" "}
+                      {activeCharacter.deity.name}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="bg-stone-900/40 p-3 rounded-xl border border-stone-800/50">
+                        <span className="text-[9px] font-black text-amber-600/60 uppercase tracking-widest block mb-1">
+                          Crenças
+                        </span>
+                        <p className="text-xs text-stone-300 leading-relaxed italic line-clamp-3">
+                          {activeCharacter.deity.crencasObjetivos}
+                        </p>
+                      </div>
+                      <div className="bg-stone-900/40 p-3 rounded-xl border border-stone-800/50">
+                        <span className="text-[9px] font-black text-amber-600/60 uppercase tracking-widest block mb-1">
+                          Restrições
+                        </span>
+                        <p className="text-xs text-red-300/80 leading-relaxed italic line-clamp-3">
+                          {activeCharacter.deity.obrigacoesRestricoes}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {activeCharacter.grantedPower && (
                   <SimpleList
                     title="Poder Concedido"
@@ -808,15 +1037,25 @@ export function CharacterSheetView({
                   inventory.filter((i: any) =>
                     i.group?.toLowerCase().includes("arma")
                   );
-                const others = inventory.filter(
-                  (i: any) => !i.group?.toLowerCase().includes("arma")
-                );
+
+                // If we have bag categories, get everything except weapons
+                let others = [];
+                if (Object.keys(equips).length > 0) {
+                  others = Object.entries(equips)
+                    .filter(([group]) => group !== "Arma")
+                    .map(([_, items]) => items)
+                    .flat();
+                } else {
+                  others = inventory.filter(
+                    (i: any) => !i.group?.toLowerCase().includes("arma")
+                  );
+                }
 
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <ItemList
                       title="Armas & Ataques"
-                      items={weapons}
+                      items={weapons || []}
                       icon={Swords}
                     />
                     <ItemList title="Mochila" items={others} icon={Backpack} />
@@ -876,16 +1115,26 @@ export function CharacterSheetView({
                       </div>
                     )}
                   </div>
-                  <label className="cursor-pointer bg-amber-600 hover:bg-amber-500 text-black font-black px-6 py-2 rounded-xl transition-all shadow-lg text-sm uppercase tracking-widest flex items-center gap-2">
-                    <Upload size={16} /> Carregar Imagem
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={isUploading}
-                    />
-                  </label>
+                  <div className="flex gap-3">
+                    <label className="cursor-pointer bg-amber-600 hover:bg-amber-500 text-black font-black px-6 py-2 rounded-xl transition-all shadow-lg text-sm uppercase tracking-widest flex items-center gap-2">
+                      <Upload size={16} /> Carregar Imagem
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isUploading}
+                      />
+                    </label>
+                    {activeCharacter.imageUrl && (
+                      <button
+                        onClick={handleDeleteImage}
+                        className="bg-red-600 hover:bg-red-500 text-white font-black px-6 py-2 rounded-xl transition-all shadow-lg text-sm uppercase tracking-widest flex items-center gap-2"
+                      >
+                        <Trash2 size={16} /> Apagar
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
