@@ -12,6 +12,18 @@ export const formatAssetName = (name: string) => {
     .replace(/^_|_$/g, ""); // Remove trailing/leading underscores
 };
 
+export const getRaceImageName = (raceName: string) => {
+  // Special case for Suraggel variants (Aggelus/Sulfure)
+  // We want to use the inner name: "Suraggel (Aggelus)" -> "aggelus"
+  if (raceName.includes("Suraggel") && raceName.includes("(")) {
+    const match = raceName.match(/\(([^)]+)\)/);
+    if (match) {
+      return formatAssetName(match[1]);
+    }
+  }
+  return formatAssetName(raceName);
+};
+
 /**
  * Returns the path to the item's icon.
  * Note: In a client-side environment, checking for file existence synchronously is not possible.

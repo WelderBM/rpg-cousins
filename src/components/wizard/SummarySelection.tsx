@@ -21,7 +21,7 @@ import {
 import { Atributo } from "../../data/atributos";
 import { CharacterService } from "../../lib/characterService";
 
-import { formatAssetName } from "../../utils/assetUtils";
+import { formatAssetName, getRaceImageName } from "../../utils/assetUtils";
 import { sanitizeForFirestore } from "../../utils/firestoreUtils";
 
 const ATTRIBUTES_LIST = [
@@ -194,6 +194,17 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
           armorPenalty: bag.getArmorPenalty(),
         },
         level: 1,
+        // Initialize physical traits with empty values
+        physicalTraits: {
+          gender: "",
+          hair: "",
+          eyes: "",
+          skin: "",
+          scars: "",
+          height: "",
+          extra: "",
+        },
+        classPowers: [],
       };
 
       const sanitizedData = sanitizeForFirestore(characterData);
@@ -294,7 +305,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
               {/* Race Background */}
               {selectedRace && (
                 <Image
-                  src={`/assets/races/${formatAssetName(
+                  src={`/assets/races/${getRaceImageName(
                     selectedRace.name
                   )}.webp`}
                   alt={selectedRace.name}

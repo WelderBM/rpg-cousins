@@ -19,19 +19,7 @@ import {
   Users,
 } from "lucide-react";
 
-import { formatAssetName } from "../../utils/assetUtils";
-
-const getRaceImageName = (raceName: string) => {
-  // Special case for Suraggel variants (Aggelus/Sulfure)
-  // We want to use the inner name: "Suraggel (Aggelus)" -> "aggelus"
-  if (raceName.includes("Suraggel") && raceName.includes("(")) {
-    const match = raceName.match(/\(([^)]+)\)/);
-    if (match) {
-      return formatAssetName(match[1]);
-    }
-  }
-  return formatAssetName(raceName);
-};
+import { formatAssetName, getRaceImageName } from "../../utils/assetUtils";
 
 /**
  * Componente de Card de Raça Visual

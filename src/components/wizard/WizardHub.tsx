@@ -9,7 +9,7 @@ interface WizardHubProps {
   onNew: () => void;
 }
 
-import { formatAssetName } from "../../utils/assetUtils";
+import { formatAssetName, getRaceImageName } from "../../utils/assetUtils";
 
 const WizardHub = ({ onContinue, onNew }: WizardHubProps) => {
   const {
@@ -62,7 +62,7 @@ const WizardHub = ({ onContinue, onNew }: WizardHubProps) => {
             {selectedRace && (
               <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Image
-                  src={`/assets/races/${formatAssetName(
+                  src={`/assets/races/${getRaceImageName(
                     selectedRace.name
                   )}.webp`}
                   alt={selectedRace.name}
@@ -84,7 +84,7 @@ const WizardHub = ({ onContinue, onNew }: WizardHubProps) => {
                 <div className="w-20 h-20 rounded-2xl bg-stone-800 border-2 border-amber-900/40 flex items-center justify-center overflow-hidden shadow-2xl">
                   {selectedRace ? (
                     <Image
-                      src={`/assets/races/${formatAssetName(
+                      src={`/assets/races/${getRaceImageName(
                         selectedRace.name
                       )}.webp`}
                       alt={selectedRace.name}
