@@ -608,6 +608,51 @@ export function WikiDetailDrawer({
                 {/* 6. DIVINDADES */}
                 {selectedItem.category === "divindades" && (
                   <div className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <StatCard
+                        label="Símbolo Sagrado"
+                        value={selectedItem.raw.simboloSagrado}
+                        icon={Star}
+                      />
+                      <StatCard
+                        label="Energia"
+                        value={selectedItem.raw.canalizacaoEnergia}
+                        icon={Zap}
+                      />
+                      <StatCard
+                        label="Arma Preferida"
+                        value={selectedItem.raw.armaPreferida}
+                        icon={Swords}
+                      />
+                      <StatCard
+                        label="Devotos"
+                        value={selectedItem.raw.devotos}
+                        icon={Users}
+                      />
+                    </div>
+
+                    <section>
+                      <SectionTitle
+                        title="Crenças e Objetivos"
+                        icon={Target}
+                        color="text-cyan-500"
+                      />
+                      <div className="text-neutral-300 leading-relaxed italic bg-white/5 p-4 rounded-xl border border-white/5 border-l-4 border-l-cyan-500/50">
+                        {selectedItem.raw.crencasObjetivos}
+                      </div>
+                    </section>
+
+                    <section>
+                      <SectionTitle
+                        title="Obrigações e Restrições"
+                        icon={BadgeAlert}
+                        color="text-red-500"
+                      />
+                      <div className="text-red-200/80 leading-relaxed italic bg-red-900/10 p-4 rounded-xl border border-red-900/20 border-l-4 border-l-red-500/50">
+                        {selectedItem.raw.obrigacoesRestricoes}
+                      </div>
+                    </section>
+
                     <section>
                       <SectionTitle
                         title="Poderes Concedidos"
@@ -651,14 +696,6 @@ export function WikiDetailDrawer({
                         ))}
                       </div>
                     </section>
-
-                    <div className="p-6 bg-cyan-500/5 border border-cyan-500/20 rounded-2xl">
-                      <p className="text-neutral-400 text-sm italic leading-relaxed text-center">
-                        \"O panteão de Arton é vasto e misterioso. Seguir os
-                        preceitos de uma divindade concede dons únicos, mas
-                        exige devoção total.\"
-                      </p>
-                    </div>
                   </div>
                 )}
 

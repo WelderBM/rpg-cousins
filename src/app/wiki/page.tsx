@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   getAllSpells,
   getAllEquipments,
@@ -22,12 +23,40 @@ import { FloatingBackButton } from "@/components/FloatingBackButton";
 const ITEMS_PER_PAGE = 24;
 
 export default function WikiPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-stone-950 flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-amber-900/30 border-t-amber-500 rounded-full animate-spin"></div>
+        </div>
+      }
+    >
+      <WikiContent />
+    </Suspense>
+  );
+}
+
+function WikiContent() {
+  const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<Category>("magias");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<ItemBase | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [displayLimit, setDisplayLimit] = useState(ITEMS_PER_PAGE);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Data State
+  const [data, setData] = useState<Record<Category, ItemBase[]>>({
+    magias: [],
+    equipamentos: [],
+    racas: [],
+    poderes: [],
+    mercado: [],
+    origens: [],
+    divindades: [],
+    classes: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
   // Filter States - Magias
   const [spellCircle, setSpellCircle] = useState<number | "all">("all");
@@ -43,29 +72,52 @@ export default function WikiPage() {
   const [maxPrice, setMaxPrice] = useState<number | "">("");
   const [equipSubGroup, setEquipSubGroup] = useState<string | "all">("all");
 
+  // Initial URL handling (Only on mount)
+  useEffect(() => {
+    const cat = searchParams.get("cat") as Category;
+    if (cat && data[cat] !== undefined) {
+      setActiveCategory(cat);
+    }
+  }, []); // Only on mount
+
+  // Select item from URL once data is loaded for that category
+  useEffect(() => {
+    const id = searchParams.get("id");
+    const cat = (searchParams.get("cat") || activeCategory) as Category;
+
+    if (id && data[cat] && data[cat].length > 0) {
+      const item = data[cat].find((i) => i.id === id);
+      if (item && selectedItem?.id !== id) {
+        setSelectedItem(item);
+      }
+    }
+  }, [data, activeCategory]); // Trigger when data for a category is loaded
+
   // Reset limit when category or search changes
   useEffect(() => {
     setDisplayLimit(ITEMS_PER_PAGE);
   }, [activeCategory, searchQuery]);
 
-  // Data State
-  const [data, setData] = useState<{
-    magias: ItemBase[];
-    equipamentos: ItemBase[];
-    racas: ItemBase[];
-    poderes: ItemBase[];
-    mercado: ItemBase[];
-  }>({
-    magias: [],
-    equipamentos: [],
-    racas: [],
-    poderes: [],
-    mercado: [],
-    origens: [],
-    divindades: [],
-    classes: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  // Sync URL with selection (Without causing loops)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const currentCat = params.get("cat");
+    const currentId = params.get("id");
+
+    if (
+      currentCat !== activeCategory ||
+      currentId !== (selectedItem?.id || null)
+    ) {
+      params.set("cat", activeCategory);
+      if (selectedItem) {
+        params.set("id", selectedItem.id);
+      } else {
+        params.delete("id");
+      }
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, [selectedItem, activeCategory]);
 
   // Load data for active category
   useEffect(() => {
@@ -157,7 +209,9 @@ export default function WikiPage() {
             name: d.name,
             category: "divindades" as Category,
             type: "Divindade do Panteão",
-            description: `Poderes: ${d.poderes.map((p) => p.name).join(", ")}`,
+            description: `${d.crencasObjetivos.slice(0, 100)}... | Símbolo: ${
+              d.simboloSagrado
+            }`,
             raw: d,
           }));
         } else if (activeCategory === "classes") {
