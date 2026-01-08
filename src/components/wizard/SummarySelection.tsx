@@ -17,7 +17,9 @@ import {
   Sword,
   Scroll,
   Copy,
+  Flame,
 } from "lucide-react";
+import { SimpleList } from "../character/DisplayComponents";
 import { Atributo } from "../../data/atributos";
 import { CharacterService } from "../../lib/characterService";
 
@@ -26,6 +28,7 @@ import { sanitizeForFirestore } from "../../utils/firestoreUtils";
 import Bag from "../../interfaces/Bag";
 import { Armas, Armaduras, Escudos } from "../../data/equipamentos";
 import { GENERAL_EQUIPMENT } from "../../data/equipamentos-gerais";
+import { getClassEquipments } from "../../functions/general";
 
 const ATTRIBUTES_LIST = [
   Atributo.FORCA,
@@ -50,6 +53,8 @@ const SummarySelection = () => {
     selectedGrantedPowers,
     selectedClassPowers,
     bag,
+    selectedClassWeapons,
+    selectedOriginWeapons,
     money,
     selectedSkills,
     setStep,
@@ -185,15 +190,30 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         ...GENERAL_EQUIPMENT.food,
       ];
 
-      const finalBag = new Bag(bag.getEquipments()); // Start with current bag
+      const finalBag = new Bag(); // Start with a fresh bag to ensure no pollution from previous states
+
+      // Add Class Equipments
+      if (selectedClass) {
+        const classEquipments = getClassEquipments(
+          selectedClass,
+          finalBag,
+          selectedClassWeapons
+        );
+        finalBag.addEquipment(classEquipments);
+      }
 
       if (selectedOrigin?.getItems) {
         const originItems = selectedOrigin.getItems();
 
+        let choiceIdx = 0;
         originItems.forEach((item) => {
           let equipmentToAdd: any = null;
 
-          if (typeof item.equipment === "string") {
+          // Se for uma escolha e o usuário selecionou algo, use a seleção
+          if (item.choice && selectedOriginWeapons[choiceIdx]) {
+            equipmentToAdd = { ...selectedOriginWeapons[choiceIdx] };
+            choiceIdx++;
+          } else if (typeof item.equipment === "string") {
             // Try to find in all databases
             const found =
               Object.values(Armas).find(
@@ -303,7 +323,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         origin: selectedOrigin,
         originBenefits,
         deity: selectedDeity,
-        grantedPower: selectedGrantedPowers[0] || null,
+        grantedPowers: selectedGrantedPowers,
         bag: finalBag, // Use finalBag which contains origin items
         money: money,
         currentPv: hpBase + conMod,
@@ -435,44 +455,56 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
 
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
-              {Object.entries(finalAttributes).map(([attr, val]) => (
-                <div
-                  key={attr}
-                  className="bg-neutral-900/50 border border-neutral-800 p-3 rounded-xl flex flex-col items-center"
-                >
-                  <span className="text-[9px] text-neutral-500 uppercase font-bold">
-                    {attr}
-                  </span>
-                  <span className="text-2xl font-bold font-cinzel text-amber-100">
-                    {val >= 0 ? `+${val}` : val}
-                  </span>
-                </div>
-              ))}
+              {[
+                { label: "FOR", attr: Atributo.FORCA },
+                { label: "DES", attr: Atributo.DESTREZA },
+                { label: "CON", attr: Atributo.CONSTITUICAO },
+                { label: "INT", attr: Atributo.INTELIGENCIA },
+                { label: "SAB", attr: Atributo.SABEDORIA },
+                { label: "CAR", attr: Atributo.CARISMA },
+              ].map(({ label, attr }) => {
+                const val = finalAttributes[attr];
+                return (
+                  <div
+                    key={attr}
+                    className="bg-stone-900/60 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex flex-col items-center group transition-all hover:border-amber-500/30 shadow-lg"
+                  >
+                    <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">
+                      {label}
+                    </span>
+                    <div className="text-3xl font-black text-stone-100 tabular-nums font-cinzel">
+                      {val >= 0 ? `+${val}` : val}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* HP/PM Quick View */}
-            <div className="grid grid-cols-1 gap-3">
-              <div className="bg-red-950/20 border border-red-900/30 p-4 rounded-xl flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <Heart className="text-red-500" size={20} />
-                  <span className="text-xs font-bold uppercase text-red-200/70">
-                    Pv Iniciais
+            <div className="grid grid-cols-1 gap-4 pt-4 border-t border-white/5">
+              <div className="bg-gradient-to-br from-red-950/90 to-stone-900/90 backdrop-blur-md border border-red-900/50 rounded-2xl p-5 flex flex-col items-center relative overflow-hidden shadow-2xl">
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="text-[10px] font-black text-red-400/80 uppercase tracking-widest">
+                    Vida (PV) Inicial
                   </span>
+                  <Heart size={14} className="text-red-500" />
                 </div>
-                <span className="text-2xl font-bold font-cinzel text-red-400">
-                  {20 + finalAttributes[Atributo.CONSTITUICAO]}
-                </span>
+                <div className="text-4xl font-black text-red-100 tabular-nums font-cinzel">
+                  {(selectedClass?.pv || 20) +
+                    finalAttributes[Atributo.CONSTITUICAO]}
+                </div>
               </div>
-              <div className="bg-blue-950/20 border border-blue-900/30 p-4 rounded-xl flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <Brain className="text-blue-500" size={20} />
-                  <span className="text-xs font-bold uppercase text-blue-200/70">
-                    Pm Iniciais
+
+              <div className="bg-gradient-to-br from-blue-950/90 to-stone-900/90 backdrop-blur-md border border-blue-900/50 rounded-2xl p-5 flex flex-col items-center relative overflow-hidden shadow-2xl">
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="text-[10px] font-black text-blue-400/80 uppercase tracking-widest">
+                    Mana (PM) Inicial
                   </span>
+                  <Brain size={14} className="text-blue-500" />
                 </div>
-                <span className="text-2xl font-bold font-cinzel text-blue-400">
+                <div className="text-4xl font-black text-blue-100 tabular-nums font-cinzel">
                   {selectedClass?.pm || 0}
-                </span>
+                </div>
               </div>
             </div>
           </div>
@@ -559,50 +591,32 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
                 </div>
 
                 {/* Special Perks Block */}
-                {selectedGrantedPowers && selectedGrantedPowers.length > 0 && (
-                  <div className="pt-8 border-t border-white/5 space-y-3">
-                    <h4 className="text-[10px] text-neutral-500 uppercase tracking-widest">
-                      Poderes Concedidos ({selectedGrantedPowers.length})
-                    </h4>
-                    {selectedGrantedPowers.map((power) => (
-                      <div key={power.name} className="flex items-center gap-3">
-                        <Zap className="text-amber-400" size={18} />
-                        <span className="text-lg text-amber-100 font-cinzel leading-none">
-                          {power.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <SimpleList
+                  title="Poderes Concedidos"
+                  items={selectedGrantedPowers}
+                  icon={Zap}
+                  useIconAsBullet={true}
+                />
 
                 {/* Class Powers Block */}
-                {selectedClassPowers && selectedClassPowers.length > 0 && (
-                  <div className="pt-8 border-t border-white/5 space-y-3">
-                    <h4 className="text-[10px] text-neutral-500 uppercase tracking-widest">
-                      Poderes de Classe ({selectedClassPowers.length})
-                    </h4>
-                    {selectedClassPowers.map((power) => (
-                      <div key={power.name} className="flex items-center gap-3">
-                        <Sparkles className="text-purple-400" size={18} />
-                        <span className="text-lg text-purple-100 font-cinzel leading-none">
-                          {power.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <SimpleList
+                  title="Poderes de Classe"
+                  items={selectedClassPowers}
+                  icon={Sparkles}
+                  useIconAsBullet={true}
+                />
               </div>
             </div>
 
             {/* AI Prompt Section */}
-            <div className="bg-amber-900/10 border border-amber-900/30 rounded-2xl p-6 relative overflow-hidden group">
-              <div className="flex justify-between items-center mb-3">
+            <div className="bg-stone-950/50 p-6 rounded-2xl border border-stone-800 shadow-xl overflow-hidden group">
+              <div className="flex justify-between items-center mb-4">
                 <h3 className="text-amber-500 font-cinzel text-sm flex items-center gap-2">
                   <Sparkles size={16} /> Prompt para IA (Retrato)
                 </h3>
                 <button
                   onClick={copyToClipboard}
-                  className="flex items-center gap-2 px-3 py-1 bg-amber-900/40 border border-amber-600/30 rounded-lg text-[10px] font-bold text-amber-100 hover:bg-amber-600 hover:text-black transition-all"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-amber-900/40 border border-amber-600/30 rounded-lg text-[10px] font-bold text-amber-100 hover:bg-amber-600 hover:text-black transition-all"
                 >
                   {copied ? (
                     "Copiado!"
@@ -613,14 +627,13 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
                   )}
                 </button>
               </div>
-              <p className="text-xs text-neutral-400 leading-relaxed italic pr-12 whitespace-pre-wrap">
+              <p className="text-xs text-stone-400 leading-relaxed italic pr-12 whitespace-pre-wrap">
                 "{aiPrompt}"
               </p>
-              <div className="mt-4 pt-4 border-t border-amber-900/20">
-                <p className="text-[10px] text-amber-500/50 uppercase tracking-widest leading-tight">
+              <div className="mt-4 pt-4 border-t border-stone-800">
+                <p className="text-[10px] text-stone-500/70 uppercase tracking-[0.2em] leading-tight">
                   Dica: Use este texto em IAs como Midjourney ou DALL-E. Você
-                  pode adicionar detalhes como "cicatriz no olho" ou "capa azul"
-                  para personalizar ainda mais.
+                  pode adicionar detalhes para personalizar ainda mais.
                 </p>
               </div>
             </div>
@@ -632,10 +645,26 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
               </h3>
               <div className="flex flex-wrap gap-2">
                 {(() => {
-                  const items =
+                  let items =
                     bag && typeof bag.getEquipments === "function"
                       ? Object.values(bag.getEquipments()).flat()
                       : [];
+
+                  // Add preview of class equipments if not already in bag
+                  if (selectedClass) {
+                    const classEquips = getClassEquipments(
+                      selectedClass,
+                      undefined,
+                      selectedClassWeapons
+                    );
+                    const classItems = Object.values(classEquips).flat();
+                    // Avoid duplicates in preview if they were already added (though they usually aren't yet)
+                    const existingNames = new Set(items.map((i) => i.nome));
+                    const newClassItems = classItems.filter(
+                      (i) => !existingNames.has(i.nome)
+                    );
+                    items = [...items, ...newClassItems];
+                  }
 
                   return (
                     <>
