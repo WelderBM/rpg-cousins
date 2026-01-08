@@ -14,7 +14,7 @@ import {
   Brain,
   Sparkles,
 } from "lucide-react";
-import { ClassDescription } from "../../interfaces/Class";
+import { ClassDescription, ClassPower } from "../../interfaces/Class";
 import Skill from "../../interfaces/Skills";
 import { Atributo } from "../../data/atributos";
 import ARCANISTA, {
@@ -94,6 +94,7 @@ const RoleSelection = () => {
     setStep,
     roleSelectionState,
     setRoleSelectionState,
+    selectClassPowers,
   } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] =
@@ -105,6 +106,9 @@ const RoleSelection = () => {
   >({});
   const [classSkillChoices, setClassSkillChoices] = useState<Skill[]>([]);
   const [generalSkillChoices, setGeneralSkillChoices] = useState<Skill[]>([]);
+  const [selectedClassPowers, setSelectedClassPowers] = useState<ClassPower[]>(
+    []
+  );
 
   // --- CONFIG MODAL STATE ---
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
@@ -158,25 +162,26 @@ const RoleSelection = () => {
       setBasicSkillChoices({});
       setClassSkillChoices([]);
       setGeneralSkillChoices([]);
+      setSelectedClassPowers([]);
     }
     setSelectedPreview(cls);
   };
 
   // --- CALCULATIONS ---
+  const getFinalAttr = (attr: Atributo) => {
+    let bonus = 0;
+    if (selectedRace) {
+      selectedRace.attributes.attrs.forEach((a, idx) => {
+        if (a.attr === attr) bonus += a.mod;
+        if (a.attr === "any" && flexibleAttributeChoices[idx] === attr)
+          bonus += a.mod;
+      });
+    }
+    return baseAttributes[attr] + bonus;
+  };
+
   const stats = useMemo(() => {
     if (!selectedPreview) return null;
-
-    const getFinalAttr = (attr: Atributo) => {
-      let bonus = 0;
-      if (selectedRace) {
-        selectedRace.attributes.attrs.forEach((a, idx) => {
-          if (a.attr === attr) bonus += a.mod;
-          if (a.attr === "any" && flexibleAttributeChoices[idx] === attr)
-            bonus += a.mod;
-        });
-      }
-      return baseAttributes[attr] + bonus;
-    };
 
     const conMod = getFinalAttr(Atributo.CONSTITUICAO);
     const intMod = getFinalAttr(Atributo.INTELIGENCIA);
@@ -247,6 +252,41 @@ const RoleSelection = () => {
     }
   };
 
+  // Helper to check if power requirements are met
+  const checkPowerRequirements = (power: ClassPower): boolean => {
+    if (!power.requirements || power.requirements.length === 0) return true;
+
+    // At level 1, we only check attribute requirements
+    return power.requirements.some((reqGroup) => {
+      return reqGroup.every((req) => {
+        if (req.type === "ATRIBUTO" && req.name && req.value !== undefined) {
+          const attrValue = getFinalAttr(req.name as Atributo);
+          return attrValue >= req.value;
+        }
+        if (req.type === "NIVEL" && req.value !== undefined) {
+          return 1 >= req.value; // Level 1 character
+        }
+        // Other requirements are assumed to be met or not applicable at level 1
+        return true;
+      });
+    });
+  };
+
+  const toggleClassPower = (power: ClassPower) => {
+    const isSelected = selectedClassPowers.some((p) => p.name === power.name);
+
+    if (isSelected) {
+      setSelectedClassPowers(
+        selectedClassPowers.filter((p) => p.name !== power.name)
+      );
+    } else {
+      // Level 1 characters get 1 power
+      if (selectedClassPowers.length < 1) {
+        setSelectedClassPowers([...selectedClassPowers, power]);
+      }
+    }
+  };
+
   const handleConfirm = () => {
     if (!selectedPreview) return;
 
@@ -277,6 +317,7 @@ const RoleSelection = () => {
     }
 
     updateSkills(finalSkills);
+    selectClassPowers(selectedClassPowers);
     setStep(4);
   };
 
@@ -305,12 +346,14 @@ const RoleSelection = () => {
     );
     const classDone = classSkillChoices.length === limits.class;
     const extraDone = generalSkillChoices.length === Math.max(0, limits.extra);
-    return basicDone && classDone && extraDone;
+    const powersDone = selectedClassPowers.length === 1; // Level 1 = 1 power
+    return basicDone && classDone && extraDone && powersDone;
   }, [
     selectedPreview,
     basicSkillChoices,
     classSkillChoices,
     generalSkillChoices,
+    selectedClassPowers,
     limits,
   ]);
 
@@ -409,22 +452,34 @@ const RoleSelection = () => {
             {/* Stats & Description */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Image & Description Banner */}
-              <div className="md:col-span-2 relative overflow-hidden flex items-center bg-stone-900/50 rounded-2xl min-h-[300px] md:min-h-[500px]">
-                <div className="absolute inset-0">
-                  <Image
-                    src={`/assets/classes/${formatAssetName(
-                      selectedPreview.name
-                    )}.webp`}
-                    alt={selectedPreview.name}
-                    fill
-                    className="object-cover object-top opacity-30"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/80 to-transparent" />
+              <div className="md:col-span-2 relative overflow-hidden flex items-center bg-stone-950 rounded-2xl min-h-[300px] md:min-h-[500px]">
+                {/* Background Image - Vertically Aligned with dark side padding */}
+                <div className="absolute inset-0 bg-stone-950">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Image
+                      src={`/assets/classes/${formatAssetName(
+                        selectedPreview.name
+                      )}.webp`}
+                      alt={selectedPreview.name}
+                      width={800}
+                      height={1200}
+                      className="object-contain opacity-30 h-full w-auto"
+                      style={{
+                        maxHeight: "100%",
+                        objectPosition: "center center",
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="relative z-10 p-6">
-                  <p className="text-neutral-300 leading-relaxed italic text-sm md:text-base border-l-4 border-amber-600/50 pl-4">
-                    "{selectedPreview.description || "Descrição indisponível."}"
-                  </p>
+                {/* Text Content */}
+                <div className="relative z-10 p-6 w-full">
+                  <div className="bg-stone-950/90 backdrop-blur-sm rounded-xl p-4 border border-stone-800/50">
+                    <p className="text-neutral-300 leading-relaxed italic text-sm md:text-base border-l-4 border-amber-600/50 pl-4">
+                      "
+                      {selectedPreview.description || "Descrição indisponível."}
+                      "
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -644,6 +699,117 @@ const RoleSelection = () => {
                 </div>
               </section>
             )}
+
+            {/* CLASS POWERS */}
+            <section className="space-y-4">
+              <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
+                <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
+                  <Zap size={18} /> Poderes de Classe
+                </h3>
+                <span
+                  className={`text-xs font-bold px-3 py-1 rounded-full ${
+                    selectedClassPowers.length === 1
+                      ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50"
+                      : "bg-stone-800 text-stone-400 border border-stone-700"
+                  }`}
+                >
+                  {selectedClassPowers.length} / 1
+                </span>
+              </div>
+
+              <p className="text-xs text-stone-500 italic">
+                Escolha 1 poder de classe. Poderes com requisitos não atendidos
+                aparecem desabilitados.
+              </p>
+
+              <div className="grid gap-3">
+                {selectedPreview.powers.map((power) => {
+                  const isSelected = selectedClassPowers.some(
+                    (p) => p.name === power.name
+                  );
+                  const meetsRequirements = checkPowerRequirements(power);
+                  const isDisabled =
+                    !isSelected &&
+                    (!meetsRequirements || selectedClassPowers.length >= 1);
+
+                  return (
+                    <button
+                      key={power.name}
+                      disabled={isDisabled}
+                      onClick={() => toggleClassPower(power)}
+                      className={`text-left p-4 rounded-xl border transition-all ${
+                        isSelected
+                          ? "bg-purple-900/30 border-purple-500 text-purple-100"
+                          : isDisabled
+                          ? "opacity-40 cursor-not-allowed border-stone-800 text-stone-600 bg-stone-900/30"
+                          : "bg-stone-900 border-stone-800 text-stone-300 hover:border-purple-900/50 hover:bg-stone-800"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            isSelected
+                              ? "bg-purple-500 border-purple-500"
+                              : "border-stone-600 bg-black/40"
+                          }`}
+                        >
+                          {isSelected && (
+                            <Check size={14} className="text-stone-950" />
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-bold text-base">
+                              {power.name}
+                              {power.canRepeat && (
+                                <span className="ml-2 text-[10px] bg-amber-900/40 text-amber-400 px-2 py-0.5 rounded-full">
+                                  REPETÍVEL
+                                </span>
+                              )}
+                            </h4>
+                            {power.pmCost && (
+                              <span className="text-xs bg-blue-900/40 text-blue-400 px-2 py-1 rounded-full whitespace-nowrap">
+                                {power.pmCost} PM
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm leading-relaxed opacity-90">
+                            {power.text}
+                          </p>
+                          {power.requirements &&
+                            power.requirements.length > 0 && (
+                              <div className="flex flex-wrap gap-1 pt-1">
+                                {power.requirements[0].map((req, idx) => {
+                                  const reqMet = meetsRequirements;
+                                  return (
+                                    <span
+                                      key={idx}
+                                      className={`text-[10px] px-2 py-0.5 rounded-full ${
+                                        reqMet
+                                          ? "bg-emerald-900/40 text-emerald-400"
+                                          : "bg-red-900/40 text-red-400"
+                                      }`}
+                                    >
+                                      {req.type === "ATRIBUTO" &&
+                                        `${req.name} ${req.value}+`}
+                                      {req.type === "NIVEL" &&
+                                        `Nível ${req.value}+`}
+                                      {req.type === "PERICIA" &&
+                                        `Perícia: ${req.name}`}
+                                      {req.type === "PODER" &&
+                                        `Poder: ${req.name}`}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
             {/* ACTION FOOTER */}
             <div className="sticky bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">

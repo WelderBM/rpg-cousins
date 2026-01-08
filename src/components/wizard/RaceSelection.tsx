@@ -174,17 +174,27 @@ const RaceSelection = () => {
             className="relative flex flex-col h-full min-h-screen max-w-5xl mx-auto w-full"
           >
             {/* Header com imagem de fundo */}
-            <div className="relative h-72 md:h-[500px] overflow-hidden">
-              <Image
-                src={`/assets/races/${getRaceImageName(
-                  selectedPreview.name
-                )}.webp`}
-                alt={selectedPreview.name}
-                fill
-                className="object-cover object-top"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-stone-950" />
+            <div className="relative h-72 md:h-[500px] overflow-hidden bg-stone-950">
+              {/* Background Image - Vertically Aligned with dark side padding */}
+              <div className="absolute inset-0 flex items-center justify-center bg-stone-950">
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <Image
+                    src={`/assets/races/${getRaceImageName(
+                      selectedPreview.name
+                    )}.webp`}
+                    alt={selectedPreview.name}
+                    width={800}
+                    height={1200}
+                    className="object-contain opacity-100 h-full w-auto"
+                    style={{ 
+                      maxHeight: '100%',
+                      objectPosition: 'center center'
+                    }}
+                    priority
+                  />
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-stone-950/80" />
               <button
                 onClick={() => setSelectedPreview(null)}
                 className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2 bg-black/60 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-200 hover:text-amber-400 hover:border-amber-500/50 transition-all"
@@ -192,7 +202,7 @@ const RaceSelection = () => {
                 <ChevronLeft size={20} />
                 <span className="hidden sm:inline">Voltar</span>
               </button>
-              <div className="absolute bottom-4 left-4 right-4">
+              <div className="absolute bottom-4 left-4 right-4 z-10">
                 <h2 className="text-3xl md:text-4xl font-cinzel text-amber-100 drop-shadow-2xl">
                   {selectedPreview.name}
                 </h2>

@@ -48,6 +48,7 @@ const SummarySelection = () => {
     originBenefits,
     selectedDeity,
     selectedGrantedPowers,
+    selectedClassPowers,
     bag,
     money,
     selectedSkills,
@@ -279,7 +280,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
           height: "",
           extra: "",
         },
-        classPowers: [],
+        classPowers: selectedClassPowers,
       };
 
       const sanitizedData = sanitizeForFirestore(characterData);
@@ -567,6 +568,23 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
                       <div key={power.name} className="flex items-center gap-3">
                         <Zap className="text-amber-400" size={18} />
                         <span className="text-lg text-amber-100 font-cinzel leading-none">
+                          {power.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Class Powers Block */}
+                {selectedClassPowers && selectedClassPowers.length > 0 && (
+                  <div className="pt-8 border-t border-white/5 space-y-3">
+                    <h4 className="text-[10px] text-neutral-500 uppercase tracking-widest">
+                      Poderes de Classe ({selectedClassPowers.length})
+                    </h4>
+                    {selectedClassPowers.map((power) => (
+                      <div key={power.name} className="flex items-center gap-3">
+                        <Sparkles className="text-purple-400" size={18} />
+                        <span className="text-lg text-purple-100 font-cinzel leading-none">
                           {power.name}
                         </span>
                       </div>

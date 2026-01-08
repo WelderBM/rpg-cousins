@@ -13,7 +13,7 @@ import {
   calculateTotalPointsSpent,
   INITIAL_POINTS,
 } from "../utils/attributeUtils";
-import { ClassDescription } from "../interfaces/Class";
+import { ClassDescription, ClassPower } from "../interfaces/Class";
 import Skill from "../interfaces/Skills";
 
 export interface CharacterSummary {
@@ -47,6 +47,7 @@ interface CharacterWizardState {
   }[];
   selectedDeity: Divindade | null;
   selectedGrantedPowers: GeneralPower[];
+  selectedClassPowers: ClassPower[];
   bag: Bag;
   money: number;
   baseAttributes: Record<Atributo, number>;
@@ -85,6 +86,7 @@ interface CharacterWizardState {
   ) => void;
   selectDeity: (deity: Divindade) => void;
   selectGrantedPowers: (powers: GeneralPower[]) => void;
+  selectClassPowers: (powers: ClassPower[]) => void;
   updateBaseAttribute: (attr: Atributo, value: number) => void;
   setFlexibleAttributeChoice: (index: number, attr: Atributo) => void;
   addToBag: (item: Equipment) => void;
@@ -131,6 +133,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
       originBenefits: [],
       selectedDeity: null,
       selectedGrantedPowers: [],
+      selectedClassPowers: [],
       bag: new Bag(),
       money: 18, // Default start
       baseAttributes: { ...INITIAL_ATTRIBUTES },
@@ -175,6 +178,10 @@ export const useCharacterStore = create<CharacterWizardState>()(
 
       selectGrantedPowers: (powers) => {
         set({ selectedGrantedPowers: powers });
+      },
+
+      selectClassPowers: (powers) => {
+        set({ selectedClassPowers: powers });
       },
 
       addToBag: (item) => {
@@ -411,6 +418,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
           originBenefits: [],
           selectedDeity: null,
           selectedGrantedPowers: [],
+          selectedClassPowers: [],
           bag: new Bag(),
           money: 18,
           baseAttributes: { ...INITIAL_ATTRIBUTES },
@@ -432,6 +440,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
         originBenefits: state.originBenefits,
         selectedDeity: state.selectedDeity,
         selectedGrantedPowers: state.selectedGrantedPowers,
+        selectedClassPowers: state.selectedClassPowers,
         bag: state.bag,
         money: state.money,
         baseAttributes: state.baseAttributes,
