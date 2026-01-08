@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Sword,
   BookOpen,
@@ -14,6 +14,9 @@ import {
   User,
   ShoppingBag,
   Home,
+  Menu,
+  X,
+  LayoutGrid,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -22,16 +25,45 @@ function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
 }
 
-const navItems = [
+const primaryNavItems = [
   { name: "Home", href: "/", icon: Home },
   { name: "Meu Herói", href: "/my-character", icon: User },
-  { name: "Novo Personagem", href: "/wizard", icon: Wand2 },
-  { name: "Poderes", href: "/grimorio", icon: BookOpen },
-  { name: "Meus Heróis", href: "/characters", icon: Users },
-  { name: "Mercado", href: "/market", icon: ShoppingBag }, // NEW: Added Market
   { name: "Wiki", href: "/wiki", icon: Scroll },
   { name: "Mestre", href: "/mestre", icon: ShieldAlert },
 ];
+
+const secondaryNavItems = [
+  {
+    name: "Novo Personagem",
+    href: "/wizard",
+    icon: Wand2,
+    description: "Crie um novo herói lendário",
+    color: "from-amber-400 to-orange-600",
+  },
+  {
+    name: "Meus Heróis",
+    href: "/characters",
+    icon: Users,
+    description: "Gerencie todos os seus personagens",
+    color: "from-blue-400 to-indigo-600",
+  },
+  {
+    name: "Grimório",
+    href: "/grimorio",
+    icon: BookOpen,
+    description: "Consulte o grimório de magias",
+    color: "from-purple-400 to-fuchsia-600",
+  },
+  {
+    name: "Mercado",
+    href: "/market",
+    icon: ShoppingBag,
+    description: "Compre e venda equipamentos",
+    color: "from-emerald-400 to-teal-600",
+  },
+];
+
+const allNavItems = [...primaryNavItems, ...secondaryNavItems];
 
 import UserMenu from "@/components/auth/UserMenu";
 
@@ -42,6 +74,7 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
+  const [showSecondaryMenu, setShowSecondaryMenu] = React.useState(false);
 
   const mainRef = React.useRef<HTMLElement>(null);
 
@@ -49,31 +82,116 @@ export default function MainLayout({
     if (mainRef.current) {
       mainRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
+    // Close menus on route change
+    setShowMobileMenu(false);
+    setShowSecondaryMenu(false);
   }, [pathname]);
 
   return (
-    <div className="flex h-screen w-full flex-col md:flex-row overflow-hidden bg-medieval-stone">
+    <div className="flex h-screen w-full flex-col md:flex-row overflow-hidden bg-medieval-stone text-parchment-DEFAULT">
       {/* Mobile Header */}
-      <header className="md:hidden flex items-center justify-between p-4 bg-medieval-stone/95 border-b border-medieval-iron/50 relative z-50 shrink-0">
+      <header className="md:hidden flex items-center justify-between px-6 py-4 bg-medieval-stone/95 border-b border-medieval-iron/50 relative z-50 shrink-0 backdrop-blur-md">
         <div className="flex items-center gap-2">
-          <h1 className="font-serif text-xl font-bold text-medieval-gold tracking-widest">
-            RPG <span className="text-parchment-DEFAULT">Cousins</span>
+          <h1 className="font-serif text-2xl font-bold text-medieval-gold tracking-[0.15em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+            RPG{" "}
+            <span className="text-parchment-DEFAULT font-light">COUSINS</span>
           </h1>
         </div>
         <button
           onClick={() => setShowMobileMenu(!showMobileMenu)}
-          className="p-2 text-medieval-gold border border-medieval-gold/30 rounded-lg bg-black/20 active:scale-95 transition-transform"
+          className={cn(
+            "p-2 rounded-full transition-all duration-300",
+            showMobileMenu
+              ? "bg-medieval-gold text-black scale-110 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
+              : "text-medieval-gold border border-medieval-gold/30 bg-black/20"
+          )}
         >
-          <User className="h-5 w-5" />
+          {showMobileMenu ? <X size={20} /> : <User size={20} />}
         </button>
       </header>
 
-      {/* Mobile Menu Dropdown */}
-      {showMobileMenu && (
-        <div className="md:hidden absolute top-16 right-4 z-50 w-72 bg-medieval-stone border border-medieval-iron shadow-2xl rounded-xl overflow-hidden p-2 animate-in slide-in-from-top-2 fade-in duration-200">
-          <UserMenu />
-        </div>
-      )}
+      {/* Mobile Profile Dropdown (Legacy location, kept for logic but styled better) */}
+      <AnimatePresence>
+        {showMobileMenu && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="md:hidden absolute top-16 right-4 z-50 w-72 bg-medieval-stone/98 border border-medieval-gold/20 shadow-2xl rounded-2xl overflow-hidden p-2 backdrop-blur-xl"
+          >
+            <UserMenu />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Secondary Menu (Grid of Items) */}
+      <AnimatePresence>
+        {showSecondaryMenu && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="md:hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex flex-col p-6"
+          >
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-serif font-bold text-medieval-gold tracking-widest">
+                MENU PRINCIPAL
+              </h2>
+              <button
+                onClick={() => setShowSecondaryMenu(false)}
+                className="p-3 rounded-full bg-white/5 text-medieval-gold border border-medieval-gold/20"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {secondaryNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 flex flex-col gap-3 transition-all active:scale-95"
+                  onClick={() => setShowSecondaryMenu(false)}
+                >
+                  <div
+                    className={cn(
+                      "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-lg",
+                      item.color
+                    )}
+                  >
+                    <item.icon size={24} className="text-white" />
+                  </div>
+                  <div>
+                    <span className="block font-serif text-lg font-bold text-parchment-DEFAULT leading-tight">
+                      {item.name}
+                    </span>
+                    <span className="block text-[10px] text-parchment-dark/70 font-sans uppercase tracking-tighter mt-1">
+                      {item.description}
+                    </span>
+                  </div>
+                  <div className="absolute top-0 right-0 p-2 opacity-5">
+                    <item.icon size={64} />
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-auto grid grid-cols-2 gap-2 pb-12">
+              {primaryNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/5 text-parchment-light transition-all active:scale-95"
+                  onClick={() => setShowSecondaryMenu(false)}
+                >
+                  <item.icon size={18} className="text-medieval-gold/60" />
+                  <span className="font-serif text-sm">{item.name}</span>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex h-full w-64 flex-col border-r border-medieval-iron bg-medieval-stone/90 p-4 shadow-xl z-10 shrink-0">
@@ -84,37 +202,45 @@ export default function MainLayout({
             <span className="text-xl text-parchment-DEFAULT">Cousins</span>
           </h1>
         </div>
-        <nav className="flex flex-col gap-2">
-          {navItems.map((item) => {
+        <nav className="flex flex-col gap-2 mt-4 px-2">
+          {allNavItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-lg p-3 transition-all duration-300",
+                  "group relative flex items-center gap-3 rounded-xl p-3 px-4 transition-all duration-300",
                   isActive
-                    ? "bg-medieval-gold/10 text-medieval-gold"
-                    : "text-parchment-light hover:bg-white/5 hover:text-parchment-DEFAULT"
+                    ? "bg-medieval-gold/15 text-medieval-gold shadow-[inset_0_0_20px_rgba(245,158,11,0.1)]"
+                    : "text-parchment-dark hover:bg-white/5 hover:text-parchment-DEFAULT"
                 )}
               >
                 {isActive && (
                   <motion.div
                     layoutId="desktop-active-bg"
-                    className="absolute inset-0 rounded-lg bg-medieval-gold/5"
+                    className="absolute inset-0 rounded-xl bg-medieval-gold/5 border border-medieval-gold/20"
                     initial={false}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
                 <item.icon
-                  className="h-6 w-6 relative z-10"
-                  strokeWidth={1.5}
+                  className={cn(
+                    "h-5 w-5 relative z-10 transition-transform duration-300",
+                    isActive && "scale-110"
+                  )}
+                  strokeWidth={isActive ? 2 : 1.5}
                 />
-                <span className="font-serif text-lg relative z-10">
+                <span
+                  className={cn(
+                    "font-serif text-lg relative z-10 tracking-wide",
+                    isActive ? "font-bold" : "font-medium"
+                  )}
+                >
                   {item.name}
                 </span>
                 {isActive && (
-                  <div className="absolute left-0 h-full w-1 bg-medieval-gold rounded-r shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
+                  <div className="absolute left-0 h-8 w-1 bg-medieval-gold rounded-r shadow-[0_0_15px_rgba(245,158,11,0.8)]" />
                 )}
               </Link>
             );
@@ -140,37 +266,75 @@ export default function MainLayout({
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="flex md:hidden fixed bottom-6 left-4 right-4 h-16 rounded-2xl border border-medieval-iron/50 bg-medieval-stone/95 backdrop-blur-md justify-between items-center z-50 px-6 shadow-2xl ring-1 ring-white/5">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex flex-col items-center justify-center w-12 h-full relative group"
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="mobile-indicator"
-                  className="absolute -top-3 w-10 h-1 bg-medieval-gold rounded-full shadow-[0_0_8px_rgba(245,158,11,0.8)]"
-                />
-              )}
-              <div
-                className={cn(
-                  "p-2 rounded-xl transition-all duration-300",
-                  isActive
-                    ? "bg-medieval-gold/10 text-medieval-gold scale-110"
-                    : "text-parchment-dark group-hover:text-parchment-light"
-                )}
+      <nav className="md:hidden fixed bottom-5 left-4 right-4 h-20 rounded-3xl border border-white/10 bg-[#0c0a09]/95 backdrop-blur-2xl flex justify-between items-center z-50 px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
+        <div className="flex w-full justify-around items-center h-full">
+          {primaryNavItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center justify-center flex-1 h-full relative group transition-all"
               >
-                <item.icon
-                  className="h-6 w-6"
-                  strokeWidth={isActive ? 2 : 1.5}
-                />
+                <div
+                  className={cn(
+                    "flex flex-col items-center gap-1 p-2 transition-all duration-300",
+                    isActive ? "text-medieval-gold" : "text-parchment-dark/70"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "p-2 rounded-2xl mb-0.5 relative transition-all duration-500",
+                      isActive && "bg-medieval-gold/10 scale-110"
+                    )}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="mobile-indicator-glow"
+                        className="absolute inset-0 rounded-2xl bg-medieval-gold/20 blur-md"
+                      />
+                    )}
+                    <item.icon
+                      className="h-6 w-6 relative z-10"
+                      strokeWidth={isActive ? 2.5 : 1.5}
+                    />
+                  </div>
+                  <span
+                    className={cn(
+                      "text-[9px] font-serif uppercase tracking-widest font-black transition-all",
+                      isActive
+                        ? "opacity-100 scale-100"
+                        : "opacity-0 scale-75 h-0 overflow-hidden"
+                    )}
+                  >
+                    {item.name}
+                  </span>
+                </div>
+                {isActive && (
+                  <motion.div
+                    layoutId="mobile-active-bar"
+                    className="absolute bottom-1 w-1 h-1 bg-medieval-gold rounded-full shadow-[0_0_8px_rgba(245,158,11,1)]"
+                  />
+                )}
+              </Link>
+            );
+          })}
+
+          {/* More Menu Trigger */}
+          <button
+            onClick={() => setShowSecondaryMenu(true)}
+            className="flex flex-col items-center justify-center flex-1 h-full relative group"
+          >
+            <div className="text-parchment-dark/70 p-2 flex flex-col items-center gap-1">
+              <div className="p-2">
+                <LayoutGrid className="h-6 w-6" strokeWidth={1.5} />
               </div>
-            </Link>
-          );
-        })}
+              <span className="text-[9px] font-serif uppercase tracking-widest font-black opacity-0 h-0 overflow-hidden">
+                MAIS
+              </span>
+            </div>
+          </button>
+        </div>
       </nav>
     </div>
   );
