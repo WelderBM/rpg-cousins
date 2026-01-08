@@ -32,6 +32,7 @@ import {
   Crosshair,
   Dices,
   Sparkles,
+  Star,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";

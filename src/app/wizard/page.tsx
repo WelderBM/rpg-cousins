@@ -13,8 +13,13 @@ import SummarySelection from "@/components/wizard/SummarySelection";
 import WizardHub from "@/components/wizard/WizardHub";
 
 export default function WizardPage() {
-  const { step, resetWizard, selectedRace, selectedOrigin } =
-    useCharacterStore();
+  const {
+    step,
+    resetWizard,
+    selectedRace,
+    selectedOrigin,
+    clearActiveCharacter,
+  } = useCharacterStore();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   // Decide if we should show the hub initially
@@ -27,12 +32,14 @@ export default function WizardPage() {
   }, [step, showHub]);
 
   const handleReset = () => {
+    clearActiveCharacter();
     resetWizard();
     setShowResetConfirm(false);
     setShowHub(false); // Go to step 1
   };
 
   const handleNewFromHub = () => {
+    clearActiveCharacter();
     resetWizard();
     setShowHub(false);
   };
