@@ -60,6 +60,7 @@ export default function CharacterSelectPage() {
                   raceName: c.race?.name || "Desconhecido",
                   className: c.class?.name || "Desconhecido",
                   level: c.level || 1,
+                  isFavorite: c.isFavorite || false,
                 }));
 
                 setUserCharacters(summaryList);
@@ -91,6 +92,9 @@ export default function CharacterSelectPage() {
     try {
       const { doc, getDoc } = await import("firebase/firestore");
       const { db } = await import("@/firebaseConfig");
+
+      // Auto-favorite removed as per user request
+      // await CharacterService.setFavoriteCharacter(currentUser.uid, charId);
 
       // Finding the character in the DB
       const charRef = doc(
@@ -175,8 +179,8 @@ export default function CharacterSelectPage() {
             className="group relative bg-[#1e1e1e] border-2 border-medieval-iron rounded-xl overflow-hidden hover:border-medieval-gold transition-all duration-300 shadow-lg cursor-pointer flex flex-col"
             onClick={() => handleSelectCharacter(char.id)}
           >
-            {/* Delete Button */}
-            <div className="absolute top-2 right-2 z-20">
+            {/* Top Buttons: Delete only (Favorite removed) */}
+            <div className="absolute top-2 right-2 z-20 flex gap-2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
