@@ -32,6 +32,8 @@ const DeitySelection = () => {
     selectedClass,
     setStep,
     selectOrigin,
+    wizardDrafts,
+    setWizardDraft,
   } = useCharacterStore();
 
   const isMandatory = useMemo(() => {
@@ -57,6 +59,28 @@ const DeitySelection = () => {
     GeneralPower[]
   >([]);
 
+  // Sync LOCAL state with STORE draft
+  React.useEffect(() => {
+    const draft = wizardDrafts.deity;
+    if (draft.previewName) {
+      const deity = DIVINDADES.find((d) => d.name === draft.previewName);
+      if (deity) {
+        setSelectedPreview(deity);
+        setLocalSelectedPowers(draft.localPowers);
+      }
+    }
+  }, []); // Run once on mount
+
+  // Sync draft whenever state changes
+  React.useEffect(() => {
+    if (selectedPreview) {
+      setWizardDraft("deity", {
+        previewName: selectedPreview.name,
+        localPowers: localSelectedPowers,
+      });
+    }
+  }, [selectedPreview, localSelectedPowers, setWizardDraft]);
+
   // Scroll to top when entering/leaving preview
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -68,11 +92,17 @@ const DeitySelection = () => {
 
   const handleSelectDeityReview = (deity: Divindade) => {
     setSelectedPreview(deity);
-    if (powerLimit >= 99) {
-      // Clerics/Paladins receive all directly
-      setLocalSelectedPowers(deity.poderes);
-    } else {
-      setLocalSelectedPowers([]);
+    // If it's a different deity, reset locals
+    if (wizardDrafts.deity.previewName !== deity.name) {
+      if (powerLimit >= 99) {
+        setLocalSelectedPowers(deity.poderes);
+      } else {
+        setLocalSelectedPowers([]);
+      }
+      setWizardDraft("deity", {
+        previewName: deity.name,
+        localPowers: powerLimit >= 99 ? deity.poderes : [],
+      });
     }
   };
 
@@ -232,7 +262,10 @@ const DeitySelection = () => {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-stone-800 pb-4">
               <button
-                onClick={() => setSelectedPreview(null)}
+                onClick={() => {
+                  setSelectedPreview(null);
+                  setWizardDraft("deity", { previewName: null });
+                }}
                 className="flex items-center text-neutral-400 hover:text-white transition-colors"
                 aria-label="Voltar"
               >

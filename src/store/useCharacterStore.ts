@@ -34,12 +34,31 @@ interface CharacterWizardState {
   selectedClassWeapons: Equipment[];
   selectedOriginWeapons: Equipment[];
 
-  // Draft state for Role Selection persistence
-  roleSelectionState: {
-    previewName: string | null;
-    basic: Record<number, Skill>;
-    classSkills: Skill[];
-    generalSkills: Skill[];
+  // Draft state for persistence across all wizard steps
+  wizardDrafts: {
+    race: {
+      previewName: string | null;
+    };
+    role: {
+      previewName: string | null;
+      basic: Record<number, Skill>;
+      classSkills: Skill[];
+      generalSkills: Skill[];
+      classPowers: ClassPower[];
+      arcanistConfig: {
+        subtype: ArcanistaSubtypes | null;
+        lineage: string | null;
+        damageType: string | null;
+      };
+    };
+    origin: {
+      previewName: string | null;
+      localWeapons: Equipment[];
+    };
+    deity: {
+      previewName: string | null;
+      localPowers: GeneralPower[];
+    };
   };
 
   selectedOrigin: Origin | null;
@@ -74,12 +93,10 @@ interface CharacterWizardState {
   updateSkills: (skills: Skill[]) => void;
   setSelectedClassWeapons: (weapons: Equipment[]) => void;
   setSelectedOriginWeapons: (weapons: Equipment[]) => void;
-  setRoleSelectionState: (state: {
-    previewName: string | null;
-    basic: Record<number, Skill>;
-    classSkills: Skill[];
-    generalSkills: Skill[];
-  }) => void;
+  setWizardDraft: (
+    step: "race" | "role" | "origin" | "deity",
+    data: any
+  ) => void;
 
   selectOrigin: (origin: Origin) => void;
   setOriginBenefits: (
@@ -129,11 +146,18 @@ export const useCharacterStore = create<CharacterWizardState>()(
       selectedClassWeapons: [],
       selectedOriginWeapons: [],
 
-      roleSelectionState: {
-        previewName: null,
-        basic: {},
-        classSkills: [],
-        generalSkills: [],
+      wizardDrafts: {
+        race: { previewName: null },
+        role: {
+          previewName: null,
+          basic: {},
+          classSkills: [],
+          generalSkills: [],
+          classPowers: [],
+          arcanistConfig: { subtype: null, lineage: null, damageType: null },
+        },
+        origin: { previewName: null, localWeapons: [] },
+        deity: { previewName: null, localPowers: [] },
       },
 
       selectedOrigin: null,
@@ -174,8 +198,13 @@ export const useCharacterStore = create<CharacterWizardState>()(
         set({ selectedOriginWeapons: weapons });
       },
 
-      setRoleSelectionState: (state) => {
-        set({ roleSelectionState: state });
+      setWizardDraft: (step, data) => {
+        set((state) => ({
+          wizardDrafts: {
+            ...state.wizardDrafts,
+            [step]: { ...state.wizardDrafts[step], ...data },
+          },
+        }));
       },
 
       selectOrigin: (origin) => {
@@ -392,6 +421,10 @@ export const useCharacterStore = create<CharacterWizardState>()(
       setUserCharacters: (list) => set({ userCharacters: list }),
 
       setActiveCharacter: (char) => {
+        if (!char) {
+          set({ activeCharacter: null });
+          return;
+        }
         let bagInstance = char.bag;
         if (char.bag && !(char.bag instanceof Bag)) {
           bagInstance = new Bag();
@@ -427,11 +460,22 @@ export const useCharacterStore = create<CharacterWizardState>()(
           selectedSkills: [],
           selectedClassWeapons: [],
           selectedOriginWeapons: [],
-          roleSelectionState: {
-            previewName: null,
-            basic: {},
-            classSkills: [],
-            generalSkills: [],
+          wizardDrafts: {
+            race: { previewName: null },
+            role: {
+              previewName: null,
+              basic: {},
+              classSkills: [],
+              generalSkills: [],
+              classPowers: [],
+              arcanistConfig: {
+                subtype: null,
+                lineage: null,
+                damageType: null,
+              },
+            },
+            origin: { previewName: null, localWeapons: [] },
+            deity: { previewName: null, localPowers: [] },
           },
           selectedOrigin: null,
           originBenefits: [],
@@ -456,7 +500,6 @@ export const useCharacterStore = create<CharacterWizardState>()(
         selectedSkills: state.selectedSkills,
         selectedClassWeapons: state.selectedClassWeapons,
         selectedOriginWeapons: state.selectedOriginWeapons,
-        roleSelectionState: state.roleSelectionState,
         selectedOrigin: state.selectedOrigin,
         originBenefits: state.originBenefits,
         selectedDeity: state.selectedDeity,
@@ -467,6 +510,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
         baseAttributes: state.baseAttributes,
         pointsRemaining: state.pointsRemaining,
         flexibleAttributeChoices: state.flexibleAttributeChoices,
+        wizardDrafts: state.wizardDrafts,
         name: state.name,
         activeCharacter: state.activeCharacter,
         userCharacters: state.userCharacters,

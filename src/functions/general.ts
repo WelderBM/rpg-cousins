@@ -854,102 +854,29 @@ export function getSkillsAndPowersByClassAndOrigin(
   };
 }
 export function getWeapons(
-  classe: ClassDescription,
+  _classe: ClassDescription,
   selectedWeapons?: Equipment[]
 ) {
-  // Se o usuário já escolheu armas específicas no wizard, use-as
+  // Se o usuário selecionou armas explicitamente (ex: em algum passo do wizard), use-as.
+  // Caso contrário, as classes não dão mais armas automaticamente.
   if (selectedWeapons && selectedWeapons.length > 0) {
-    return selectedWeapons;
+    return selectedWeapons.filter((w) => !!w);
   }
 
-  const weapons: Equipment[] = [];
-
-  switch (classe.name) {
-    case "Arcanista":
-      weapons.push(Armas.BORDAO);
-      break;
-    case "Barbaro":
-      weapons.push(Armas.MONTANTE);
-      break;
-    case "Bardo":
-      weapons.push(Armas.FLORETE);
-      break;
-    case "Bucaneiro":
-      weapons.push(Armas.FLORETE);
-      break;
-    case "Caçador":
-      weapons.push(Armas.ARCOCURTO);
-      weapons.push(Armas.ESPADACURTA);
-      weapons.push(Armas.ESPADACURTA);
-      break;
-    case "Cavaleiro":
-      weapons.push(Armas.ESPADA_LONGA);
-      break;
-    case "Clerigo":
-      weapons.push(Armas.MACA);
-      break;
-    case "Druida":
-      weapons.push(Armas.FOICE);
-      break;
-    case "Guerreiro":
-      weapons.push(Armas.ESPADA_LONGA);
-      break;
-    case "Inventor":
-      weapons.push(Armas.ADAGA);
-      break;
-    case "Ladino":
-      weapons.push(Armas.ADAGA);
-      weapons.push(Armas.BESTALEVE);
-      break;
-    case "Lutador":
-      weapons.push(Armas.MANOPLA);
-      break;
-    case "Nobre":
-      weapons.push(Armas.ESPADA_LONGA);
-      break;
-    case "Paladino":
-      weapons.push(Armas.ESPADA_LONGA);
-      break;
-    default:
-      weapons.push(Armas.ADAGA);
-  }
-
-  return weapons;
+  // FIXED: Classes don't give weapons anymore. Player must buy them in the market.
+  return [];
 }
 
-export function getShields(classe: ClassDescription) {
-  const shields: DefenseEquipment[] = [];
-  if (classe.proficiencias.includes(todasProficiencias.ESCUDOS)) {
-    if (
-      ["Cavaleiro", "Guerreiro", "Paladino"].includes(classe.name) ||
-      classe.proficiencias.includes(todasProficiencias.PESADAS)
-    ) {
-      shields.push(Escudos.ESCUDO_PESADO);
-    } else {
-      shields.push(Escudos.ESCUDOLEVE);
-    }
-  }
-
-  return shields;
+export function getShields(_classe: ClassDescription) {
+  // Regra Geral Tormenta20: Personagens começam sem escudo gratuito.
+  // Devem ser comprados com o dinheiro inicial (4d6 TO).
+  return [];
 }
 
-export function getArmors(classe: ClassDescription, currentBag?: Bag) {
-  // Se já tem armadura no bag (ex: de origem), não gerar nova
-  if (
-    currentBag?.equipments?.Armadura &&
-    currentBag.equipments.Armadura.length > 0
-  ) {
-    return [];
-  }
-
-  const armors: DefenseEquipment[] = [];
-  if (classe.proficiencias.includes(todasProficiencias.PESADAS)) {
-    armors.push(Armaduras.BRUNEA);
-  } else if (classe.name !== "Arcanista" && classe.name !== "Lutador") {
-    armors.push(Armaduras.ARMADURADECOURO);
-  }
-
-  return armors;
+export function getArmors(_classe: ClassDescription, _currentBag?: Bag) {
+  // Regra Geral Tormenta20: Personagens começam sem armadura gratuita.
+  // Devem ser comprados com o dinheiro inicial (4d6 TO).
+  return [];
 }
 
 export function getClassEquipments(

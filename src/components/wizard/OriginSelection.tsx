@@ -90,10 +90,36 @@ const OriginSelection = () => {
     setStep,
     selectedOriginWeapons,
     setSelectedOriginWeapons,
+    wizardDrafts,
+    setWizardDraft,
   } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] = useState<Origin | null>(null);
   const [localOriginWeapons, setLocalOriginWeapons] = useState<Equipment[]>([]);
+
+  // Sync LOCAL state with STORE draft
+  React.useEffect(() => {
+    const draft = wizardDrafts.origin;
+    if (draft.previewName) {
+      const origin = Object.values(ORIGINS).find(
+        (o) => o.name === draft.previewName
+      );
+      if (origin) {
+        setSelectedPreview(origin);
+        setLocalOriginWeapons(draft.localWeapons);
+      }
+    }
+  }, []); // Run once on mount
+
+  // Sync draft whenever state changes
+  React.useEffect(() => {
+    if (selectedPreview) {
+      setWizardDraft("origin", {
+        previewName: selectedPreview.name,
+        localWeapons: localOriginWeapons,
+      });
+    }
+  }, [selectedPreview, localOriginWeapons, setWizardDraft]);
 
   // Scroll to top when entering/leaving preview
   React.useEffect(() => {
@@ -109,20 +135,15 @@ const OriginSelection = () => {
   const handleSelectPreview = (origin: Origin) => {
     setSelectedPreview(origin);
 
-    // AUTO-SELECT ALL BENEFITS (Mestre Rule: Receive everything available)
-    const allBenefits = [
-      ...origin.pericias.map((skill) => ({
-        type: "skill" as const,
-        name: skill,
-        value: skill,
-      })),
-      ...origin.poderes.map((power) => ({
-        type: "power" as const, // using 'power' generic type for visuals
-        name: power.name,
-        value: power,
-      })),
-    ];
-    setOriginBenefits(allBenefits);
+    // If it's a different origin than before, reset benefits and internal weapons
+    if (selectedOrigin?.name !== origin.name) {
+      setOriginBenefits([]);
+      setLocalOriginWeapons([]);
+      setWizardDraft("origin", {
+        previewName: origin.name,
+        localWeapons: [],
+      });
+    }
 
     // Initialize weapon choices
     if (origin.getItems) {
@@ -136,12 +157,45 @@ const OriginSelection = () => {
         ) {
           setLocalOriginWeapons(selectedOriginWeapons);
         } else {
-          // Default to whatever getItems() returns (first weapon in list usually)
+          // Default to whatever getItems() returns, but ensure it respects the 30 gold limit
           const defaults = choices
-            .map((c) => (typeof c.equipment !== "string" ? c.equipment : null))
+            .map((c) => {
+              const available = (
+                c.choice === "Armas Marciais"
+                  ? [
+                      ...EQUIPAMENTOS.armasSimples,
+                      ...EQUIPAMENTOS.armasMarciais,
+                    ]
+                  : EQUIPAMENTOS.armasSimples
+              ).filter((arm) => arm.preco <= 30);
+
+              if (typeof c.equipment !== "string" && c.equipment.preco <= 30) {
+                return c.equipment;
+              }
+
+              return available[0];
+            })
             .filter(Boolean) as Equipment[];
           setLocalOriginWeapons(defaults);
         }
+      }
+    }
+  };
+
+  const toggleBenefit = (benefitObj: any) => {
+    const isSelected = originBenefits.some(
+      (b) => b.name === benefitObj.name && b.type === benefitObj.type
+    );
+
+    if (isSelected) {
+      setOriginBenefits(
+        originBenefits.filter(
+          (b) => !(b.name === benefitObj.name && b.type === benefitObj.type)
+        )
+      );
+    } else {
+      if (originBenefits.length < 2) {
+        setOriginBenefits([...originBenefits, benefitObj]);
       }
     }
   };
@@ -183,9 +237,9 @@ const OriginSelection = () => {
               transition={{ delay: 0.2 }}
               className="text-neutral-400 text-center font-cinzel tracking-[0.2em] text-sm md:text-base uppercase -mt-4 opacity-70"
             >
-              Cada origem concede{" "}
-              <span className="text-amber-500 font-bold">todos</span> os
-              benefícios listados.
+              Cada origem permite escolher{" "}
+              <span className="text-amber-500 font-bold">2 benefícios</span>{" "}
+              (perícias ou poderes).
             </motion.p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -225,7 +279,10 @@ const OriginSelection = () => {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-stone-800 pb-4">
               <button
-                onClick={() => setSelectedPreview(null)}
+                onClick={() => {
+                  setSelectedPreview(null);
+                  setWizardDraft("origin", { previewName: null });
+                }}
                 className="flex items-center text-neutral-400 hover:text-white transition-colors"
                 aria-label="Voltar"
               >
@@ -258,10 +315,16 @@ const OriginSelection = () => {
 
                 <div className="relative z-10 w-full flex flex-col items-center gap-4">
                   <p className="text-sm text-amber-100/90 italic text-center drop-shadow-md">
-                    Todos os benefícios abaixo serão seus.
+                    Escolha 2 benefícios (perícias ou poderes).
                   </p>
-                  <span className="text-sm font-bold px-4 py-2 rounded-full border bg-emerald-900/60 text-emerald-300 border-emerald-500/50 shadow-xl backdrop-blur-sm">
-                    {originBenefits.length} Benefícios Incluídos
+                  <span
+                    className={`text-sm font-bold px-4 py-2 rounded-full border backdrop-blur-sm transition-all shadow-xl ${
+                      originBenefits.length === 2
+                        ? "bg-emerald-900/60 text-emerald-300 border-emerald-500/50"
+                        : "bg-amber-900/40 text-amber-200 border-amber-500/50"
+                    }`}
+                  >
+                    {originBenefits.length} / 2 Benefícios Selecionados
                   </span>
                 </div>
               </div>
@@ -270,92 +333,126 @@ const OriginSelection = () => {
                 {/* Skills */}
                 <div className="mb-8">
                   <h3 className="text-stone-500 uppercase tracking-widest font-bold text-xs mb-3 flex items-center gap-2">
-                    <Book size={14} /> Perícias Incluídas
+                    <Book size={14} /> Perícias Disponíveis
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedPreview.pericias.map((skill) => {
                       const isKnown = knownSkills.includes(skill);
+                      const isSelected = originBenefits.some(
+                        (b) => b.name === skill && b.type === "skill"
+                      );
+                      const isLimitReached = originBenefits.length >= 2;
 
                       return (
                         <div key={skill} className="group/skill relative">
-                          <div
-                            className={`px-4 py-2 rounded-lg text-sm font-bold border transition-all flex items-center gap-2 cursor-default
+                          <button
+                            disabled={isLimitReached && !isSelected}
+                            onClick={() =>
+                              toggleBenefit({
+                                type: "skill",
+                                name: skill,
+                                value: skill,
+                              })
+                            }
+                            className={`px-4 py-2 rounded-lg text-sm font-bold border transition-all flex items-center gap-2
                                       ${
-                                        isKnown
-                                          ? "bg-amber-950/40 text-amber-200 border-amber-500/50 shadow-[0_0_10px_-5px_var(--color-amber-500)]"
-                                          : "bg-emerald-900/20 text-emerald-100 border-emerald-500/30"
+                                        isSelected
+                                          ? "bg-emerald-900/40 text-emerald-200 border-emerald-500 shadow-[0_0_15px_-5px_var(--color-emerald-500)]"
+                                          : isKnown
+                                          ? "bg-amber-950/20 text-stone-500 border-amber-900/30 opacity-60"
+                                          : isLimitReached
+                                          ? "bg-stone-900/50 text-stone-600 border-stone-800 cursor-not-allowed"
+                                          : "bg-stone-900 border-stone-700 text-stone-300 hover:border-amber-500/50"
                                       }
                                   `}
                           >
                             {skill}
-                            {!isKnown && (
+                            {isSelected && (
                               <Check size={14} className="text-emerald-500" />
                             )}
-                            {isKnown && (
+                            {isKnown && !isSelected && (
                               <AlertTriangle
                                 size={14}
-                                className="text-amber-500"
+                                className="text-amber-900/50"
                               />
                             )}
-                          </div>
+                          </button>
 
                           {/* Tooltip for Known Skills */}
                           {isKnown && (
                             <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-64 p-3 bg-stone-950 border border-amber-500/30 rounded-xl text-xs text-amber-100 shadow-2xl opacity-0 group-hover/skill:opacity-100 transition-opacity pointer-events-none z-50 text-center backdrop-blur-md">
                               <p className="font-bold mb-1 text-amber-500">
-                                Atenção!
+                                Perícia já treinada
                               </p>
-                              Você já possui treinamento nesta perícia (via Raça
-                              ou Classe). Considere escolher outra Origem para
-                              maximizar seus benefícios.
+                              Você já possui treinamento nesta perícia via Raça
+                              ou Classe. Se escolher ela aqui, não receberá
+                              benefício extra.
                               <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-stone-950"></div>
                             </div>
                           )}
                         </div>
                       );
                     })}
-                    {selectedPreview.pericias.length === 0 && (
-                      <span className="text-stone-600 text-sm italic">
-                        Nenhuma perícia específica.
-                      </span>
-                    )}
                   </div>
                 </div>
 
                 {/* Powers */}
                 <div>
                   <h3 className="text-stone-500 uppercase tracking-widest font-bold text-xs mb-3 flex items-center gap-2">
-                    <Check size={14} /> Poderes Incluídos
+                    <Sparkles size={14} /> Poderes Disponíveis
                   </h3>
                   <div className="grid gap-3">
                     {selectedPreview.poderes.map((power: any, idx: number) => {
-                      const name = power.name;
+                      const isSelected = originBenefits.some(
+                        (b) => b.name === power.name && b.type === "power"
+                      );
+                      const isLimitReached = originBenefits.length >= 2;
+
                       return (
-                        <div
+                        <button
                           key={idx}
-                          className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-900/10 transition-all relative group"
+                          disabled={isLimitReached && !isSelected}
+                          onClick={() =>
+                            toggleBenefit({
+                              type: "power",
+                              name: power.name,
+                              value: power,
+                            })
+                          }
+                          className={`p-4 rounded-xl border transition-all relative text-left group
+                                    ${
+                                      isSelected
+                                        ? "bg-emerald-900/20 border-emerald-500 shadow-[0_0_15px_-5px_var(--color-emerald-500)]"
+                                        : isLimitReached
+                                        ? "bg-stone-900/50 border-stone-800 opacity-60 cursor-not-allowed"
+                                        : "bg-stone-900 border-stone-800 hover:border-amber-500/40"
+                                    }
+                                  `}
                         >
                           <div className="flex justify-between items-start mb-2">
-                            <span className="font-bold font-cinzel text-lg text-emerald-100">
-                              {name}
+                            <span
+                              className={`font-bold font-cinzel text-lg ${
+                                isSelected
+                                  ? "text-emerald-100"
+                                  : "text-stone-200"
+                              }`}
+                            >
+                              {power.name}
                             </span>
-                            <div className="bg-emerald-500/20 text-emerald-400 p-1 rounded-full">
-                              <Check size={14} />
-                            </div>
+                            {isSelected && (
+                              <div className="bg-emerald-500/20 text-emerald-400 p-1 rounded-full">
+                                <Check size={14} />
+                              </div>
+                            )}
                           </div>
-                          <p className="text-sm text-stone-400 leading-relaxed">
+                          <p className="text-sm text-stone-400 leading-relaxed group-hover:text-stone-300">
                             {(power as any).text ||
                               (power as any).description ||
                               "Descrição indisponível."}
                           </p>
-                        </div>
+                        </button>
                       );
                     })}
-                    {selectedPreview.poderes.length === 0 && (
-                      <span className="text-stone-600 text-sm italic">
-                        Nenhum poder específico.
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>
@@ -381,13 +478,14 @@ const OriginSelection = () => {
                       .getItems()
                       .filter((i) => !!i.choice)
                       .map((item, idx) => {
-                        const available =
+                        const available = (
                           item.choice === "Armas Marciais"
                             ? [
                                 ...EQUIPAMENTOS.armasSimples,
                                 ...EQUIPAMENTOS.armasMarciais,
                               ]
-                            : EQUIPAMENTOS.armasSimples;
+                            : EQUIPAMENTOS.armasSimples
+                        ).filter((arm) => arm.preco <= 30);
 
                         return (
                           <div key={idx} className="space-y-2">
@@ -468,14 +566,26 @@ const OriginSelection = () => {
               </ul>
             </div>
 
-            {/* ACTION FOOTER */}
             <div className="sticky bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
               <div className="max-w-4xl mx-auto">
                 <button
                   onClick={handleConfirm}
-                  className="w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.99] bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 shadow-amber-900/20 hover:scale-[1.01]"
+                  disabled={originBenefits.length !== 2}
+                  className={`w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.99] hover:scale-[1.01] ${
+                    originBenefits.length === 2
+                      ? "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 shadow-amber-900/20"
+                      : "bg-stone-800 text-stone-500 border border-stone-700 cursor-not-allowed grayscale"
+                  }`}
                 >
-                  <Check size={24} /> Confirmar Origem
+                  {originBenefits.length === 2 ? (
+                    <>
+                      <Check size={24} /> Confirmar Escolhas
+                    </>
+                  ) : (
+                    `Escolha mais ${2 - originBenefits.length} benefício${
+                      2 - originBenefits.length > 1 ? "s" : ""
+                    }`
+                  )}
                 </button>
               </div>
             </div>

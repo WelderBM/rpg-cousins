@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { useCharacterStore } from "../../store/useCharacterStore";
 import { Scroll, Plus, Trash2, User, Sword, ArrowRight } from "lucide-react";
+import { Atributo } from "../../data/atributos";
 import { motion } from "framer-motion";
 
 interface WizardHubProps {
@@ -10,6 +11,7 @@ interface WizardHubProps {
 }
 
 import { formatAssetName, getRaceImageName } from "../../utils/assetUtils";
+import { getAttributeTotal } from "../../utils/attributeUtils";
 
 const WizardHub = ({ onContinue, onNew }: WizardHubProps) => {
   const {
@@ -19,9 +21,18 @@ const WizardHub = ({ onContinue, onNew }: WizardHubProps) => {
     name,
     resetWizard,
     baseAttributes,
+    flexibleAttributeChoices,
   } = useCharacterStore();
 
   const hasDraft = step > 1 || !!selectedRace;
+
+  const getFinalAttr = (attr: Atributo) =>
+    getAttributeTotal(
+      attr,
+      baseAttributes,
+      selectedRace,
+      flexibleAttributeChoices
+    );
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] w-full p-6">
@@ -114,7 +125,7 @@ const WizardHub = ({ onContinue, onNew }: WizardHubProps) => {
               <div className="grid grid-cols-3 gap-2 py-4 border-y border-stone-800/50">
                 <div className="text-center">
                   <span className="block text-xl font-bold text-amber-100/80">
-                    {baseAttributes.Força}
+                    {getFinalAttr(Atributo.FORCA)}
                   </span>
                   <span className="text-[10px] text-stone-500 uppercase font-black">
                     FOR
@@ -122,7 +133,7 @@ const WizardHub = ({ onContinue, onNew }: WizardHubProps) => {
                 </div>
                 <div className="text-center">
                   <span className="block text-xl font-bold text-amber-100/80">
-                    {baseAttributes.Destreza}
+                    {getFinalAttr(Atributo.DESTREZA)}
                   </span>
                   <span className="text-[10px] text-stone-500 uppercase font-black">
                     DES
@@ -130,7 +141,7 @@ const WizardHub = ({ onContinue, onNew }: WizardHubProps) => {
                 </div>
                 <div className="text-center">
                   <span className="block text-xl font-bold text-amber-100/80">
-                    {baseAttributes.Inteligência}
+                    {getFinalAttr(Atributo.INTELIGENCIA)}
                   </span>
                   <span className="text-[10px] text-stone-500 uppercase font-black">
                     INT
