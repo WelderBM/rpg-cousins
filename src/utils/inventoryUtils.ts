@@ -18,7 +18,14 @@ export function calculateCarryCapacity(character: Character): number {
   if (!character) return 10; // Fallback base
 
   // Base Rule: 10 + 2 * Strength
-  const strMod = character.attributes[Atributo.FORCA] || 0;
+  // Handle attributes that can be objects with mod/value or just numbers
+  const forcaAttr = character.attributes[Atributo.FORCA];
+  let strMod = 0;
+  if (typeof forcaAttr === "object" && forcaAttr !== null) {
+    strMod = (forcaAttr as any).mod ?? (forcaAttr as any).value?.total ?? 0;
+  } else if (typeof forcaAttr === "number") {
+    strMod = forcaAttr;
+  }
   const baseCapacity = 10 + strMod * 2;
 
   // Bag Inspection

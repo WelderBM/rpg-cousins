@@ -13,7 +13,7 @@ import {
   calculateTotalPointsSpent,
   INITIAL_POINTS,
 } from "../utils/attributeUtils";
-import { ClassDescription } from "../interfaces/Class";
+import { ClassDescription, ClassPower } from "../interfaces/Class";
 import Skill from "../interfaces/Skills";
 
 export interface CharacterSummary {
@@ -23,6 +23,7 @@ export interface CharacterSummary {
   className: string;
   level: number;
   image?: string; // For the race image
+  isFavorite?: boolean;
 }
 
 interface CharacterWizardState {
@@ -30,10 +31,12 @@ interface CharacterWizardState {
   selectedRace: Race | null;
   selectedClass: ClassDescription | null;
   selectedSkills: Skill[];
+  selectedClassWeapons: Equipment[];
+  selectedOriginWeapons: Equipment[];
 
   // Draft state for Role Selection persistence
   roleSelectionState: {
-    previewName: string | null; // changed to string to avoid complex object nesting issues in persistence if needed, but object is fine
+    previewName: string | null;
     basic: Record<number, Skill>;
     classSkills: Skill[];
     generalSkills: Skill[];
@@ -47,6 +50,7 @@ interface CharacterWizardState {
   }[];
   selectedDeity: Divindade | null;
   selectedGrantedPowers: GeneralPower[];
+  selectedClassPowers: ClassPower[];
   bag: Bag;
   money: number;
   baseAttributes: Record<Atributo, number>;
@@ -68,6 +72,8 @@ interface CharacterWizardState {
   selectRace: (race: Race) => void;
   selectClass: (role: ClassDescription) => void;
   updateSkills: (skills: Skill[]) => void;
+  setSelectedClassWeapons: (weapons: Equipment[]) => void;
+  setSelectedOriginWeapons: (weapons: Equipment[]) => void;
   setRoleSelectionState: (state: {
     previewName: string | null;
     basic: Record<number, Skill>;
@@ -85,6 +91,7 @@ interface CharacterWizardState {
   ) => void;
   selectDeity: (deity: Divindade) => void;
   selectGrantedPowers: (powers: GeneralPower[]) => void;
+  selectClassPowers: (powers: ClassPower[]) => void;
   updateBaseAttribute: (attr: Atributo, value: number) => void;
   setFlexibleAttributeChoice: (index: number, attr: Atributo) => void;
   addToBag: (item: Equipment) => void;
@@ -119,6 +126,8 @@ export const useCharacterStore = create<CharacterWizardState>()(
       selectedRace: null,
       selectedClass: null,
       selectedSkills: [],
+      selectedClassWeapons: [],
+      selectedOriginWeapons: [],
 
       roleSelectionState: {
         previewName: null,
@@ -131,6 +140,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
       originBenefits: [],
       selectedDeity: null,
       selectedGrantedPowers: [],
+      selectedClassPowers: [],
       bag: new Bag(),
       money: 18, // Default start
       baseAttributes: { ...INITIAL_ATTRIBUTES },
@@ -156,6 +166,14 @@ export const useCharacterStore = create<CharacterWizardState>()(
         set({ selectedSkills: skills });
       },
 
+      setSelectedClassWeapons: (weapons) => {
+        set({ selectedClassWeapons: weapons });
+      },
+
+      setSelectedOriginWeapons: (weapons) => {
+        set({ selectedOriginWeapons: weapons });
+      },
+
       setRoleSelectionState: (state) => {
         set({ roleSelectionState: state });
       },
@@ -177,20 +195,19 @@ export const useCharacterStore = create<CharacterWizardState>()(
         set({ selectedGrantedPowers: powers });
       },
 
+      selectClassPowers: (powers) => {
+        set({ selectedClassPowers: powers });
+      },
+
       addToBag: (item) => {
         const state = get();
         const updates: Partial<CharacterWizardState> = {};
-
-        // Update Wizard Bag
-        const currentBag = state.bag;
-        const newBag = new Bag(currentBag.getEquipments());
         const group = item.group || "Item Geral";
         const partial: any = {};
         partial[group] = [item];
-        newBag.addEquipment(partial);
-        updates.bag = newBag;
 
-        // Update Active Character Bag
+        // If we have an active character, we are likely in the Market or Character Sheet.
+        // We should ONLY update the active character, NOT the wizard draft bag.
         if (state.activeCharacter) {
           const charBag =
             state.activeCharacter.bag instanceof Bag
@@ -203,6 +220,12 @@ export const useCharacterStore = create<CharacterWizardState>()(
             ...state.activeCharacter,
             bag: newCharBag,
           };
+        } else {
+          // ONLY update Wizard Bag if NO active character is being used
+          const currentBag = state.bag;
+          const newBag = new Bag(currentBag.getEquipments());
+          newBag.addEquipment(partial);
+          updates.bag = newBag;
         }
 
         set(updates);
@@ -211,28 +234,9 @@ export const useCharacterStore = create<CharacterWizardState>()(
       removeFromBag: (item) => {
         const state = get();
         const updates: Partial<CharacterWizardState> = {};
-
-        // Update Wizard Bag
-        const currentBag = state.bag;
-        const equips = cloneDeep(currentBag.getEquipments());
         const group = item.group || "Item Geral";
         const groupKey = group as keyof BagEquipments;
 
-        if (equips[groupKey]) {
-          const list = equips[groupKey];
-          const idx = list.findIndex((i) => i.nome === item.nome);
-          if (idx > -1) {
-            const existing = list[idx];
-            if ((existing.quantidade || 1) > 1) {
-              existing.quantidade = (existing.quantidade || 1) - 1;
-            } else {
-              list.splice(idx, 1);
-            }
-            updates.bag = new Bag(equips);
-          }
-        }
-
-        // Update Active Character Bag
         if (state.activeCharacter) {
           const charBag =
             state.activeCharacter.bag instanceof Bag
@@ -256,6 +260,24 @@ export const useCharacterStore = create<CharacterWizardState>()(
               };
             }
           }
+        } else {
+          // Update Wizard Bag ONLY if NO active character
+          const currentBag = state.bag;
+          const equips = cloneDeep(currentBag.getEquipments());
+
+          if (equips[groupKey]) {
+            const list = equips[groupKey];
+            const idx = list.findIndex((i) => i.nome === item.nome);
+            if (idx > -1) {
+              const existing = list[idx];
+              if ((existing.quantidade || 1) > 1) {
+                existing.quantidade = (existing.quantidade || 1) - 1;
+              } else {
+                list.splice(idx, 1);
+              }
+              updates.bag = new Bag(equips);
+            }
+          }
         }
 
         if (Object.keys(updates).length > 0) {
@@ -269,31 +291,6 @@ export const useCharacterStore = create<CharacterWizardState>()(
         const group = item.group || "Item Geral";
         const groupKey = group as keyof BagEquipments;
 
-        // Update Wizard Bag
-        const currentBag = state.bag;
-        const equips = cloneDeep(currentBag.getEquipments());
-
-        if (equips[groupKey]) {
-          const list = equips[groupKey];
-          const idx = list.findIndex((i) => i.nome === item.nome);
-          if (idx > -1) {
-            const existing = list[idx];
-            const newQty = (existing.quantidade || 1) + delta;
-            if (newQty > 0) {
-              existing.quantidade = newQty;
-            } else {
-              list.splice(idx, 1);
-            }
-            updates.bag = new Bag(equips);
-          } else if (delta > 0) {
-            // If item not in bag and we are adding
-            const newItem = { ...item, quantidade: delta };
-            list.push(newItem as any);
-            updates.bag = new Bag(equips);
-          }
-        }
-
-        // Update Active Character Bag
         if (state.activeCharacter) {
           const charBag =
             state.activeCharacter.bag instanceof Bag
@@ -328,6 +325,33 @@ export const useCharacterStore = create<CharacterWizardState>()(
                 ...state.activeCharacter,
                 bag: new Bag(charEquips),
               };
+            }
+          }
+        } else {
+          // Update Wizard Bag ONLY if NO active character
+          const currentBag = state.bag;
+          const equips = cloneDeep(currentBag.getEquipments());
+
+          if (!equips[groupKey]) {
+            (equips as any)[groupKey] = [];
+          }
+
+          if (equips[groupKey]) {
+            const list = equips[groupKey];
+            const idx = list.findIndex((i) => i.nome === item.nome);
+            if (idx > -1) {
+              const existing = list[idx];
+              const newQty = (existing.quantidade || 1) + delta;
+              if (newQty > 0) {
+                existing.quantidade = newQty;
+              } else {
+                list.splice(idx, 1);
+              }
+              updates.bag = new Bag(equips);
+            } else if (delta > 0) {
+              const newItem = { ...item, quantidade: delta };
+              list.push(newItem as any);
+              updates.bag = new Bag(equips);
             }
           }
         }
@@ -401,6 +425,8 @@ export const useCharacterStore = create<CharacterWizardState>()(
           selectedRace: null,
           selectedClass: null,
           selectedSkills: [],
+          selectedClassWeapons: [],
+          selectedOriginWeapons: [],
           roleSelectionState: {
             previewName: null,
             basic: {},
@@ -411,6 +437,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
           originBenefits: [],
           selectedDeity: null,
           selectedGrantedPowers: [],
+          selectedClassPowers: [],
           bag: new Bag(),
           money: 18,
           baseAttributes: { ...INITIAL_ATTRIBUTES },
@@ -427,11 +454,14 @@ export const useCharacterStore = create<CharacterWizardState>()(
         selectedRace: state.selectedRace,
         selectedClass: state.selectedClass,
         selectedSkills: state.selectedSkills,
+        selectedClassWeapons: state.selectedClassWeapons,
+        selectedOriginWeapons: state.selectedOriginWeapons,
         roleSelectionState: state.roleSelectionState,
         selectedOrigin: state.selectedOrigin,
         originBenefits: state.originBenefits,
         selectedDeity: state.selectedDeity,
         selectedGrantedPowers: state.selectedGrantedPowers,
+        selectedClassPowers: state.selectedClassPowers,
         bag: state.bag,
         money: state.money,
         baseAttributes: state.baseAttributes,

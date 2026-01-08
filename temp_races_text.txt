@@ -1,0 +1,1733 @@
+
+--- Page 15 ---
+Introdução
+ 
+Mas como se “joga”? Você e seus amigos cons-
+troem personagens, anotando seus atributos em 
+folhas de papel. O mestre, um jogador com um cargo 
+especial, começa a contar a história. Você, jogador, 
+aguarda sua vez e diz, em voz alta, aquilo que você 
+(ou melhor, seu personagem) gostaria de fazer. “Eu 
+ataco o dragão!” pode ser sua escolha. O mestre julga 
+se você teve sucesso ou não. Talvez a resposta dele 
+seja: “Sua espada causa ao monstro um profundo ferimento, 
+fazendo-o urrar de raiva”.
+Ou não. Para ações difíceis, cujo resultado é 
+incerto, você precisará rolar um dado. Quanto me-
+lhor o resultado da rolagem, maior sua chance de 
+realizar a tarefa. Sucesso ou fracasso? Em qualquer 
+dos casos, o mestre vai anunciar os resultados e os 
+jogadores vão lidar com as consequências. Assim, a 
+cada decisão, a cada ação, a aventura prossegue.
+Mecânica básica
+Tormenta20 tem uma regra simples que fun-
+ciona na maioria das situações. Toda vez que fizer 
+uma ação difícil, você precisa fazer um teste. Para 
+isso, você vai:
+•	 Rolar um dado de vinte faces (1d20).
+•	 Somar os modificadores adequados.
+•	 Comparar o resultado à dificuldade da ação, um 
+número definido pelo mestre (abreviado como CD).
+Se o resultado for igual ou maior que a difi-
+culdade, você é bem-sucedido. Simples! Mantenha 
+essa mecânica básica em mente e tudo ficará claro.
+Começando
+Para jogar Tormenta20, você precisará do 
+seguinte:
+Um grupo de amigos. É possível jogar com 
+apenas duas pessoas (o mestre e um jogador), mas 
+para um jogo mais divertido sugerimos de três a seis 
+pessoas (o mestre mais dois a cinco jogadores).
+Personagens. Cada jogador deve criar um 
+personagem, o herói que irá interpretar durante o 
+jogo. O kit introdutório (veja o quadro) traz perso-
+nagens prontos para ajudar jogadores iniciantes.
+Uma Aventura. O mestre deve criar a base 
+da história que irá narrar. Note que uma aventura de 
+RPG não é como um romance ou roteiro — o mestre 
+não deve escrever cada cena ou diálogo em detalhes, 
+apenas estabelecer o básico da história. O desenrolar 
+dela se dará ao longo do jogo, em conjunto com os 
+jogadores. O kit introdutório também traz uma aven-
+tura pronta para ajudar o mestre no início.
+Dados. Um conjunto de dados de RPG para 
+cada jogador, com dados de quatro, seis, oito, dez, 
+doze e vinte faces. Os dados são abreviados como 
+d4, d6, d8, d10, d12 e d20. Também existem as abre-
+viações d2 (role qualquer dado; um resultado ímpar 
+equivale a 1 e um resultado par equivale a 2), d3 
+(role 1d6, divida o resultado por 2 e arredonde para 
+cima) e d% (role dois dados de dez faces, um para a 
+dezena e outro para a unicade; em uma rolagem de 
+00, o resultado é 100). Você pode adquirir os dados 
+no site da Jambô. Na falta deles, o aplicativo oficial 
+de Tormenta pode ser usado para as rolagens — além 
+de diversos outros aplicativos gratuitos na internet.
+Você também encontrará abreviações para as 
+rolagens, como 3d6+2, por exemplo. Isso quer dizer 
+“três dados de seis faces, mais dois”. O primeiro 
+número diz quantos dados você deve rolar e somar 
+os resultados, o segundo (depois do “d”) diz o tipo 
+de dado a ser rolado. Qualquer número depois disso 
+deve ser adicionado ou subtraído do resultado.
+A partir daqui, leia o Capítulo 1: Constru-
+ção de Personagem, para fazer sua primeira fi-
+cha. Se você nunca jogou antes, pode acessar o canal 
+de vídeos da Jambô, em youtube.com/jamboeditora, 
+e assistir algumas sessões de RPG de Tormenta. Isso 
+dará a você uma ideia geral de como funciona uma 
+partida. Mas, claro, o melhor jeito de aprender a 
+jogar RPG é jogando. Então...
+Pronto para desbravar o mundo de Arton?
+Mais Tormenta!
+Tormenta20 começa aqui — mas vai mais 
+além! A seguir estão alguns conteúdos para 
+expandir sua experiência com o jogo.
+• Kit Introdutório. Se você 
+nunca jogou antes, comece por aqui. 
+Este arquivo digital gratuito traz um 
+grupo de personagens e uma aventura 
+pronta, e está disponível no site da 
+Jambô, em jamboeditora.com.br.
+• Suplementos. Livros como Atlas de 
+Arton, Ameaças de Arton e as Jornadas Heroicas 
+trazem muito material para tornar seus 
+jogos ainda mais divertidos. Veja o catálogo 
+completo de Tormenta no site da Jambô.
+• Comunidade do Discord. Reúna-se 
+com outros fãs no servidor oficial da editora. 
+Encontre grupos para jogar, tire dúvidas ou 
+simplesmente converse sobre o cenário e 
+suas histórias em discord.gg/jambo.
+9
+
+--- Page 16 ---
+Introdução
+Os guerreiros 
+Os guerreiros 
+Christian e Verônica, 
+Christian e Verônica, 
+humano e medusa, 
+humano e medusa, 
+explorando uma 
+explorando uma 
+masmorra de Arton
+masmorra de Arton
+10
+
+--- Page 17 ---
+Introdução
+ 
+Termos 
+importantes
+A seguir estão alguns termos usados em 
+Tormenta20. Acostume-se com eles agora para 
+facilitar a leitura!
+Jogador. Um participante do jogo, exceto o 
+mestre. Cada jogador interpreta um personagem.
+Mestre. A pessoa que controla o jogo, narrando 
+a história e preparando as cenas.
+Personagem. Um personagem fictício, inter-
+pretado por um jogador. São os protagonistas da 
+história. Também chamados de heróis ou aventu-
+reiros, pelo papel que ocupam no mundo de Arton.
+Atributos. As competências físicas e mentais 
+de um personagem. Existem seis atributos. Eles 
+operam numa escala numérica, na qual um valor 0 
+equivale a média humana.
+• Força. Potência muscular e capacidade atlética.
+• Destreza. Agilidade e coordenação motora.
+• Constituição. Saúde e resistência física.
+• Inteligência. Raciocínio e educação.
+• Sabedoria. Sentidos e força de vontade.
+• Carisma. Habilidades sociais.
+Raça. Todo personagem pertence a uma raça, 
+um dos vários povos fantásticos que habita o mundo 
+de Arton. Este livro traz 17 raças.
+Classe. Todo personagem possui uma classe. 
+Ela funciona como sua “profissão”, definindo suas 
+habilidades e papel no jogo. Existem 14 classes.
+Nível. Uma medida da experiência e poder de 
+um personagem. Vai do 1º (aventureiro iniciante) ao 
+20º (entre os maiores heróis do mundo).
+NPC. Sigla em inglês para “personagem não 
+jogador”. Todos os personagens que não são inter-
+pretados por um jogador — ou seja, que são intepre-
+tados pelo mestre — são NPCs. Isso inclui todos os 
+coadjuvantes e antagonistas da história.
+Criatura. Qualquer ser senciente, seja um 
+camponês, um zumbi ou um dragão. Criaturas são 
+dividas em seis tipos: animais, humanoides, constru-
+tos, espíritos, monstros e mortos-vivos.
+Aliado. Uma criatura (personagem ou NPC) 
+amistosa a seu personagem.
+Inimigo. Uma criatura hostil a seu personagem. 
+Objeto. Qualquer coisa não senciente — uma 
+espada, um baú e um navio são todos objetos.
+Pontos de Vida (PV). Representam a saúde 
+e a vitalidade do personagem. Quando seu perso-
+nagem é ferido, seja por cair de um barranco, seja 
+por ser dilacerado por um troll, sofre dano. O dano 
+diminui seus PV. Caso seus PV cheguem a 0, você 
+começa a morrer.
+Pontos de Mana (PM). Representam a ener-
+gia e a determinação do personagem. Você gasta PM 
+para usar suas habilidades.
+Perícia. Uma habilidade mundana, como ca-
+valgar ou forjar uma espada. Sua origem, sua classe 
+e seu valor de Inteligência definem em quais perícias 
+você será treinado, ou seja, mais competente.
+Teste. A mecânica básica do jogo. Sempre 
+que você tenta uma ação difícil, precisa rolar 1d20, 
+somar quaisquer modificadores aplicáveis e com-
+parar o resultado com uma dificuldade estipulada 
+pelo mestre. Testes são explicados em detalhes no 
+Capítulo 5: Jogando.
+Modificador. Algo que afeta as características 
+ou testes de uma criatura. Modificadores positivos 
+são chamados de bônus, enquanto modificadores 
+negativos são chamados de penalidades.
+Condição. Algo que afeta uma criatura, como 
+estar envenenado ou paralisado. Condições são 
+descritas na página 394.
+Turnos e Rodadas. Medidas de tempo para 
+cenas de ação. A cada rodada, cada personagem tem 
+um turno — sua vez de agir. Quando todos tiverem 
+agido, a rodada termina e uma nova começa.
+Cena. Um pedaço distinto da história. O 
+início e o fim de uma cena são determinadas pelo 
+andamento da história, não pelo tempo passado. 
+Por exemplo, uma cena de ação na qual os heróis 
+encontram um ogro termina quando eles matam a 
+criatura (ou fogem dela), independentemente de 
+quanto tempo levarem para fazer isso.
+Aventura. Uma história completa, com início, 
+meio e fim. Uma aventura é composta por uma 
+sequência de cenas — normalmente, de 3 a 4 cenas 
+para uma história curta até 10 cenas ou mais para 
+uma história longa.
+Campanha. Uma sequência de aventura unidas 
+por uma trama maior — como unificar um reino, 
+impedir os planos de um grande vilão ou destruir 
+uma área de Tormenta.
+Sessão de Jogo. Cada vez que você se reúne 
+com seus amigos para jogar é uma sessão de jogo 
+— ou só “sessão”. É um evento no mundo real, não 
+uma duração de tempo dentro do jogo.
+11
+
+--- Page 18 ---
+12
+20 Coisas a Saber
+1. Mas Por Que Vinte? Em Tormenta, o 
+número 20 sempre foi o símbolo mais poderoso de 
+todos. As rolagens importantes usam um dado de 
+vinte faces — e “rolar um 20” é uma grande faça-
+nha, um acerto crítico, uma festa. Os personagens 
+têm vinte níveis. O Panteão tem vinte deuses. Por 
+tudo isso, nossa celebração de vinte anos teria que 
+ser algo muito especial.
+2. Grupo de Heróis. Tormenta20 é sobre 
+trabalho em equipe. Aventureiros com diferentes ha-
+bilidades unem-se para somar suas forças e proteger 
+suas fraquezas. Não há personagem “melhor”, não 
+há raça ou classe mais forte. Mesmo aquele guerreiro 
+apelão, capaz de causar quantidades estupendas 
+de dano, acabará sobrepujado por desafios que sua 
+espada não pode vencer. Não há membro menos 
+importante; todos têm seu papel no grupo.
+3. Estranhos e Maravilhosos. Vejam, ali 
+vão um elfo bárbaro, um minotauro inventor, um 
+bucaneiro anão e um cavaleiro goblin! Estranho? 
+Com certeza! Errado? De jeito nenhum! Tormen-
+ta20 é sobre heróis exóticos e extravagantes, que 
+se destacam mesmo no mais colorido dos mundos. 
+Você e seus amigos são os protagonistas, os astros 
+da história. Não importa quantos tipos esquisitos 
+existam em Arton, os olhares de espanto sempre se 
+voltam para os personagens jogadores.
+4. Salvar o Mundo é SEU Trabalho. 
+Ainda que Arton seja bem provido de personalidades 
+com vasto poder e influência, elas têm seus próprios 
+problemas para resolver. Diante de uma crise, bater 
+à porta do arquimago ou sumo-sacerdote mais pró-
+ximo não é a resposta — exceto, talvez, em busca de 
+pistas ou conselhos. “Por que eles não fazem nada?” 
+alguém perguntará. Esse alguém, com certeza, não é 
+um herói aventureiro. Um herói simplesmente em-
+punha espada ou magia, reúne-se com seus aliados e 
+ruma para o desafio.
+5. Um Novo Reinado. Aqueles mais familia-
+rizados com o antigo mapa político de Arton podem 
+ficar chocados. Onde estão os reinos que conhe-
+ciam? Acredite, nenhuma nação desapareceu (isto é, 
+quase nenhuma), mas com certeza houve grandes 
+mudanças. Enquanto umas só mudaram de nome, 
+outras mudaram mais profundamente. Algumas, 
+que representam melhor a identidade do Reinado, 
+ganharam destaque; outras foram reduzidas a pon-
+tos curiosos, exóticos, sem a mesma relevância no 
+panorama geral — mas ainda presentes, ainda ao 
+alcance de uma boa jornada.
+6. Magia Versus Ciência. Seja arcana ou di-
+vina, a magia é uma dádiva maravilhosa, um presente 
+do universo — mesmo o camponês mais ignorante 
+e supersticioso sabe disso. No Reinado, arcanistas e 
+clérigos são figuras de grande prestígio. Itens encan-
+tados trazem poderes fantásticos a seus portadores. 
+Por que, então, existem aqueles dedicados a cons-
+truir engenhos mecânicos infernais, que funcionam 
+metade das vezes e explodem na outra metade? 
+Armas de pólvora, criaturas artificiais, máquinas 
+voadoras... Alguns chamam de progresso. Outros só 
+querem ficar longe, bem longe.
+7. Tormenta. Ainda Mais. O pesadelo aber-
+rante está mais presente do que nunca. Aharadak, 
+o Deus da Tormenta, agora ocupa um lugar no Pan-
+teão. Seus cultistas depravados espalham corrupção 
+através do Reinado. Ainda assim, existem heróis que 
+empunham o poder da Tormenta para nos salvar. 
+Nascidos com a mácula, ou aceitando deformações 
+em seus corpos, ou até cultuando o deus macabro 
+para brandir sua magia contra os próprios invasores. 
+Mas estariam mesmo protegendo Arton, ou apenas 
+cedendo à sedução do poder profano?
+8. Compatibilidade. Tormenta20 mudou, 
+evoluiu, mas continua honrando seu legado. Ainda é 
+o jogo que você conhece e ama, ainda tem as mesmas 
+regras fundamentais. Você continua rolando um 
+dado de vinte faces, somando modificadores e ten-
+tando alcançar uma dificuldade. A maior parte das 
+mecânicas continua: os atributos básicos, as raças e 
+classes, as perícias... Outras mudaram de nome (os 
+antigos talentos, por exemplo, agora se chamam po-
+deres), mas também estão presentes. Se você jogou 
+qualquer das edições anteriores, tudo será familiar.
+9. Regras Existem... Grande parte deste livro 
+contém regras. Em um jogo de imaginação, são as 
+regras que dizem como o mundo funciona, são as re-
+gras que mantêm a realidade coesa. Para quase tudo 
+que você tentar, existe uma chance matemática de 
+sucesso ou fracasso. Para quase tudo que você quiser, 
+existe uma regra prevendo tal situação. Quando não 
+existe, você pode inventá-la.
+10. ...Para Serem Quebradas. E quando 
+você não gosta de uma regra, pode apenas mudá-la. 
+Tormenta20 tem muitas regras, mas elas estão 
+aqui para ajudar, não para restringir. Após conhecê- 
+-las, entendê-las, você pode simplesmente decidir 
+que as prefere diferentes. Você pode trocar por ou-
+tras novas. Pode adicionar regras mais detalhadas ou 
+simplificar aquelas que achar difíceis. Ninguém vai 
+proibir. A única lei é que todos os jogadores devem 
+conhecer e concordar com as novas regras.
+Introdução
+
+--- Page 19 ---
+13
+11. Fácil de Aprender, Difícil de Dominar. 
+Esse é o grande objetivo do game design. Tormenta20 
+foi reformulado para melhorar a construção de per-
+sonagem — que pode ser simples e rápida, ou então 
+um mergulho na profunda complexidade mecânica 
+em busca de suas escolhas favoritas. Cada classe ofe-
+rece métodos mais diretos, mas nenhum personagem 
+será igual a outro. Combates podem ser resolvidos 
+sem pausas demoradas para debater regras, mas 
+ainda com numerosas estratégias à disposição.
+12. Panteão Renovado. Exceto pelos per-
+sonagens jogadores, os seres de maior influência 
+em Arton são seus deuses — tudo que acontece no 
+mundo, de bom e ruim, terá envolvimento deles. 
+Entre clérigos, druidas e paladinos, seus devotos 
+empunham magia divina e cumprem seus objetivos. 
+Embora poderosos, os deuses podem ser derrotados, 
+podem ser mortos. Deuses caem, deuses elevam-se, 
+pois sempre deve haver vinte. Os antigos Keenn, 
+Tauron e Ragnar desapareceram. Em seus lugares, 
+ascenderam Arsenal, Aharadak e Thwor.
+13. Poderes e Obrigações. Em suas pri-
+meiras versões, Tormenta trazia opções especiais 
+para servos dos deuses — incluindo dons únicos de 
+cada divindade, acompanhados por votos sagrados 
+que cobravam um alto preço quando violados. Esse 
+conjunto de poderes e deveres trazia aos clérigos 
+muita personalidade. As regras mudaram ao longo 
+dos anos, ficaram flexíveis, soltas, pouco relevan-
+tes. Agora, não apenas retomam a força original, 
+como também estão disponíveis para outras clas-
+ses. Um guerreiro comum, ou um guerreiro devoto 
+de Valkaria? A escolha é sua!
+14. Raças e Classes. Grandes mudanças aqui! 
+Meia-dríade, ícone do mangá Holy Avenger, agora cha-
+ma-se dahllan e entra no elenco das raças principais 
+— enquanto todas as outras tiveram suas habilidades 
+reformuladas. Substituições importantes nas classes: 
+saem o monge e o samurai (voltando ao lar em 
+Império de Jade), chegam o lutador e o cavaleiro. O 
+impronunciável swashbuckler dá lugar ao bucaneiro. 
+Feiticeiro e mago tornam-se um só. O inventor e o 
+nobre trazem novas maneiras de vencer desafios.
+15. Origens. Além de uma raça e uma classe, 
+este novo ingrediente acrescenta riqueza à história 
+de seu personagem. Aqui é onde você decidirá quem 
+ele era no passado, antes de se tornar um aventurei-
+ro. Um esperto sobrevivente das ruas, que conhece 
+todas as manhas? Um membro da nobreza, agora 
+portador da armadura tradicional da família? Um 
+estudioso matriculado ainda jovem na Academia 
+Arcana? Você pode modificar uma origem, deixando 
+mais a seu gosto, ou até inventar uma nova!
+16. Pontos de Mana. Na antiga versão do 
+jogo, apenas conjuradores (clérigos, druidas, magos) 
+usavam pontos para ativar seus poderes. Agora, as 
+habilidades especiais de todos os personagens exi-
+gem uma mesma energia para sua ativação. Esta é 
+mais uma medida para tornar o jogo mais simples, 
+para evitar que você precise gerenciar um número de 
+utilizações separado para cada poder diferente.
+17. Alinhamento. Sempre se disse que, em 
+Arton, “bem, mal, ordem e caos são forças funda-
+mentais do universo”. Elas continuam sendo assim, 
+mas agora se tornam mais misteriosas para os 
+mortais. As tendências (agora alinhamentos) ainda 
+existem, ainda funcionam como guias de conduta 
+para os personagens, mas sem a importância mecâ-
+nica de antes. Não há mais restrições de tendência 
+para classes. Obedecer aos desígnios de um deus é 
+mais importante do que ter alinhamento similar ao 
+dele. A única exceção é o paladino, que permanece 
+como campeão sagrado do bem e ordem.
+18. A Maior e Melhor Comunidade. 
+Então, forasteiro, você acaba de chegar ao Reinado? 
+Nada tema, você não está sozinho. Nessas duas 
+décadas de jornada, Tormenta reuniu uma legião 
+de fãs, uma horda de companheiros prontos para 
+participar de seu grupo, um exército de veteranos 
+prontos para mostrar o caminho. Não importa quem 
+você é; em Arton, ninguém é estranho, exótico ou 
+esquisito demais para ser herói. Suas diferenças são 
+a nossa força. Seja bem-vindo!
+19. A versão Oficial É a SUA. Quando você 
+e seus amigos se reúnem para jogar Tormenta20, 
+estão assumindo o protagonismo da aventura. 
+Vocês são os personagens principais, suas escolhas 
+decidem o destino do mundo. Ainda que grandes 
+histórias sejam contadas em livros e quadrinhos, 
+elas não existem para apagar os jogadores; existem 
+para inspirá-los, para mostrar o que pode ser feito. 
+Seguir o material oficial à risca, reinventar tudo ou 
+algo no meio? Você escolhe.
+20. Jogue como Quiser. Como você sente 
+que este jogo deveria ser? Uma aventura despreocu-
+pada, plena de batalhas divertidas que terminam em 
+festa? Uma saga monumental sobre heróis modes-
+tos que evoluem e tornam-se campeões cósmicos? 
+Um conto de horror macabro, sobre pesadelos aber-
+rantes espreitando nas frestas da realidade? Não há 
+jeito errado de jogar Tormenta20! Jogue todos 
+os dias, ou semanas, ou meses. Jogue por algumas 
+horas ou atravesse a noite. Faça de cada sessão um 
+evento dramático, denso, ou uma grande bagunça. 
+Tormenta é sobre imaginação, aventuras, sonhos. 
+E nenhuma dessas coisas tem limites.
+Introdução
+
+--- Page 20 ---
+CAPÍTULO
+1
+Construção de 
+Construção de 
+personagem
+personagem
+
+--- Page 21 ---
+“Eu sinto um herói esperando para nascer! Um herói precisando só de um 
+motivo!”
+— Val
+
+--- Page 22 ---
+Capítulo Um
+C
+ada jogador de Tormenta20 contro-
+la um personagem, um herói aven-
+tureiro. Este capítulo traz as regras 
+para a construção de personagens 
+jogadores — como determinar seus atributos, 
+raça, classe, origem e demais características.
+O personagem pode ser fornecido pelo mestre, 
+especialmente se você ainda não conhece as regras 
+— mas inventar seu aventureiro é uma das partes 
+mais divertidas do jogo. Para fazer isso, siga os 
+passos abaixo.
+1. Defina seus Atributos. Força, Destreza, 
+Constituição, Inteligência, Sabedoria e Carisma. Esses 
+seis atributos são as principais características de seu 
+personagem e afetam quase tudo que você faz.
+2. Escolha sua Raça. Este livro contém 
+dezessete raças. Cada uma modifica seus atributos 
+e fornece habilidades específicas.
+3. Escolha sua Classe. Enquanto a raça diz 
+como você nasceu, a classe é como uma profissão. 
+Este livro oferece quatorze classes.
+4. Escolha sua Origem. O que você fazia 
+antes de ser aventureiro? Aqui você escolhe o histó-
+rico, o passado de seu personagem.
+5. Escolha sua Divindade (Opcional). 
+Existem vinte deuses em Arton. Se quiser, você pode 
+devotar-se a um deles.
+6. Escolha suas Perícias. As habilidades 
+mundanas que seu personagem aprendeu com trei-
+namento, importantes para resolver desafios físicos, 
+mentais e sociais. Veja o Capítulo 2.
+7. Anote seu Equipamento. Anote seus 
+itens iniciais, determinados por sua origem e sua 
+classe. Veja o Capítulo 3.
+8. Magias (Apenas Arcanistas, Bardos, 
+Clérigos e Druidas). Verifique quantas magias 
+você conhece e escolha quais são. Veja o Capítulo 4.
+9. Toques Finais. Preencha os campos que 
+faltam na ficha de personagem: pontos de vida e 
+pontos de mana, tamanho e deslocamento, Defesa e 
+ataques. Escolha também o nome do personagem e 
+defina sua personalidade e aparência.
+Conceito 
+de Personagem
+Antes de começar a construir sua ficha, é útil ter 
+uma ideia básica sobre quem você quer interpretar 
+— um conceito de personagem.
+Você não precisa ter qualquer experiência com 
+o jogo, nem conhecer o mundo de Arton. Só precisa 
+saber que Tormenta20 se passa num mundo de 
+fantasia cheio de tipos variados e que seu personagem 
+será um herói. É claro, familiaridade com a história 
+e a geografia deste mundo podem levar a conceitos 
+interessantes. Se quiser, leia o Capítulo 9: Mundo 
+de Arton ou qualquer uma das várias obras que se 
+passam no cenário para conhecê-lo melhor.
+Você pode basear seu conceito em uma combina-
+ção de raça e classe. Dê uma olhada nas seções deste 
+capítulo. Não se preocupe com regras, apenas leia a 
+descrição das que achar mais interessantes e imagine 
+como elas podem se combinar. Essa mistura já diz 
+muito sobre seu personagem.
+Você também pode basear seu personagem em 
+algum herói de filmes, livros ou videogames. Apenas 
+lembre que você estará interpretando um aventurei-
+ro em início de carreira. A parte mais emocionante 
+da vida do seu personagem ainda está por vir — na 
+forma da história que será contada durante o jogo.
+É claro, você não precisa usar nenhum desses 
+apoios para imaginar seu personagem. Tente descre-
+ver o conceito em uma frase curta, incluindo pelo 
+menos um traço de personalidade. Se conseguir, pro-
+vavelmente tem um conceito de personagem forte.
+Tudo muito teórico? Sem problemas, vamos a 
+alguns exemplos de bons conceitos de personagem.
+• Uma bucaneira que sonha em conhecer os 
+pontos mais distantes de Arton.
+• Um guerreiro apaixonado pela nobre que só 
+viu uma vez, determinado a se provar digno dela.
+• Um mago atrapalhado e tímido, mas muito 
+inteligente.
+• Uma paladina que não consegue controlar 
+seu pavio curto.
+• Um anão clérigo de Valkaria — um não 
+humano devotado a uma divindade de humanos 
+já é um ótimo conceito!
+• Uma elfa amargurada e traumatizada com a 
+queda do reino élfico.
+• Um jovem pobre cujo maior objetivo é ganhar 
+dinheiro e se tornar o maior comerciante do mundo.
+• Um bardo vaidoso, obcecado com a própria 
+beleza.
+• O filho de um nobre que deve superar a própria 
+covardia para se tornar um herdeiro digno.
+• Uma guerreira cuja aldeia foi massacrada por 
+orcs, que busca vingança e uma nova família.
+16
+ 
+
+--- Page 23 ---
+Construção de Personagem
+Atributos básicos
+Todo personagem tem seis atributos, que defi-
+nem suas competências básicas: Força, Destreza, 
+Constituição, Inteligência, Sabedoria e Carisma. 
+Atributos são medidos numericamente. Um valor 
+0 representa a média humana. Valores 1 ou 2 estão 
+acima da média — o lenhador da vila, acostumado 
+a trabalho pesado, pode ter Força nesse intervalo. 
+Valores 3 ou 4 representam pessoas extraordinárias 
+— o conselheiro real, que leu todos os livros da bi-
+blioteca do castelo, pode ter Inteligência nessa faixa. 
+Valores 5 ou mais representam indivíduos heroicos. 
+Já valores negativos estão abaixo da média. Uma 
+criança pode ter Força –1, enquanto um ancião de 
+saúde muito frágil pode ter Constituição –2.
+Força • For
+Seu poder muscular. A Força é aplicada em testes 
+de Atletismo e Luta; rolagens de dano corpo a corpo 
+ou com armas de arremesso, e testes de Força para 
+levantar peso e atos similares.
+Destreza • Des
+Sua agilidade, reflexos, equilíbrio e coordenação 
+motora. A Destreza é aplicada na Defesa e em testes 
+de Acrobacia, Cavalgar, Furtividade, Iniciativa, Ladi-
+nagem, Pilotagem, Pontaria e Reflexos.
+Constituição • Con
+Sua saúde e vigor. A Constituição é aplicada aos 
+pontos de vida iniciais e por nível e em testes de For-
+titude. Se a Constituição muda, seus pontos de vida 
+aumentam ou diminuem retroativamente de acordo.
+Inteligência • Int
+Sua capacidade de raciocínio, memória e educa-
+ção. A Inteligência é aplicada em testes de Conheci-
+mento, Guerra, Investigação, Misticismo, Nobreza e 
+Ofício. Além disso, se sua Inteligência for positiva, 
+você recebe um número de perícias treinadas igual 
+ao valor dela (não precisam ser da sua classe).
+Sabedoria • Sab
+Sua observação, ponderação e determinação. A 
+Sabedoria é aplicada em testes de Cura, Intuição, 
+Percepção, Religião, Sobrevivência e Vontade.
+Carisma • Car
+Sua força de personalidade e capacidade de per-
+suasão, além de uma mistura de simpatia e beleza. O 
+Carisma é aplicado em testes de Adestramento, Atu-
+ação, Diplomacia, Enganação, Intimidação e Jogatina.
+Definindo 
+seus atributos
+Há duas maneiras de definir seus atributos: com 
+pontos ou com rolagens. Escolha a que preferir.
+Pontos. Você começa com todos os atributos 
+em 0 e recebe 10 pontos para aumentá-los. O custo 
+para aumentar cada atributo está descrito na tabela 
+abaixo. Você também pode reduzir um atributo para 
+–1 para receber 1 ponto adicional.
+Rolagens. Role 4d6, descarte o menor e 
+some os outros três. Anote o resultado. Repita esse 
+processo cinco vezes, até obter um total de seis nú-
+meros. Então, converta esses números em atributos 
+conforme a tabela abaixo. Por exemplo, se você rolar 
+13, 8, 15, 18, 10 e 9, seus atributos serão 1, –1, 2, 4, 
+0 e –1. Distribua esses valores entre os seis atributos 
+como quiser. Caso seus atributos não somem pelo 
+menos 6, role novamente o menor valor. Repita esse 
+processo até seus atributos somarem 6 ou mais.
+Atributos Mínimos
+Um valor menor que –5 em um atributo gera 
+um efeito: For ou Des (paralisado), Con (morre), Int 
+ou Sab (inconsciente), Car (torna-se um NPC). Isso 
+ignora imunidades.
+Tabela 1-1: Atributos
+Atributo
+Custo
+Rolagem
+–2
+—
+7 ou menos
+–1
+–1 ponto
+8-9
+0
+0 ponto
+10-11
+1
+1 ponto
+12-13
+2
+2 pontos
+14-15
+3
+4 pontos
+16-17
+4
+7 pontos
+18
+17
+
+--- Page 24 ---
+Capítulo Um
+Raças
+As raças de Arton são muito variadas entre si. 
+Na maior parte do mundo civilizado um personagem 
+não será hostilizado por pertencer a qualquer raça. 
+Contudo, alguns antros de vilania podem nutrir 
+verdadeiro ódio por determinadas raças — a Supre-
+macia Purista, por exemplo, despreza não humanos. 
+A exceção a isso são os lefou. Tocados pela Tormenta, 
+a maior ameaça deste mundo, os lefou atraem medo 
+em todos os reinos.
+Algumas raças são mais numerosas ou têm 
+papel predominante na história de Arton — hu-
+manos, anões, dahllan, elfos, goblins, lefou, 
+minotauros e qareen. O povo do continente está 
+acostumado a ver membros dessas raças. Uma vila 
+humana pode ter um ferreiro anão, por exemplo, e 
+ninguém ficará surpreso.
+Mas essas não são as únicas raças de Arton. 
+Dentre toda a variedade dos seres deste mundo, há 
+um grupo de raças mais raras: golens, hynne, kliren, 
+medusas, osteon, sereias, sílfides, suraggel e trogs. 
+A maioria das pessoas nunca viu um membro dessas 
+raças. Pode considerar que são míticas, que foram 
+extintas ou que jamais pisaram no continente. 
+Um membro dessas raças pode atrair curiosidade, 
+espanto ou até medo por onde passar. Em termos de 
+jogo, essas raças possuem mecânicas mais avança-
+das e são indicadas para jogadores veteranos.
+Quase todas as grandes sagas artonianas são sobre 
+grupos de diferentes raças. Aventureiros aprendem a 
+ver o melhor em cada indivíduo e, ao longo de uma 
+vida de viagens e batalhas, acostumam-se até mesmo 
+ao mais exótico companheiro.
+Escolhendo sua Raça
+Após definir seus atributos, é hora de escolher 
+sua raça. Você pode escolher qualquer raça, mas de-
+pendendo do seu conceito de personagem, algumas 
+são mais indicadas que outras.
+Se você quiser um personagem bom de briga, 
+por exemplo, minotauro é uma boa escolha. Se gosta 
+de lançar magias, vá de elfo. Já se prefere resolver 
+seus problemas na lábia, escolha qareen. Da mesma 
+forma, algumas raças não são indicadas para certos 
+conceitos. Um trog estudioso provavelmente não 
+será muito competente, assim como um hynne 
+brigão. Humanos são um caso especial — são a raça 
+mais versátil, capazes de se destacar em qualquer 
+carreira. Se estiver em dúvida, vá de humano.
+Como dito acima, todas as raças funcionam para 
+todos os tipos de personagem, e fazer combinações 
+inusitadas pode ser muito divertido. Mas, se você for 
+um jogador iniciante, prefira uma raça que forneça 
+um bônus no atributo principal de sua classe.
+Características 
+das Raças
+Modificadores de Atributo. Sua raça 
+modifica seus atributos, podendo aumentá-los acima 
+de 4 ou diminuí-los abaixo de –2.
+Habilidades de Raça. Você possui todas as 
+habilidades de sua raça. As regras para usar habili-
+dades são explicadas no Capítulo 5: Jogando.
+Tabela 1-2: Raças
+ 
+Raça
+Modificadores 
+de Atributo
+Humano
++1 em três atributos diferentes
+Anão
+Con +2, Sab +1, Des –1
+Dahllan
+Sab +2, Des +1, Int –1
+Elfo
+Int +2, Des +1, Con –1
+Goblin
+Des +2, Int +1, Car –1
+Lefou
++1 em três atributos diferentes 
+(exceto Car), Car –1
+Minotauro
+For +2, Con +1, Sab –1
+Qareen
+Car +2, Int +1, Sab –1
+Golem
+For +2, Con +1, Car –1
+Hynne
+Des +2, Car +1, For –1
+Kliren
+Int +2, Car +1, For –1
+Medusa
+Des +2, Car +1
+Osteon
++1 em três atributos diferentes 
+(exceto Con), Con –1
+Sereia/Tritão
++1 em três atributos diferentes
+Sílfide
+Car +2, Des +1, For –2
+Suraggel
+Sab +2, Car +1 (aggelus) 
+ou Des +2, Int +1 (sulfure)
+Trog
+Con +2, For +1, Int –1
+18
+ 
+
+--- Page 25 ---
+Construção de Personagem
+O povo mais numeroso em Arton, humanos 
+são considerados os escolhidos dos deuses, aque-
+les que governam o mundo. Em sua variedade e 
+adaptabilidade, são encontrados em quase todos os 
+pontos do continente — dos vales férteis do Reinado 
+às vastidões áridas do Deserto da Perdição. São 
+exploradores e desbravadores ambiciosos, sempre 
+buscando algo além.
+Habilidades de Raça
++1 em Três Atributos Diferentes. Filhos 
+de Valkaria, a Deusa da Ambição, humanos podem 
+se destacar em qualquer caminho que escolherem.
+Versátil. Você se torna treinado em duas pe-
+rícias a sua escolha (não precisam ser da sua classe). 
+Você pode trocar uma dessas perícias por um poder 
+geral a sua escolha.
+Humano
+Humanos são como uma praga: espalham-se por todo 
+o mundo de Arton.
+Não interessa onde você olhe ou por onde passe. Nas 
+Montanhas Sanguinárias, nas ilhas do Mar do Dragão-
+-Rei, em alguma masmorra debaixo da terra, sempre ha-
+verá algum humano se metendo onde não deve, procurando 
+alguma coisa. Não é à toa que são maioria.
+Aos quinze anos já se consideram adultos, andando por 
+aí, sacudindo espadas e lançando feitiços malucos.
+Dizem que a culpa é de Valkaria. A deusa, que passou 
+gerações presa em forma de estátua, hoje lidera todas as di-
+vindades e alimenta a ambição daqueles que chama de filhos. 
+Faz com que queiram cada vez mais, não importa o que já te-
+nham conseguido. Com exemplos como o
+arquimago Vectorius, que arrancou um 
+pedaço enorme do chão para transfor-
+mar em ilha voadora só por causa de 
+uma aposta, ou Mestre Arsenal, que 
+enfrentou o próprio Deus da Guer-
+ra para tomar seu lugar, é di-
+fícil convencê-los de que 
+isso pode ser errado. 
+Talvez nem seja.
+Humanos 
+podem ter qual-
+quer porte físico, cor 
+de pele ou tipo de cabe-
+lo. São tão variados quan-
+to suas ambições, tão diver-
+sos quanto as ideias que têm 
+a cada instante. Suas tra-
+dições e modas vêm e vão 
+rápido demais e eles fa-
+zem o que bem entendem. 
+E embora a deusa cria-
+dora seja sua principal 
+padroeira, humanos 
+podem ser devotos de 
+quais e quantos deuses 
+desejarem.
+Ser humano é ter a liber-
+dade e a conveniência de se 
+tornar o que quiser, mesmo 
+sem nem sempre compreen-
+der as responsabilidades que 
+isso carrega. É ter o instinto 
+aventureiro corren-
+do no sangue.
+— Broktar 
+Hellpipes, anão bardo
+Vallen e Drikka. 
+Vallen e Drikka. 
+Humanos são 
+Humanos são 
+os escolhidos 
+os escolhidos 
+dos deuses
+dos deuses
+19
+
+--- Page 26 ---
+Capítulo Um
+Anão
+Não existe nada mais confiável em Arton que um anão. 
+Cachorros também são confiáveis, mas eu não compararia os 
+dois em frente a um anão se fosse você.
+São troncudos, maciços, resistentes como os pedaços de 
+minério pelos quais são apaixonados. Seus dedos curtos e 
+grossos parecem pouco habilidosos, mas das mãos dos anões 
+saem as armas e armaduras mais fabulosas de Arton.
+Quando uma criança anã nasce, cada choro é acom-
+panhado de uma martelada do melhor ferreiro da família 
+em uma bigorna cerimonial. Eles acreditam que cada golpe 
+fortalece o corpo e o espírito do recém-nascido pelo resto da 
+vida. Não há nada que indique que a crença não é verdadeira.
+Um ditado humano diz que há apenas uma diferença 
+entre anões e metal: o metal é duro, mas você pode martelar 
+e depois derreter, e martelar de novo até que ele vire uma 
+espada ou qualquer outra coisa. Já um anão não muda nem 
+arreda pé, não importa o quanto você bata.
+A justiça é muito importante para os anões — tão 
+importante quanto suas longas e vastas barbas. Por isso o 
+patrono deles é Heredrimm, o deus que os humanos chamam 
+de Khalmyr. Dizem que Tenebra tem um dedo ou dois na 
+criação deles também, mas dependendo de quem estiver por 
+perto, também não é bom falar isso em voz alta.
+A pátria dos anões, Doherimm — um complexo de 
+cavernas em escala continental — é guardada a sete chaves. 
+Só eles sabem o caminho para o reino e mesmo nobres im-
+portantes e amigos da raça só são levados até lá vendados, 
+desacordados ou qualquer coisa do tipo.
+O subterrâneo é ameaçado pelos finntroll, inimigos 
+jurados dos anões. Mesmo assim, muitos deles abandonam 
+Doherimm e partem para a aventura na superfície. Não 
+viajam só em busca de riquezas, mas também para dar uma 
+amostra de sua honra e tradição ao resto do mundo.
+— Dynx, goblin paladino de Allihanna
+Anões são o mais resiliente dos povos. Em suas 
+cidadelas subterrâneas, trabalham duro escavando 
+minas e forjando metal em belas armas, armaduras 
+e joias. São honestos e determinados, honrando a 
+família e a tradição. Apesar de sua profunda paixão 
+por forja e cerveja, pouca coisa é mais preciosa para 
+um anão que cultivar uma barba longa e orgulhosa.
+Habilidades de Raça
+Constituição +2, Sabedoria +1, Des-
+treza –1.
+Conhecimento das Rochas. Você 
+recebe visão no escuro e +2 em testes de 
+Percepção e Sobrevivência realizados no 
+subterrâneo.
+Devagar e Sempre. 
+Seu deslocamento é 6m (em 
+vez de 9m). Porém, seu 
+deslocamento não é redu-
+zido por uso de armadura 
+ou excesso de carga.
+Duro como Pedra. 
+Você recebe +3 pontos de 
+vida no 1º nível e +1 por 
+nível seguinte.
+Tradição de He-
+redrimm. Você é peri-
+to nas armas tradicionais 
+anãs, seja por ter trei-
+nado com elas, seja por 
+usá-las como ferramen-
+tas de ofício. Para você, 
+todos os machados, 
+martelos, marretas e 
+picaretas são armas 
+simples. Você recebe 
++2 em ataques com 
+essas armas.
+Golinda e 
+Golinda e 
+Ingram. 
+Ingram. 
+Nem todo 
+Nem todo 
+anão segue 
+anão segue 
+tradições
+tradições
+20
+ 
+
+--- Page 27 ---
+Construção de Personagem
+Dahllan
+Houve época em que meias-dríades eram muito, muito 
+raras. Nascidas da união improvável entre uma dríade — 
+uma fada das florestas — e um humano, eram consideradas 
+meras lendas. Mesmo assim, bastou uma delas para tornar 
+a raça conhecida em todos os reinos: Lisandra de Galrasia. 
+Após uma campanha dramática para tentar ressuscitar o 
+Paladino de Arton, não apenas se tornaria a maior druida 
+guerreira no mundo, mas também a sumo-sacerdotisa de 
+Allihanna, e uma das mortais mais poderosas a existir.
+Por algum motivo, algo mudou.
+Recentemente, jovens meias-dríades começaram a surgir 
+no Reinado. A maior parte emergiu de matas profundas, 
+tendo sido criadas por animais ou fadas. Outras, misteriosa-
+mente, nasceram de famílias humanas. Todas femininas; há 
+rumores sobre meios-dríades masculinos, nunca confirmados. 
+De qualquer forma, por não serem necessariamente filhas de 
+dríades, receberam outro nome. Dahllan.
+Até hoje ninguém tem resposta para o mistério 
+de sua origem. A própria Allihanna deve ser res-
+ponsável, mas com que propósito? Uma tentativa 
+de ajudar meu povo a proteger as florestas, dizem 
+alguns. Uma resposta da Mãe Natureza contra a 
+Tormenta, teorizam outros — um contra-ataque 
+das forças primordiais de Arton contra a tempestade 
+rubra. Embora tenham forte ligação com a Deusa da 
+Natureza, nem todas as dahllan se tornam druidas. 
+Têm sido vistas abraçando as mais variadas carreiras, 
+desde arcanistas e bucaneiras até inventoras e cavaleiras.
+Dahllan são ágeis e sábias, mas também um tanto rústi-
+cas. Assim como as árvores antigas onde as almas das dríades 
+habitam, as dahllan têm tipos físicos variados. Algumas são 
+musculosas, outras esguias, outras ainda têm curvas acen-
+tuadas. O cabelo, como as folhas, pode ser verde, vermelho 
+ou dourado — em algumas, a cor muda conforme as estações 
+—, mas os olhos são invariavelmente verdes e brilhantes. 
+Não raro, trazem a cabeça ornamentada com caules ou fila-
+mentos delicados, como antenas feéricas. Também é normal 
+ver flores brotando em seu cabelo, além de uma ocasional 
+borboleta ou joaninha vinda sabe-se lá de onde.
+Por serem recém-chegadas a Arton, o tempo de 
+vida dahllan é desconhecido. Talvez sejam tão lon-
+gevas quanto os mais antigos carvalhos, ou mais. 
+Talvez nunca envelheçam de fato, enquanto houver 
+vida natural no mundo.
+— Arasthoriel, elfo mago
+Parte humanas, parte fadas, as dahllan são uma 
+raça de mulheres com a seiva de árvores correndo nas 
+veias. Falam com os animais, controlam as plantas 
+— mas também são ferozes em batalha, retorcendo 
+madeira para formar armaduras.
+Habilidades de Raça
+Sabedoria +2, Destreza +1, Inteligência –1.
+Amiga das Plantas. Você pode lançar a magia 
+Controlar Plantas (atributo-chave Sabedoria). Caso 
+aprenda novamente essa magia, seu custo diminui 
+em –1 PM. e
+Armadura de Allihanna. Você pode gastar 
+uma ação de movimento e 1 PM para transformar 
+sua pele em casca de árvore, recebendo +2 na Defesa 
+até o fim da cena.
+Empatia Selvagem. Você pode se comunicar 
+com animais por meio de linguagem corporal e vocali-
+zações. Você pode usar Adestra-
+mento para mudar atitude e 
+persuasão com animais (veja 
+Diplomacia, na página 
+118). Caso receba esta 
+habilidade novamente, 
+recebe +2 em 
+Adestra-
+mento.
+Lisandra. 
+Lisandra. 
+As meias-dríades 
+As meias-dríades 
+começam a 
+começam a 
+explorar Arton
+explorar Arton
+21
+
+--- Page 28 ---
+Capítulo Um
+Elfo
+Os elfos vieram de longe há muito tempo, em embar-
+cações trazidas — dizem — por ventos divinos. São belos 
+e esguios, de cabelos e olhos de cores tão variadas quanto 
+o arco-íris. Suas vestes costumam ser intrincadas e fluidas 
+como seus movimentos. Nada neles parece comum, rasteiro. 
+É difícil não se sentir impressionado ou inspirado ao lado de 
+uma presença élfica. Há sempre algo de mágico nos elfos.
+Um dia eles tiveram sua própria pátria, Lenórienn, no 
+continente sul. Uma cidade majestosa, de torres espiraladas 
+surgidas em meio à floresta, onde a magia e as artes eram en-
+sinadas desde cedo. Onde tomos ancestrais ocupavam longas 
+estantes e a poesia tomava os ares com suas rimas e melodias.
+Mas o conhecimento trouxe a arrogância, e a arrogân-
+cia, a derrota. Lenórienn caiu, vítima da Aliança Negra 
+dos goblinoides, um exército implacável. Depois, por conta 
+de um estratagema de Glórienn, antiga 
+Deusa dos Elfos, os membros da raça 
+que não ficaram espalhados pelo Rei-
+nado foram escravizados pelos minotauros. O que sobrou 
+foi um povo mergulhado em amargor, apoiado nas glórias 
+de um passado destruído.
+Agora, porém, eles encaram uma chance de redenção. 
+Com a morte de Tauron e livres dos desígnios de uma di-
+vindade mesquinha, os elfos do Reinado têm pela primeira 
+vez um futuro em branco à frente. E ainda estão tentando 
+descobrir o que fazer com ele. Enquanto uns buscam recupe-
+rar os conhecimentos perdidos de seu antigo reino, outros se 
+misturam a ordens de cavalaria ou guildas de ladrões, usan-
+do seus talentos naturais para traçar seu próprio caminho, 
+abraçando os deuses que melhor lhes convêm.
+“Das maiores tragédias nascem os maiores aventureiros”, 
+diz um ditado que circula nas tavernas de Malpetrim. Parece 
+algo feito sob medida 
+para os elfos de Arton.
+— Garibaldo Cachimbo 
+Caído, hynne bardo
+Elfos são seres feitos 
+para a beleza e para a guer-
+ra, tão habilidosos com ma-
+gia quanto com espadas e arcos. Ele-
+gantes, astutos, de vidas quase eternas, 
+parecem superiores aos humanos em 
+tudo. Poderiam ter governado toda 
+Arton, não fosse a arrogância her-
+dada de sua deusa. Com a queda 
+de Glórienn, os elfos se tornaram 
+um povo sem uma deusa. Um 
+povo independente. Enquan-
+to alguns veem a falta de uma 
+divindade como uma tragédia, 
+outros acreditam que, pela pri-
+meira vez na história, são livres.
+Habilidades 
+de Raça
+Inteligência +2, Destreza +1, 
+Constituição –1.
+Graça de Glórienn. Seu deslo-
+camento é 12m (em vez de 9m).
+Sangue Mágico. Você recebe 
++1 ponto de mana por nível.
+Sentidos 
+Élficos. 
+Você 
+recebe visão na penumbra e +2 em 
+Misticismo e Percepção.
+Gwen e Fren. Os elfos 
+Gwen e Fren. Os elfos 
+tentam superar um 
+tentam superar um 
+passado arrogante 
+passado arrogante 
+e trágico
+e trágico
+22
+ 
+
+--- Page 29 ---
+Construção de Personagem
+Goblin
+Não importa se você gosta ou não de goblins. Se você se 
+importa com eles ou se os odeia. Se os tem como amigos ou se 
+acredita que são meras pestes.
+Goblins sempre existirão.
+Sabemos que eles se reproduzem em grande quantidade 
+e de forma vertiginosa, mas sua origem divina é complicada, 
+com explicações que dão voltas e se contradizem, assim como 
+a tradição oral da raça. A mais popular é que Graolak, o 
+Deus dos Goblins, foi o responsável direto, aproveitando 
+para criar a raça à sua imagem e semelhança, usando os 
+restos de um banquete do Panteão, enquanto os vinte deuses 
+maiores dormiam. Mas academicamente existem dúvidas até 
+se Graolak realmente existiu.
+O que se pode dizer de verdade é que poucos goblins se 
+importam com o que os acadêmicos pensam. A menos que os 
+acadêmicos queiram aprender sobre suas engenhocas insanas.
+Pequenos, de pele rugosa verde, marrom ou amarela, 
+orelhas longas e nariz pontudo, os goblins vivem nas frestas 
+do mundo civilizado. No Reinado, habitam zonas de grande 
+pobreza. Nos ermos, ficam entocados em cavernas. Erronea-
+mente são vistos como inferiores — ou, na pior das hipóteses, 
+como monstros.
+Mas essa é uma visão simplista. O que define os goblins 
+é perseverança e inventividade. Eles criam engenhocas que 
+desafiam a lógica — máquinas cheias de peças, sempre expe-
+lindo fumaça e ameaçando explodir. Também são aeronautas 
+pioneiros: um piloto ou baloeiro goblin pode 
+levá-lo a qualquer lugar de Arton por um preço 
+módico, desde que você não se importe com uma 
+eventual queda desastrosa.
+O instinto de sobrevivência e a 
+agilidade tornam os goblins aventu-
+reiros furtivos e malandros. A necessidade 
+de se virar com o que têm faz com que 
+possam improvisar melhor do que o 
+mais criativo humano. Para quem 
+nasceu sem nada, qualquer 
+coisa é uma ferramenta, uma 
+arma, um tesouro. Além dis-
+so, aos que sabem reconhe-
+cer seu valor, um goblin 
+pode ser um parceiro para 
+a vida toda.
+Se você não se 
+importar com servir 
+de cobaia para alguns 
+inventos...
+— Leona Steelblade, 
+humana cavaleira arcana
+Estes pequenos seres feiosos conseguiram um 
+lugar entre os povos do Reinado. Podem ser encon-
+trados em todas as grandes cidades, muitos vivendo 
+na imundície, outros prosperando em carreiras que 
+quase ninguém tentaria: espiões, aeronautas, enge-
+nhoqueiros. Onde o anão teimoso e o elfo empolado 
+falham, o goblin pode dar um jeito. Porque ele não 
+tem vergonha. Nem orgulho. Nem bom senso. 
+Habilidades de Raça
+Destreza +2, Inteligência +1, Carisma –1.
+Engenhoso. Você não sofre penalidades em 
+testes de perícia por não usar ferramentas. Se usar a 
+ferramenta necessária, recebe +2 no teste de perícia.
+Espelunqueiro. Você recebe visão no escuro 
+e deslocamento de escalada igual ao seu deslocamen-
+to terrestre.
+Peste Esguia. Seu tamanho é Pequeno (veja a 
+página 106), mas seu deslocamento se mantém 9m. 
+Apesar de pequenos, goblins são rápidos.
+Rato das Ruas. 
+Você recebe +2 em 
+Fortitude e sua 
+recuperação 
+de PV e PM 
+nunca é 
+inferior ao 
+seu nível.
+Dok e Gradda. 
+Dok e Gradda. 
+Engenhosos 
+Engenhosos 
+e astutos, 
+e astutos, 
+mas a seu 
+mas a seu 
+próprio modo
+próprio modo
+23
+
+--- Page 30 ---
+Capítulo Um
+Lefou
+Em minhas andanças, encontrei membros das mais 
+variadas raças. De todas, a mais misteriosa é a dos lefou.
+De forma bem pouco lisonjeira, parcelas da sociedade os 
+definem como pouco mais que filhos rejeitados da Tormenta. 
+São considerados meios-demônios, como se a tempestade 
+aberrante pudesse atacar um corpo e deixar suas marcas 
+como faz com a própria Arton. Corrompendo de forma 
+irreversível o que antes era puro.
+Pensando assim, até faz sentido. Um lefou pode surgir 
+simplesmente porque os pais são aventureiros que tiveram 
+contato com a Tormenta. Ou enfrentaram a tempestade 
+rubra. Como uma doença, uma insidiosa vingança contra 
+aqueles que a tentaram destruir, talvez?
+Em suas características, entretanto, um lefou não é 
+distante de seus pais. Um filho de pais humanos parecerá 
+humano. O mesmo é verdade para os lefou filhos de outras 
+raças. Mas a cria carregará consigo sempre uma 
+mácula. Algo diferente, uma deformidade ou ca-
+racterística que pode causar incômodo, embora lhe 
+possa trazer alguma vantagem. Um par de antenas. 
+Uma crosta sobre a pele. Garras. A marca indelével de 
+que a Tormenta esteve ali e sempre estará.
+Claro, esta é uma versão preconceituosa. É 
+verdade que, com a ascensão de Aharadak, os cultos 
+se espalharam, e lefou têm sido procurados para 
+assumir altas posições nas ordens de adoradores, 
+mas muitos deles fazem exatamente o contrário. Aproveitam 
+sua familiaridade com a maior ameaça de Arton para lutar 
+contra ela. Estudam, treinam, dominam seus poderes para 
+usá-los quando a tempestade rubra atacar.
+E o que é melhor do que ter ao seu lado alguém que 
+conhece tão intimamente o inimigo?
+— Sir Porti, moreau do cão paladino de Thyatis
+Com a influência macabra da Tormenta perme-
+ando cada vez mais o mundo, surgiram os lefou. 
+Estes meios-demônios de aparência grotesca passa-
+ram a nascer em famílias de outras raças, sendo logo 
+sacrificados ou expulsos. Entre os que escapam, por 
+sua facilidade em manifestar poderes aberrantes, 
+muitos escolhem abraçar o mal, enquanto outros 
+decidem combatê-lo.
+Habilidades de Raça
++1 em Três Atributos Diferentes 
+(exceto Carisma), Carisma –1.
+Cria da Tormenta. Você é uma 
+criatura do tipo monstro e re-
+cebe +5 em testes de re-
+sistência contra efei-
+tos causados por lefeu e 
+pela Tormenta.
+Deformidade. 
+Todo lefou possui defeitos 
+físicos que, embora desa-
+gradáveis, conferem cer-
+tas vantagens. Você recebe 
++2 em duas perícias a sua 
+escolha. Cada um desses 
+bônus conta como um po-
+der da Tormenta (exceto 
+para perda de Carisma). 
+Você pode trocar um des-
+ses bônus por um po-
+der da Tormenta a sua 
+escolha (ele também 
+não conta para perda 
+de Carisma).
+Asha e Ichabod. 
+Asha e Ichabod. 
+Ser meio-demônio 
+Ser meio-demônio 
+da Tormenta não 
+da Tormenta não 
+significa ser maligno
+significa ser maligno
+24
+ 
+
+--- Page 31 ---
+Construção de Personagem
+Minotauro
+Ah, os minotauros. Talvez o maior paradoxo de Arton 
+atualmente. E talvez o maior retrato de como as coisas são 
+mutáveis e, no fim, a roda gira.
+Com suas legiões de soldados e disciplina pétrea, toma-
+ram o que puderam com a justificativa de que o forte deve 
+sempre proteger o mais fraco, preceito de Tauron, o Deus 
+da Força. Provaram-se vencedores, conquistadores. A seus 
+próprios olhos, protetores. E acima de tudo, fortes.
+Mas nada permanece como é por muito tempo em 
+Arton, e a derrocada veio. Numa tentativa de proteger seu 
+povo do Lorde da Tormenta Aharadak, Tauron desceu dos 
+céus e o enfrentou. Mas perdeu.
+Tauron morreu na luta contra a Tor-
+menta. Seu gigantesco cadáver está estira-
+do sobre Tiberus, a capital do Império de 
+Tauron, domínio dos minotauros. Tiberus 
+se encontra numa luta incessante contra as 
+forças da Tormenta, e o corpo do deus é a lem-
+brança de que mesmo o mais forte um dia 
+pode ser derrotado.
+As legiões dos minotauros lu-
+tam dia e noite contra a tempesta-
+de rubra, mantendo aceso o espí-
+rito guerreiro da raça e tentando 
+preservar o império fragmenta-
+do. Os orgulhosos minotauros 
+já conhecem a derrota, o medo 
+e a fraqueza.
+Por conta disso, mino-
+tauros hoje se espalham por 
+Arton para provar que seus 
+princípios ainda são verdadei-
+ros, mesmo que sua divindade 
+não exista mais. São disciplinados, 
+normalmente sisudos e deter-
+minados. Sua pelagem 
+tem cores variadas, 
+seus chifres são seu or-
+gulho. Sua força é seu 
+maior trunfo. Ter um mi-
+notauro como companheiro é contar 
+com proteção constante e garantida. 
+— Masaru Yudai, lefou monge feiticeiro
+Povo guerreiro, orgulhoso e poderoso, 
+criadores de uma civilização avançada, com 
+a missão sagrada de proteger e governar 
+os fracos — ou assim se enxergavam. 
+Em seus tempos áureos, tomaram 
+grande parte de Arton. Hoje, após 
+a morte de sua divindade e a decadência de seu Impé-
+rio, os minotauros lutam para recuperar a glória per-
+dida ou encontrar um novo papel no mundo.
+Habilidades de Raça
+Força +2, Constituição +1, Sabedoria –1.
+Chifres. Você possui uma arma natural de 
+chifres (dano 1d6, crítico x2, perfuração). Uma vez 
+por rodada, quando usa a ação agredir para atacar 
+com outra arma, pode gastar 1 PM para fazer um 
+ataque corpo a corpo extra com os chifres.
+Couro Rígido. Sua pele é dura como a de um 
+touro. Você recebe +1 na Defesa.
+Faro. Você tem olfato apurado. Contra 
+inimigos em alcance curto que não 
+possa perceber, você não fica 
+desprevenido e camufla-
+gem total lhe causa ape-
+nas 20% de chance 
+de falha.
+Medo de Altura. 
+Se estiver adjacente a 
+uma queda de 3m ou mais 
+de altura (como um buraco ou 
+penhasco), você fica abalado.
+Artorius. 
+Artorius. 
+Uma nova era 
+Uma nova era 
+aguarda o povo 
+aguarda o povo 
+de Tauron
+de Tauron
+25
+
+--- Page 32 ---
+Capítulo Um
+Descendentes de poderosos gênios, os qareen são 
+otimistas, generosos e prestativos, sempre ansiosos 
+por ajudar. Consideram-se abençoados pela Deusa da 
+Magia, exibindo como evidência a marca de Wynna 
+em seus corpos. Sua magia é mais poderosa quando 
+usada para realizar desejos de outros.
+Habilidades de Raça
+Carisma +2, Inteligência +1, Sabedoria –1.
+Desejos. Se lançar uma magia que alguém te-
+nha pedido desde seu último turno, o custo da magia 
+diminui em –1 PM. Fazer um desejo ao qareen é uma 
+ação livre.
+Resistência Elemental. Conforme sua 
+ascendência, você recebe redução 10 a um tipo de 
+dano. Escolha uma: frio (qareen da água), eletricida-
+de (do ar), fogo (do fogo), ácido (da terra), luz (da 
+luz) ou trevas (qareen das trevas).
+Tatuagem Mística. Você 
+pode lançar uma magia de 1º 
+círculo a sua escolha (atri-
+buto-chave Carisma). Caso 
+aprenda novamente essa 
+magia, seu custo dimi-
+nui em –1 PM. e
+Qareen
+Embora lembrem humanos de aparência magnífica, qa-
+reen são seres mágicos. Não só no sentido de sua curiosidade 
+e modo alegre de ver a vida, mas por serem uma mistura de 
+mortais com gênios. Cada um deles carrega no corpo elabo-
+radas tatuagens que são o símbolo de seu poder. Uma “marca 
+de Wynna”, como eles mesmos chamam, que brilha sempre 
+que uma de suas habilidades mágicas é utilizada. 
+Os qareen são filhos de Wynna, a Deusa da Magia. 
+Para eles, fazer mágica é tão natural quanto respirar e 
+atender a desejos é um instinto primordial. Assim como sua 
+deusa mãe, este povo é generoso, curioso e encantador.
+Os qareen têm o espírito desbravador inerente aos 
+aventureiros, seja para satisfazer as próprias vontades, seja 
+para auxiliar grupos de heróis mundanos. Carismáticos, 
+atraem para si novos amigos assim como o calor de uma 
+fogueira atrai um viajante perdido e enregelado. Concedem 
+pequenos desejos, mágicos ou não, àqueles que abrem o 
+coração e fazem um pedido.
+E, se você não acredita em receber um desejo sem dar 
+algo em troca, é porque ainda não teve a 
+felicidade de conhecer um qareen.
+— Nagard Wyrmslayer, 
+humano guardião 
+da realidade
+Kadeen e Niala. 
+Kadeen e Niala. 
+Meios-gênios 
+Meios-gênios 
+estão sempre 
+estão sempre 
+dispostos 
+dispostos 
+a ajudar
+a ajudar
+26
+ 
+
+--- Page 33 ---
+Construção de Personagem
+Raças Extras
+Golem
+Diz-se que estes seres são apenas construtos 
+sem vida, criados não pelos deuses, mas por mortais. 
+No entanto, são movidos por forças vivas — espíri-
+tos elementais selvagens, capturados e lacrados por 
+meios mágicos em corpos de pedra e metal. Muitos 
+conformam-se com seus papéis como trabalhadores 
+e soldados, enquanto outros demonstram alta inteli-
+gência, personalidade e iniciativa. Podem fazer tudo 
+que outras raças fazem, até mesmo conjurar magias. 
+Será que têm alma? Será que encontrarão os deuses 
+quando chegar sua hora?
+Força +2, Constituição +1, 
+Carisma –1.
+Chassi. Seu corpo artificial é resis-
+tente, mas rígido. Seu deslocamento é 
+6m, mas não é reduzido por uso de arma-
+dura ou excesso de carga. Você recebe +2 
+na Defesa, mas possui penalidade de armadu-
+ra –2. Você leva um dia para vestir ou remover 
+uma armadura (pois precisa acoplar as peças dela 
+a seu chassi). Por ser acoplada, sua armadura não 
+conta no limite de itens que você pode usar (mas 
+você continua só podendo usar uma armadura).
+Criatura Artificial. Você é uma criatura do 
+tipo construto. Recebe visão no escuro e imunidade 
+a efeitos de cansaço, metabólicos e de veneno. Além 
+disso, não precisa respirar, alimentar-se ou dormir, 
+mas não se beneficia de cura mundana e de itens 
+da categoria alimentação. Você precisa ficar inerte 
+por oito horas por dia para recarregar sua fonte de 
+energia. Se fizer isso, recupera PV e PM por descanso 
+em condições normais (golens não são afetados 
+por condições boas ou ruins de descanso). Por fim, 
+a perícia Cura não funciona em você, mas Ofício 
+(artesão) pode ser usada no lugar dela.
+Fonte Elemental. Você possui um espírito 
+elemental preso em seu corpo. Escolha entre água 
+(frio), ar (eletricidade), fogo (fogo) e terra (ácido). 
+Você é imune a dano desse tipo. Se fosse sofrer dano 
+mágico desse tipo, em vez disso cura PV em quan-
+tidade igual à metade do dano. Por exemplo, se um 
+golem com espírito elemental do fogo é atingido por 
+uma Bola de Fogo que causa 30 pontos de dano, em 
+vez de sofrer esse dano, ele recupera 15 PV.
+Propósito de Criação. Você foi construído 
+“pronto” para um propósito específico e não teve 
+uma infância. Você não tem direito a escolher uma 
+origem, mas recebe um poder geral a sua escolha.
+Hynne
+Também conhecidos como halflings ou “peque-
+ninos”, os hynne são apreciadores de boa comida 
+e casas aconchegantes, raras vezes escolhendo sair 
+pelo mundo em aventuras perigosas. Quando deci-
+dem fazê-lo, contudo, recorrem à agilidade e encan-
+to naturais para ludibriar os inimigos — mais de um 
+taverneiro ou miliciano deixou-se enganar por suas 
+mãos ligeiras e sorrisos inocentes. Foram re-
+centemente forçados a fugir de seu antigo rei-
+no natal, sendo então acolhidos pelas Repú-
+blicas Livres de Sambúrdia, onde cultivam 
+ervas e especiarias valiosas. Para espan-
+to de todos, também se tor-
+naram astutos mercadores, 
+muitos ascendendo a 
+príncipes mercantes.
+Hynne são 
+Hynne são 
+simpáticos e 
+simpáticos e 
+furtivos, mas 
+furtivos, mas 
+golens podem 
+golens podem 
+ser o que menos 
+ser o que menos 
+se espera
+se espera
+27
+
+--- Page 34 ---
+Capítulo Um
+Destreza +2, Carisma +1, Força –1.
+Arremessador. Quando faz um ataque à dis-
+tância com uma funda ou uma arma de arremesso, 
+seu dano aumenta em um passo.
+Pequeno e Rechonchudo. Seu tamanho é 
+Pequeno (veja a página 106) e seu deslocamento é 6m. 
+Você recebe +2 em Enganação e pode usar Destreza 
+como atributo-chave de Atletismo (em vez de Força).
+Sorte Salvadora. Quando faz um teste de 
+resistência, você pode gastar 1 PM para rolar este 
+teste novamente.
+Kliren
+Estes visitantes de outro mundo seriam uma 
+combinação entre humanos e gnomos — mas, 
+afinal, o que são gnomos? São uma raça 
+que talvez existisse em Arton, não fosse o envolvi-
+mento criminoso de seu deus Tilliann na criação da 
+própria Tormenta. Seja como for, os kliren somam 
+a alta inteligência gnômica e a curiosidade humana, 
+resultando em seres de extrema engenhosidade, 
+criatividade e talento com aparatos mecânicos. Se-
+riam capazes de grandes feitos, talvez até dominar 
+Arton, não fossem a impulsividade e imprudência 
+que por vezes abreviam suas vidas...
+Inteligência +2, Carisma +1, Força –1.
+Híbrido. Sua natureza multifacetada fez com 
+que você aprendesse conhecimentos variados. Você 
+se torna treinado em uma perícia a sua escolha (não 
+precisa ser da sua classe).
+Engenhosidade. Quando faz um teste de 
+perícia, você pode gastar 2 PM para somar sua 
+Inteligência no teste. Você não pode usar esta 
+habilidade em testes de ataque. Caso receba esta 
+habilidade novamente, seu custo é reduzido em 
+–1 PM.
+Ossos Frágeis. Você sofre 1 ponto de 
+dano adicional por dado de dano de impacto. 
+Por exemplo, se for atingido por uma clava 
+(dano 1d6), sofre 1d6+1 
+pontos de dano. Se cair de 
+3m de altura (dano 2d6), sofre 
+2d6+2 pontos de dano.
+Vanguardista. Você re-
+cebe proficiência em armas de 
+fogo e +2 em Ofício (um qualquer, a sua 
+escolha).
+Medusa
+Ainda que estas criaturas 
+reclusas sejam famosas por 
+transformar suas vítimas em 
+pedra com um simples olhar, 
+apenas as mais antigas e 
+poderosas o fazem. 
+Jovens medusas 
+por vezes 
+rejeitam 
+a solidão 
+e crueldade racial, aventurando-
+se no Reinado, até mesmo fazendo 
+amigos ou integrando equipes de 
+heróis. Conseguem se fazer passar por 
+mulheres humanas, quando 
+escondem o cabelo feito de 
+serpentes. O único povo que 
+não teme medusas são os anões, 
+que as consideram belas musas.
+Os meios-
+Os meios-
+gnomos kliren, 
+gnomos kliren, 
+ou as exóticas 
+ou as exóticas 
+medusas: 
+medusas: 
+quem é mais 
+quem é mais 
+perigoso?
+perigoso?
+28
+ 
+
+--- Page 35 ---
+Construção de Personagem
+Destreza +2, Carisma +1.
+Cria de Megalokk. Você é uma criatura do 
+tipo monstro e recebe visão no escuro.
+Natureza Venenosa. Você recebe resistência 
+a veneno +5 e pode gastar uma ação de movimento e 
+1 PM para envenenar uma arma que esteja usando. A 
+arma causa perda de 1d12 pontos de vida. O veneno 
+dura até você acertar um ataque ou até o fim da cena 
+(o que acontecer primeiro). Veneno.
+Olhar Atordoante. Você pode gastar uma 
+ação de movimento e 1 PM para forçar uma criatura 
+em alcance curto a fazer um teste de Fortitude (CD 
+Car). Se a criatura falhar, fica atordoada por uma 
+rodada (apenas uma vez por cena).
+Osteon
+Esqueletos sempre foram temidos como mons-
+tros profanos, movidos por puro rancor pelos vi-
+vos. Isso mudou; conhecidos como osteon, estes 
+esqueletos demonstram a inteligência e a cons-
+ciência das raças vivas, sendo capazes de adotar 
+quaisquer de suas profissões e devoções. Alguns 
+atribuem seu surgimento à queda de Ragnar, 
+antigo Deus da Morte; outros dizem ser conse-
+quência da ascensão de Ferren Asloth como 
+um poderoso lich, transformando a nação 
+de Aslothia em um reino necromante.
++1 em Três Atributos Diferen-
+tes (exceto Constituição), Consti-
+tuição –1.
+Armadura Óssea. Você recebe redu-
+ção de corte, frio e perfuração 5.
+Memória Póstuma. Você se torna 
+treinado em uma perícia (não precisa ser da 
+sua classe) ou recebe um poder geral a sua 
+escolha. Como alternativa, você pode ser um 
+osteon de outra raça humanoide que não hu-
+mano. Neste caso, você ganha uma habilida-
+de dessa raça a sua escolha. Se a raça era de 
+tamanho diferente de Médio, você também 
+possui sua categoria de tamanho.
+Natureza Esquelética. Você é uma 
+criatura do tipo morto-vivo. Recebe visão no escu-
+ro e imunidade a efeitos de cansaço, me-
+tabólicos, de trevas e de veneno. Além 
+disso, não precisa respirar, alimentar-
+-se ou dormir. Por fim, efeitos má-
+gicos de cura de luz causam dano a 
+você e você não se beneficia de itens 
+da categoria alimentação, mas dano 
+de trevas recupera seus PV.
+Preço da Não Vida. Você precisa passar oito 
+horas sob a luz de estrelas ou no subterrâneo. Se 
+fizer isso, recupera PV e PM por descanso em condi-
+ções normais (osteon não são afetados por condições 
+boas ou ruins de descanso). Caso contrário, sofre os 
+efeitos de fome.
+Sereia/tritão
+Sendo chamadas sereias quando femininas e 
+tritões quando masculinos, os membros desta raça 
+de torso humanoide e corpo de peixe podem adotar 
+forma bípede para caminhar em terras emersas — 
+algo que têm feito com cada vez mais frequência. 
+Enquanto algumas sereias temem ou desprezam 
+os humanos, outras enxergam Arton como um 
+mundo misterioso, exótico, cheio de 
+oportunidades e aventuras.
+Arton terá 
+Arton terá 
+que aceitar 
+que aceitar 
+esqueletos 
+esqueletos 
+inteligentes 
+inteligentes 
+e sereias em 
+e sereias em 
+terra firme
+terra firme
+29
+
+--- Page 36 ---
+Capítulo Um
++1 em Três Atributos Diferentes.
+Canção dos Mares. Você pode lançar duas 
+das magias a seguir: Amedrontar, Comando, Despedaçar, 
+Enfeitiçar, Hipnotismo ou Sono (atributo-chave Caris-
+ma). Caso aprenda novamente uma dessas magias, 
+seu custo diminui em –1 PM. e
+Mestre do Tridente. Para você, o tridente é 
+uma arma simples. Além disso, você recebe +2 em 
+rolagens de dano com azagaias, lanças e tridentes.
+Transformação Anfíbia. Você pode respirar 
+debaixo d’água e possui uma cauda que fornece des-
+locamento de natação 12m. Quando fora d’água, sua 
+cauda desaparece e dá lugar a pernas (deslocamento 
+9m). Se permanecer mais de um dia sem contato com 
+água, você não recupera PM com descanso até voltar 
+para a água (ou, pelo menos, tomar um bom banho!).
+Sílfide
+As mais numerosas fadas em Arton são estas 
+criaturinhas (alguns diriam “pestes”) esvoaçantes, 
+com suas delicadas asas de inseto e grandes olhos 
+escuros. Curiosas e brincalhonas, parecem sempre 
+à procura de alguma diversão, levando todos a su-
+bestimá-las quando o assunto exige seriedade. É ver-
+dade que seu entusiasmo e inocência podem causar 
+problemas. Também é verdade que gostam de usar 
+magias e ilusões para pregar peças. Pensando bem, 
+ninguém até hoje encontrou um bom motivo para 
+aceitar uma sílfide em um grupo de aventureiros...
+Carisma +2, Destreza +1, Força –2.
+Asas de Borboleta. Seu tamanho é Minús-
+culo. Você pode pairar a 1,5m do chão com desloca-
+mento 9m. Isso permite que você ignore terreno di-
+fícil e o torna imune a dano por queda (a menos que 
+esteja inconsciente). Você pode gastar 1 PM por ro-
+dada para voar com deslocamento de 12m.
+Espírito da Natureza. Você é uma 
+criatura do tipo espírito, recebe visão na pe-
+numbra e pode falar com animais livremente.
+Magia das Fadas. Você 
+pode lançar duas das ma-
+gias a seguir (atributo-cha-
+ve Carisma): Criar Ilusão, 
+Enfeitiçar, Luz (como uma magia ar-
+cana) e Sono. Caso aprenda novamen-
+te uma dessas magias, seu custo dimi-
+nui em –1 PM. e
+Suraggel
+Descendentes de extraplanares divinos, 
+esta raça é formada por seres com traços 
+angelicais ou demoníacos — ou ambos. 
+Por serem ligados às forças opostas da 
+luz e trevas, suraggel têm traços di-
+ferentes quando orientados para seu 
+lado celestial, sendo então conhe-
+cidos como aggelus; ou para o lado 
+abissal, assim sendo chamados sul-
+fure. Sua natureza em geral combi-
+na com a ascendência, lembrando ha-
+bitantes dos Mundos dos Deuses, mas 
+eles também podem ser surpreendentes 
+e contraditórios: não se espante muito ao 
+conhecer um aggelus ladino ou um sul-
+fure paladino.
+Sabedoria +2, Carisma +1 
+(Aggelus); Destreza +2, Inte-
+ligência +1 (Sulfure).
+Entre a fadinha 
+Entre a fadinha 
+zombeteira e o 
+zombeteira e o 
+celestial/abissal, 
+celestial/abissal, 
+em quem confiar?
+em quem confiar?
+30
+ 

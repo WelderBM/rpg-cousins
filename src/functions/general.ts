@@ -853,29 +853,88 @@ export function getSkillsAndPowersByClassAndOrigin(
     },
   };
 }
-function getWeapons(classe: ClassDescription) {
-  const weapons = [];
+export function getWeapons(
+  classe: ClassDescription,
+  selectedWeapons?: Equipment[]
+) {
+  // Se o usuário já escolheu armas específicas no wizard, use-as
+  if (selectedWeapons && selectedWeapons.length > 0) {
+    return selectedWeapons;
+  }
 
-  weapons.push(getRandomItemFromArray(EQUIPAMENTOS.armasSimples));
+  const weapons: Equipment[] = [];
 
-  if (classe.proficiencias.includes(todasProficiencias.MARCIAIS)) {
-    weapons.push(getRandomItemFromArray(EQUIPAMENTOS.armasMarciais));
+  switch (classe.name) {
+    case "Arcanista":
+      weapons.push(Armas.BORDAO);
+      break;
+    case "Barbaro":
+      weapons.push(Armas.MONTANTE);
+      break;
+    case "Bardo":
+      weapons.push(Armas.FLORETE);
+      break;
+    case "Bucaneiro":
+      weapons.push(Armas.FLORETE);
+      break;
+    case "Caçador":
+      weapons.push(Armas.ARCOCURTO);
+      weapons.push(Armas.ESPADACURTA);
+      weapons.push(Armas.ESPADACURTA);
+      break;
+    case "Cavaleiro":
+      weapons.push(Armas.ESPADA_LONGA);
+      break;
+    case "Clerigo":
+      weapons.push(Armas.MACA);
+      break;
+    case "Druida":
+      weapons.push(Armas.FOICE);
+      break;
+    case "Guerreiro":
+      weapons.push(Armas.ESPADA_LONGA);
+      break;
+    case "Inventor":
+      weapons.push(Armas.ADAGA);
+      break;
+    case "Ladino":
+      weapons.push(Armas.ADAGA);
+      weapons.push(Armas.BESTALEVE);
+      break;
+    case "Lutador":
+      weapons.push(Armas.MANOPLA);
+      break;
+    case "Nobre":
+      weapons.push(Armas.ESPADA_LONGA);
+      break;
+    case "Paladino":
+      weapons.push(Armas.ESPADA_LONGA);
+      break;
+    default:
+      weapons.push(Armas.ADAGA);
   }
 
   return weapons;
 }
 
-function getShields(classe: ClassDescription) {
-  const shields = [];
+export function getShields(classe: ClassDescription) {
+  const shields: DefenseEquipment[] = [];
   if (classe.proficiencias.includes(todasProficiencias.ESCUDOS)) {
-    shields.push(Escudos.ESCUDOLEVE);
+    if (
+      ["Cavaleiro", "Guerreiro", "Paladino"].includes(classe.name) ||
+      classe.proficiencias.includes(todasProficiencias.PESADAS)
+    ) {
+      shields.push(Escudos.ESCUDO_PESADO);
+    } else {
+      shields.push(Escudos.ESCUDOLEVE);
+    }
   }
 
   return shields;
 }
 
-function getArmors(classe: ClassDescription, currentBag?: Bag) {
-  // Se já tem armadura no bag, não gerar nova
+export function getArmors(classe: ClassDescription, currentBag?: Bag) {
+  // Se já tem armadura no bag (ex: de origem), não gerar nova
   if (
     currentBag?.equipments?.Armadura &&
     currentBag.equipments.Armadura.length > 0
@@ -883,29 +942,29 @@ function getArmors(classe: ClassDescription, currentBag?: Bag) {
     return [];
   }
 
-  const armors = [];
+  const armors: DefenseEquipment[] = [];
   if (classe.proficiencias.includes(todasProficiencias.PESADAS)) {
     armors.push(Armaduras.BRUNEA);
-  } else if (classe.name !== "Arcanista") {
-    armors.push(getRandomItemFromArray(EQUIPAMENTOS.armadurasLeves));
+  } else if (classe.name !== "Arcanista" && classe.name !== "Lutador") {
+    armors.push(Armaduras.ARMADURADECOURO);
   }
 
   return armors;
 }
 
-function getClassEquipments(
+export function getClassEquipments(
   classe: ClassDescription,
-  currentBag?: Bag
+  currentBag?: Bag,
+  selectedWeapons?: Equipment[]
 ): Pick<BagEquipments, "Arma" | "Escudo" | "Armadura" | "Item Geral"> {
-  const weapons = getWeapons(classe);
+  const weapons = getWeapons(classe, selectedWeapons);
   const shields = getShields(classe);
   const armors = getArmors(classe, currentBag);
 
   const instruments: Equipment[] = [];
   if (classe.name === "Bardo") {
-    const instrumentName = getRandomItemFromArray(bardInstruments);
     instruments.push({
-      nome: instrumentName,
+      nome: "Alaúde",
       group: "Item Geral",
     });
   }
@@ -925,14 +984,25 @@ function getInitialBag(
 ): Bag {
   // 6.1 A depender da classe os itens podem variar
   const initialMoney = getInitialMoney(level, className);
-  const equipments: Partial<BagEquipments> = {
-    "Item Geral": [
-      {
-        nome: `T$ ${initialMoney}`,
-        group: "Item Geral",
-      },
-    ],
+
+  const equipments: BagEquipments = {
+    Arma: [],
+    Armadura: [],
+    Escudo: [],
+    "Item Geral": [],
+    Alquimía: [],
+    Vestuário: [],
+    Hospedagem: [],
+    Alimentação: [],
+    Animal: [],
+    Veículo: [],
+    Serviço: [],
   };
+
+  equipments["Item Geral"].push({
+    nome: `T$ ${initialMoney}`,
+    group: "Item Geral",
+  });
 
   const originItems = origin?.getItems();
 
@@ -942,10 +1012,22 @@ function getInitialBag(
         nome: `${equip.qtd ? `${equip.qtd}x ` : ""}${equip.equipment}`,
         group: "Item Geral",
       };
-      equipments["Item Geral"]?.push(newEquip);
+      equipments["Item Geral"].push(newEquip);
     } else {
-      // É uma arma
-      equipments.Arma?.push(equip.equipment);
+      const item = equip.equipment;
+      // Classify item based on its group
+      if (item.group === "Armadura") {
+        equipments.Armadura.push(item as DefenseEquipment);
+      } else if (item.group === "Escudo") {
+        equipments.Escudo.push(item as DefenseEquipment);
+      } else if (item.group === "Arma") {
+        equipments.Arma.push(item);
+      } else if (equipments[item.group]) {
+        (equipments[item.group] as Equipment[]).push(item);
+      } else {
+        // Fallback for unexpected groups
+        equipments["Item Geral"].push(item);
+      }
     }
   });
 

@@ -11,7 +11,11 @@ const HUMANO: Race = {
   commonReligions:
     "Qualquer divindade do Panteão, com destaque para Valkaria (Deusa da Ambição).",
   attributes: {
-    attrs: [{ attr: "any", mod: 2 }],
+    attrs: [
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
+      { attr: "any", mod: 1 },
+    ],
   },
   faithProbability: {
     AHARADAK: 1,
@@ -22,7 +26,7 @@ const HUMANO: Race = {
     {
       name: "Versátil",
       description:
-        "Você se torna treinado em três perícias a sua escolha (não precisam ser da sua classe). Você pode trocar uma dessas perícias por um poder geral a sua escolha.",
+        "Você se torna treinado em duas perícias a sua escolha (não precisam ser da sua classe). Você pode trocar uma dessas perícias por um poder geral a sua escolha.",
       sheetActions: [
         {
           source: {

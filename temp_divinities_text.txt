@@ -1,0 +1,2041 @@
+
+--- Page 96 ---
+Capítulo Um
+Benefícios. Atletismo, Fortitude, Furtividade 
+(perícias); Desejo de Liberdade, Vitalidade (poderes).
+Desejo de Liberdade
+Ninguém voltará a torná-lo um escravo! Você re-
+cebe +5 em testes contra a manobra agarrar e efeitos 
+de movimento.
+Estudioso
+Não importa se você já nasceu apaixonado por 
+certo assunto, testemunhou um evento incrível que 
+atiçou sua curiosidade ou se viu forçado a estudar 
+por imposição familiar. Longos anos de sua vida 
+foram gastos em meio a livros e pergaminhos. Da 
+engenharia dos anões à geopolítica do Reinado, das 
+táticas militares puristas aos sistemas de conjura-
+ção da Academia Arcana, da anatomia dos dragões 
+aos enigmas cósmicos da Tormenta... em Arton não 
+faltam campos a conquistar, segredos a desvendar. 
+Agora, como aventureiro, você tem a chance de 
+vivenciar aquilo que aprendeu e também auxiliar o 
+grupo com o fruto de seus estudos.
+Itens. Coleção de livros (+1 em Conhecimento, 
+Guerra, Misticismo ou Nobreza, a sua escolha).
+Benefícios. Conhecimento, Guerra, Misticis-
+mo (perícias); Aparência Inofensiva, Palpite Funda-
+mentado (poderes).
+Palpite Fundamentado
+Quando vai fazer um teste de perícia original-
+mente baseada em Inteligência ou Sabedoria, você 
+pode gastar 2 PM para substituí-la por Conhecimento.
+Fazendeiro
+Boa parte da população de Arton jamais co-
+nheceu outro modo de viver. Em algum lugar na 
+perigosa transição entre os ermos e as cidades, você 
+trabalhou duro em campos e fazendas. Cultivando 
+a terra ou criando animais, viveu longos anos em 
+contato com a natureza, orando e trabalhando por 
+boas colheitas ou gado saudável, só ocasionalmente 
+visitando povoados para negociar sua produção. 
+Por que essa vida tranquila acabou? Sua família foi 
+assassinada por goblins? Sua fazenda foi devastada 
+por um dragão? Ou você apenas foi atraído pelo 
+chamado da aventura?
+Itens. Carroça, uma ferramenta agrícola 
+(mesmas estatísticas de uma lança), 10 rações de 
+viagem, um animal não combativo (como uma 
+galinha, porco ou ovelha).
+Benefícios. Adestramento, Cavalgar, Ofício, 
+Sobrevivência (perícias); Água no Feijão, Ginete 
+(poderes).
+Água no Feijão
+Você não sofre a penalidade de –5 e não gasta 
+matéria-prima adicional para fabricar pratos para 
+cinco pessoas.
+Forasteiro
+Você veio de longe. Sua cultura nativa é quase 
+ou totalmente desconhecida no Reinado, tornando-o 
+uma figura exótica, de hábitos estranhos. Você 
+pertence a uma tribo perdida nas Montanhas San-
+guinárias? Nasceu em uma bela cidade de cúpulas 
+douradas no Deserto da Perdição? Navegou em 
+navios audazes desde os Reinos de Moreania? Talvez 
+você até tenha chegado de outro mundo, através de 
+algum portal mágico. Será que conseguiu ajustar-se a 
+este Reinado, agora chamando-o de lar? Ou procura 
+até hoje o caminho de volta para casa?
+Itens. Equipamento de viagem, instrumento 
+musical exótico (+1 em uma perícia de Carisma 
+aprovada pelo mestre), traje estrangeiro.
+Benefícios. Cavalgar, Pilotagem, Sobrevi-
+vência (perícias); Cultura Exótica, Lobo Solitário 
+(poderes).
+Cultura Exótica
+Por sua diferente visão de mundo, você encontra 
+soluções inesperadas. Quando vai fazer um teste de 
+perícia que requer treinamento, você pode gastar 1 
+PM para ignorar esse requerimento para esse teste.
+Gladiador
+Combates de arena são um entretenimento 
+popular em Arton — a ponto de atrair muitos jovens 
+praticantes. Podem ser combates até a morte ou ape-
+nas encenações elaboradas ou ainda corridas de ca-
+valo, arquearia e outros esportes menos sangrentos. 
+Você se envolveu nesse mundo glamoroso por ser 
+tradição em sua família, por admirar algum gladiador 
+renomado ou apenas por sede de fama e fortuna. Um 
+evento traumático, uma desilusão ou o puro tédio 
+levou você a abandonar as arenas e aplausos, usando 
+sua experiência em torneios para viver aventuras.
+Itens. Uma arma marcial ou exótica, um item 
+sem valor recebido de um admirador.
+Benefícios. Atuação, Luta (perícias); Atraente, 
+Pão e Circo, Torcida, um poder de combate a sua 
+escolha (poderes).
+90
+ 
+
+--- Page 97 ---
+Construção de Personagem
+Pão e Circo
+Por seu treino em combates de exibição, você 
+sabe “bater sem machucar”. Pode escolher causar 
+dano não letal sem sofrer a penalidade de –5.
+Guarda
+Você atuou como agente da lei em uma vila ou 
+cidade. Nem de longe uma profissão tão glamorosa 
+ou emocionante quanto parece; boa parte de seu 
+trabalho resumia-se a guardar um portão, fazer ron-
+das tediosas ou recolher bêbados em tavernas. Pelo 
+menos você recebeu algum treino em investigação 
+e combate. Também tem consigo alguma boa arma, 
+que “esqueceu” de devolver quando abandonou a 
+milícia para se tornar aventureiro.
+Itens. Apito, insígnia da milícia, uma arma 
+marcial.
+Benefícios. Investigação, Luta, Percepção 
+(perícias); Detetive, Investigador, um poder de 
+combate a sua escolha (poderes).
+Detetive
+Você pode gastar 1 PM para substituir testes de 
+Percepção e Intuição por testes de Investigação até 
+o fim da cena.
+Herdeiro
+Você pertence a uma linhagem de nobres, mer-
+cadores, conjuradores, acadêmicos, assassinos, 
+ou outra atividade tradicional em sua família 
+— tão tradicional que, de você, não se espe-
+ra outra coisa. Pode ser uma longa e anti-
+quíssima ascendência, traçada até antes 
+da Grande Batalha, ou você apenas é fi-
+lho de uma importante personalidade. 
+Talvez tenha nascido em alguma or-
+dem de cavalaria em Bielefeld, ou uma 
+influente estirpe da nobreza de Dehe-
+on, ou como filho de um célebre arqui-
+mago com planos de enviá-lo à Aca-
+demia Arcana, ou até cresceu em 
+um culto familiar secreto a um 
+deus maligno. Graças a essa 
+herança, recebeu treino e 
+equipamento adequados. 
+Mas você pretende mesmo 
+seguir esse caminho?
+Itens. Um símbolo 
+de sua herança, como um 
+anel de sinete ou manto ceri-
+monial. Enquanto estiver com esse 
+item, você pode ser reconhecido por sua descendên-
+cia, o que pode ser bom... ou não!
+Benefícios. Misticismo, Nobreza, Ofício (pe-
+rícias); Comandar, Herança (poderes).
+Herança
+Você herdou um item de preço de até T$ 1.000. 
+Você pode escolher este poder duas vezes, para um 
+item de até T$ 2.000.
+Herói Camponês
+Quando o povoado foi atacado por goblins, você 
+empunhou o forcado para expulsá-los. Quando o 
+estábulo pegou fogo, você se arriscou para salvar 
+todos os animais. Quando todos temiam a mansão 
+assombrada na colina, você encontrou a carta de 
+amor perdida que trouxe descanso à alma torturada. 
+Você era o campeão local, amado pelo povo, mas 
+também destinado a feitos maiores. Houve comoção 
+quando você partiu para uma vida de aventuras, mas 
+Uma forasteira 
+Uma forasteira 
+do longínquo 
+do longínquo 
+Império de Jade
+Império de Jade
+91
+
+--- Page 98 ---
+Capítulo Um
+ninguém deixou de orar por seu sucesso. Talvez você 
+até tenha sido presenteado com alguma arma ou 
+item há tempos guardado no povoado.
+Itens. Instrumentos de ofício ou uma arma 
+simples, traje de plebeu.
+Benefícios. Adestramento, Ofício (perícias); 
+Coração Heroico, Sortudo, Surto Heroico, Torcida 
+(poderes).
+Coração Heroico
+Você recebe +3 pontos de mana. Quando atinge 
+um novo patamar (no 5º, 11º e 17º níveis), recebe 
++3 PM.
+Marujo
+Você foi tripulante em uma embarcação — um 
+barco pesqueiro, galé pirata, caravela exploradora, 
+trirreme dos minotauros... — no Mar Negro, no Mar 
+do Dragão-Rei ou mesmo ao longo do imenso Rio 
+dos Deuses. Você também pode ter trabalhado em 
+um veículo exótico, como um dirigível goblin, ou 
+mesmo em uma embarcação mágica, como as naves 
+vivas gog’magogue que viajam entre mundos!
+Itens. T$ 2d6 (seu último salário), corda.
+Benefícios. Atletismo, Jogatina, Pilotagem 
+(perícias); Acrobático, Passagem de Navio (poderes).
+Passagem de Navio
+Você consegue transporte marítimo para você e 
+seus aliados, sem custos, desde que todos paguem 
+com trabalho (passar em pelo menos um teste de pe-
+rícia adequado durante a viagem).
+Mateiro
+Nem todos em Arton vivem em cidades confor-
+tavelmente abastecidas por fazendeiros, mineiros ou 
+pescadores — muitas comunidades ainda obtêm sus-
+tento através da caça. Você aprendeu cedo a abater 
+animais selvagens para colocar comida na mesa, ou 
+como esporte de gosto duvidoso. Se você caça com 
+reverência a Allihanna ou apenas coleciona troféus 
+com orgulho, a escolha é sua. De qualquer forma, 
+para alguém habituado a flechar cervos e colocar 
+armadilhas para coelhos, combater ogros, demônios 
+e dragões seria apenas o passo seguinte.
+Itens. Arco curto, barraca, equipamento de 
+viagem, 20 flechas.
+Benefícios. Atletismo, Furtividade, Sobrevi-
+vência (perícias); Lobo Solitário, Sentidos Aguçados, 
+Vendedor de Carcaças (poderes).
+Vendedor de Carcaças
+Você pode extrair recursos de criaturas em um 
+minuto, em vez de uma hora, e recebe +5 no teste.
+Membro de Guilda
+Você foi, ou ainda é, membro atuante em 
+uma grande guilda — uma associação de artesãos, 
+mercadores, magos, criminosos ou mesmo aventu-
+reiros. A guilda forneceu o treinamento e equipa-
+mento necessários para suas atividades, esperando 
+que você seja útil em troca. Você se manteve fiel 
+a seus patronos, cumprindo missões e colhendo os 
+benefícios de pertencer a uma vasta organização? 
+Ou deixou essa vida para trás, sendo 
+agora desprezado ou até caçado por 
+seus antigos mestres?
+Itens. Gazua ou instrumen-
+tos de ofício.
+Benefícios. Diplomacia, Enga- 
+nação, Misticismo, Ofício (pe-
+rícias); Foco em Perícia, Rede de Contatos 
+(poderes).
+Rede de Contatos
+Graças à influência de sua guilda, você pode 
+usar Diplomacia para interrogar sem custo e em 
+um minuto (veja Investigação).
+Ingram Brassbones. 
+Ingram Brassbones. 
+Uma guilda pode 
+Uma guilda pode 
+ser valiosa ou 
+ser valiosa ou 
+um estorvo
+um estorvo
+92
+ 
+
+--- Page 99 ---
+Construção de Personagem
+Mercador
+Seguindo uma tradição de família, após herdar 
+um estabelecimento ou apenas como um jovem 
+empregado, você atuou como comerciante — pelo 
+menos por algum tempo. Uma tenda modesta em 
+algum grande mercado urbano? Uma caravana 
+mercante cruzando o Reinado? Um belo bazar na 
+prestigiada cidade voadora de Vectora? Após alguns 
+anos de negociações e jornadas (nem tão tranquilas 
+quanto outros imaginam), você talvez não tenha fi-
+cado rico, mas reuniu algum equipamento e dinheiro 
+suficientes para começar carreira como aventureiro.
+Itens. Carroça, trobo, mercadorias para vender 
+no valor de T$ 100.
+Benefícios. Diplomacia, Intuição, Ofício (pe-
+rícias); Negociação, Proficiência, Sortudo (poderes).
+Negociação
+Você pode vender itens 10% mais caro (não 
+cumulativo com barganha).
+Minerador
+Ser aventureiro é a profissão mais perigosa de 
+todas; ser mineiro, talvez a segunda mais perigosa. 
+Você mergulhou nas profundezas da terra atrás de 
+metais necessários à civilização ou riquezas em 
+gemas preciosas. Enquanto humanos e outras raças 
+consideram essa vida um pesadelo, quase todos os 
+anões acreditam ser a mais feliz das carreiras. A 
+escuridão e o sufocamento dos subterrâneos talvez 
+tenham sido assustadores, mas trouxeram a você 
+bens materiais valiosos, bem como informação pro-
+funda (sem trocadilhos) sobre túneis e masmorras.
+Itens. Gemas preciosas no valor de T$ 100, 
+picareta.
+Benefícios. 
+Atletismo, 
+Fortitude, 
+Ofício 
+(minerador) (perícias); Ataque Poderoso, Escavador, 
+Sentidos Aguçados (poderes).
+Escavador
+Você se torna proficiente em picaretas, causa +1 
+de dano com elas e não é afetado por terreno difícil 
+em masmorras e subterrâneos.
+Nômade
+Até onde se lembra, você nunca pertenceu a um 
+só lugar. Sua família viajava constantemente, como 
+parte de alguma grande caravana comercial, peregri-
+nação religiosa ou algum povo primitivo que nunca 
+praticou agricultura. Ou talvez suas razões para 
+viajar sejam bastante diferentes e pessoais — após 
+a quase extinção de seu povo, muitos elfos temem 
+criar raízes, enquanto a deusa Valkaria exige que 
+seus devotos se mantenham sempre em viagem. 
+Para você, habituado às estradas e sem laços com 
+nenhuma terra, bastou um pequeno passo para se 
+tornar aventureiro.
+Itens. Bordão, equipamento de viagem.
+Benefícios. Cavalgar, Pilotagem, Sobrevivência 
+(perícias); Lobo Solitário, Mochileiro, Sentidos Agu-
+çados (poderes).
+Mochileiro
+Seu limite de carga aumenta em 5 espaços.
+Pivete
+Você era uma criança de rua. Não conheceu seus 
+pais, foi abandonado por eles ou fugiu para evitar maus 
+tratos. Sem muitas escolhas na vida, aprendeu cedo 
+a sobreviver em grandes cidades, pedindo esmolas, 
+roubando bolsas ou cumprindo pequenas tarefas para 
+bandidos. Tornar-se aventureiro não parecia apenas 
+um jeito de ficar rico e famoso, mas também a única 
+chance de uma vida melhor. Talvez você não tenha as 
+armaduras e mantos chiques de seus companheiros, 
+mas sabe se virar nas ruas melhor que ninguém.
+Itens. Gazua, traje de plebeu, um animal urbano 
+(como um cão, gato, rato ou pombo).
+Benefícios. Furtividade, Iniciativa, Ladinagem 
+(perícias); Acrobático, Aparência Inofensiva, Que-
+bra-Galho (poderes).
+Quebra-galho
+Em cidades ou metrópoles, você pode comprar 
+qualquer item mundano não superior por metade 
+do preço normal. Esses itens não podem ser maté-
+rias-primas e não podem ser revendidos (são velhos, 
+sujos, furtados...).
+Refugiado
+Neste mundo assolado por tantas guerras e 
+tragédias, você acabou sobrevivendo a alguma delas. 
+Sendo elfo, estava presente durante a sofrida queda 
+de Lenórienn. Escapou à destruição de Tamu-ra. 
+Teve sorte em sair do caminho de Mestre Arsenal, 
+conseguiu esconder-se das forças puristas ou teste-
+munhou a chegada da Flecha de Fogo e viveu para 
+contar a história. Trauma e privações talvez tenham 
+tornado você amargo, sombrio, embrutecido... mas 
+também um sobrevivente tenaz, acostumado a uma 
+vida perigosa.
+93
+
+--- Page 100 ---
+Capítulo Um
+Itens. Um item estrangeiro de até T$ 100.
+Benefícios. Fortitude, Reflexos, Vontade 
+(perícias); Estoico, Vontade de Ferro (poderes).
+Estoico
+Sua condição de descanso é uma categoria acima 
+do padrão pela situação (normal em condições ruins, 
+confortável em condições normais e luxuosa em 
+condições confortáveis ou melhores). Veja as regras 
+de recuperação na página 106.
+Seguidor
+Você não nasceu herói, mas viveu algum tempo 
+na companhia de um. Pode ter sido escudeiro de um 
+cavaleiro de Khalmyr, garoto de recados para um 
+ladino, criado de um nobre... enfim, um ajudante 
+para um aventureiro de verdade. Durante esse tempo 
+adquiriu aprendizado valioso, testemunhou eventos 
+incríveis, mas você não seria um seguidor para sem-
+pre. Como ocorreu a separação? Você apenas disse 
+adeus e trilhou seu próprio caminho? Seu mestre 
+desapareceu de forma misteriosa ou foi assassinado 
+diante de seus olhos? Você ficou com parte de seus 
+itens, como presente ou lembrança?
+Itens. Um item recebido de seu mestre de até 
+T$ 100.
+Benefícios. Adestramento, Ofício (perícias); 
+Antigo Mestre, Proficiência, Surto Heroico (poderes).
+Antigo Mestre
+Você ainda mantém contato com o herói que cos-
+tumava servir. Uma vez por aventura, ele surge para 
+ajudá-lo por uma cena. Ele é um parceiro mestre de 
+um tipo a sua escolha (definido ao obter este poder) 
+que não conta em seu limite de aliados.
+Selvagem
+Você nasceu em uma tribo de bárbaros incultos 
+ou tem uma origem bem mais exótica. Perdeu-se 
+dos pais verdadeiros em alguma região remota, 
+sobrevivendo graças aos cuidados de um eremita, 
+ou criado por animais, ou por pura bondade dos 
+deuses. Você pode nem mesmo ter nascido de pais 
+humanoides — talvez seja cria de dragões, demô-
+nios ou deuses, com poderes a serem revelados no 
+momento certo. Será que você ainda teme a civili-
+zação, assustando-se com uma simples fogueira? 
+Ou já aprendeu algumas coisas, graças a seus 
+novos companheiros?
+Itens. Uma arma simples, um pequeno animal 
+de estimação como um pássaro ou esquilo.
+Benefícios. Percepção, Reflexos, Sobrevi-
+vência (perícias); Lobo Solitário, Vida Rústica, 
+Vitalidade (poderes).
+Vida Rústica
+Você come coisas que fariam um avestruz vomi-
+tar (sendo imune a efeitos prejudiciais de itens in-
+geríveis) e também consegue descansar nos lugares 
+mais desconfortáveis (mesmo dormindo ao relento, 
+sua recuperação de PV e PM nunca é inferior a seu 
+próprio nível).
+Soldado
+Deheon. Bielefeld. A Supremacia Purista. Em 
+Arton existem vastas forças militares. Ainda jovem, 
+você se alistou (ou foi convocado) como soldado em 
+um grande exército. Independentemente de sua fun-
+ção exata dentro da máquina de guerra — infantaria, 
+cavalaria, arqueiro, cozinheiro... —, você recebeu 
+treinamento em combate e equipamento decente. 
+Mas em alguma ocasião você abandonou a vida mi-
+litar para se tornar aventureiro. Foi dispensado com 
+honras, após uma grande façanha? Sobreviveu a um 
+conflito sangrento? Desertou antes de um massacre?
+Itens. Uma arma marcial, um uniforme militar, 
+uma insígnia de seu exército.
+Benefícios. Fortitude, Guerra, Luta, Pontaria 
+(perícias); Influência Militar, um poder de combate a 
+sua escolha (poderes).
+Influência Militar
+Você fez amigos nas forças armadas. Onde 
+houver acampamentos ou bases militares, você pode 
+conseguir hospedagem e informações para você e 
+seus aliados.
+Taverneiro
+Não é incomum que heróis aposentados se 
+tornem donos de tavernas ou estalagens, mas o 
+contrário também pode ocorrer. Você foi dono, filho 
+do dono ou empregado em algum lugar frequentado 
+por aventureiros — esses tipos sempre cheios de 
+ouro e bravatas, atiçando sua ambição. Claro, eles 
+nem sempre mencionam os horrores, amputações 
+e mortes! Ainda assim, parece bem melhor que a 
+vida atrás do balcão, limpando canecas sujas. Você 
+ouviu todas as grandes histórias, trocou socos em 
+algumas brigas e até ganhou uma lembrança ou 
+outra de algum herói bêbado.
+Itens. Rolo de macarrão ou martelo de carne 
+(mesmas estatísticas de uma clava), uma panela, um 
+avental, uma caneca e um pano sujo.
+94
+ 
+
+--- Page 101 ---
+Construção de Personagem
+Benefícios. 
+Diplomacia, 
+Jogatina, 
+Ofício 
+(cozinheiro) (perícias); Gororoba, Proficiência, Vita-
+lidade (poderes).
+Gororoba
+Você não sofre a penalidade de –5 para fabricar 
+um prato especial adiconal.
+Trabalhador
+Nenhum glamour aqui, apenas trabalho braçal 
+pesado. De origem humilde, sem grandes chances na 
+vida, você trabalhou duro desde muito jovem. Trans-
+portou pedras na construção de templos e castelos, 
+carregou sacas de grãos em fazendas, empilhou car-
+gas em portos, puxou arado feito um animal 
+de tração. Talvez sua vida tenha sido um 
+pouco melhor, como servo em um palá-
+cio. Ou muito pior, arrastando ou quei-
+mando corpos em campos de batalha. 
+Não é surpresa que a carreira como aven-
+tureiro, mesmo perigosa, tenha parecido 
+muito mais atraente.
+Itens. Uma ferra-
+menta pesada (mesmas 
+estatísticas de uma maça 
+ou lança, a sua escolha).
+Benefícios. Atletis-
+mo, Fortitude (perícias); 
+Atlético, Esforçado (poderes).
+Esforçado
+Você não teme trabalho 
+duro, nem prazos apertados. 
+Você recebe um bônus de +2 
+em todos os testes de perícias 
+estendidos (incluindo perigos 
+complexos).
+Sua Própria Origem
+Uma origem é algo que você pode mudar, nego-
+ciando com o mestre, para ajustar melhor à história 
+que você imaginou. Por exemplo, Kurt Snyder estu-
+dou como médico de Salistick — mais especificamen-
+te, como alienista. A origem Curandeiro oferece as 
+perícias Cura e Vontade. Nesse caso, o jogador de 
+Kurt poderia trocar uma dessas por Intuição.
+Outro exemplo: o suraggel paladino Agatode-
+mo, um herói camponês, protegeu sua aldeia contra 
+o ataque de hobgoblins que, ao fugir, deixaram cair 
+uma arma exótica. Antes de partir da aldeia, Agato-
+demo treinou com essa arma. Assim, você poderia 
+trocar seus itens iniciais pela própria arma, e pe-
+gar o poder Proficiência para saber usá-la.
+Até mesmo uma nova habilida-
+de pode ser inventada, usando as 
+outras como referência e inspira-
+ção. Você não precisa ficar preso 
+apenas a benefícios mecânicos, 
+como “ganhar +2 em alguma 
+coisa”. Pense em coisas que aju-
+dem seu grupo ou tragam mais 
+sabor à interpretação, ou ainda 
+algo relacionado à própria cam-
+panha — ser parente de algum 
+NPC importante, por exemplo.
+Ainda, você pode inventar uma 
+origem totalmente nova. Talvez 
+Kaine, o Coletor, seja um guerrei-
+ro esqueleto conjurado pelo pró-
+prio necromante Vladislav, en-
+quanto Ira Dodado é um clérigo 
+de Nimb que começou sua car-
+reira após matar um dragão com 
+uma panelada, e Kadi O’ Blaine 
+é um arcanista vindo de Magika, 
+mundo da deusa Wynna. Lem-
+bre-se: em Arton, nenhum he-
+rói é estranho demais.
+Aproveite a origem para 
+transpor para o jogo ideias 
+que você tenha e não consi-
+ga representar com raça e 
+classe. Em outras palavras, 
+ela é o espaço para o joga-
+dor criar. Só não vale ape-
+lar! “Ah, eu era seguidor de 
+um arcanista de 18º nível, então 
+ele morreu engasgado com um 
+pretzel e eu fiquei com as coi-
+sas mágicas dele, tudo bem?”
+Aventureiros 
+Aventureiros 
+podem ter as 
+podem ter as 
+origens mais 
+origens mais 
+surpreendentes
+surpreendentes
+95
+
+--- Page 102 ---
+Capítulo Um
+Deuses do Panteão
+Aharadak
+Outrora um dos ter-
+ríveis Lordes da Tor-
+menta, esta aberração 
+monstruosa 
+ambicio-
+nava o grande poder 
+divino oferecido pelos 
+devotos de Arton. Após 
+anos liderando seu próprio 
+culto profano, Aharadak matou 
+Tauron, o Deus da Força, e ascendeu como o novo e 
+macabro Deus da Tormenta. Agora ocupando uma po-
+sição importante no Panteão, os invasores lefeu avan-
+çam mais uma etapa em seus planos para corromper 
+Arton. Apenas os devotos mais depravados ousam 
+cultuar esta divindade de escatologia e sadismo.
+Crenças e Objetivos. Reverenciar a Tor-
+menta, apregoar a inevitabilidade de sua chegada ao 
+mundo. Praticar a devassidão e a perversão. Deturpar 
+tudo que é correto, desfigurar tudo que é normal. 
+Abraçar a agonia, crueldade e loucura.
+Símbolo Sagrado. Um olho macabro de 
+pupila vertical e cercado de espinhos.
+Canalizar Energia. Negativa.
+Arma Preferida. Corrente de espinhos.
+Devotos. Quaisquer. A Tormenta aceita tudo 
+e todos.
+Poderes Concedidos. Afinidade com a 
+Tormenta, Êxtase da Loucura, Percepção Temporal, 
+Rejeição Divina.
+Obrigações & Restrições. Quase todos os 
+cultistas de Aharadak são maníacos insanos, compeli-
+dos a praticar os atos mais abomináveis. No entanto, 
+talvez devido à natureza alienígena e incompreensível 
+deste deus, alguns devotos conseguem se resguardar. 
+Preservam sua humanidade, abstendo-se de cometer 
+crimes ou profanações. Ainda assim, o devoto paga 
+um preço. No início de qualquer cena de ação, role 
+1d6. Com um resultado ímpar, você fica fascinado na 
+primeira rodada, perdido em devaneios sobre a futili-
+dade da vida (mesmo que seja imune a esta condição).
+Deuses
+Em Arton, você pode trabalhar a serviço dos 
+deuses, cumprindo seus desígnios. Um personagem 
+que serve a uma divindade é chamado devoto e, em 
+troca de seguir certas obrigações, recebe poderes. Ser 
+devoto é uma escolha. Por exemplo, você pode ser um 
+cavaleiro normal, sem obrigações, ou um cavaleiro 
+devoto de Khalmyr, com obrigações e poderes.
+Escolhendo seu deus
+Você pode se tornar devoto na construção de seu 
+personagem ou sempre que subir de nível. Porém, só 
+pode ter uma devoção e não pode mudá-la (exceto 
+sob critério do mestre). Se você for clérigo, druida ou 
+paladino, automaticamente será um devoto.
+Para ser devoto de um deus, sua raça ou sua 
+classe devem estar listadas na seção “Devotos” do 
+deus em questão. Humanos e clérigos são exceção — 
+podem ser devotos de qualquer divindade.
+Ao se tornar devoto, você recebe um poder con-
+cedido a sua escolha da lista do deus e passa a seguir 
+as Obrigações & Restrições dele. Se violá-las, perde 
+todos os seus PM e só pode recuperá-los a partir do 
+próximo dia. Se violá-las de novo na mesma aventu-
+ra, perde todos os seus PM e não pode recuperá-los 
+até fazer uma penitência (veja a perícia Religião). 
+Poderes concedidos são descritos no Capítulo 2.
+Multiclasse. No caso de classes com listas de de-
+voções permitidas, a classe com menos opções deter-
+mina a que deve ser seguida (isso permite que uma 
+devoção anterior seja mudada). Se não houver devo-
+ções compatíveis, a multiclasse não pode ser feita.
+Características 
+dos deuses
+Crenças e Objetivos. Um resumo da dou-
+trina da divindade, aquilo em que os devotos creem. 
+Símbolo Sagrado. O símbolo do deus, nor-
+malmente usado como um medalhão ou na roupa.
+Canalizar Energia. O tipo de energia que 
+a divindade canaliza. Devotos de alguns deuses 
+podem escolher o tipo de energia (nesse caso, uma 
+vez feita, a escolha não pode ser mudada).
+Arma Preferida. A arma típica de devotos do 
+deus, importante para certas habilidades e magias.
+96
+ 
+
+--- Page 103 ---
+Construção de Personagem
+Allihanna
+A Deusa da Natu-
+reza representa a bon-
+dade inerente ao mun-
+do natural, a pureza das 
+plantas e animais. Mesmo 
+os animais predadores são 
+considerados puros, inocentes 
+— pois matam apenas para sobreviver, ao contrário 
+dos monstros e seres civilizados. A divindade prin-
+cipal dos druidas, Allihanna também é cultuada por 
+povos bárbaros. Estes veneram faces variadas desta 
+deusa, que pode se manifestar como um majestoso 
+animal (diferente para cada culto) ou uma criatura 
+quimérica de muitas cabeças.
+Crenças e Objetivos. Reverenciar os seres 
+da natureza. Proteger a vida selvagem. Promover 
+harmonia entre a natureza e a civilização. Combater 
+monstros, mortos-vivos e outras criaturas que per-
+turbam o equilíbrio natural.
+Símbolo Sagrado. Para bárbaros e outros 
+adoradores de animais, o símbolo corresponde ao 
+respectivo animal. Para outros, uma pequena árvore.
+Canalizar Energia. Positiva.
+Arma Preferida. Bordão.
+Devotos. Dahllan, elfos, sílfides, bárbaros, 
+caçadores, druidas.
+Poderes Concedidos. Compreender os Er-
+mos, Dedo Verde, Descanso Natural, Voz da Natureza.
+Obrigações & Restrições. Devotos de 
+Allihanna não podem usar armaduras e escudos 
+feitos de metal. Assim, você só pode usar armadura 
+acolchoada, de couro, gibão de peles e escudo leve, 
+ou itens feitos de materiais especiais não metálicos.
+Devotos de Allihanna não podem descansar em 
+nenhuma comunidade maior que uma aldeia (não 
+perdem seus poderes, mas também não recuperam 
+pontos de vida ou mana). Por isso, sempre preferem 
+o relento a um quarto de estalagem.
+Tabela 1-20: Deuses
+Divindade
+Energia
+Poderes Concedidos
+Aharadak
+Negativa
+Afinidade com a Tormenta, Êxtase da Loucura, 
+Percepção Temporal, Rejeição Divina
+Allihanna
+Positiva
+Compreender os Ermos, Dedo Verde, Descanso Natural, Voz da Natureza
+Arsenal
+Qualquer
+Conjurar Arma, Coragem Total, Fé Guerreira, Sangue de Ferro
+Azgher
+Positiva
+Espada Solar, Fulgor Solar, Habitante do Deserto, Inimigo de Tenebra
+Hyninn
+Qualquer
+Apostar com o Trapaceiro, Farsa do Fingidor, 
+Forma de Macaco, Golpista Divino
+Kallyadranoch
+Negativa
+Aura de Medo, Escamas Dracônicas, Presas Primordiais, Servos do Dragão
+Khalmyr
+Positiva
+Coragem Total, Dom da Verdade, Espada Justiceira, Reparar Injustiça
+Lena
+Positiva
+Ataque Piedoso, Aura Restauradora, Cura Gentil, Curandeira Perfeita
+Lin-Wu
+Qualquer
+Coragem Total, Kiai Divino, Mente Vazia, Tradição de Lin-Wu
+Marah
+Positiva
+Aura de Paz, Dom da Esperança, Palavras de Bondade, Talento Artístico
+Megalokk
+Negativa
+Olhar Amedrontador, Presas Primordiais, Urro Divino, Voz dos Monstros
+Nimb
+Qualquer
+Êxtase da Loucura, Poder Oculto, Sorte dos Loucos, Transmissão da Loucura
+Oceano
+Qualquer
+Anfíbio, Arsenal das Profundezas, Mestre dos Mares, Sopro do Mar
+Sszzaas
+Negativa
+Astúcia da Serpente, Familiar Ofídico, Presas Venenosas, Sangue Ofídico
+Tanna-Toh
+Qualquer
+Conhecimento Enciclopédico, Mente Analítica, 
+Pesquisa Abençoada, Voz da Civilização
+Tenebra
+Negativa
+Carícia Sombria, Manto da Penumbra, Visão nas Trevas, Zumbificar
+Thwor
+Qualquer
+Almejar o Impossível, Fúria Divina, Olhar Amedrontador, Tropas Duyshidakk
+Thyatis
+Positiva
+Ataque Piedoso, Dom da Imortalidade, Dom da Profecia, Dom da Ressurreição
+Valkaria
+Positiva
+Almejar o Impossível, Armas da Ambição, Coragem Total, Liberdade Divina
+Wynna
+Qualquer
+Bênção do Mana, Centelha Mágica, Escudo Mágico, Teurgista Místico
+97
+
+--- Page 104 ---
+Capítulo Um
+Arsenal
+Outrora um infame 
+clérigo guerreiro, o vi-
+lão conhecido apenas 
+como Mestre Arsenal se 
+tornou 
+sumo-sacerdote 
+do violento deus Keenn. 
+No entanto, após uma lon-
+ga campanha que envolveu a 
+conquista da mais poderosa espada mágica de Arton, 
+o clérigo derrotou seu próprio patrono em comba-
+te durante um torneio épico, ascendendo ao Panteão 
+como o novo Deus da Guerra. Com o objetivo de tor-
+nar Arton mais forte, capaz de confrontar qualquer 
+inimigo, Arsenal e seus devotos seguem deflagrando 
+conflitos por todo o Reinado e além.
+Crenças e Objetivos. Promover a guerra e o 
+conflito. Vencer a qualquer custo, pela força ou estra-
+tégia. Jamais oferecer ou aceitar rendição. Eliminar 
+as próprias fraquezas. Conhecer o inimigo como a 
+si mesmo. Sempre encontrar condições de vitória; 
+quando não existirem, criá-las.
+Símbolo Sagrado. Um martelo de guerra e 
+uma espada longa cruzados sobre um escudo.
+Canalizar Energia. Qualquer.
+Arma Preferida. Martelo de guerra.
+Devotos. Anões, minotauros, bárbaros, cava-
+leiros, guerreiros, lutadores.
+Poderes Concedidos. Conjurar Arma, Cora-
+gem Total, Fé Guerreira, Sangue de Ferro.
+Obrigações & Restrições. Um devoto de 
+Arsenal é proibido de ser derrotado em qualquer tipo 
+de combate ou disputa (como um teste oposto para 
+ver quem é mais forte). Caso seu grupo seja derrotado, 
+isso também constitui uma violação das obrigações.
+Azgher
+Venerado pelos povos 
+do Deserto da Perdição, o 
+Deus-Sol é também cul-
+tuado por viajantes, mer-
+cadores honestos e todos 
+aqueles que combatem as 
+trevas. É um deus generoso; 
+sua jornada diária derrama ca-
+lor e conforto sobre Arton. Azgher é como um pai 
+severo: responsável, provedor, mas que também exi-
+ge respeito de seus filhos. Como um olho sempre vi-
+gilante nos céus, nada acontece à luz do dia sem que 
+Azgher perceba.
+Crenças e Objetivos. Praticar a gratidão pela 
+proteção e generosidade do sol. Promover a honesti-
+dade, expor embustes e mentiras. Praticar a caridade 
+e o altruísmo. Proteger os necessitados. Oferecer 
+clemência, perdão e redenção. Combater o mal.
+Símbolo Sagrado. Um sol dourado.
+Canalizar Energia. Positiva.
+Arma Preferida. Cimitarra.
+Devotos. Aggelus, qareen, arcanistas, bárbaros, 
+caçadores, cavaleiros, guerreiros, nobres, paladinos.
+Poderes Concedidos. Espada Solar, Fulgor 
+Solar, Habitante do Deserto, Inimigo de Tenebra.
+Obrigações & Restrições. O devoto de 
+Azgher deve manter o rosto sempre coberto (com 
+uma máscara, capuz ou trapos). Sua face pode ser 
+revelada apenas ao sumo-sacerdote ou em seu fu-
+neral. Devotos do Sol também devem doar para a 
+igreja de Azgher 20% de qualquer tesouro obtido. 
+Essa doação deve ser feita em ouro, seja na forma 
+de moedas ou itens.
+Hyninn
+Capaz de enganar até 
+mesmo outros deuses, o 
+ardiloso Deus da Trapa-
+ça é uma divindade fa-
+vorita de foras da lei — 
+seus clérigos atuam como 
+conselheiros, ou até mesmo 
+líderes, em guildas criminosas 
+ou navios piratas. Também é louvado por regentes e 
+mercadores não muito honestos, orando por vanta-
+gens ilícitas. No entanto, mesmo pessoas honradas 
+eventualmente simpatizam com Hyninn por sua es-
+perteza, despreocupação e ousadia.
+Crenças e Objetivos. Praticar a astúcia e a 
+esperteza. Demonstrar que honestidade e sincerida-
+de levam ao fracasso. Desafiar a lei e a ordem. Ser 
+vitorioso sem seguir regras. Fazer aos outros antes 
+que façam a você. Levar vantagem em tudo.
+Símbolo Sagrado. Uma adaga atravessando 
+uma máscara, ou uma raposa.
+Canalizar Energia. Qualquer.
+Arma Preferida. Adaga.
+Devotos. Hynne, goblins, sílfides, bardos, 
+bucaneiros, ladinos, inventores, nobres.
+Poderes Concedidos. Apostar com o 
+Trapaceiro, Farsa do Fingidor, Forma de Macaco, 
+Golpista Divino.
+98
+ 
+
+--- Page 105 ---
+Construção de Personagem
+Obrigações & Restrições. Um devoto de 
+Hyninn não recusa participação em um golpe, trapa-
+ça ou artimanha (o que muitas vezes inclui missões 
+para roubar... hã, resgatar tesouros), exceto quando 
+prejudica seus próprios aliados.
+O devoto também deve fazer um ato furtivo, 
+ousado ou proibido por dia (ou por sessão de jogo, 
+o que demorar mais), como oferenda a Hyninn. 
+Roubar uma bolsa, enganar um miliciano, invadir o 
+quarto de um nobre... Em termos de jogo, uma ação 
+exigindo um teste de Enganação ou Ladinagem com 
+CD mínima 15 + metade do seu nível.
+Kallyadranoch
+Como punição imposta 
+por Khalmyr pelo crime de 
+criar a Tormenta, o Deus 
+dos Dragões estava es-
+quecido até poucos anos 
+atrás, conhecido apenas 
+como “o Terceiro”. Res-
+taurado em tempos re-
+centes durante um combate 
+épico contra os invasores aber-
+rantes, Kallyadranoch agora governa não apenas os 
+dragões, mas todos que cultuam o poder elemental 
+das grandes feras. Além disso, enquanto Wynna re-
+presenta o lado bondoso e generoso da magia arcana, 
+Kally é cultuado por arcanistas malignos.
+Crenças e Objetivos. Praticar a soberania. 
+Demonstrar orgulho, superioridade, majestade. Pra-
+ticar o acúmulo de riquezas. Proteger suas posses e 
+sua dignidade. Ser implacável com seus inimigos. 
+Reverenciar os dragões e suas crias.
+Símbolo Sagrado. Escamas de cinco cores 
+diferentes.
+Canalizar Energia. Negativa.
+Arma Preferida. Lança.
+Devotos. Elfos, medusas, sulfure, arcanistas, 
+cavaleiros, guerreiros, lutadores, nobres.
+Poderes Concedidos. Aura de Medo, Esca-
+mas Dracônicas, Presas Primordiais, Servos do Dragão.
+Obrigações & Restrições. Para subir de 
+nível, além de acumular XP suficiente, o devoto de 
+Kally deve realizar uma oferenda em tesouro. O valor 
+é igual à 20% da diferença do dinheiro inicial do nível 
+que vai alcançar para o nível atual (por exemplo, T$ 
+80 para subir para o 4° nível). Sabe-se, também, de 
+devotos malignos que sacrificam vítimas a Kally (não 
+permitido para personagens jogadores).
+Khalmyr
+Antigo líder do Pan-
+teão, o Deus da Justiça 
+já foi considerado a di-
+vindade 
+mais 
+popular 
+no Reinado. Isso muda-
+ria com a vitória dos mi-
+notauros nas Guerras Táuri-
+cas, bem como a recente 
+ascensão de Valkaria como nova lí-
+der dos deuses. Mesmo assim, Khalmyr ainda é lou-
+vado por aqueles que lutam pela ordem e justiça. As 
+duas maiores ordens de cavaleiros em Arton foram 
+criadas em sua honra: a Ordem da Luz e a Ordem de 
+Khalmyr. Esta é também uma das divindades princi-
+pais dos anões, junto de Tenebra — conforme a crença, 
+ambos teriam gerado juntos a raça anã.
+Crenças e Objetivos. Praticar a caridade e 
+o altruísmo. Defender a lei, a ordem e os necessita-
+dos. Combater a mentira, o crime e o mal. Oferecer 
+clemência, perdão e redenção. Lutar o bom combate.
+Símbolo Sagrado. Espada sobreposta a uma 
+balança.
+Canalizar Energia. Positiva.
+Arma Preferida. Espada longa.
+Devotos. Aggelus, anões, cavaleiros, guerreiros, 
+nobres, paladinos.
+Poderes Concedidos. Coragem Total, Dom 
+da Verdade, Espada Justiceira, Reparar Injustiça.
+Obrigações & Restrições. Devotos de Khal-
+myr não podem recusar pedidos de ajuda de pessoas 
+inocentes. Também devem cumprir as ordens de su-
+periores na hierarquia da igreja (devotos do Deus da 
+Justiça de nível maior) e só podem usar itens mágicos 
+permanentes criados por devotos do mesmo deus.
+Lena
+Mesmo 
+os 
+deuses 
+mais violentos e cruéis 
+são respeitosos com a 
+Deusa Criança, provedo-
+ra da fertilidade, do sus-
+tento, da própria vida. 
+Lena não é venerada apenas 
+por aventureiros necessitados 
+de curas mágicas, mas também por fazendeiros que 
+imploram por colheitas fartas, criadores desejosos de 
+saúde para seus animais e cada grávida prestes a dar 
+à luz. Servida quase exclusivamente por mulheres, a 
+Deusa da Vida oferece os mais poderosos milagres de 
+cura presenciados em Arton.
+99
+
+--- Page 106 ---
+Capítulo Um
+Crenças e Objetivos. Reverenciar e proteger 
+a vida em todas as suas formas. Reverenciar a fer-
+tilidade, a fecundidade, a maternidade e a infância. 
+Praticar a caridade e o altruísmo. Oferecer clemência, 
+perdão e redenção. Aliviar a dor e o sofrimento físico, 
+mental ou espiritual.
+Símbolo Sagrado. Lua crescente prateada.
+Canalizar Energia. Positiva.
+Arma Preferida. Não há. Servos desta deusa 
+não podem lançar a magia Arma Espiritual e similares.
+Devotos. Dahllan, qareen, nobres, paladinos.
+Poderes Concedidos. Ataque Piedoso, Aura 
+Restauradora, Cura Gentil, Curandeira Perfeita.
+Obrigações & Restrições. Devotos de Lena 
+não podem causar dano letal ou perda de PV a cria-
+turas vivas (fornecer bônus em dano letal também é 
+proibido). Podem causar dano não letal e prejudicar 
+seus inimigos (em termos de jogo, impondo condi-
+ções), desde que não causem dano letal ou perda de 
+PV. Para um devoto de Lena, é preferível perder a 
+própria vida a tirá-la de outros.
+Apenas mulheres podem ser devotas de Lena. 
+Uma clériga precisa dar à luz pelo menos uma vez 
+antes de receber seus poderes divinos. A fecundação 
+é um mistério bem guardado pelas sacerdotisas; 
+conta-se que a própria deusa vem semear suas discí-
+pulas. Paladinos de Lena podem ser homens (são os 
+únicos devotos masculinos permitidos) ou mulheres.
+Lin-Wu
+Mesmo com a qua-
+se extinção de seu povo 
+pela Tormenta, o hon-
+rado 
+Deus 
+Samurai 
+nunca fraquejou, nun-
+ca perdeu sua dignida-
+de. Hoje, o Império de 
+Jade está livre da tempestade, 
+seus habitantes retornam para a grande reconstru-
+ção. Lin-Wu e seu povo sempre serão gratos aos cam-
+peões gaijin, por sua amizade e suporte durante os 
+anos de pesadelo. Talvez por esse motivo, conforme 
+especulam seus servos shugenja, devotos de Lin-Wu 
+atuando longe de Tamu-ra recebem poderes diferen-
+tes, mais convenientes para suas missões. 
+Crenças e Objetivos. Promover a honra 
+acima de tudo. Proteger Tamu-ra e o Reinado de 
+Arton. Praticar honestidade, coragem, cortesia e 
+compaixão. Demonstrar integridade e dignidade. 
+Ser leal a seus companheiros. Buscar redenção após 
+cometer desonra.
+Símbolo Sagrado. Placa de metal com a 
+silhueta de um dragão-serpente celestial.
+Canalizar Energia. Qualquer.
+Arma Preferida. Katana.
+Devotos. Anões, cavaleiros, guerreiros, nobres, 
+paladinos.
+Os vinte deuses do Panteão de Arton
+Os vinte deuses do Panteão de Arton
+100
+ 
+
+--- Page 107 ---
+Construção de Personagem
+Poderes Concedidos. Coragem Total, Kiai 
+Divino, Mente Vazia, Tradição de Lin-Wu.
+Obrigações & Restrições. Antigas proi-
+bições quanto a devotos estrangeiros ou do gênero 
+feminino não mais se aplicam. No entanto, devotos 
+de Lin-Wu ainda devem demonstrar comportamento 
+honrado, jamais recorrendo a mentiras e subterfú-
+gios. Em termos de jogo, são proibidos de tentar 
+qualquer ação que exigiria um teste de Enganação, 
+Furtividade ou Ladinagem.
+Marah
+Neste mundo sem-
+pre em guerra, devotos 
+da Deusa da Paz talvez 
+sejam os mais corajosos 
+e perseverantes, buscan-
+do inspiração em sua pa-
+droeira para proteger Arton 
+sem usar de violência. Marah 
+ensina a suportar qualquer provação, 
+demonstrar que brutalidade nunca é a única respos-
+ta. Ainda assim, esta não é apenas uma divindade de 
+placidez e indolência; devotos de Marah costumam 
+ser plenos de bom humor e atitude positiva, sem-
+pre prontos para uma nova celebração ou romance...
+Crenças e Objetivos. Praticar o amor e a 
+gratidão pela vida e pela bondade. Promover a paz, 
+harmonia e felicidade. Aliviar a dor e o sofrimento, 
+trazer conforto aos aflitos. Praticar a caridade e o 
+altruísmo. Oferecer clemência, perdão e redenção.
+Símbolo Sagrado. Um coração vermelho.
+Canalizar Energia. Positiva.
+Arma Preferida. Não há. Devotos desta deusa 
+não podem lançar a magia Arma Espiritual e similares.
+Devotos. Aggelus, elfos, hynne, qareen, bar-
+dos, nobres, paladinos.
+Poderes Concedidos. Aura de Paz, Dom da 
+Esperança, Palavras de Bondade, Talento Artístico.
+Obrigações & Restrições. Devotos de Ma-
+rah não podem causar dano, perda de PV e condições 
+a criaturas, exceto enfeitiçado, fascinado e pasmo 
+(fornecer bônus em dano também é proibido). Em 
+combate, só podem recorrer a ações como proteger 
+ou curar — ou fugir, render-se ou aceitar a morte. 
+Um devoto de Marah jamais vai causar violência, 
+nem mesmo para se salvar.
+Megalokk
+O Deus dos Monstros 
+é uma divindade de sel-
+vageria e descontrole — 
+quando bárbaros entram 
+em fúria, diz-se que es-
+tão apenas canalizando 
+seu rancor primordial. En-
+101
+
+--- Page 108 ---
+Capítulo Um
+quanto servos de Allihanna promovem harmonia en-
+tre a natureza e os povos civilizados, devotos de seu 
+irmão sanguinário buscam apenas o extermínio de 
+seus inimigos. E, para um servo do Deus dos Mons-
+tros, quase tudo que se move é um inimigo...
+Crenças e Objetivos. Praticar a violência, a 
+soberania do mais forte. Jamais reprimir os próprios 
+instintos e desejos. Jamais ser domado, desafiar qual-
+quer forma de controle. Jamais oferecer perdão ou 
+rendição. Eliminar os fracos. Destruir seus inimigos.
+Símbolo Sagrado. A garra de um monstro.
+Canalizar Energia. Negativa.
+Arma Preferida. Maça.
+Devotos. Goblins, medusas, minotauros, sul-
+fure, trogs, bárbaros, caçadores, druidas, lutadores.
+Poderes Concedidos. Olhar Amedrontador, 
+Presas Primordiais, Urro Divino, Voz dos Monstros.
+Obrigações & Restrições. Devotos de Me-
+galokk devem rejeitar os modos civilizados e se en-
+tregar à ferocidade, descontrole e impaciência. Você 
+é proibido de usar perícias baseadas em Inteligência 
+ou Carisma (exceto Adestramento e Intimidação) e 
+não pode preparar uma ação, escolher 10 ou 20 em 
+testes e sustentar efeitos (pois são ações que exigem 
+foco e paciência).
+Nimb
+“Khalmyr tem o tabu-
+leiro, mas quem move as 
+peças é Nimb” — pro-
+vérbio dos tempos em 
+que o Deus da Justi-
+ça governava o Panteão, 
+sua liderança sempre de-
+safiada pelo insano Deus do 
+Caos. Nada é certo sobre esta 
+entidade do acaso, sorte e azar. Teria Nimb cuidadosa-
+mente tramado a queda de Khalmyr, enfim derrotan-
+do o eterno rival? Seria ele capaz de um plano tão lou-
+co e brilhante? Ou não?
+Nimb é mais temido do que venerado pelos 
+artonianos, cautelosos quanto as suas constantes 
+mudanças de humor. Muitos desejam que ele lhes 
+sorria, mas poucos escolhem ser seus devotos. Ainda 
+assim, há quem abrace sua loucura libertadora.
+Crenças e Objetivos. Reverenciar o caos, a 
+aleatoriedade, a sorte e o azar. Praticar a ousadia e a 
+rebeldia, desafiar regras e leis. Rejeitar o bom senso. 
+Tornar o mundo mais interessante. Ou divertido. 
+Ou terrível. Ou não.
+Símbolo Sagrado. Um dado de seis faces.
+Canalizar Energia. Qualquer.
+Arma Preferida. Nenhuma e todas! Ao usar 
+um efeito que dependa de arma preferida, qualquer 
+arma (ou outro objeto!) pode aparecer, de acordo 
+com o mestre.
+Devotos. Goblins, qareen, sílfides, arcanistas, 
+bárbaros, bardos, bucaneiros, inventores, ladinos.
+Poderes Concedidos. Êxtase da Loucura, 
+Poder Oculto, Sorte dos Loucos, Transmissão da 
+Loucura.
+Obrigações & Restrições. Por serem 
+incapazes de seguir regras, estes devotos não têm 
+“obrigações” verdadeiras (portanto, nunca perdem 
+PM por descumprirem suas O&R). No entanto, 
+sofrem certas restrições que não podem ignorar.
+Devotos de Nimb são loucos (ou agem como se 
+fossem), não conseguindo convencer ninguém de 
+coisa alguma. Você sofre –5 em testes de perícias 
+baseadas em Carisma. Além disso, no início de cada 
+cena de ação, role 1d6. Com um resultado 1, você fica 
+confuso (mesmo que seja imune a esta condição).
+Oceano
+Nestes tempos de 
+grande tumulto no pla-
+no divino, em meio a 
+deuses caindo e ascen-
+dendo, o Deus dos Ma-
+res está entre os poucos 
+ainda imutáveis. Sua época 
+de fúria, quando arrasava civili-
+zações inteiras, foi quase esquecida. Hoje o Oceano 
+é sereno, pleno em si mesmo, alienado dos conflitos 
+no Panteão — acha os outros deuses mesquinhos, 
+disputando ninharias, frente à vastidão de seus do-
+mínios. Ainda assim, recebe preces de marinheiros, 
+piratas e povos marinhos, orando por sua tranqui-
+lidade, rogando que suas tempestades sejam breves.
+Crenças e Objetivos. Reverenciar os ma-
+res, o oceano e os seres que ali habitam. Promover 
+harmonia entre o oceano e o mundo seco. Proteger 
+os seres marinhos, mas também os seres do mundo 
+seco que se aventuram sobre as ondas. Demandar 
+devido respeito ao mar e seu poder.
+Símbolo Sagrado. Uma concha.
+Canalizar Energia. Qualquer.
+Arma Preferida. Tridente.
+Devotos. Dahllan, hynne, minotauros, sereias/
+tritões, bárbaros, bucaneiros, caçadores, druidas.
+102
+ 
+
+--- Page 109 ---
+Construção de Personagem
+Poderes Concedidos. Anfíbio, Arsenal das 
+Profundezas, Mestre dos Mares, Sopro do Mar.
+Obrigações & Restrições. As únicas armas 
+permitidas para devotos do Oceano são a azagaia, a 
+lança, o tridente e a rede. Podem usar apenas arma-
+duras leves. O devoto também não pode se manter 
+afastado do oceano por mais de um mês.
+Sszzaas
+O sibilante Deus da 
+Traição não é apenas o 
+mais inteligente entre 
+os deuses, mas também 
+o mais perigoso. Tão pe-
+rigoso que, certa vez, ten-
+tou reunir os Rubis da Vir-
+tude — vinte gemas de poder 
+contendo a essência de todos os deuses. Chegou a 
+ser expulso do Panteão por esse crime, mas sua as-
+túcia não conhecia limites; Sszzaas conseguiu tramar 
+um novo plano para ser aceito de volta. Hoje, mes-
+mo após a quase extinção de seu culto, os sszzaazitas 
+voltam a se espalhar sobre Arton, agindo em nome 
+do Grande Corruptor. Mas será prudente devotar-se 
+a um Deus da Traição? Apenas os mais ousados e as-
+tutos acreditam que sim.
+Crenças e Objetivos. Praticar a mentira e a 
+trapaça. Buscar sempre a solução mais inteligente. 
+Demonstrar que lealdade e confiança são fraquezas, 
+devem ser eliminadas. Promover competição, riva-
+lidade, desconfiança. Usar os recursos do inimigo 
+para alcançar seus objetivos. Levar outros a se 
+sacrificarem em seu lugar.
+Símbolo Sagrado. Uma naja vertendo vene-
+no pelas presas.
+Canalizar Energia. Negativa.
+Arma Preferida. Adaga.
+Devotos. Medusas, arcanistas, bardos, buca-
+neiros, inventores, ladinos, nobres.
+Poderes Concedidos. Astúcia da Serpente, 
+Familiar Ofídico, Presas Venenosas, Sangue Ofídico.
+Obrigações & Restrições. O devoto deve 
+fazer um ato de traição, intriga ou corrupção por dia 
+(ou por sessão de jogo, o que demorar mais) como 
+oferenda a Sszzaas. Pouco importa se o alvo é aliado 
+ou inimigo — uns poucos sszzaazitas usam seus 
+métodos torpes para ajudar colegas aventureiros em 
+suas missões, às vezes sem que eles próprios saibam.
+Sugerir a alguém que foi traído pelo cônjuge, 
+influenciar um guarda a aceitar suborno, instruir 
+um mercador a roubar nos preços, incriminar 
+alguém por um crime que não cometeu, enganar 
+um guerreiro para que mate um oponente rendido e 
+inofensivo... Em termos de jogo, uma ação exigindo 
+um teste de Enganação com CD mínima 15 + me-
+tade do seu nível.
+Tanna-Toh
+Em uma sociedade 
+medieval típica, apenas 
+membros do clero ou da 
+nobreza teriam acesso a 
+boa educação — cam-
+poneses jamais sabe-
+riam ler e escrever. Não é 
+assim no Reinado de Arton, 
+graças ao empenho da igreja de 
+Tanna-Toh. Devotos da Deusa do Conhecimento 
+atuam como professores, catequistas e pesquisado-
+res, tomando a missão sagrada de levar educação e 
+cultura para todos. Tanna-Toh é amplamente vene-
+rada pelos povos civilizados, amada por aqueles que 
+se devotam aos estudos ou artes. Ainda assim, esta 
+deusa é inimiga de povos bárbaros que escolhem 
+permanecer ignorantes e selvagens.
+Crenças e Objetivos. Reverenciar a mente 
+racional, o conhecimento, a civilização, a verdade. 
+Proteger o progresso, o avanço dos povos civili-
+zados. Promover o ensino e a prática das artes e 
+das ciências. Solucionar todos os mistérios, revelar 
+todas as mentiras. Buscar novo conhecimento. Não 
+tolerar a ignorância.
+Símbolo Sagrado. Pergaminho e pena.
+Canalizar Energia. Qualquer.
+Arma Preferida. Bordão.
+Devotos. Golens, kliren, arcanistas, bardos, 
+inventores, nobres, paladinos.
+Poderes Concedidos. Conhecimento En-
+ciclopédico, Mente Analítica, Pesquisa Abençoada, 
+Voz da Civilização.
+Obrigações & Restrições. Devotos de 
+Tanna-Toh jamais podem recusar uma missão que 
+envolva a busca por um novo conhecimento ou infor-
+mação; investigar rumores sobre um livro perdido, 
+procurar uma aldeia lendária, pesquisar os hábitos 
+de uma criatura desconhecida...
+Além disso, o devoto sempre deve dizer a ver-
+dade e nunca pode se recusar a responder uma per-
+gunta direta, pouco importando as consequências. É 
+proibido para ele esconder qualquer conhecimento.
+103
+
+--- Page 110 ---
+Capítulo Um
+Tenebra
+Assim como seu ini-
+migo Azgher vigia e pro-
+tege Arton durante o 
+dia, Tenebra é atenta sob 
+as estrelas; nada aconte-
+ce na noite sem seu co-
+nhecimento. A sedutora e 
+misteriosa Deusa das Trevas 
+é mãe de tudo que anda e rasteja no escuro, dos no-
+bres anões aos sinistros mortos-vivos e trogloditas. 
+Ainda que muitas vezes temida, Tenebra sempre pro-
+tegeu as criaturas noturnas e subterrâneas, bondo-
+sas ou malignas. No entanto, com a recente destrui-
+ção de Ragnar, antigo Deus da Morte, cada vez mais 
+cultos necromantes começam a oferecer sacrifícios à 
+Mãe Noite.
+Crenças e Objetivos. Reverenciar a noite, 
+a escuridão, a lua e as estrelas. Proteger segredos 
+e mistérios, proteger tudo que é oculto e invisível. 
+Reverenciar a não vida e os mortos-vivos, propagar a 
+prática da necromancia. Rejeitar o sol e a luz.
+Símbolo Sagrado. Estrela negra de cinco 
+pontas.
+Canalizar Energia. Negativa.
+Arma Preferida. Adaga.
+Devotos. Anões, medusas, qareen, osteon, 
+sulfure, trogs, arcanistas, bardos, ladinos.
+Poderes Concedidos. Carícia Sombria, 
+Manto da Penumbra, Visão nas Trevas, Zumbificar.
+Obrigações & Restrições. Tenebra proíbe 
+que seus devotos sejam tocados por Azgher, o odiado 
+rival. O devoto deve se cobrir inteiramente durante o 
+dia, sem expor ao sol nenhum pedaço de pele.
+Thwor
+A Flecha de Fogo foi 
+disparada, rompendo o 
+coração das trevas. A 
+antiga profecia foi cum-
+prida. No entanto, o que 
+muitos pensavam signifi-
+car o fim da Aliança Negra 
+dos goblinoides resultou em 
+algo totalmente diferente, totalmente novo. Ao en-
+frentar e derrotar o próprio Ragnar, antigo Deus da 
+Morte, o imperador bugbear Thwor Khoshkothruk 
+ascendeu ao Panteão como o Deus dos Goblinoides. 
+Agora protegidos e governados por uma poderosa di-
+vindade, os povos duyshidakk erguem sua própria ci-
+vilização no continente de Lamnor, e o Reinado de 
+Arton deverá lidar com o futuro que surgir disso.
+Crenças e Objetivos. Reverenciar a leal-
+dade, a força e a coragem. Promover a união entre 
+goblins, hobgoblins, bugbears, orcs, ogros e outros 
+povos humanoides. Reverenciar o caos, a mutação, 
+a vida sempre em movimento. Proteger a cultura e o 
+modo de vida goblinoide. Destruir os elfos.
+Símbolo Sagrado. Um grande punho fechado.
+Canalizar Energia. Qualquer.
+Arma Preferida. Machado de guerra.
+Devotos. Qualquer duyshidakk (veja abaixo).
+Poderes Concedidos. Almejar o Impos-
+sível, Fúria Divina, Olhar Amedrontador, Tropas 
+Duyshidakk.
+Obrigações & Restrições. Não importan-
+do sua raça, o devoto de Thwor deve ser duyshidakk 
+— ou seja, aceito como membro do povo goblinoide. 
+Também deve se esforçar para que o “Mundo Como 
+Deve Ser” tome o continente (veja a página 386). 
+Deve sempre procurar fazer alianças com goblinoides 
+e só lutar contra eles em último caso.
+Thyatis
+O generoso Deus da 
+Ressurreição e Profecia 
+representa o perdão, a 
+tolerância, as segundas 
+chances. Seu dom maior 
+é a prevenção ou correção 
+dos erros — através de pre-
+dições que evitam esses erros ou 
+reversão das mortes que tenham causado. Para Th-
+yatis, ninguém deve ser castigado por errar e todos 
+merecem a chance de aprender com suas falhas, em 
+vez de morrer por elas. Dizem que seus clérigos são 
+contemplados com poderosos dons de profecia e res-
+surreição, e seus paladinos nunca morrem!
+Crenças e Objetivos. Proteger a vida e 
+aqueles necessitados de novas chances. Renegar a 
+morte e a mentira. Ajudar os perdidos a encontrar 
+seus caminhos e alcançar seus destinos. Oferecer 
+clemência, perdão e redenção.
+Símbolo Sagrado. Uma ave fênix.
+Canalizar Energia. Positiva.
+Arma Preferida. Espada longa.
+Devotos. Aggelus, cavaleiros, guerreiros, 
+inventores, lutadores, paladinos.
+104
+ 
+
+--- Page 111 ---
+Construção de Personagem
+Wynna
+Depois de abando-
+nados por Glórienn, a 
+antiga Deusa dos Elfos, 
+muitos membros desta 
+raça estão oferecendo 
+sua devoção à bondosa 
+Wynna. Ela é a exuberan-
+te Deusa da Magia, louvada 
+por fadas, qareen, gênios e todos 
+aqueles que empregam poder arcano. Generosa e li-
+beral além dos limites, Wynna concede mágica a to-
+dos que pedem, não importando se usada para o bem 
+ou para o mal — pois a magia é mais importante que 
+a vida e nunca deve ser negada a ninguém. Talvez por 
+esse motivo Arton seja um mundo tão intenso em 
+energias mágicas e tão povoado por arcanistas.
+Crenças e Objetivos. Reverenciar a magia 
+arcana e seus praticantes. Promover o ensino da 
+magia. Usar a magia para proteger os necessitados e 
+trazer felicidade ao mundo.
+Símbolo Sagrado. Um anel metálico.
+Canalizar Energia. Qualquer.
+Arma Preferida. Adaga.
+Devotos. Elfos, golens, qareen, sílfides, arca-
+nistas, bardos.
+Poderes Concedidos. Bênção do Mana, 
+Centelha Mágica, Escudo Mágico, Teurgista Místico.
+Obrigações & Restrições. Assim como a 
+magia jamais deva ser negada para quem a busca, 
+devotos de Wynna devem praticar a bondade e a 
+generosidade de sua deusa, jamais recusando um 
+pedido de ajuda de alguém inocente. Além disso, 
+devotos de Wynna são proibidos de matar seres 
+mágicos (elfos, qareen, sílfides e outros a critério do 
+mestre) e conjuradores arcanos.
+Poderes Concedidos. Ataque Piedoso, Dom da 
+Imortalidade, Dom da Profecia, Dom da Ressurreição.
+Obrigações & Restrições. Devotos de 
+Thyatis são proibidos de matar criaturas inteligentes 
+(Int –3 ou maior). Podem atacar e causar dano, mas 
+jamais levar à morte. Por esse motivo, devotos de 
+Thyatis preferem armas e ataques que apenas inca-
+pacitam seus oponentes ou causam dano não letal.
+Valkaria
+A Deusa da Ambição 
+sempre foi a mais ousa-
+da entre os seus. Aju-
+daria a criar os lefeu, a 
+própria Tormenta. Cria-
+ria os seres humanos, 
+povo mais impetuoso e 
+beligerante de todos. Acaba-
+ria condenada ao cativeiro, até 
+ser resgatada por seus próprios protegidos, elevan-
+do ainda mais sua glória (ou teria assim planejado 
+desde o início?). Mas, quando Mestre Arsenal der-
+rotou Keenn para tomar seu lugar como Deus da 
+Guerra, o maior objetivo de Valkaria foi enfim al-
+cançado: um humano superou um deus. Esse even-
+to, e também a morte do antigo líder Tauron, levou 
+os deuses a reconhecerem Valkaria como a nova li-
+derança do Panteão.
+Crenças e Objetivos. Praticar o otimismo, 
+a evolução, a rebeldia. Desafiar limites, almejar o 
+impossível. Combater o mal, a opressão e a tirania. 
+Proteger a liberdade. Aceitar o novo e diferente e 
+adaptar-se a ele. Demonstrar ambição, paixão e 
+coragem. Desfrutar e amar a vida.
+Símbolo Sagrado. A Estátua de Valkaria ou 
+seis faixas entrelaçadas.
+Canalizar Energia. Positiva.
+Arma Preferida. Mangual.
+Devotos. Aventureiros; membros de todas as 
+classes podem ser devotos de Valkaria.
+Poderes Concedidos. Almejar o Impossível, 
+Armas da Ambição, Coragem Total, Liberdade Divina.
+Obrigações & Restrições. Valkaria odeia 
+o conformismo. Seus devotos são proibidos de 
+fixar moradia em um mesmo lugar, não podendo 
+permanecer mais de 2d10+10 dias na mesma cida-
+de (ou vila, aldeia, povoado...) ou 1d4+2 meses no 
+mesmo reino.
+Devotos de Valkaria também são proibidos de se 
+casar ou formar qualquer união estável.
+Deuses Menores
+Além das vinte divindades maiores do 
+Panteão, Arton é povoado por uma miríade 
+de deuses menores — neste mundo todos 
+podem ascender à divindade, desde que 
+sejam cultuados por um número suficiente 
+de pessoas. Entre os mais conhecidos 
+estão Tibar, o Deus do Comércio; Rhond, 
+o Deus das Armas, e Sckhar, o Deus (e 
+tirano) de Sckharshantallas.
+Regras para devotos de deuses menores 
+serão apresentadas em suplementos futuros.
+105
+
+--- Page 112 ---
+Capítulo Um
+Toques Finais
+Características 
+derivadas
+Pontos de Vida • PV
+Pontos de vida são uma medida de seu vigor 
+físico, tolerância a dor e experiência em combate. 
+Eles indicam a quantidade de dano que você pode 
+sofrer antes de cair inconsciente. Assim, o mesmo 
+ferimento que mataria um camponês comum será 
+“apenas um arranhão” para um bárbaro embrutecido 
+ou um ladino esquivo.
+Enquanto tiver pelo menos 1 ponto de vida, você 
+pode agir e lutar normalmente. Se ficar com 0 ou 
+menos PV, você cai inconsciente e sangrando (veja 
+mais sobre isso na página 236).
+Pontos de Mana • PM
+Pontos de mana são uma medida de sua energia, 
+determinação e força interior. Eles indicam quantas 
+habilidades você consegue usar.
+Você não pode gastar mais pontos de mana do 
+que tem, mas não sofre penalidades por ficar com 0 
+ou menos PM.
+Recuperando PV e PM
+Com uma noite de des­canso (pelo menos oito 
+horas de sono), você recupera PV e PM de acordo 
+com seu nível e condições de descanso.
+Ruim. Recuperação igual à metade do nível. 
+Dormir ao relento, sem um saco de dormir e um 
+acampamento, constitui condição ruim (veja Sobre-
+vivência, na página 123).
+Normal. Recuperação igual ao nível. Dormir 
+em uma estalagem comum constitui condição normal 
+(veja Hospedagem, na página 163.)
+Confortável. Recuperação igual ao dobro 
+do nível.
+Luxuosa. Recuperação igual ao triplo do nível.
+Helior, elfo caçador de 7º nível, recupera 7 PV e 
+7 PM com uma noite de sono numa estalagem. Mas, 
+como vive com o pé na estrada, dormindo ao relento, 
+se acostumou a recuperar apenas 3 PV e 3 PM.
+Certas habilidades, magias e itens também re-
+cuperam PV e PM. Você nunca pode recuperar mais 
+pontos de vida ou mana do que perdeu — ou seja, 
+não pode ultrapassar seu máximo.
+Pontos Temporários. Certos efeitos forne-
+cem PV ou PM temporários. Eles são somados a seus 
+pontos atuais, mesmo que ultrapassem o máximo. 
+Pontos temporários são sempre os primeiros a se-
+rem gastos. Caso não seja especificado o contrário, 
+pontos temporários desaparecem no fim do dia.
+Defesa
+A Defesa representa o quão difícil é acertá-lo em 
+combate. Sua Defesa é 10 + sua Destreza + seu 
+bônus de armadura e escudo.
+Quando você ataca um inimigo, a CD do seu 
+teste de ataque é à Defesa dele (veja mais sobre isso 
+no Capítulo 5: Jogando).
+Tamanho
+O tamanho de uma criatura é classificado em 
+seis categorias: Minúsculo, Pequeno, Médio, Grande, 
+Enorme e Colossal. Por padrão, seu tamanho é 
+Médio, mas sua raça pode alterar isso. Criaturas 
+Médias não recebem modificadores por tamanho. 
+Criaturas menores recebem bônus em Furtividade e 
+penalidade em manobras de combate. Para criaturas 
+maiores, esses bônus e penalidades são invertidos.
+Criaturas Minúsculas usam armas reduzidas, que 
+causam um passo a menos de dano (veja a Tabela 
+3-2: Dano de Armas, na página 143). Criaturas 
+Grandes e Enormes usam armas aumentadas, que 
+causam um passo a mais de dano, e criaturas Colos-
+sais usam armas gigantes, que causam dois passos 
+a mais de dano. Uma criatura pode usar uma arma 
+feita para até uma categoria de tamanho maior ou 
+menor que a dela, mas sofre –5 nos testes de ataque 
+e a arma ocupa um espaço a mais ou a menos, res-
+pectivamente (mínimo meio espaço).
+Deslocamento
+Sua velocidade, medida em quantos metros você 
+anda com uma ação de movimento. Por padrão, seu 
+deslocamento é 9 metros (6 quadrados no mapa), 
+mas algumas habilidades podem mudar esse valor.
+106
+ 
+
+--- Page 113 ---
+Construção de Personagem
+Descrição
+Atributos, raça, classe, origem, perícias, equipa-
+mentos, magias. O que você tem até aqui é suficiente 
+para jogar. Mas não é tudo que você pode ter.
+Um personagem pode ser mais que estatísticas 
+mecânicas. O mundo de Tormenta tem romances, 
+contos e quadrinhos: você pode reconhecer as raças 
+e classes dos heróis, mas grande parte de suas carac-
+terísticas não existe em termos de jogo. São criações 
+de seus autores. Aqui você também é livre para criar.
+“Não quero, não tenho talento, não tenho dom!”, você 
+pode pensar. Primeiro, não se sinta pressionado. 
+Você pode jogar como quiser, sem inventar nada. 
+Use a ficha, use os números e poderes. Não é feio, 
+não é pecado, é apenas mais um estilo. Milhares de 
+jogadores pelo mundo fazem o mesmo.
+Segundo, você pode criar — qualquer ser humano 
+pode. Somos a única espécie no planeta capaz de 
+imaginar coisas como elas não são, capaz de conce-
+ber coisas que não existem. Você não precisa ser um 
+gênio inventivo, não precisa se igualar a um escritor 
+ou roteirista profissional. Este jogo não é um concur-
+so de criatividade, nem uma entrevista de emprego. 
+Apenas invente algo que o deixe satisfeito. Não há 
+necessidade de ser totalmente original, você pode se 
+inspirar em outros personagens. Usar a ideia de ou-
+tra pessoa não é plágio (exceto quando você mente 
+sobre ser o verdadeiro autor e ainda ganha dinheiro 
+ou prestígio, mas isso é outra história).
+Para deixar seu personagem mais rico e colorido, 
+procure escrever pelo menos um parágrafo sobre o 
+histórico, a aparência e a personalidade dele.
+Ainda que sua raça e origem digam algo sobre o 
+passado de seu personagem, são apenas uma base, 
+um ponto de partida. Você é livre para acrescentar 
+todo tipo de detalhe — onde nasceu e cresceu, as 
+pessoas que conheceu, as lembranças e eventos que 
+o marcaram. Da mesma forma, sua classe diz o que 
+você consegue fazer, mas você ainda pode ser criativo 
+e acrescentar seu próprio estilo, seu jeito único de 
+resolver as coisas. Você é um bardo clássico com 
+bandolim ou harpa, ou será que espanca um furioso 
+tambor tribal? Você é um clérigo trajado em solenes 
+vestes monásticas, ou traz o símbolo sagrado de sua 
+divindade tatuado no peito nu? Luta com uma maça, 
+ou uma enorme frigideira?
+Consulte as descrições das raças para saber 
+sobre sua aparência. Essas são guias gerais, mas você 
+pode ser criativo. Seus atributos também podem 
+dar pistas sobre aparência — Força elevada indica 
+alguém musculoso, enquanto alto Carisma indicaria 
+grande beleza... ou não. Você também é livre para 
+escolher o gênero do seu personagem, mesmo que 
+seja diferente daquele com o qual você se identifica. 
+Acrescente traços particulares, como cor dos olhos, 
+cabelo, barba, cicatrizes, acessórios...
+A descrição da raça diz um pouco sobre sua 
+personalidade. Este é o comportamento padrão da-
+quele povo, mas não uma regra; você pode escolher 
+segui-lo ou não. Anões são desconfiados e teimosos, 
+elfos são amargos e arrogantes, mas você é livre para 
+inventar um anão crédulo e prestativo ou um elfo 
+despreocupado e modesto. Aliás, aqueles que deci-
+dem ser aventureiros muitas vezes o fazem porque 
+são diferentes, não se encaixam em sua sociedade.
+Não exagere nos detalhes ou será difícil mostrar 
+tudo na mesa de jogo (isto é, sem atrapalhar o an-
+damento da aventura). Muitos bons personagens de 
+séries, filmes e quadrinhos têm históricos curtos e uns 
+poucos traços marcantes. Claro, se quiser você pode 
+escrever diários, contos, até um romance inteiro sobre 
+seu personagem — muitos jogadores acham divertido 
+fazer isso! Apenas mantenha-se moderado ao jogar.
+O Capítulo 5: Jogando traz mais informa-
+ções sobre como lidar com os aspectos descritivos de 
+seu personagem durante uma aventura.
+Tabela 1-21: Tamanho de Criaturas
+Categoria 
+de Tamanho
+ 
+Exemplos
+Espaço Ocupado*/ 
+Alcance Natural
+Modificador de 
+Furtividade/Manobras
+Minúsculo
+Falcão, rato, sílfide
+1,5m
++5/–5
+Pequeno
+Cão, goblin, hynne
+1,5m
++2/–2
+Médio
+Humano, anão, elfo
+1,5m
+0
+Grande
+Cavalo, ogro, serpe
+3m
+–2/+2
+Enorme
+Ente, gigante, hidra
+4,5m
+–5/+5
+Colossal
+Colosso, dragão, kraken
+9m
+–10/+10
+*Espaço ocupado pela criatura. “3m”, por exemplo, significa que a criatura ocupa um espaço de 3m x 3m, ou seja, 2x2 quadrados num mapa.
+107
+
+--- Page 114 ---
+Capítulo Um
+Nome
+“E qual é o nome do personagem?”, pergunta 
+o mestre, trazendo sustos, engasgos e suor frio à 
+mesa de jogo! Depois de tantas decisões sobre 
+atributos, raças, classes e magias, muitos jogadores 
+costumam deixar isto por último. Dedicam pouco 
+tempo e esforço a esta escolha, justamente uma das 
+mais importantes.
+Pode parecer pouco, apenas um nome. Pode 
+parecer que qualquer improviso serve, qualquer Bob, 
+o Bárbaro, está de bom tamanho. Muitas vezes, em 
+muitos grupos, esse nome mal será usado — os joga-
+dores tratam-se por seus nomes reais ou apenas suas 
+classes ou raças: “Ah, eu ajudo o paladino e o minotauro 
+enquanto o clérigo lança a magia no anão!”.
+Você pode jogar assim, não é proibido. Como já 
+foi dito, Tormenta20 é jogado como você achar 
+que deve. No entanto, se deseja um personagem 
+marcante e memorável, um herói lendário de aven-
+turas e batalhas fabulosas, então vai precisar de um 
+nome. E um que seja bom!
+Não há regras aqui, mas deve haver bom senso. 
+Escolha um nome ridículo, constrangedor, e nin-
+guém vai querer dizê-lo em voz alta. Escolha um 
+nome complicado, de difícil pronúncia, e ninguém 
+vai lembrar. Um nome muito famoso como “Sher-
+lock” ou “Gandalf” levará todos a criar uma imagem 
+errada sobre o personagem (a menos que seja essa 
+sua intenção). Um nome muito comum, da vida real, 
+acabará com a imersão do grupo; esgueirar-se pelas 
+docas de Nova Malpetrim para encontrar um pesca-
+dor que diz “Olá, eu sou Paulo do Porto!” vai destruir 
+qualquer clima épico!
+Uma técnica de escritores é escolher um adjetivo 
+que descreva seu personagem e mudá-lo para que 
+pareça um nome; o público, inconscientemente, vai 
+associar essa qualidade (ou defeito) ao personagem. 
+Por exemplo, se você decidir que seu guerreiro é 
+muito agressivo, poderia chamá-lo “Agravh” ou 
+“Agrovorr”. Uma arcanista elegante poderia ser “Ele-
+annt” ou “Elgania”, e assim por diante.
+Está sem ideias? Abra um site com nomes de 
+bebês — alguns nomes da vida real são diferentes 
+e exóticos o bastante para combinar com histórias 
+de fantasia. Lisandra, Dagmar, Verônica, Christian, 
+Elisabeth, Hildegard. Outra ideia é pegar um nome 
+verdadeiro e mudar algumas letras: Mighel, Jeremun, 
+Kharolinne, Reynard, Nichaela. Por fim, você sempre 
+pode usar um gerador de nomes da internet!
+Para informações sobre os nomes em Arton, veja 
+as páginas 361 e 364.
+Idade
+Muitos heróis são jovens, mas nem todos pre-
+cisam ser. Não há idade certa para viver aventuras, 
+perseguir sonhos e combater o mal.
+Idade Inicial
+Você pode escolher a idade inicial de seu per-
+sonagem ou determiná-la aleatoriamente, com uma 
+rolagem que varia conforme sua classe.
+Bárbaro, Bucaneiro, Ladino, Luta-
+dor. 1d6+15 anos (para um resultado entre 16 
+e 21 anos).
+Bardo, Caçador, Cavaleiro, Guerreiro, 
+Nobre, Paladino. 2d4+15 anos (para um resulta-
+do entre 17 e 23 anos).
+Arcanista, Clérigo, Druida, Inven-
+tor. 2d6+15 anos (para um resultado entre 17 
+e 27 anos).
+Envelhecimento
+Conforme envelhecem, personagens recebem os 
+seguintes modificadores.
+Maduro (45 Anos). For –1, Des –1, Con –1, 
+Int +1, Sab +1, Car +1.
+Velho (70 Anos). For –2, Des –2, Con –2, Int 
++1, Sab +1, Car +1.
+Longevidade Máxima. 70 + 2d20 anos.
+Os modificadores são cumulativos. Assim, um 
+personagem velho recebe um total de For –3, Des 
+–3, Con –3, Int +2, Sab +2, Car +2.
+Raças Longevas
+As categorias de envelhecimento abaixo 
+se aplicam a todas as raças, com exceção 
+de anões, dahllan, elfos, golens, osteon, 
+qareen e sílfides. Essas raças usam a mesma 
+idade inicial, mas multiplicam as categorias 
+de envelhecimento (maduro e velho) e a 
+longevidade máxima pelos seguintes valores.
+• Anões e Qareen. x2.
+• Dahllan, Elfos, Golens, 
+Osteon, Sílfides. x5. Personagens 
+dessas raças não têm longevidade máxima; 
+podem viver para sempre, morrendo 
+apenas de formas violentas ou por razões 
+excepcionais (por exemplo, quando 
+escolhem deixar de viver ou são chamados 
+ao além-vida por sua divindade).
+108
+ 
+
+--- Page 115 ---
+Construção de Personagem
+O Esquadrão do Inferno. Aventureiros podem 
+O Esquadrão do Inferno. Aventureiros podem 
+salvar o mundo ou condená-lo
+salvar o mundo ou condená-lo
+Alinhamento
+Em tempos antigos, Arton era mais simples. 
+Havia bem e mal, lei e caos, a eterna batalha entre 
+os opostos. Verdadeiras forças cósmicas universais, 
+superiores aos próprios deuses. Mas isso mudaria. 
+Com o passar dos anos, tudo ficaria mais compli-
+cado. Entre os extremos, surgiriam tons de cinza. 
+Decisões antes simples, óbvias, não seriam mais. 
+Certo e errado nem sempre são o que parecem. Mais 
+que um mundo de problemas, Arton agora é um 
+mundo de decisões difíceis, um mundo de escolhas 
+que demandam sabedoria.
+O alinhamento de um personagem ou criatura 
+indica seu comportamento, sua filosofia de vida, sua 
+forma de ver o mundo. Não tem efeito em regras, 
+é apenas um guia de conduta que você pode adotar 
+para seu personagem. Cada um pode escolher usar 
+este aspecto do jogo ou ignorá-lo.
+Alinhamentos são somente guias gerais. Nin-
+guém é 100% consistente na vida real; duas pessoas 
+de mesmo alinhamento podem ser muito diferentes. 
+Você ainda é livre para escolher a personalidade de 
+seu aventureiro como quiser.
+O Eixo Ético: Bem e Mal
+Bondade. Pessoas bondosas ativamente reali-
+zam boas ações, protegendo a vida e o bem-estar das 
+criaturas vivas, sem pedir ou esperar recompensa: para 
+elas, ajudar é uma atitude natural, a coisa certa a fazer. 
+Pessoas bondosas também demonstram clemência, 
+aceitando a rendição de um inimigo e tratando-o com 
+compaixão ou mesmo gentileza.
+Neutralidade. Alguém moralmente neutro 
+vive em harmonia e colabora com seus semelhantes, 
+mas em geral espera receber algo em troca — mesmo 
+que seja apenas reconhecimento e gratidão. Só fará 
+sacrifícios por pessoas queridas ou se tiver algo a ga-
+nhar (e nesse caso não será realmente um sacrifício). 
+Por outro lado, hesita em prejudicar outros, e sente 
+no mínimo algum desconforto ao cometer atos cruéis.
+Maldade. Seres malignos provocam dor, morte 
+e angústia. Podem fazê-lo por crueldade (prazer com 
+a dor alheia) ou simples indiferença ao bem-estar 
+de outros. Muitos são incapazes de compaixão; 
+acham que os fracos e ineptos merecem tudo que 
+lhes aconteça. Só praticam atos virtuosos se houver 
+uma recompensa — e se não a recebem, sentem-se 
+injustiçados e buscam vingança.
+109
+
+--- Page 116 ---
+Capítulo Um
+O Eixo Moral: Lei e Caos
+Lei. Pessoas leais cumprem seus deveres, res-
+peitam a lei, a autoridade e a tradição. São honestos, 
+confiáveis, fiéis e obedientes — mas também podem 
+ser literais e teimosos, ter mente fechada e dificulda-
+de para se adaptar a situações novas. Muitas vezes 
+são ingênuos, achando que todos são sinceros e dig-
+nos de confiança. Por outro lado, também acreditam 
+que todos têm obrigações e podem ser intolerantes 
+com aqueles que não as cumprem.
+Neutralidade. Alguém moralmente neutro 
+obedece a leis e ordens, mas apenas até onde seus 
+sentimentos permitem. Diante de uma decisão 
+importante, pode optar por seguir seu bom senso. 
+Pessoas neutras são sinceras no que dizem, mas 
+também acham natural mentir e enganar — especial-
+mente quando acreditam que a mentira é inofensiva 
+ou que a verdade causará ainda mais estrago.
+Caos. Uma pessoa caótica segue seu coração, 
+não aceitando que outros digam o que é certo ou 
+errado. Liberdade é algo precioso para elas. São im-
+previsíveis: fazem o que querem, quando querem, 
+e mudam de ideia o tempo todo. Alguém caótico 
+tem facilidade para lidar com o inesperado, 
+adaptar-se ao novo e aceitar coisas diferentes 
+— mas também dificuldade para seguir ordens, 
+atuar em equipe, agir com responsabilidade e 
+manter a palavra.
+Os Nove 
+Alinhamentos
+Bem, mal, lei, caos e neutralidade 
+juntam-se em nove combinações. Aven-
+tureiros normalmente têm boa 
+índole (são bondosos ou neu-
+tros), enquanto seus adversá-
+rios costumam ser malignos.
+Criaturas se compor-
+tam de acordo com seu 
+alinhamento na maior 
+parte do tempo — mas 
+não o tempo todo. Um per-
+sonagem leal pode, vez ou 
+outra, violar uma regra ou 
+quebrar uma promessa. Um personagem ma-
+ligno pode, por alguma razão, ajudar uma 
+pessoa em apuros. No entanto, atitudes 
+que contrariam a tendência são raras, ja-
+mais constantes.
+Leal e Bondoso (LB)
+Estas pessoas fazem o que é esperado de uma 
+pessoa justa, respeitando a lei e sacrificando-se para 
+ajudar os necessitados. Cumprem suas promessas e 
+dizem a verdade. Quando não assumem a liderança, 
+são fiéis e devotados a seus comandantes. São into-
+lerantes com o mal; mesmo sendo capazes de perdão 
+e compaixão, acreditam que todo crime precisa ser 
+punido. Este é o alinhamento dos paladinos.
+Diante de uma criança faminta roubando um 
+pedaço de pão, vai explicar que roubar é errado, 
+comprar comida para ela e sua família, então levá-la 
+até um guarda da milícia.
+Neutro e Bondoso (NB)
+São pessoas de bom coração, que sentem prazer 
+e satisfação pessoal com a felicidade de outros. 
+Colaboram com as autoridades, mas não se sentem 
+O golem paladino Ignis Crae: líder da 
+O golem paladino Ignis Crae: líder da 
+Ordem da Redenção e campeão do Bem
+Ordem da Redenção e campeão do Bem
+110
+ 
+
+--- Page 117 ---
+Construção de Personagem
+obrigadas a fazê-lo — acham que ajudar o próximo é 
+mais importante que seguir ordens ou leis.
+Diante de uma criança faminta roubando um pe-
+daço de pão, ajuda tanto a criança quanto o mercador 
+roubado. Não tentará punir a criança (talvez apenas 
+dar-lhe um bom susto).
+Caótico e Bondoso (CB)
+São espíritos livres que promovem o bem, mas 
+preferem seguir seus próprios instintos e convic-
+ções, em vez de confiar em regras. Não acham 
+errado mentir, trapacear e roubar para trazer 
+bem-estar e alegria a outros. Também se preocu-
+pam em proteger a liberdade alheia, muitas vezes 
+combatendo tiranos.
+Diante de uma criança roubando pão, ajuda a en-
+cobrir a fuga da criança. Pode até orientá-la a roubar 
+de comerciantes ricos e inescrupulosos e também 
+dividir seu roubo com outros famintos.
+Leal e Neutro (LN)
+Pessoas metódicas e disciplinadas, que obede-
+cem às leis e cumprem suas promessas a qualquer 
+custo — pouco importando quem é beneficiado ou 
+prejudicado. Alguns adotam uma disciplina mais 
+pessoal, enquanto outros tentam impor suas normas 
+a todos ao redor. Sua sinceridade pode ser dura; 
+dizem o que pensam e não mentem, mesmo quando 
+a verdade pode magoar ou prejudicar alguém.
+Diante de uma criança faminta roubando pão, vai 
+impedir o roubo e avisar a milícia ou levar a criança 
+às autoridades.
+Neutro (N)
+Indivíduos com este alinhamento costumam ser 
+indiferentes, fracos em suas convicções, sem grandes 
+preocupações morais ou éticas. Ou então lutam ati-
+vamente pelo equilíbrio entre bem, mal, lei e caos, já 
+que um não existe sem o outro. Usam simples bom 
+senso para tomar suas decisões e no geral fazem 
+aquilo que parece ser uma boa ideia.
+Diante da criança que rouba pão, uma pessoa 
+neutra em geral não se envolve, a menos que tenha 
+alguma ligação pessoal com a criança ou o mercador.
+Certas criaturas — incluindo os animais — não 
+possuem nenhuma moral ou ética. Não sabem 
+a diferença entre certo e errado. Agem seguindo 
+seu instinto ou programação, sem a capacidade de 
+fazer escolhas reais. Um gorlogg e um colosso da 
+Supremacia podem ser perigosos, mas não malignos; 
+apenas fazem aquilo que foram criados para fazer. 
+Estas criaturas também são consideradas neutras.
+Caótico e Neutro (CN)
+Fazem o que bem entendem, sem se importar 
+com o que outros pensam. Valorizam a própria 
+liberdade, mas sem preocupação ou respeito pela li-
+berdade dos outros. Embora não aceitem autoridade, 
+também não lutarão contra ela, exceto quando essa 
+autoridade tenta impedi-los de fazer algo. Impacien-
+tes e imprevisíveis, parecem loucos — e talvez sejam.
+Diante de uma criança roubando pão, faz o 
+que parecer mais divertido. Talvez ajude na fuga 
+da criança ou aproveite a distração para pegar seu 
+próprio pedaço.
+Leal e Maligno (LM)
+Estes vilões acreditam que ordem, tradições 
+e códigos de conduta são mais importantes que 
+liberdade, dignidade e vida — especialmente de 
+outros. Podem estar presos a tabus, dogmas ou 
+códigos. Seguem leis pessoais ou impostas por líde-
+res, sentindo-se seguros e confortáveis ao fazê-lo, 
+mesmo causando sofrimento alheio. São metódicos e 
+organizados. Muitos respeitam regras de combate e 
+cumprem a palavra, mesmo frente a heróis inimigos.
+Diante da criança faminta roubando pão, trataria 
+de castigar o pequeno ladrão ali mesmo ou entregá-
+-lo à milícia para receber a punição mais severa.
+Neutro e Maligno (NM)
+São egoístas e mesquinhos, colocando a si mes-
+mos sempre em primeiro lugar. Pegam o que que-
+rem, pouco importando quem precisam roubar ou 
+matar. Quando fazem algum tipo de aliança, é ape-
+nas para tirar vantagem do parceiro e traí-lo no mo-
+mento oportuno. Adotam regras para quebrá-las em 
+seu próprio benefício no minuto seguinte.
+Diante da criança roubando pão, ameaça entregá-
+-la à milícia se não obedecer às suas ordens. Pode até 
+chantagear seus pais, tomando tudo que possuem.
+Caótico e Maligno (CM)
+Diferente de alguém que apenas não se importa 
+com outros, estes monstros são verdadeiramente 
+cruéis, tirando prazer do sofrimento alheio. São 
+brutais, violentos e imprevisíveis, capazes de matar 
+por pura diversão ou necessidade perversa. Por todos 
+estes motivos, é quase impossível que consigam 
+viver em sociedade — você não encontra um destes 
+andando pelas ruas com frequência. Têm dificuldade 
+em fazer planos e só trabalham em equipe quando 
+obrigados por força ou intimidação.
+Mataria a criança. E o mercador. E quem mais 
+estivesse por perto. E os comeria, com pão.
+111
+
+--- Page 118 ---
+CAPÍTULO
+Perícias 
+Perícias 
+& Poderes
+& Poderes
+2

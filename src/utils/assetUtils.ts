@@ -6,10 +6,22 @@ export const formatAssetName = (name: string) => {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, "_")
-    .replace(/[^\w_]/g, "")
-    .replace(/_+/g, "_") // Remove duplicate underscores
-    .replace(/^_|_$/g, ""); // Remove trailing/leading underscores
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]/g, "")
+    .replace(/-+/g, "-") // Remove duplicate hyphens
+    .replace(/^-|-$/g, ""); // Remove trailing/leading hyphens
+};
+
+export const getRaceImageName = (raceName: string) => {
+  // Special case for Suraggel variants (Aggelus/Sulfure)
+  // We want to use the inner name: "Suraggel (Aggelus)" -> "aggelus"
+  if (raceName.includes("Suraggel") && raceName.includes("(")) {
+    const match = raceName.match(/\(([^)]+)\)/);
+    if (match) {
+      return formatAssetName(match[1]);
+    }
+  }
+  return formatAssetName(raceName);
 };
 
 /**

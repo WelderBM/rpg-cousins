@@ -13,12 +13,23 @@ import {
   Swords,
   Brain,
   Sparkles,
+  Sword,
 } from "lucide-react";
-import { ClassDescription } from "../../interfaces/Class";
+import { ClassDescription, ClassPower } from "../../interfaces/Class";
 import Skill from "../../interfaces/Skills";
 import { Atributo } from "../../data/atributos";
+import ARCANISTA, {
+  allArcanistaSubtypes,
+  feiticeiroPaths,
+  draconicDamageTypes,
+  ArcanistaSubtypes,
+} from "../../data/classes/arcanista";
+
+import EQUIPAMENTOS, { Armas } from "../../data/equipamentos";
 
 import { formatAssetName } from "../../utils/assetUtils";
+import { getWeapons } from "@/functions/general";
+import Equipment from "@/interfaces/Equipment";
 
 /**
  * Componente de Card de Classe Visual
@@ -88,6 +99,9 @@ const RoleSelection = () => {
     setStep,
     roleSelectionState,
     setRoleSelectionState,
+    selectClassPowers,
+    selectedClassWeapons,
+    setSelectedClassWeapons,
   } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] =
@@ -99,6 +113,18 @@ const RoleSelection = () => {
   >({});
   const [classSkillChoices, setClassSkillChoices] = useState<Skill[]>([]);
   const [generalSkillChoices, setGeneralSkillChoices] = useState<Skill[]>([]);
+  const [selectedClassPowers, setSelectedClassPowers] = useState<ClassPower[]>(
+    []
+  );
+  const [localWeapons, setLocalWeapons] = useState<Equipment[]>([]);
+
+  // --- CONFIG MODAL STATE ---
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [arcanistConfig, setArcanistConfig] = useState<{
+    subtype: ArcanistaSubtypes | null;
+    lineage: string | null;
+    damageType: string | null;
+  }>({ subtype: null, lineage: null, damageType: null });
 
   // Sync LOCAL state with STORE when initialized or when Store changes
   useEffect(() => {
@@ -133,6 +159,19 @@ const RoleSelection = () => {
     setRoleSelectionState,
   ]);
 
+  // Initialize local weapons from store or defaults
+  useEffect(() => {
+    if (selectedPreview) {
+      if (selectedClassWeapons.length > 0) {
+        setLocalWeapons(selectedClassWeapons);
+      } else {
+        // Fallback to default weapons for the class if nothing is selected yet
+        const defaultWeapons = getWeapons(selectedPreview);
+        setLocalWeapons(defaultWeapons);
+      }
+    }
+  }, [selectedPreview]);
+
   // Scroll to top when entering/leaving preview
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -144,25 +183,26 @@ const RoleSelection = () => {
       setBasicSkillChoices({});
       setClassSkillChoices([]);
       setGeneralSkillChoices([]);
+      setSelectedClassPowers([]);
     }
     setSelectedPreview(cls);
   };
 
   // --- CALCULATIONS ---
+  const getFinalAttr = (attr: Atributo) => {
+    let bonus = 0;
+    if (selectedRace) {
+      selectedRace.attributes.attrs.forEach((a, idx) => {
+        if (a.attr === attr) bonus += a.mod;
+        if (a.attr === "any" && flexibleAttributeChoices[idx] === attr)
+          bonus += a.mod;
+      });
+    }
+    return baseAttributes[attr] + bonus;
+  };
+
   const stats = useMemo(() => {
     if (!selectedPreview) return null;
-
-    const getFinalAttr = (attr: Atributo) => {
-      let bonus = 0;
-      if (selectedRace) {
-        selectedRace.attributes.attrs.forEach((a, idx) => {
-          if (a.attr === attr) bonus += a.mod;
-          if (a.attr === "any" && flexibleAttributeChoices[idx] === attr)
-            bonus += a.mod;
-        });
-      }
-      return baseAttributes[attr] + bonus;
-    };
 
     const conMod = getFinalAttr(Atributo.CONSTITUICAO);
     const intMod = getFinalAttr(Atributo.INTELIGENCIA);
@@ -175,8 +215,7 @@ const RoleSelection = () => {
   }, [selectedPreview, selectedRace, baseAttributes, flexibleAttributeChoices]);
 
   const limits = useMemo(() => {
-    if (!selectedPreview || !stats)
-      return { class: 0, general: 0, raceBonus: 0 };
+    if (!selectedPreview || !stats) return { class: 0, extra: 0, raceBonus: 0 };
 
     const classQty = selectedPreview.periciasrestantes.qtd;
     const isHuman = selectedRace?.name === "Humano";
@@ -212,6 +251,26 @@ const RoleSelection = () => {
     return allSkills.filter((s) => !alreadyPicked.includes(s)).sort();
   }, [pickedInBasic, classSkillChoices, selectedPreview]);
 
+  const availableWeapons = useMemo(() => {
+    if (!selectedPreview) return [];
+    const profs = selectedPreview.proficiencias;
+    let list = [...EQUIPAMENTOS.armasSimples];
+    if (profs.includes("Armas Marciais"))
+      list = [...list, ...EQUIPAMENTOS.armasMarciais];
+    if (profs.includes("Armas de Fogo"))
+      list = [...list, ...EQUIPAMENTOS.armasDeFogo];
+    if (profs.includes("Armas Exóticas"))
+      list = [...list, ...EQUIPAMENTOS.armasExoticas];
+    return list;
+  }, [selectedPreview]);
+
+  const weaponSlots = useMemo(() => {
+    if (!selectedPreview) return 0;
+    if (selectedPreview.name === "Caçador") return 2;
+    if (selectedPreview.name === "Ladino") return 2;
+    return 1;
+  }, [selectedPreview]);
+
   // --- HANDLERS ---
   const toggleClassSkill = (skill: Skill) => {
     if (classSkillChoices.includes(skill)) {
@@ -233,16 +292,98 @@ const RoleSelection = () => {
     }
   };
 
+  const toggleWeapon = (weapon: Equipment, slotIdx: number) => {
+    const newWeapons = [...localWeapons];
+    newWeapons[slotIdx] = weapon;
+    setLocalWeapons(newWeapons);
+  };
+
+  // Helper to check if power requirements are met
+  const checkPowerRequirements = (power: ClassPower): boolean => {
+    if (!power.requirements || power.requirements.length === 0) return true;
+
+    // At level 1, we only check attribute requirements
+    return power.requirements.some((reqGroup) => {
+      return reqGroup.every((req) => {
+        if (req.type === "ATRIBUTO" && req.name && req.value !== undefined) {
+          const attrValue = getFinalAttr(req.name as Atributo);
+          return attrValue >= req.value;
+        }
+        if (req.type === "NIVEL" && req.value !== undefined) {
+          return 1 >= req.value; // Level 1 character
+        }
+        // Other requirements are assumed to be met or not applicable at level 1
+        return true;
+      });
+    });
+  };
+
+  const toggleClassPower = (power: ClassPower) => {
+    const isSelected = selectedClassPowers.some((p) => p.name === power.name);
+
+    if (isSelected) {
+      setSelectedClassPowers(
+        selectedClassPowers.filter((p) => p.name !== power.name)
+      );
+    } else {
+      // Level 1 characters get 1 power
+      if (selectedClassPowers.length < 1) {
+        setSelectedClassPowers([...selectedClassPowers, power]);
+      }
+    }
+  };
+
   const handleConfirm = () => {
     if (!selectedPreview) return;
+
+    // Check if class requires configuration
+    if (selectedPreview.name === "Arcanista") {
+      setIsConfigModalOpen(true);
+      return;
+    }
+
+    // Default fast-path for classes without options
+    proceedWithSelection(selectedPreview);
+  };
+
+  const proceedWithSelection = (finalClass: ClassDescription) => {
     const finalSkills = [
       ...pickedInBasic,
       ...classSkillChoices,
       ...generalSkillChoices,
     ];
-    selectClass(selectedPreview);
+
+    // If the class has a setup function but we haven't run it (not Arcanist), run it with defaults
+    // This covers classes like Cleric that might have a setup but no choices
+    if (finalClass.setup && finalClass.name !== "Arcanista") {
+      const setupClass = finalClass.setup(finalClass);
+      selectClass(setupClass);
+    } else {
+      selectClass(finalClass);
+    }
+
     updateSkills(finalSkills);
+    selectClassPowers(selectedClassPowers);
+    setSelectedClassWeapons(localWeapons);
     setStep(4);
+  };
+
+  const handleConfigConfirm = () => {
+    if (!selectedPreview) return;
+
+    if (selectedPreview.name === "Arcanista") {
+      if (!arcanistConfig.subtype) return; // Should be disabled if not selected
+
+      // Apply setup with options
+      const finalClass = ARCANISTA.setup!(selectedPreview, {
+        subtype: arcanistConfig.subtype,
+        lineage: arcanistConfig.lineage || undefined,
+        damageType: arcanistConfig.damageType || undefined,
+      });
+
+      proceedWithSelection(finalClass);
+      setIsConfigModalOpen(false);
+    }
   };
 
   const isValid = useMemo(() => {
@@ -251,15 +392,33 @@ const RoleSelection = () => {
       g.type === "or" ? !!basicSkillChoices[i] : true
     );
     const classDone = classSkillChoices.length === limits.class;
-    const extraDone = generalSkillChoices.length === Math.max(0, limits.extra);
-    return basicDone && classDone && extraDone;
+    const extraDone =
+      generalSkillChoices.length === Math.max(0, limits.extra || 0);
+    const powersDone = selectedClassPowers.length === 1; // Level 1 = 1 power
+    return basicDone && classDone && extraDone && powersDone;
   }, [
     selectedPreview,
     basicSkillChoices,
     classSkillChoices,
     generalSkillChoices,
+    selectedClassPowers,
     limits,
   ]);
+
+  const isConfigValid = useMemo(() => {
+    if (selectedPreview?.name === "Arcanista") {
+      if (!arcanistConfig.subtype) return false;
+      if (arcanistConfig.subtype === "Feiticeiro") {
+        if (!arcanistConfig.lineage) return false;
+        if (
+          arcanistConfig.lineage === "Linhagem Dracônica" &&
+          !arcanistConfig.damageType
+        )
+          return false;
+      }
+    }
+    return true;
+  }, [selectedPreview, arcanistConfig]);
 
   return (
     <div className="w-full min-h-screen relative bg-stone-950 pb-32">
@@ -341,22 +500,34 @@ const RoleSelection = () => {
             {/* Stats & Description */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Image & Description Banner */}
-              <div className="md:col-span-2 relative overflow-hidden flex items-center bg-stone-900/50 rounded-2xl min-h-[300px] md:min-h-[500px]">
-                <div className="absolute inset-0">
-                  <Image
-                    src={`/assets/classes/${formatAssetName(
-                      selectedPreview.name
-                    )}.webp`}
-                    alt={selectedPreview.name}
-                    fill
-                    className="object-cover object-top opacity-30"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/80 to-transparent" />
+              <div className="md:col-span-2 relative overflow-hidden flex items-center bg-stone-950 rounded-2xl min-h-[300px] md:min-h-[500px]">
+                {/* Background Image - Vertically Aligned with dark side padding */}
+                <div className="absolute inset-0 bg-stone-950">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Image
+                      src={`/assets/classes/${formatAssetName(
+                        selectedPreview.name
+                      )}.webp`}
+                      alt={selectedPreview.name}
+                      width={800}
+                      height={1200}
+                      className="object-contain opacity-30 h-full w-auto"
+                      style={{
+                        maxHeight: "100%",
+                        objectPosition: "center center",
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="relative z-10 p-6">
-                  <p className="text-neutral-300 leading-relaxed italic text-sm md:text-base border-l-4 border-amber-600/50 pl-4">
-                    "{selectedPreview.description || "Descrição indisponível."}"
-                  </p>
+                {/* Text Content */}
+                <div className="relative z-10 p-6 w-full">
+                  <div className="bg-stone-950/90 backdrop-blur-sm rounded-xl p-4 border border-stone-800/50">
+                    <p className="text-neutral-300 leading-relaxed italic text-sm md:text-base border-l-4 border-amber-600/50 pl-4">
+                      "
+                      {selectedPreview.description || "Descrição indisponível."}
+                      "
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -380,6 +551,35 @@ const RoleSelection = () => {
                   </span>
                 </div>
               </div>
+              {/* SKILLS - BASIC */}
+              <section className="space-y-4 pt-4 border-t border-stone-800 md:col-span-3 w-full">
+                <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
+                  <Sparkles size={18} /> Habilidades de 1º Nível
+                </h3>
+                <div className="grid gap-3">
+                  {selectedPreview.abilities
+                    .filter((a) => a.nivel === 1)
+                    .map((ability, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-stone-900/50 p-4 rounded-xl border border-stone-800 space-y-2"
+                      >
+                        <h4 className="font-ciszel font-bold text-amber-100">
+                          {ability.name}
+                        </h4>
+                        <p className="text-sm text-stone-400 leading-relaxed">
+                          {ability.text}
+                        </p>
+                      </div>
+                    ))}
+                  {selectedPreview.abilities.filter((a) => a.nivel === 1)
+                    .length === 0 && (
+                    <p className="text-stone-500 italic">
+                      Nenhuma habilidade inicial específica.
+                    </p>
+                  )}
+                </div>
+              </section>
             </div>
 
             {/* SKILLS - BASIC */}
@@ -515,7 +715,8 @@ const RoleSelection = () => {
                   {availableForGeneral.map((skill) => {
                     const isSelected = generalSkillChoices.includes(skill);
                     const isDisabled =
-                      !isSelected && generalSkillChoices.length >= limits.extra;
+                      !isSelected &&
+                      generalSkillChoices.length >= (limits.extra || 0);
                     return (
                       <button
                         key={skill}
@@ -548,6 +749,204 @@ const RoleSelection = () => {
               </section>
             )}
 
+            {/* CLASS POWERS */}
+            <section className="space-y-4">
+              <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
+                <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
+                  <Zap size={18} /> Poderes de Classe
+                </h3>
+                <span
+                  className={`text-xs font-bold px-3 py-1 rounded-full ${
+                    selectedClassPowers.length === 1
+                      ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50"
+                      : "bg-stone-800 text-stone-400 border border-stone-700"
+                  }`}
+                >
+                  {selectedClassPowers.length} / 1
+                </span>
+              </div>
+
+              <p className="text-xs text-stone-500 italic">
+                Escolha 1 poder de classe. Poderes com requisitos não atendidos
+                aparecem desabilitados.
+              </p>
+
+              <div className="grid gap-3">
+                {selectedPreview.powers.map((power) => {
+                  const isSelected = selectedClassPowers.some(
+                    (p) => p.name === power.name
+                  );
+                  const meetsRequirements = checkPowerRequirements(power);
+                  const isDisabled =
+                    !isSelected &&
+                    (!meetsRequirements || selectedClassPowers.length >= 1);
+
+                  return (
+                    <button
+                      key={power.name}
+                      disabled={isDisabled}
+                      onClick={() => toggleClassPower(power)}
+                      className={`text-left p-4 rounded-xl border transition-all ${
+                        isSelected
+                          ? "bg-purple-900/30 border-purple-500 text-purple-100"
+                          : isDisabled
+                          ? "opacity-40 cursor-not-allowed border-stone-800 text-stone-600 bg-stone-900/30"
+                          : "bg-stone-900 border-stone-800 text-stone-300 hover:border-purple-900/50 hover:bg-stone-800"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            isSelected
+                              ? "bg-purple-500 border-purple-500"
+                              : "border-stone-600 bg-black/40"
+                          }`}
+                        >
+                          {isSelected && (
+                            <Check size={14} className="text-stone-950" />
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-bold text-base">
+                              {power.name}
+                              {power.canRepeat && (
+                                <span className="ml-2 text-[10px] bg-amber-900/40 text-amber-400 px-2 py-0.5 rounded-full">
+                                  REPETÍVEL
+                                </span>
+                              )}
+                            </h4>
+                            {power.pmCost && (
+                              <span className="text-xs bg-blue-900/40 text-blue-400 px-2 py-1 rounded-full whitespace-nowrap">
+                                {power.pmCost} PM
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm leading-relaxed opacity-90">
+                            {power.text}
+                          </p>
+                          {power.requirements &&
+                            power.requirements.length > 0 && (
+                              <div className="flex flex-wrap gap-1 pt-1">
+                                {power.requirements[0].map((req, idx) => {
+                                  const reqMet = meetsRequirements;
+                                  return (
+                                    <span
+                                      key={idx}
+                                      className={`text-[10px] px-2 py-0.5 rounded-full ${
+                                        reqMet
+                                          ? "bg-emerald-900/40 text-emerald-400"
+                                          : "bg-red-900/40 text-red-400"
+                                      }`}
+                                    >
+                                      {req.type === "ATRIBUTO" &&
+                                        `${req.name} ${req.value}+`}
+                                      {req.type === "NIVEL" &&
+                                        `Nível ${req.value}+`}
+                                      {req.type === "PERICIA" &&
+                                        `Perícia: ${req.name}`}
+                                      {req.type === "PODER" &&
+                                        `Poder: ${req.name}`}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* WEAPON SELECTION SECTION */}
+            <section className="space-y-6 pt-6 border-t border-stone-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-cinzel text-amber-500">
+                    Equipamento Inicial
+                  </h3>
+                  <p className="text-sm text-stone-400">
+                    Escolha suas armas iniciais com base em suas proficiências.
+                  </p>
+                </div>
+                <div className="px-4 py-2 bg-amber-900/20 border border-amber-900/50 rounded-full">
+                  <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">
+                    {weaponSlots} {weaponSlots > 1 ? "Espaços" : "Espaço"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid gap-6">
+                {Array.from({ length: weaponSlots }).map((_, slotIdx) => (
+                  <div
+                    key={slotIdx}
+                    className="p-6 rounded-2xl bg-stone-900/50 border border-stone-800 space-y-4"
+                  >
+                    <div className="flex items-center gap-3 text-amber-100/60 uppercase text-[10px] font-bold tracking-[0.2em]">
+                      <Sword size={12} className="text-amber-500" />
+                      Slot de Arma {slotIdx + 1}
+                    </div>
+
+                    <div className="relative group">
+                      <select
+                        value={localWeapons[slotIdx]?.nome || ""}
+                        onChange={(e) => {
+                          const w = availableWeapons.find(
+                            (weapon) => weapon.nome === e.target.value
+                          );
+                          if (w) toggleWeapon(w, slotIdx);
+                        }}
+                        className="w-full bg-black/40 border border-stone-700 text-stone-100 p-4 rounded-xl outline-none focus:border-amber-500 transition-all appearance-none cursor-pointer group-hover:bg-black/60"
+                      >
+                        <option value="" disabled>
+                          Selecione uma arma...
+                        </option>
+                        {availableWeapons.map((weapon) => (
+                          <option key={weapon.nome} value={weapon.nome}>
+                            {weapon.nome} ({weapon.dano} | {weapon.critico})
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-amber-500/50 group-hover:text-amber-500 transition-colors">
+                        <ChevronRight size={20} className="rotate-90" />
+                      </div>
+                    </div>
+
+                    {localWeapons[slotIdx] && (
+                      <div className="flex flex-wrap gap-4 text-xs">
+                        <div className="flex items-center gap-1.5 text-stone-400">
+                          <span className="text-amber-500/50 font-bold uppercase tracking-tighter">
+                            Dano:
+                          </span>
+                          <span className="text-stone-200 font-medium">
+                            {localWeapons[slotIdx].dano}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-stone-400">
+                          <span className="text-amber-500/50 font-bold uppercase tracking-tighter">
+                            Crítico:
+                          </span>
+                          <span className="text-stone-200 font-medium">
+                            {localWeapons[slotIdx].critico}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-stone-400">
+                          <span className="text-amber-500/50 font-bold uppercase tracking-tighter">
+                            Tipo:
+                          </span>
+                          <span className="text-stone-200 font-medium">
+                            {localWeapons[slotIdx].tipo}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+
             {/* ACTION FOOTER */}
             <div className="sticky bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
               <div className="max-w-4xl mx-auto">
@@ -565,6 +964,144 @@ const RoleSelection = () => {
               </div>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CONFIG MODAL */}
+      <AnimatePresence>
+        {isConfigModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-stone-900 border border-amber-900/50 rounded-2xl p-8 max-w-xl w-full shadow-2xl space-y-6"
+            >
+              <h3 className="text-2xl font-cinzel text-amber-500 text-center border-b border-amber-900/30 pb-4">
+                Caminho do Arcanista
+              </h3>
+
+              <div className="space-y-6">
+                {/* SUBTYPE */}
+                <div className="space-y-2">
+                  <label className="text-xs text-stone-400 uppercase tracking-widest font-bold">
+                    Escolha seu Caminho
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {allArcanistaSubtypes.map((sub) => (
+                      <button
+                        key={sub}
+                        onClick={() =>
+                          setArcanistConfig({
+                            ...arcanistConfig,
+                            subtype: sub,
+                            // Reset dependent fields if changing main type
+                            lineage:
+                              sub === "Feiticeiro"
+                                ? arcanistConfig.lineage
+                                : null,
+                            damageType:
+                              sub === "Feiticeiro"
+                                ? arcanistConfig.damageType
+                                : null,
+                          })
+                        }
+                        className={`p-3 rounded-lg border text-sm font-bold transition-all ${
+                          arcanistConfig.subtype === sub
+                            ? "bg-amber-600 text-stone-950 border-amber-500"
+                            : "bg-stone-800 text-stone-400 border-stone-700 hover:border-amber-500/50"
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* LINEAGE (Feiticeiro only) */}
+                {arcanistConfig.subtype === "Feiticeiro" && (
+                  <div className="space-y-2">
+                    <label className="text-xs text-stone-400 uppercase tracking-widest font-bold">
+                      Linhagem Sobrenatural
+                    </label>
+                    <select
+                      value={arcanistConfig.lineage || ""}
+                      onChange={(e) =>
+                        setArcanistConfig({
+                          ...arcanistConfig,
+                          lineage: e.target.value,
+                          // Reset damage if not Draconic
+                          damageType:
+                            e.target.value === "Linhagem Dracônica"
+                              ? arcanistConfig.damageType
+                              : null,
+                        })
+                      }
+                      className="w-full bg-black/40 border border-stone-700 text-stone-200 rounded-lg p-3 outline-none focus:border-amber-500"
+                    >
+                      <option value="" disabled>
+                        Selecione uma Linhagem
+                      </option>
+                      {feiticeiroPaths.map((path) => (
+                        <option key={path.name} value={path.name}>
+                          {path.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* DAMAGE TYPE (Draconic only) */}
+                {arcanistConfig.lineage === "Linhagem Dracônica" && (
+                  <div className="space-y-2">
+                    <label className="text-xs text-stone-400 uppercase tracking-widest font-bold">
+                      Elemento Dracônico
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {draconicDamageTypes.map((type) => (
+                        <button
+                          key={type}
+                          onClick={() =>
+                            setArcanistConfig({
+                              ...arcanistConfig,
+                              damageType: type,
+                            })
+                          }
+                          className={`p-2 rounded border text-xs font-bold transition-all ${
+                            arcanistConfig.damageType === type
+                              ? "bg-red-500/80 text-white border-red-500"
+                              : "bg-stone-800 text-stone-400 border-stone-700 hover:border-red-500/50"
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 mt-8 pt-4 border-t border-stone-800">
+                <button
+                  onClick={() => setIsConfigModalOpen(false)}
+                  className="flex-1 py-3 bg-stone-800 text-stone-400 rounded-xl font-bold hover:bg-stone-700 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfigConfirm}
+                  disabled={!isConfigValid}
+                  className={`flex-1 py-3 rounded-xl font-bold transition-all flex justify-center items-center gap-2 ${
+                    isConfigValid
+                      ? "bg-amber-600 text-stone-950 hover:bg-amber-500 shadow-lg shadow-amber-900/20"
+                      : "bg-stone-800 text-stone-600 cursor-not-allowed"
+                  }`}
+                >
+                  Confirmar Escolhas
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

@@ -86,6 +86,28 @@ export const CharacterService = {
     }
   },
 
+  // Update a character by its full path
+  async updateCharacterByPath(path: string, updates: Partial<Character>) {
+    try {
+      const { doc, updateDoc, serverTimestamp } = await import(
+        "firebase/firestore"
+      );
+      const { db } = await import("../firebaseConfig");
+
+      const charRef = doc(db!, path);
+
+      const dataToUpdate = sanitizeForFirestore({
+        ...updates,
+        updatedAt: serverTimestamp(),
+      });
+
+      await updateDoc(charRef, dataToUpdate);
+    } catch (error) {
+      console.error("Erro ao atualizar personagem por caminho:", error);
+      throw error;
+    }
+  },
+
   // Listar personagens
   async getCharacters(
     userId?: string,
@@ -159,18 +181,20 @@ export const CharacterService = {
       const charsRef = collection(db!, "users", uid, "characters");
       const snapshot = await getDocs(charsRef);
 
+      // Ensures only ONE favorite exists (Radio Button behavior)
       snapshot.docs.forEach((d) => {
+        const charRef = doc(db!, "users", uid, "characters", d.id);
+        const data = d.data();
+
         if (d.id === charId) {
-          batch.update(doc(db!, "users", uid, "characters", d.id), {
-            isFavorite: true,
-          });
+          // Verify if it needs update to avoid unnecessary writes
+          if (data.isFavorite !== true) {
+            batch.update(charRef, { isFavorite: true });
+          }
         } else {
-          // Optimization: only update if currently true?
-          // But reading data inside loop is fine since we have snapshot
-          if (d.data().isFavorite) {
-            batch.update(doc(db!, "users", uid, "characters", d.id), {
-              isFavorite: false,
-            });
+          // Unset all others
+          if (data.isFavorite === true) {
+            batch.update(charRef, { isFavorite: false });
           }
         }
       });

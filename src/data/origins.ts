@@ -1,65 +1,65 @@
-import _ from 'lodash';
-import Origin, { Items, OriginBenefits } from '../interfaces/Origin';
+import _ from "lodash";
+import Origin, { Items, OriginBenefits } from "../interfaces/Origin";
 import {
   getNotRepeatedRandomSkill,
   getNotUsedSkillsFromAllowed,
-} from './pericias';
-import originPowers, { ORIGIN_POWER_TYPE } from './powers/originPowers';
-import { DestinyPowers } from './powers/destinyPowers';
+} from "./pericias";
+import originPowers, { ORIGIN_POWER_TYPE } from "./powers/originPowers";
+import { DestinyPowers } from "./powers/destinyPowers";
 import {
   getNotRepeatedRandom,
   getRandomItemFromArray,
   pickFromArray,
-} from '../functions/randomUtils';
+} from "../functions/randomUtils";
 import {
   OriginPower,
   GeneralPower,
   GeneralPowerType,
   PowerGetter,
-} from '../interfaces/Poderes';
-import generalPowers, { getUnrestricedTormentaPowers } from './poderes';
-import Skill from '../interfaces/Skills';
-import EQUIPAMENTOS, { Armas } from './equipamentos';
-import combatPowers from './powers/combatPowers';
-import CharacterSheet, { SubStep } from '../interfaces/CharacterSheet';
-import { isPowerAvailable } from '../functions/powers';
+} from "../interfaces/Poderes";
+import generalPowers, { getUnrestricedTormentaPowers } from "./poderes";
+import Skill from "../interfaces/Skills";
+import EQUIPAMENTOS, { Armas } from "./equipamentos";
+import combatPowers from "./powers/combatPowers";
+import CharacterSheet, { SubStep } from "../interfaces/CharacterSheet";
+import { isPowerAvailable } from "../functions/powers";
 
 export type origins =
-  | 'Acólito'
-  | 'Amigo dos Animais'
-  | 'Amnésico'
-  | 'Aristocrata'
-  | 'Artesão'
-  | 'Artista'
-  | 'Assistente de Laboratório'
-  | 'Batedor'
-  | 'Capanga'
-  | 'Charlatão'
-  | 'Circense'
-  | 'Criminoso'
-  | 'Curandeiro'
-  | 'Eremita'
-  | 'Escravo'
-  | 'Estudioso'
-  | 'Fazendeiro'
-  | 'Forasteiro'
-  | 'Gladiador'
-  | 'Guarda'
-  | 'Herdeiro'
-  | 'Herói Camponês'
-  | 'Marujo'
-  | 'Mateiro'
-  | 'Membro de Guilda'
-  | 'Mercador'
-  | 'Minerador'
-  | 'Nômade'
-  | 'Pivete'
-  | 'Refugiado'
-  | 'Seguidor'
-  | 'Selvagem'
-  | 'Soldado'
-  | 'Taverneiro'
-  | 'Trabalhador';
+  | "Acólito"
+  | "Amigo dos Animais"
+  | "Amnésico"
+  | "Aristocrata"
+  | "Artesão"
+  | "Artista"
+  | "Assistente de Laboratório"
+  | "Batedor"
+  | "Capanga"
+  | "Charlatão"
+  | "Circense"
+  | "Criminoso"
+  | "Curandeiro"
+  | "Eremita"
+  | "Escravo"
+  | "Estudioso"
+  | "Fazendeiro"
+  | "Forasteiro"
+  | "Gladiador"
+  | "Guarda"
+  | "Herdeiro"
+  | "Herói Camponês"
+  | "Marujo"
+  | "Mateiro"
+  | "Membro de Guilda"
+  | "Mercador"
+  | "Minerador"
+  | "Nômade"
+  | "Pivete"
+  | "Refugiado"
+  | "Seguidor"
+  | "Selvagem"
+  | "Soldado"
+  | "Taverneiro"
+  | "Trabalhador";
 
 function removeOriginPowers(origin: Origin) {
   return origin.poderes.filter((power) =>
@@ -75,7 +75,7 @@ function makeOriginGeneralPowerGetter(
 
   return (sheet: CharacterSheet, subSteps: SubStep[]) => {
     const originGeneralPowersbyOrigin =
-      origin.name === 'Amnésico'
+      origin.name === "Amnésico"
         ? Object.values(generalPowers).flat()
         : originGeneralPowers;
     const allowedByRequirement = originGeneralPowersbyOrigin.filter((power) => {
@@ -94,7 +94,7 @@ function makeOriginGeneralPowerGetter(
     if (randomPower) {
       sheet.generalPowers.push(randomPower);
       subSteps.push({
-        name: 'Poder Geral',
+        name: "Poder Geral",
         value: randomPower.name,
       });
       return;
@@ -107,7 +107,7 @@ function makeOriginGeneralPowerGetter(
     if (randomSkillFromOrigin) {
       sheet.skills.push(randomSkillFromOrigin);
       subSteps.push({
-        name: 'Perícia',
+        name: "Perícia",
         value: randomSkillFromOrigin,
       });
       return;
@@ -120,7 +120,7 @@ function makeOriginGeneralPowerGetter(
 
     sheet.skills.push(randomSkill);
     subSteps.push({
-      name: 'Perícia*',
+      name: "Perícia*",
       value: randomSkill,
     });
   };
@@ -163,7 +163,7 @@ function getBenefits(
 ) {
   return benefits.reduce<OriginBenefits>(
     (acc, benefit) => {
-      if (typeof benefit === 'string') {
+      if (typeof benefit === "string") {
         return benefitsStrategies.string(benefit, acc);
       }
 
@@ -277,7 +277,7 @@ function getBenefitsWithRandomCombatPower(
 
 export const ORIGINS: Record<origins, Origin> = {
   Acólito: {
-    name: 'Acólito',
+    name: "Acólito",
     pericias: [Skill.CURA, Skill.RELIGIAO, Skill.VONTADE],
     poderes: [
       DestinyPowers.MEDICINA,
@@ -286,29 +286,29 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
     getItems: (): Items[] => [
       {
-        equipment: 'Símbolo sagrado',
+        equipment: "Símbolo sagrado",
       },
       {
-        equipment: 'Traje de Sacerdote',
+        equipment: "Traje de Sacerdote",
       },
     ],
   },
-  'Amigo dos Animais': {
-    name: 'Amigo dos Animais',
+  "Amigo dos Animais": {
+    name: "Amigo dos Animais",
     getItems: (): Items[] => [
       {
-        equipment: 'Cão de guarda, cavalo, pônei ou trobo (escolha um).',
+        equipment: "Cão de guarda, cavalo, pônei ou trobo (escolha um).",
       },
     ],
     pericias: [Skill.ADESTRAMENTO, Skill.CAVALGAR],
     poderes: [originPowers.AMIGO_ESPECIAL],
   },
   Amnésico: {
-    name: 'Amnésico',
+    name: "Amnésico",
     getItems: (): Items[] => [
       {
         equipment:
-          'Um ou mais itens (somando até T$ 500), aprovados pelo mestre, que podem ser uma pista misteriosa do seu passado.',
+          "Um ou mais itens (somando até T$ 500), aprovados pelo mestre, que podem ser uma pista misteriosa do seu passado.",
       },
     ],
     pericias: [],
@@ -316,37 +316,37 @@ export const ORIGINS: Record<origins, Origin> = {
     getPowersAndSkills: sortAmnesicBenefits,
   },
   Aristocrata: {
-    name: 'Aristocrata',
+    name: "Aristocrata",
     getItems: (): Items[] => [
       {
-        equipment: 'Joia de família no valor de T$ 300',
+        equipment: "Joia de família no valor de T$ 300",
       },
       {
-        equipment: 'Traje da Corte',
+        equipment: "Traje da Corte",
       },
     ],
     pericias: [Skill.DIPLOMACIA, Skill.ENGANACAO, Skill.NOBREZA],
     poderes: [originPowers.SANGUE_AZUL, DestinyPowers.COMANDAR],
   },
   Artesão: {
-    name: 'Artesão',
+    name: "Artesão",
     getItems: (): Items[] => [
       {
-        equipment: 'Instrumentos de ofício (qualquer)',
+        equipment: "Instrumentos de ofício (qualquer)",
       },
       {
-        equipment: 'Um item que você possa fabricar de até T$ 50',
+        equipment: "Um item que você possa fabricar de até T$ 50",
       },
     ],
     pericias: [Skill.OFICIO_ARTESANATO, Skill.VONTADE],
     poderes: [originPowers.FRUTOS_DO_TRABALHO, DestinyPowers.SORTUDO],
   },
   Artista: {
-    name: 'Artista',
+    name: "Artista",
     getItems: (): Items[] => [
       {
         equipment:
-          'Estojo de disfarces ou um instrumento musical a sua escolha.',
+          "Estojo de disfarces ou um instrumento musical a sua escolha.",
       },
     ],
     pericias: [Skill.ATUACAO, Skill.ENGANACAO],
@@ -357,11 +357,11 @@ export const ORIGINS: Record<origins, Origin> = {
       DestinyPowers.TORCIDA,
     ],
   },
-  'Assistente de Laboratório': {
-    name: 'Assistente de Laboratório',
+  "Assistente de Laboratório": {
+    name: "Assistente de Laboratório",
     getItems: (): Items[] => [
       {
-        equipment: 'Instrumentos de Ofício (alquimista)',
+        equipment: "Instrumentos de Ofício (alquimista)",
       },
     ],
     pericias: [Skill.OFICIO_ALQUIMIA, Skill.MISTICISMO],
@@ -369,29 +369,21 @@ export const ORIGINS: Record<origins, Origin> = {
     getPowersAndSkills: sortLabAssistentBenefits,
   },
   Batedor: {
-    name: 'Batedor',
+    name: "Batedor",
     getItems: (): Items[] => {
-      const allowedWapons = [
-        Armas.ARCOCURTO,
-        Armas.BESTALEVE,
-        Armas.AZAGAIA,
-        Armas.FUNDA,
-        Armas.ARCO_LONGO,
-        Armas.BESTA_PESADA,
-      ];
-
-      const selectedWeapon = getRandomItemFromArray(allowedWapons);
+      const selectedWeapon = Armas.ARCOCURTO;
 
       const originItems = [
         {
           equipment: selectedWeapon,
-          description: 'Uma arma simples ou marcial de ataque à distância',
+          description: "Uma arma simples ou marcial de ataque à distância",
+          choice: "Armas Marciais", // Usamos isso para sinalizar o grupo
         },
         {
-          equipment: 'Barraca',
+          equipment: "Barraca",
         },
         {
-          equipment: 'Equipamento de viagem',
+          equipment: "Equipamento de viagem",
         },
       ];
 
@@ -405,11 +397,9 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Capanga: {
-    name: 'Capanga',
+    name: "Capanga",
     getItems: (): Items[] => {
-      const allowedWapons = [Armas.ADAGA, Armas.ESPADACURTA, Armas.FOICE];
-
-      const selectedWeapon = getRandomItemFromArray(allowedWapons);
+      const selectedWeapon = Armas.ADAGA;
 
       const originItems = [
         {
@@ -417,7 +407,7 @@ export const ORIGINS: Record<origins, Origin> = {
         },
         {
           equipment:
-            'Tatuagem ou outro adereço de sua gangue aprimorado (+1 em Intimidação)',
+            "Tatuagem ou outro adereço de sua gangue aprimorado (+1 em Intimidação)",
         },
       ];
 
@@ -428,14 +418,14 @@ export const ORIGINS: Record<origins, Origin> = {
     getPowersAndSkills: getBenefitsWithRandomCombatPower,
   },
   Charlatão: {
-    name: 'Charlatão',
+    name: "Charlatão",
     getItems: (): Items[] => [
       {
         equipment:
-          'Joia falsificada (valor aparente de T$ 100, sem valor real)',
+          "Joia falsificada (valor aparente de T$ 100, sem valor real)",
       },
       {
-        equipment: 'Estojo de disfarces',
+        equipment: "Estojo de disfarces",
       },
     ],
     pericias: [Skill.ENGANACAO, Skill.JOGATINA],
@@ -446,10 +436,10 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Circense: {
-    name: 'Circense',
+    name: "Circense",
     getItems: (): Items[] => [
       {
-        equipment: 'Bola Colorida (+1 em Atuação)',
+        equipment: "Bola Colorida (+1 em Atuação)",
         qtd: 3,
       },
     ],
@@ -461,27 +451,27 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Criminoso: {
-    name: 'Criminoso',
+    name: "Criminoso",
     getItems: (): Items[] => [
       {
-        equipment: 'Estojo de disfarces',
+        equipment: "Estojo de disfarces",
       },
       {
-        equipment: 'Gazua',
+        equipment: "Gazua",
       },
     ],
     pericias: [Skill.ENGANACAO, Skill.FURTIVIDADE, Skill.LADINAGEM],
     poderes: [originPowers.PUNGUISTA, DestinyPowers.VENEFICIO],
   },
   Curandeiro: {
-    name: 'Curandeiro',
+    name: "Curandeiro",
     getItems: (): Items[] => [
       {
-        equipment: 'Bálsamo restaurador',
+        equipment: "Bálsamo restaurador",
         qtd: 2,
       },
       {
-        equipment: 'Maleta de Medicamentos',
+        equipment: "Maleta de Medicamentos",
       },
     ],
     pericias: [Skill.CURA, Skill.VONTADE],
@@ -492,37 +482,37 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Eremita: {
-    name: 'Eremita',
+    name: "Eremita",
     getItems: (): Items[] => [
       {
-        equipment: 'Barraca',
+        equipment: "Barraca",
       },
       {
-        equipment: 'Equipamento de viagem',
+        equipment: "Equipamento de viagem",
       },
     ],
     pericias: [Skill.MISTICISMO, Skill.RELIGIAO, Skill.SOBREVIVENCIA],
     poderes: [originPowers.BUSCA_INTERIOR, DestinyPowers.LOBO_SOLITARIO],
   },
   Escravo: {
-    name: 'Escravo',
+    name: "Escravo",
     getItems: (): Items[] => [
       {
-        equipment: 'Algemas',
+        equipment: "Algemas",
       },
       {
-        equipment: 'Ferramenta Pesada (mesma estatística que maça)',
+        equipment: "Ferramenta Pesada (mesma estatística que maça)",
       },
     ],
     pericias: [Skill.ATLETISMO, Skill.FORTITUDE, Skill.FURTIVIDADE],
     poderes: [originPowers.DESEJO_DE_LIBERDADE, combatPowers.VITALIDADE],
   },
   Estudioso: {
-    name: 'Estudioso',
+    name: "Estudioso",
     getItems: (): Items[] => [
       {
         equipment:
-          'Coleção de livros (+1 em Conhecimento, Guerra, Misticismo ou Nobreza, a sua escolha).',
+          "Coleção de livros (+1 em Conhecimento, Guerra, Misticismo ou Nobreza, a sua escolha).",
       },
     ],
     pericias: [Skill.CONHECIMENTO, Skill.GUERRA, Skill.MISTICISMO],
@@ -532,20 +522,20 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Fazendeiro: {
-    name: 'Fazendeiro',
+    name: "Fazendeiro",
     getItems: (): Items[] => [
       {
-        equipment: 'Carroça',
+        equipment: "Carroça",
       },
       {
-        equipment: 'Ferramenta agrícola (mesmas estatísticas de uma lança)',
+        equipment: "Ferramenta agrícola (mesmas estatísticas de uma lança)",
       },
       {
-        equipment: 'Ração de Viagem',
+        equipment: "Ração de Viagem",
         qtd: 10,
       },
       {
-        equipment: 'Animal não combativo (como uma galinha, porco ou ovelha)',
+        equipment: "Animal não combativo (como uma galinha, porco ou ovelha)",
       },
     ],
     pericias: [
@@ -557,39 +547,35 @@ export const ORIGINS: Record<origins, Origin> = {
     poderes: [originPowers.AGUA_NO_FEIJAO, combatPowers.GINETE],
   },
   Forasteiro: {
-    name: 'Forasteiro',
+    name: "Forasteiro",
     getItems: (): Items[] => [
       {
-        equipment: 'Equipamento de viagem',
+        equipment: "Equipamento de viagem",
       },
       {
-        equipment: 'Traje de Viagem Estrangeiro',
+        equipment: "Traje de Viagem Estrangeiro",
       },
       {
         equipment:
-          'Instrumento musical exótico (+1 em uma perícia de Carisma aprovada pelo mestre)',
+          "Instrumento musical exótico (+1 em uma perícia de Carisma aprovada pelo mestre)",
       },
     ],
     pericias: [Skill.CAVALGAR, Skill.PILOTAGEM, Skill.SOBREVIVENCIA],
     poderes: [originPowers.CULTURA_EXOTICA, DestinyPowers.LOBO_SOLITARIO],
   },
   Gladiador: {
-    name: 'Gladiador',
+    name: "Gladiador",
     getItems: (): Items[] => {
-      const allowedWapons = [
-        ...EQUIPAMENTOS.armasMarciais,
-        ...EQUIPAMENTOS.armasExoticas,
-      ];
-
-      const selectedWeapon = getRandomItemFromArray(allowedWapons);
+      const selectedWeapon = Armas.ESPADA_LONGA;
 
       const originItems = [
         {
           equipment: selectedWeapon,
-          description: 'Uma arma marcial ou exótica',
+          description: "Uma arma marcial ou exótica",
+          choice: "Armas Marciais",
         },
         {
-          equipment: 'Item sem valor recebido de um admirador',
+          equipment: "Item sem valor recebido de um admirador",
         },
       ];
 
@@ -604,22 +590,21 @@ export const ORIGINS: Record<origins, Origin> = {
     getPowersAndSkills: getBenefitsWithRandomCombatPower,
   },
   Guarda: {
-    name: 'Guarda',
+    name: "Guarda",
     getItems: (): Items[] => {
-      const allowedWapons = [...EQUIPAMENTOS.armasMarciais];
-
-      const selectedWeapon = getRandomItemFromArray(allowedWapons);
+      const selectedWeapon = Armas.ESPADA_LONGA;
 
       const originItems = [
         {
-          equipment: 'Insígnia da Milícia',
+          equipment: "Insígnia da Milícia",
         },
         {
-          equipment: 'Apito',
+          equipment: "Apito",
         },
         {
           equipment: selectedWeapon,
-          description: 'Uma arma marcial',
+          description: "Uma arma marcial",
+          choice: "Armas Marciais",
         },
       ];
 
@@ -630,23 +615,23 @@ export const ORIGINS: Record<origins, Origin> = {
     getPowersAndSkills: getBenefitsWithRandomCombatPower,
   },
   Herdeiro: {
-    name: 'Herdeiro',
+    name: "Herdeiro",
     getItems: (): Items[] => [
       {
-        equipment: 'Símbolo de Herança',
+        equipment: "Símbolo de Herança",
       },
     ],
     pericias: [Skill.MISTICISMO, Skill.NOBREZA, Skill.OFICIO],
     poderes: [originPowers.HERANCA, DestinyPowers.COMANDAR],
   },
-  'Herói Camponês': {
-    name: 'Herói Camponês',
+  "Herói Camponês": {
+    name: "Herói Camponês",
     getItems: (): Items[] => [
       {
-        equipment: 'Instrumentos de ofício',
+        equipment: "Instrumentos de ofício",
       },
       {
-        equipment: 'Traje de Plebeu',
+        equipment: "Traje de Plebeu",
       },
     ],
     pericias: [Skill.ADESTRAMENTO, Skill.OFICIO],
@@ -658,31 +643,31 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Marujo: {
-    name: 'Marujo',
+    name: "Marujo",
     getItems: (): Items[] => [
       {
-        equipment: 'Corda',
+        equipment: "Corda",
       },
     ],
     pericias: [Skill.ATLETISMO, Skill.JOGATINA, Skill.PILOTAGEM],
     poderes: [originPowers.PASSAGEM_DE_NAVIO, DestinyPowers.ACROBATICO],
   },
   Mateiro: {
-    name: 'Mateiro',
+    name: "Mateiro",
     getItems: (): Items[] => [
       {
-        equipment: 'Barraca',
+        equipment: "Barraca",
       },
       {
-        equipment: 'Equipamento de viagem',
+        equipment: "Equipamento de viagem",
       },
       {
-        equipment: 'Flechas',
+        equipment: "Flechas",
         qtd: 20,
       },
       {
         equipment: Armas.ARCOCURTO,
-        description: 'Arco curto',
+        description: "Arco curto",
       },
     ],
     pericias: [Skill.ATLETISMO, Skill.FURTIVIDADE, Skill.SOBREVIVENCIA],
@@ -692,15 +677,10 @@ export const ORIGINS: Record<origins, Origin> = {
       DestinyPowers.SENTIDOS_AGUCADOS,
     ],
   },
-  'Membro de Guilda': {
-    name: 'Membro de Guilda',
+  "Membro de Guilda": {
+    name: "Membro de Guilda",
     getItems: (): Items[] => {
-      const allowedEquipments = [
-        { equipment: 'Gazua.' },
-        { equipment: 'Instrumento de Ofício' },
-      ];
-
-      const selectedItem = getRandomItemFromArray(allowedEquipments);
+      const selectedItem = { equipment: "Gazua." };
 
       return [selectedItem];
     },
@@ -713,16 +693,16 @@ export const ORIGINS: Record<origins, Origin> = {
     poderes: [originPowers.REDE_DE_CONTATOS, DestinyPowers.FOCO_EM_PERICIA],
   },
   Mercador: {
-    name: 'Mercador',
+    name: "Mercador",
     getItems: (): Items[] => [
       {
-        equipment: 'Carroça',
+        equipment: "Carroça",
       },
       {
-        equipment: 'Trobo',
+        equipment: "Trobo",
       },
       {
-        equipment: 'Mercadoria no valor de T$ 100',
+        equipment: "Mercadoria no valor de T$ 100",
       },
     ],
     pericias: [Skill.DIPLOMACIA, Skill.INTUICAO, Skill.OFICIO],
@@ -733,14 +713,14 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Minerador: {
-    name: 'Minerador',
+    name: "Minerador",
     getItems: (): Items[] => [
       {
-        equipment: 'Gemas preciosas no valor de T$ 100',
+        equipment: "Gemas preciosas no valor de T$ 100",
       },
       {
         equipment: Armas.PICARETA,
-        description: 'Picareta',
+        description: "Picareta",
       },
     ],
     pericias: [Skill.ATLETISMO, Skill.FORTITUDE, Skill.OFICIO_MINERADOR],
@@ -751,14 +731,14 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Nômade: {
-    name: 'Nômade',
+    name: "Nômade",
     getItems: (): Items[] => [
       {
         equipment: Armas.BORDAO,
-        description: 'Bordão',
+        description: "Bordão",
       },
       {
-        equipment: 'Equipamento de viagem',
+        equipment: "Equipamento de viagem",
       },
     ],
     pericias: [Skill.CAVALGAR, Skill.PILOTAGEM, Skill.SOBREVIVENCIA],
@@ -769,16 +749,16 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Pivete: {
-    name: 'Pivete',
+    name: "Pivete",
     getItems: (): Items[] => [
       {
-        equipment: 'Gazua',
+        equipment: "Gazua",
       },
       {
-        equipment: 'Traje de Plebeu',
+        equipment: "Traje de Plebeu",
       },
       {
-        equipment: 'Animal urbano (como um cão, gato, rato ou pombo)',
+        equipment: "Animal urbano (como um cão, gato, rato ou pombo)",
       },
     ],
     pericias: [Skill.FURTIVIDADE, Skill.INICIATIVA, Skill.LADINAGEM],
@@ -789,20 +769,20 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Refugiado: {
-    name: 'Refugiado',
+    name: "Refugiado",
     getItems: (): Items[] => [
       {
-        equipment: 'Um item estrangeiro de até T$ 100.',
+        equipment: "Um item estrangeiro de até T$ 100.",
       },
     ],
     pericias: [Skill.FORTITUDE, Skill.REFLEXOS, Skill.VONTADE],
     poderes: [originPowers.ESTOICO, DestinyPowers.VONTADE_DE_FERRO],
   },
   Seguidor: {
-    name: 'Seguidor',
+    name: "Seguidor",
     getItems: (): Items[] => [
       {
-        equipment: 'Um item recebido de seu mestre de até T$ 100.',
+        equipment: "Um item recebido de seu mestre de até T$ 100.",
       },
     ],
     pericias: [Skill.ADESTRAMENTO, Skill.OFICIO],
@@ -813,19 +793,18 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Selvagem: {
-    name: 'Selvagem',
+    name: "Selvagem",
     getItems: (): Items[] => {
-      const allowedWapons = [...EQUIPAMENTOS.armasSimples];
-
-      const selectedWeapon = getRandomItemFromArray(allowedWapons);
+      const selectedWeapon = Armas.TACAPE;
 
       const originItems = [
         {
-          equipment: 'Pequeno animal de estimação como um pássaro ou esquilo',
+          equipment: "Pequeno animal de estimação como um pássaro ou esquilo",
         },
         {
           equipment: selectedWeapon,
-          description: 'Uma arma simples',
+          description: "Uma arma simples",
+          choice: "Armas Simples",
         },
       ];
 
@@ -839,20 +818,21 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Soldado: {
-    name: 'Soldado',
+    name: "Soldado",
     getItems: (): Items[] => {
-      const selectedWeapon = getRandomItemFromArray(EQUIPAMENTOS.armasMarciais);
+      const selectedWeapon = Armas.ESPADA_LONGA;
 
       const originItems = [
         {
           equipment: selectedWeapon,
-          description: 'Uma arma marcial ou exótica',
+          description: "Uma arma marcial ou exótica",
+          choice: "Armas Marciais",
         },
         {
-          equipment: 'Uniforme militar',
+          equipment: "Uniforme militar",
         },
         {
-          equipment: 'Insígnia de seu exército',
+          equipment: "Insígnia de seu exército",
         },
       ];
 
@@ -863,23 +843,23 @@ export const ORIGINS: Record<origins, Origin> = {
     getPowersAndSkills: getBenefitsWithRandomCombatPower,
   },
   Taverneiro: {
-    name: 'Taverneiro',
+    name: "Taverneiro",
     getItems: (): Items[] => [
       {
         equipment:
-          'Rolo de macarrão ou martelo de carne (mesmas estatísticas de uma clava)',
+          "Rolo de macarrão ou martelo de carne (mesmas estatísticas de uma clava)",
       },
       {
-        equipment: 'Panela',
+        equipment: "Panela",
       },
       {
-        equipment: 'Avental',
+        equipment: "Avental",
       },
       {
-        equipment: 'Caneca',
+        equipment: "Caneca",
       },
       {
-        equipment: 'Pano Sujo',
+        equipment: "Pano Sujo",
       },
     ],
     pericias: [Skill.DIPLOMACIA, Skill.JOGATINA, Skill.OFICIO_CULINARIA],
@@ -890,11 +870,11 @@ export const ORIGINS: Record<origins, Origin> = {
     ],
   },
   Trabalhador: {
-    name: 'Trabalhador',
+    name: "Trabalhador",
     getItems: (): Items[] => [
       {
         equipment:
-          'Uma ferramenta pesada (mesmas estatísticas de uma maça ou lança, a sua escolha).',
+          "Uma ferramenta pesada (mesmas estatísticas de uma maça ou lança, a sua escolha).",
       },
     ],
     pericias: [Skill.ATLETISMO, Skill.FORTITUDE],

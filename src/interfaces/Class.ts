@@ -34,6 +34,7 @@ export type ClassAbility = {
   name: string;
   text: string;
   nivel: number;
+  pmCost?: number;
   sheetActions?: SheetAction[];
   sheetBonuses?: SheetBonus[];
 };
@@ -42,6 +43,7 @@ export type ClassPower = {
   name: string;
   text: string;
   requirements?: Requirement[][];
+  pmCost?: number;
   sheetActions?: SheetAction[];
   sheetBonuses?: SheetBonus[];
   canRepeat?: boolean;
@@ -72,7 +74,7 @@ export interface ClassDescription {
   faithProbability?: FaithProbability;
   attrPriority: Atributo[];
   spellPath?: SpellPath;
-  setup?: (classe: ClassDescription) => ClassDescription;
+  setup?: (classe: ClassDescription, options?: any) => ClassDescription;
   originalAbilities?: ClassAbility[]; // Internal field to preserve original abilities during level-ups
   description?: string;
   detailedProficiencies?: string;

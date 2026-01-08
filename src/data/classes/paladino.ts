@@ -72,16 +72,19 @@ const PALADINO: ClassDescription = {
       name: "Golpe Divino",
       text: "Quando faz um ataque corpo a corpo, você pode gastar 2 PM para desferir um golpe destruidor. Você soma seu Carisma no teste de ataque e +1d8 na rolagem de dano. A cada quatro níveis, pode gastar +1 PM para aumentar o dano em +1d8.",
       nivel: 1,
+      pmCost: 2,
     },
     {
       name: "Cura pelas Mãos",
       text: "A partir do 2º nível, você pode gastar uma ação de movimento e 1 PM para curar 1d8+1 pontos de vida de um alvo em alcance corpo a corpo (incluindo você). A cada quatro níveis, você pode gastar +1 PM para aumentar os PV curados em +1d8+1. Esta habilidade pode causar dano de luz a mortos-vivos, exigindo um ataque desarmado. A partir do 6º nível, você pode gastar +1 PM quando usa Cura pelas Mãos para anular uma condição afetando o alvo, entre abalado, apavorado, atordoado, cego, doente, exausto, fatigado ou surdo.",
       nivel: 2,
+      pmCost: 1,
     },
     {
       name: "Aura Sagrada",
       text: "No 3º nível, você pode gastar 1 PM para gerar uma aura com 9m de raio a partir de você e duração sustentada. A aura emite uma luz dourada e agradável. Além disso, você e os aliados dentro da aura somam seu Carisma nos testes de resistência.",
       nivel: 3,
+      pmCost: 1,
     },
     {
       name: "Bênção da Justiça",
@@ -92,6 +95,7 @@ const PALADINO: ClassDescription = {
       name: "Vingador Sagrado",
       text: "No 20º nível, você pode gastar uma ação completa e 10 PM para se cobrir de energia divina, assumindo a forma de um vingador sagrado até o fim da cena. Nesta forma, você recebe deslocamento de voo 18m e redução de dano 20. Além disso, seu Golpe Divino tem seu custo é reduzido à metade e causa mais dois dados de dano.",
       nivel: 20,
+      pmCost: 10,
     },
   ],
   powers: [
@@ -150,16 +154,19 @@ const PALADINO: ClassDescription = {
     {
       name: "Julgamento Divino: Arrependimento",
       text: "Você pode gastar 2 PM para marcar um inimigo em alcance curto. Na próxima vez que esse inimigo acertar um ataque em você ou em um de seus aliados, deve fazer um teste de Vontade (CD Car). Se falhar, fica atordoado no próximo turno dele (apenas uma vez por cena).",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Julgamento Divino: Autoridade",
       text: "Você pode gastar 1 PM para comandar uma criatura em alcance curto. Faça um teste de Diplomacia oposto pelo teste de Vontade do alvo. Se você vencer, ele obedece a um comando simples, como “pare” ou “largue a arma” (apenas uma vez por cena). Mental.",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Julgamento Divino: Coragem",
       text: "Você pode gastar 2 PM para inspirar coragem em uma criatura em alcance curto, incluindo você mesmo. A criatura fica imune a efeitos de medo e recebe +2 em testes de ataque contra o inimigo com maior ND na cena.",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -170,26 +177,31 @@ const PALADINO: ClassDescription = {
     {
       name: "Julgamento Divino: Justiça",
       text: "Você pode gastar 2 PM para marcar um inimigo em alcance curto. A próxima vez que esse inimigo causar dano em você ou em um de seus aliados, deve fazer um teste de Vontade (CD Car). Se falhar, sofre dano de luz igual à metade do dano que causou.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Julgamento Divino: Libertação",
       text: "Você pode gastar 5 PM para cancelar uma condição negativa qualquer (como abalado, paralisado etc.) que esteja afetando uma criatura em alcance curto.",
+      pmCost: 5,
       requirements: [],
     },
     {
       name: "Julgamento Divino: Salvação",
       text: "Você pode gastar 2 PM para marcar um inimigo em alcance curto. Até o fim da cena, quando você acerta um ataque corpo a corpo nesse inimigo, recupera 5 pontos de vida.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Julgamento Divino: Vindicação",
       text: "Você pode gastar 2 PM para marcar um inimigo que tenha causado dano a você ou a seus aliados na cena. Você recebe +1 em testes de ataque e +1d8 em rolagens de dano contra o inimigo escolhido, mas sofre –5 em testes de ataque contra quaisquer outros alvos. No 5º nível, e a cada cinco níveis seguintes, você pode pagar +1 PM para aumentar o bônus de ataque em +1 e o bônus de dano em +1d8. O efeito termina caso o alvo fique inconsciente.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Julgamento Divino: Zelo",
       text: "Você pode gastar 1 PM para marcar um alvo em alcance longo. Pelo restante da cena, sempre que se mover na direção desse alvo, você se move com o dobro de seu deslocamento.",
+      pmCost: 1,
       requirements: [],
     },
     {

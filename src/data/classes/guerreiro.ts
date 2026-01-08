@@ -45,16 +45,19 @@ const GUERREIRO: ClassDescription = {
       name: "Ataque Especial",
       text: "Quando faz um ataque, você pode gastar 1 PM para receber +4 no teste de ataque ou na rolagem de dano. A cada quatro níveis, pode gastar +1 PM para aumentar o bônus em +4. Você pode dividir os bônus igualmente. Por exemplo, no 17º nível, pode gastar 5 PM para receber +20 no ataque, +20 no dano ou +10 no ataque e +10 no dano.",
       nivel: 1,
+      pmCost: 1,
     },
     {
       name: "Durão",
       text: "A partir do 3ª nível, sua rijeza muscular permite que você absorva ferimentos. Sempre que sofre dano, você pode gastar 3 PM para reduzir esse dano à metade.",
       nivel: 3,
+      pmCost: 3,
     },
     {
       name: "Ataque Extra",
       text: "A partir do 6º nível, quando usa a ação agredir, você pode gastar 2 PM para realizar um ataque adicional uma vez por rodada.",
       nivel: 6,
+      pmCost: 2,
     },
     {
       name: "Campeão",
@@ -80,6 +83,7 @@ const GUERREIRO: ClassDescription = {
     {
       name: "Ataque Reflexo",
       text: "Se um alvo em alcance de seus ataques corpo a corpo sofrer um ataque, você pode gastar 1 PM para fazer um ataque corpo a corpo contra ele (apenas uma vez por alvo a cada rodada).",
+      pmCost: 1,
       requirements: [
         [{ type: RequirementType.ATRIBUTO, name: "Destreza", value: 1 }],
       ],
@@ -99,6 +103,7 @@ const GUERREIRO: ClassDescription = {
     {
       name: "Bater e Correr",
       text: "Quando faz uma investida, você pode continuar se movendo após o ataque, até o limite de seu deslocamento. Se gastar 2 PM, pode fazer uma investida sobre terreno difícil e sem sofrer a penalidade de Defesa.",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -149,16 +154,19 @@ const GUERREIRO: ClassDescription = {
     {
       name: "Golpe de Raspão",
       text: "Uma vez por rodada, quando erra um ataque, você pode gastar 2 PM. Se fizer isso, causa metade do dano que causaria (ignorando efeitos que se aplicariam caso o ataque acertasse).",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Golpe Demolidor",
       text: "Quando usa a manobra quebrar ou ataca um objeto, você pode gastar 2 PM para ignorar a redução de dano dele.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Golpe Pessoal",
       text: "Quando faz um ataque, você pode desferir seu Golpe Pessoal, uma técnica única, com efeitos determinados por você. Você constrói seu Golpe Pessoal escolhendo efeitos da lista na página 66. Cada efeito possui um custo; a soma deles será o custo do Golpe Pessoal (mínimo 1 PM). O Golpe Pessoal só pode ser usado com uma arma específica (por exemplo, apenas espadas longas). Quando sobe de nível, você pode reconstruir seu Golpe Pessoal e alterar a arma que ele usa. Você pode escolher este poder outras vezes para golpes diferentes e não pode gastar mais PM em golpes pessoais em uma mesma rodada do que seu limite de PM.",
+      pmCost: 1, // Minimum cost
       canRepeat: true,
       requirements: [[{ type: RequirementType.NIVEL, value: 5 }]],
       sheetActions: [
@@ -171,21 +179,24 @@ const GUERREIRO: ClassDescription = {
     {
       name: "Ímpeto",
       text: "Você pode gastar 1 PM para aumentar seu deslocamento em +6m por uma rodada.",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Mestre em Arma",
       text: "Escolha uma arma. Com esta arma, seu dano aumenta em um passo e você pode gastar 2 PM para rolar novamente um teste de ataque recém realizado.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Especialização em Arma" },
-          { type: RequirementType.NIVEL, value: 2 },
+          { type: RequirementType.NIVEL, value: 12 },
         ],
       ],
     },
     {
       name: "Planejamento Marcial",
       text: "Uma vez por dia, você pode gastar uma hora e 3 PM para escolher um poder de guerreiro ou de combate cujos pré-requisitos cumpra. Você recebe os benefícios desse poder até o próximo dia.",
+      pmCost: 3,
       requirements: [
         [
           {
@@ -202,6 +213,7 @@ const GUERREIRO: ClassDescription = {
     {
       name: "Romper Resistências",
       text: "Quando faz um Ataque Especial, você pode gastar 1 PM adicional para ignorar 10 pontos de redução de dano.",
+      pmCost: 1,
       requirements: [],
     },
     {
@@ -212,6 +224,7 @@ const GUERREIRO: ClassDescription = {
     {
       name: "Tornado de Dor",
       text: "Você pode gastar uma ação padrão e 2 PM para desferir uma série de golpes giratórios. Faça um ataque corpo a corpo e compare-o com a Defesa de cada inimigo em seu alcance natural. Então faça uma rolagem de dano com um bônus cumulativo de +2 para cada acerto e aplique-a em cada inimigo atingido.",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.NIVEL, value: 6 }]],
     },
     {

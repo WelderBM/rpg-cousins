@@ -39,6 +39,7 @@ const MINOTAURO: Race = {
       name: "Chifres",
       description:
         "Você possui uma arma natural de chifres (dano 1d6, crítico x2, perfuração). Quando usa a ação atacar, pode gastar 1 PM para fazer um ataque corpo a corpo extra com os chifres.",
+      pmCost: 1,
       sheetActions: [
         {
           source: {

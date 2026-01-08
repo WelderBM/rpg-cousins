@@ -111,6 +111,7 @@ const DRUIDA: ClassDescription = {
     {
       name: "Aspecto do Outono",
       text: "Você aprende e pode lançar uma magia de necromancia, arcana ou divina, de qualquer círculo que possa lançar. Além disso, pode gastar 1 PM para impor uma penalidade de –2 nos testes de resistência de todos os inimigos em alcance curto até o início do seu próximo turno.",
+      pmCost: 1,
       requirements: [[]],
       sheetActions: [
         {
@@ -149,6 +150,7 @@ const DRUIDA: ClassDescription = {
     {
       name: "Aspecto do Verão",
       text: "Você aprende e pode lançar uma magia de transmutação, arcana ou divina, de qualquer círculo que possa lançar. Além disso, pode gastar 1 PM para cobrir uma de suas armas com chamas até o fim da cena. A arma causa +1d6 pontos de dano de fogo. Sempre que você acertar um ataque com ela, recebe 1 PM temporário. Você pode ganhar um máximo de PM temporários por cena igual ao seu nível e eles desaparecem no final da cena.",
+      pmCost: 1,
       requirements: [[]],
       sheetActions: [
         {
@@ -222,6 +224,7 @@ const DRUIDA: ClassDescription = {
     {
       name: "Espírito dos Equinócios",
       text: "Você pode gastar 4 PM para ficar em equilíbrio com o mundo. Até o final da cena, quando rola um dado, pode rolar novamente qualquer resultado 1.",
+      pmCost: 4,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Aspecto da Primavera" },
@@ -233,6 +236,7 @@ const DRUIDA: ClassDescription = {
     {
       name: "Espírito dos Solstícios",
       text: "Você transita entre os extremos do mundo natural. Quando lança uma magia, pode gastar +4 PM para maximizar os efeitos numéricos variáveis dela. Por exemplo, uma magia Curar Ferimentos aprimorada para curar 5d8+5 PV irá curar automaticamente 45 PV, sem a necessidade de rolar dados. Uma magia sem efeitos variáveis não pode ser afetada por este poder.",
+      pmCost: 4,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Aspecto do Inverno" },
@@ -270,11 +274,13 @@ const DRUIDA: ClassDescription = {
     {
       name: "Forma Selvagem",
       text: "Você pode se transformar em animais. A lista está disponível na página 63.",
+      pmCost: 3,
       requirements: [[]],
     },
     {
       name: "Forma Selvagem Aprimorada",
       text: "Quando usa Forma Selvagem, você pode gastar 6 PM ao todo para assumir uma forma aprimorada.",
+      pmCost: 6,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Forma Selvagem" },
@@ -285,6 +291,7 @@ const DRUIDA: ClassDescription = {
     {
       name: "Forma Selvagem Superior",
       text: "Quando usa Forma Selvagem, você pode gastar 10 PM ao todo para assumir uma forma superior.",
+      pmCost: 10,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Forma Selvagem Aprimorada" },
@@ -295,6 +302,7 @@ const DRUIDA: ClassDescription = {
     {
       name: "Liberdade da Pradaria",
       text: "Você recebe +1 em Reflexos. Se estiver ao ar livre, sempre que lança uma magia, pode gastar 1 PM para aumentar o alcance dela em um passo (de toque para curto, de curto para médio ou de médio para longo).",
+      pmCost: 1,
       requirements: [[]],
       sheetBonuses: [
         {
@@ -331,6 +339,7 @@ const DRUIDA: ClassDescription = {
     {
       name: "Tranquilidade dos Lagos",
       text: "Você recebe +1 em Vontade. Se estiver portando um recipiente com água (não precisa estar empunhando), uma vez por rodada, quando faz um teste de resistência, pode pagar 1 PM para refazer a rolagem.",
+      pmCost: 1,
       requirements: [[]],
       sheetBonuses: [
         {

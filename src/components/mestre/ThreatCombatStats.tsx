@@ -121,7 +121,7 @@ export const ThreatCombatStats: React.FC<Props> = ({
         </h4>
 
         {/* Informative Display of Savings */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10 border-b border-medieval-iron/20 pb-4">
+        <div className="grid grid-cols-3 md:grid-cols-3 gap-6 mb-6 relative z-10 border-b border-medieval-iron/20 pb-4">
           <div className="text-center">
             <p className="text-[10px] uppercase text-parchment-dark font-bold">
               Resistência Forte (80%)

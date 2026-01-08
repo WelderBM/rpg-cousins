@@ -58,6 +58,7 @@ export type RaceAbility = {
   description: string;
   sheetActions?: SheetAction[];
   sheetBonuses?: SheetBonus[];
+  pmCost?: number;
 };
 
 export type RaceNames =

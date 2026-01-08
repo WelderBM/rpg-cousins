@@ -39,6 +39,8 @@ import { ThreatAbilities } from "@/components/mestre/ThreatAbilities";
 import { ThreatSkills } from "@/components/mestre/ThreatSkills";
 import { MonsterStatBlock } from "@/components/mestre/MonsterStatBlock";
 import { ThreatPreviewCard } from "@/components/mestre/ThreatPreviewCard";
+import { CharacterPreviewCard } from "@/components/characters/CharacterPreviewCard";
+import { CharacterSheetView } from "@/components/character/CharacterSheetView";
 import { Character } from "@/interfaces/Character";
 import { CharacterService } from "@/lib/characterService";
 
@@ -56,22 +58,71 @@ export default function MestreClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedHero, setSelectedHero] = useState<Character | null>(null);
 
-  const fetchActiveHeroes = async () => {
+  // Real-time synchronization for active heroes
+  useEffect(() => {
+    if (!isAuthenticated || activeTab !== "herois") return;
+
+    let unsubscribe: () => void;
     setIsLoading(true);
-    try {
-      const favs = (await CharacterService.getCharacters(
-        undefined,
-        true,
-        true
-      )) as Character[];
-      setHeroes(favs);
-    } catch (e) {
-      console.error("Failed to fetch heroes", e);
-    } finally {
-      setIsLoading(false);
+
+    const setupHeroSync = async () => {
+      try {
+        const { collectionGroup, query, where, onSnapshot } = await import(
+          "firebase/firestore"
+        );
+        const { db } = await import("@/firebaseConfig");
+
+        if (!db) return;
+
+        // Query all characters across all users where isFavorite is true
+        const q = query(
+          collectionGroup(db, "characters"),
+          where("isFavorite", "==", true)
+        );
+
+        unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            const fetchedHeroes = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              path: doc.ref.path,
+              ...(doc.data() as any),
+            })) as Character[];
+            setHeroes(fetchedHeroes);
+            setIsLoading(false);
+          },
+          (error) => {
+            console.error("Hero sync failed:", error);
+            setIsLoading(false);
+          }
+        );
+      } catch (e) {
+        console.error("Error setting up hero sync:", e);
+        setIsLoading(false);
+      }
+    };
+
+    setupHeroSync();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [isAuthenticated, activeTab]);
+
+  // Keep selectedHero in sync with heroes list
+  useEffect(() => {
+    if (selectedHero) {
+      const updated = heroes.find((h) => h.id === selectedHero.id);
+      if (updated && JSON.stringify(updated) !== JSON.stringify(selectedHero)) {
+        setSelectedHero(updated);
+      } else if (!updated && heroes.length > 0) {
+        // If the favorite was removed, deselect it
+        setSelectedHero(null);
+      }
     }
-  };
+  }, [heroes, selectedHero]);
 
   // Form State
   const [formData, setFormData] = useState<Partial<ThreatSheet>>({
@@ -366,6 +417,31 @@ export default function MestreClient() {
     }
   };
 
+  const handleUpdateHero = async (updates: Partial<Character>) => {
+    if (!selectedHero) return;
+
+    // Local update
+    const updatedHero = { ...selectedHero, ...updates };
+    setSelectedHero(updatedHero);
+    setHeroes((prev) =>
+      prev.map((h) => (h.id === selectedHero.id ? updatedHero : h))
+    );
+
+    try {
+      // If we have a path (which getCharacters returns as 'path'), use it
+      if ((selectedHero as any).path) {
+        await CharacterService.updateCharacterByPath(
+          (selectedHero as any).path,
+          updates
+        );
+      } else {
+        console.error("No path found for character", selectedHero);
+      }
+    } catch (e) {
+      console.error("Failed to update hero", e);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -443,7 +519,10 @@ export default function MestreClient() {
       {/* Tabs */}
       <div className="flex border-b border-medieval-iron/30">
         <button
-          onClick={() => setActiveTab("lista")}
+          onClick={() => {
+            setActiveTab("lista");
+            setSelectedHero(null);
+          }}
           className={`px-6 py-3 font-serif text-lg transition-all border-b-2 flex items-center gap-2 ${
             activeTab === "lista"
               ? "border-medieval-gold text-medieval-gold bg-medieval-gold/5"
@@ -456,7 +535,7 @@ export default function MestreClient() {
         <button
           onClick={() => {
             setActiveTab("herois");
-            fetchActiveHeroes();
+            setSelectedHero(null);
           }}
           className={`px-6 py-3 font-serif text-lg transition-all border-b-2 flex items-center gap-2 ${
             activeTab === "herois"
@@ -468,7 +547,10 @@ export default function MestreClient() {
           Heróis Ativos
         </button>
         <button
-          onClick={() => setActiveTab("criador")}
+          onClick={() => {
+            setActiveTab("criador");
+            setSelectedHero(null);
+          }}
           className={`px-6 py-3 font-serif text-lg transition-all border-b-2 flex items-center gap-2 ${
             activeTab === "criador"
               ? "border-medieval-gold text-medieval-gold bg-medieval-gold/5"
@@ -588,7 +670,23 @@ export default function MestreClient() {
               exit={{ opacity: 0, x: 20 }}
               className="space-y-8"
             >
-              {isLoading ? (
+              {selectedHero ? (
+                <div className="space-y-6">
+                  <div className="flex justify-start">
+                    <button
+                      onClick={() => setSelectedHero(null)}
+                      className="flex items-center gap-2 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-parchment-light rounded-lg transition-all"
+                    >
+                      &larr; Voltar para Lista
+                    </button>
+                  </div>
+                  <CharacterSheetView
+                    character={selectedHero}
+                    onUpdate={handleUpdateHero}
+                    isMestre={true}
+                  />
+                </div>
+              ) : isLoading ? (
                 <div className="flex flex-col items-center justify-center py-20 opacity-50">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-medieval-gold mb-4"></div>
                   <p className="text-parchment-dark font-serif">
@@ -620,14 +718,14 @@ export default function MestreClient() {
                       <div className="p-4 space-y-4">
                         {heroList.map((hero) => {
                           // Calc stats
-                          const conMod = hero.attributes.Constituição; // Assuming flat number for now from simplified interface usage or check legacy
                           const hpBase = hero.class?.pv || 16;
-                          // Check if attribute is object
                           const conVal =
                             typeof hero.attributes.Constituição === "object"
-                              ? (hero.attributes.Constituição as any).value
-                                  .total
-                              : hero.attributes.Constituição;
+                              ? (hero.attributes.Constituição as any).mod ??
+                                (hero.attributes.Constituição as any).value
+                                  ?.total ??
+                                0
+                              : hero.attributes.Constituição ?? 0;
 
                           const hpMax = hpBase + conVal;
                           const currentHp = hero.currentPv ?? hpMax;
@@ -637,21 +735,21 @@ export default function MestreClient() {
                           );
 
                           const pmBase = hero.class?.pm || 4;
-                          const pmMax = pmBase;
-                          const currentPm = hero.currentPm ?? pmMax;
+                          const currentPm = hero.currentPm ?? pmBase;
                           const pmPercent = Math.min(
                             100,
-                            Math.max(0, (currentPm / pmMax) * 100)
+                            Math.max(0, (currentPm / pmBase) * 100)
                           );
 
                           return (
                             <div
                               key={hero.id}
-                              className="flex gap-4 items-center bg-black/20 p-3 rounded-lg border border-white/5 hover:border-medieval-gold/30 transition-colors"
+                              onClick={() => setSelectedHero(hero)}
+                              className="flex gap-4 items-center bg-black/20 p-3 rounded-lg border border-white/5 hover:border-medieval-gold/30 transition-colors cursor-pointer group"
                             >
                               {/* Avatar */}
                               <div className="flex-shrink-0">
-                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-medieval-iron bg-stone-900">
+                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-medieval-iron bg-stone-900 group-hover:border-medieval-gold transition-colors">
                                   {hero.imageUrl ? (
                                     <img
                                       src={hero.imageUrl}
@@ -669,7 +767,7 @@ export default function MestreClient() {
                               {/* Stats */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-baseline mb-1">
-                                  <h4 className="font-bold text-parchment-light truncate text-sm">
+                                  <h4 className="font-bold text-parchment-light truncate text-sm group-hover:text-medieval-gold transition-colors">
                                     {hero.name}
                                   </h4>
                                   <span className="text-[10px] text-parchment-dark uppercase">
@@ -705,10 +803,6 @@ export default function MestreClient() {
                   <Crown className="w-16 h-16 mx-auto mb-4 text-medieval-iron" />
                   <p className="text-xl font-serif text-parchment-dark">
                     Nenhum herói favorito encontrado.
-                  </p>
-                  <p className="text-sm text-parchment-dark/70 mt-2">
-                    Peça aos jogadores para marcarem seus personagens como
-                    favoritos (Estrela) na ficha.
                   </p>
                 </div>
               )}

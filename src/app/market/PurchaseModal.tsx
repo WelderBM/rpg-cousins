@@ -36,6 +36,13 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const [selectedCharId, setSelectedCharId] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Reset processing state when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      setIsProcessing(false);
+    }
+  }, [isOpen]);
+
   // Set default selected character when opening
   useEffect(() => {
     if (isOpen && characters.length > 0) {
@@ -95,18 +102,12 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     const currentSlots = calcBagSpaces(bagEquipments);
     const newSlots = currentSlots + actualItemSlots;
 
-    // Load Limit: 10 + (Str * 3) (Standard T20)
-    // Note: Attributes might be mapped by name or key.
-    // In Character interface: attributes: Record<Atributo, number>
-    // Atributo enum usually has "Força" or similar.
-    // Let's safe access.
-    const str = selectedChar.attributes?.["Força"] || 0;
-    // T20 Jogo do Ano: 3 * Força. If Força <= 0?
-    // Let's assume the formula: 10 + (str * 2) based on ImpactPanel?
-    // User requested "validate slot".
-    // I will use 3 * str as standard, or 10 + 2*str if that's the project norm.
-    // Let's stick with the ImpactPanel one (10 + 2*str) to be consistent with their UI.
-    const maxSlots = 10 + str * 2;
+    // Load Limit: 10 + (Str mod * 2) - T20 Standard
+    // Access the attribute correctly: it's an object with a 'mod' property
+    const strAttr = selectedChar.attributes?.[Atributo.FORCA];
+    const strMod =
+      typeof strAttr === "object" && strAttr !== null ? strAttr.mod : 0;
+    const maxSlots = 10 + strMod * 2;
 
     const hasSlots = newSlots <= maxSlots;
 
@@ -129,14 +130,14 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   }, [selectedChar, item, price, actualItemSlots]);
 
   const handleConfirm = async () => {
-    if (!status.canBuy || isProcessing) return;
+    if (!status.canBuy || isProcessing || !selectedCharId || !item) return;
+
     setIsProcessing(true);
     try {
-      await onConfirm(selectedCharId, item!);
-      onClose();
+      await onConfirm(selectedCharId, item);
+      // Modal will be closed by parent component after successful purchase
     } catch (e) {
-      console.error(e);
-    } finally {
+      console.error("Purchase error:", e);
       setIsProcessing(false);
     }
   };
@@ -309,7 +310,10 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
           <div className="p-4 bg-[#1a1a1a] border-t border-white/5 flex justify-end gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-stone-400 hover:text-white transition-colors text-sm font-medium"
+              disabled={isProcessing}
+              className={`px-4 py-2 text-stone-400 hover:text-white transition-colors text-sm font-medium ${
+                isProcessing ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               Cancelar
             </button>
@@ -323,13 +327,32 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               }`}
             >
               {isProcessing ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Processando...
+                </>
               ) : (
-                <Check size={16} />
+                <>
+                  <Check size={16} />
+                  Confirmar Compra
+                </>
               )}
-              Confirmar Compra
             </button>
           </div>
+
+          {/* Processing Overlay */}
+          {isProcessing && (
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+              <div className="bg-[#111] p-6 rounded-xl border border-amber-500/30 shadow-2xl">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+                  <p className="text-amber-500 font-bold">
+                    Processando compra...
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </AnimatePresence>

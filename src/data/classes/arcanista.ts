@@ -12,12 +12,14 @@ import PROFICIENCIAS from "../proficiencias";
 import tormentaPowers from "../powers/tormentaPowers";
 import { spellsCircle1 } from "../magias/generalSpells";
 
-type ArcanistaSubtypes = "Bruxo" | "Mago" | "Feiticeiro";
-const allArcanistaSubtypes: ArcanistaSubtypes[] = [
+export type ArcanistaSubtypes = "Bruxo" | "Mago" | "Feiticeiro";
+export const allArcanistaSubtypes: ArcanistaSubtypes[] = [
   "Bruxo",
   "Mago",
   "Feiticeiro",
 ];
+
+export const draconicDamageTypes = ["Ácido", "Elétrico", "Fogo", "Frio"];
 
 const spellPaths: Record<ArcanistaSubtypes, SpellPath> = {
   Bruxo: {
@@ -82,7 +84,7 @@ const classAbilities: Record<ArcanistaSubtypes, ClassAbility> = {
   },
 };
 
-const feiticeiroPaths: ClassAbility[] = [
+export const feiticeiroPaths: ClassAbility[] = [
   {
     name: "Linhagem Dracônica",
     text: "Um de seus antepassados foi um majestoso dragão. Escolha um tipo de dano entre ácido, eletricidade, fogo ou frio. Básica: Você soma seu modificador de Carisma em seus pontos de vida iniciais e recebe resistência ao tipo de dano escolhido 5",
@@ -343,6 +345,7 @@ const ARCANISTA: ClassDescription = {
     {
       name: "Magia Pungente",
       text: "Quando lança uma magia, você pode pagar 1 PM para aumentar em +2 a CD para resistir a ela.",
+      pmCost: 1,
       requirements: [],
     },
     {
@@ -375,6 +378,7 @@ const ARCANISTA: ClassDescription = {
     {
       name: "Raio Elemental",
       text: "Quando usa Raio Arcano, você pode pagar 1 PM para que ele cause dano de ácido, eletricidade, fogo, frio ou trevas, a sua escolha. Se o alvo falhar no teste de Reflexos, sofre uma condição, de acordo com o tipo de dano. Ácido: vulnerável por 1 rodada. Eletricidade: ofuscado por 1 rodada. Fogo: fica em chamas. Frio: lento por 1 rodada. Trevas: não pode curar PV por 1 rodada.",
+      pmCost: 1,
       requirements: [[{ type: RequirementType.PODER, name: "Raio Arcano" }]],
     },
     {
@@ -406,22 +410,44 @@ const ARCANISTA: ClassDescription = {
     WYNNA: 1,
   },
   attrPriority: [Atributo.INTELIGENCIA],
-  setup: (classe) => {
+  setup: (
+    classe,
+    options?: {
+      subtype?: ArcanistaSubtypes;
+      lineage?: string;
+      damageType?: string;
+    }
+  ) => {
     const modifiedClasse = _.cloneDeep(classe);
-    const subtype = getRandomItemFromArray(allArcanistaSubtypes);
+
+    // Use option if provided, else random (fallback)
+    const subtype =
+      options?.subtype || getRandomItemFromArray(allArcanistaSubtypes);
+
     modifiedClasse.subname = subtype;
     modifiedClasse.spellPath = spellPaths[subtype];
     modifiedClasse.abilities.push(classAbilities[subtype]);
+
     if (subtype === "Feiticeiro") {
       modifiedClasse.attrPriority = [Atributo.CARISMA];
-      const selectedSubType = getRandomItemFromArray(feiticeiroPaths);
+      // Resolve lineage
+      let selectedSubType;
+      if (options?.lineage) {
+        selectedSubType = feiticeiroPaths.find(
+          (p) => p.name === options.lineage
+        );
+      }
+      // Fallback random
+      if (!selectedSubType) {
+        selectedSubType = getRandomItemFromArray(feiticeiroPaths);
+      }
+      // Clone to modify text
+      selectedSubType = _.cloneDeep(selectedSubType);
+
       if (selectedSubType.name === "Linhagem Dracônica") {
-        selectedSubType.text += `. Tipo escolhido: ${getRandomItemFromArray([
-          "Ácido",
-          "Elétrico",
-          "Fogo",
-          "Frio",
-        ])}`;
+        const dmg =
+          options?.damageType || getRandomItemFromArray(draconicDamageTypes);
+        selectedSubType.text += `. Tipo escolhido: ${dmg}`;
       } else if (selectedSubType.name === "Linhagem Feérica") {
         modifiedClasse.periciasbasicas.push({
           type: "and",

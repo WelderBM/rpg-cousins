@@ -40,6 +40,7 @@ const BARBARO: ClassDescription = {
       name: "Furia",
       text: "Você pode gastar 2 PM para invocar uma fúria selvagem. Você recebe +2 em testes de ataque e rolagens de dano corpo a corpo, mas não pode fazer nenhuma ação que exija calma e concentração (como usar a perícia Furtividade ou lançar magias). A cada cinco níveis, pode gastar +1 PM para aumentar os bônus em +1. A Fúria termina se, ao fim da rodada, você não tiver atacado nem sido alvo de um efeito (ataque, habilidade, magia...) hostil.",
       nivel: 1,
+      pmCost: 2,
     },
     {
       name: "Instinto Selvagem",
@@ -121,6 +122,7 @@ const BARBARO: ClassDescription = {
     {
       name: "Brado Assustador",
       text: "Você pode gastar uma ação de movimento e 1 PM para soltar um berro feroz. Todos os inimigos em alcance curto ficam vulneráveis até o fim da cena.",
+      pmCost: 1,
       requirements: [
         [{ type: RequirementType.PERICIA, name: Skill.INTIMIDACAO }],
       ],
@@ -150,11 +152,13 @@ const BARBARO: ClassDescription = {
     {
       name: "Força Indomável",
       text: "Você pode gastar 1 PM para somar seu nível em um teste de Força ou Atletismo. Você pode usar esta habilidade depois de rolar o dado, mas deve usá-la antes de o mestre dizer se você passou ou não.",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Frenesi",
       text: "Uma vez por rodada, se estiver em fúria e usar a ação agredir para fazer um ataque corpo a corpo ou com uma arma de arremesso, você pode gastar 2 PM para fazer um ataque adicional.",
+      pmCost: 2,
       requirements: [],
     },
     {
@@ -180,16 +184,19 @@ const BARBARO: ClassDescription = {
     {
       name: "Fúria Raivosa",
       text: "Se sua Fúria for terminar por você não ter atacado nem sido alvo de um efeito hostil, você pode pagar 1 PM para continuar em fúria nesta rodada. Se você atacar ou for atacado na rodada seguinte, sua fúria continua normalmente.",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Golpe Poderoso",
       text: "Ao acertar um ataque corpo a corpo ou com uma arma de arremesso, você pode gastar 1 PM para causar um dado de dano extra do mesmo tipo (por exemplo, com um montante, causa +1d6, para um dano total de 3d6; com um machado de guerra, causa +1d12).",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Ímpeto",
       text: "Você pode gastar 1 PM para aumentar seu deslocamento em +6m por uma rodada.",
+      pmCost: 1,
       requirements: [],
     },
     {

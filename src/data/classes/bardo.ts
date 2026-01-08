@@ -54,6 +54,7 @@ const BARDO: ClassDescription = {
       name: "Inspiração",
       text: "Você pode gastar uma ação padrão e 2 PM para inspirar as pessoas com sua arte. Você e todos os seus aliados em alcance curto ganham +1 em testes de perícia até o fim da cena. A cada quatro níveis, pode gastar +2 PM para aumentar o bônus em +1.",
       nivel: 1,
+      pmCost: 2,
     },
     {
       name: "Magias",
@@ -79,6 +80,7 @@ const BARDO: ClassDescription = {
       name: "Eclético",
       text: "A partir do 2º nível, você pode gastar 1 PM para receber todos os benefícios de ser treinado em uma perícia por um teste.",
       nivel: 2,
+      pmCost: 1,
     },
     {
       name: "Artista Completo",
@@ -126,6 +128,7 @@ const BARDO: ClassDescription = {
     {
       name: "Dança das Lâminas",
       text: "Quando você lança uma magia com execução de uma ação padrão, pode gastar 1 PM para fazer um ataque corpo a corpo como uma ação livre.",
+      pmCost: 1,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Esgrima Mágica" },
@@ -146,6 +149,7 @@ const BARDO: ClassDescription = {
     {
       name: "Fascinar em Massa",
       text: "Quando usa Música: Balada Fascinante, você pode gastar 2 PM. Se fizer isso, afeta todas as criaturas a sua escolha no alcance da música (você faz um único teste de Atuação, oposto pelo teste de Vontade de cada criatura).",
+      pmCost: 2,
       requirements: [
         [{ type: RequirementType.PODER, name: "Música: Balada Fascinante" }],
       ],
@@ -153,6 +157,7 @@ const BARDO: ClassDescription = {
     {
       name: "Golpe Elemental",
       text: "Enquanto estiver sob efeito de Inspiração, sempre que você acertar um ataque corpo a corpo, pode gastar 1 PM para causar 1d6 de dano adicional de ácido, eletricidade, fogo ou frio, a sua escolha. Para cada quatro níveis que possuir, pode gastar +1 PM para aumentar o dano em +1d6.",
+      pmCost: 1,
       requirements: [[{ type: RequirementType.PODER, name: "Golpe Mágico" }]],
     },
     {
@@ -168,6 +173,7 @@ const BARDO: ClassDescription = {
     {
       name: "Lendas e Histórias",
       text: "Você possui um acervo mental de relatos, canções e folclore, sendo um arquivo vivo de assuntos gerais. Além de outros benefícios a critério do mestre, você pode gastar 1 PM para rolar novamente um teste recém realizado de Conhecimento, Misticismo, Nobreza ou Religião para informação, identificar criaturas ou identificar itens mágicos.",
+      pmCost: 1,
       requirements: [
         [{ type: RequirementType.ATRIBUTO, name: "Inteligência", value: 1 }],
       ],
@@ -175,6 +181,7 @@ const BARDO: ClassDescription = {
     {
       name: "Manipular",
       text: "Você pode gastar 1 PM para fazer uma criatura fascinada por você ficar enfeitiçada até o fim da cena (Von CD Car anula). Se a criatura passar, fica imune a este efeito por um dia. Usar esta habilidade não conta como ameaça à criatura fascinada",
+      pmCost: 1,
       requirements: [
         [{ type: RequirementType.PODER, name: "Música: Balada Fascinante" }],
       ],
@@ -182,6 +189,7 @@ const BARDO: ClassDescription = {
     {
       name: "Manipular em Massa",
       text: "Quando usa Manipular, você pode gastar 2 PM extras. Se fizer isso, afeta todas as criaturas a sua escolha em alcance curto.",
+      pmCost: 2,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Fascinar em Massa" },
@@ -193,21 +201,25 @@ const BARDO: ClassDescription = {
     {
       name: "Música: Balada Fascinante",
       text: "(Ver regras de música, pag 45) Faça um teste de Atuação oposto pelo teste de Vontade de uma criatura no alcance. Se você passar, ela fica fascinada enquanto você se concentrar (uma ação padrão por rodada). Um alvo hostil ou envolvido em combate recebe +5 no teste de resistência e tem direito a um novo teste sempre que você se concentrar. Se a criatura passar, fica imune a este efeito por um dia.",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Música: Canção Assustadora",
       text: "(Ver regras de música, pag 45) Faça um teste de Atuação oposto pelo teste de Vontade de cada criatura a sua escolha dentro do alcance (você faz um único teste). Alvos que falhem ficam abalados até o fim da cena. Alvos que passem ficam imunes a este efeito por um dia.",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Música: Melodia Curativa",
       text: "(Ver regras de música, pag 45) Criaturas a sua escolha no alcance recuperam 1d6 PV. Quando usa esta habilidade, você pode gastar mais pontos de mana. Para cada PM extra, aumente a cura em +1d6 PV",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Melodia Restauradora",
       text: "Quando você usa  Música: Melodia Curativa, pode gastar +2 PM. Se fizer isso, escolha uma das condições a seguir:  abalado, alquebrado, apavorado, atordoado, cego, confuso, enfeitiçado, esmorecido, exausto, fatigado, frustrado, pasmo ou surdo. Você remove a condição escolhida das criaturas afetadas pela música.",
+      pmCost: 2,
       requirements: [
         [{ type: RequirementType.PODER, name: " Música: Melodia Curativa" }],
       ],
@@ -226,6 +238,7 @@ const BARDO: ClassDescription = {
     {
       name: "Paródia",
       text: "Uma vez por rodada, quando vê alguém lançando uma magia em alcance médio, você pode pagar 1 PM e fazer um teste de Atuação (CD 15 + custo em PM da magia). Se passar, até o final de seu próximo turno você pode lançar essa magia.",
+      pmCost: 1,
       requirements: [],
     },
     {

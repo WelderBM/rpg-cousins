@@ -62,18 +62,20 @@ const NOBRE: ClassDescription = {
     },
     {
       name: "Espólio",
-      text: "Você recebe um item a sua escolha com preço de até T$ 1.000.",
+      text: "Você recebe um item a sua escolha com preço de até T$ 2.000.",
       nivel: 1,
     },
     {
       name: "Orgulho",
-      text: "Quando faz um teste de perícia, você pode gastar 1 PM para somar o seu Carisma no teste. Você não pode usar esta habilidade em testes de ataque.",
+      text: "Quando faz um teste de perícia, você pode gastar uma quantidade de PM a sua escolha (limitado pelo seu Carisma). Para cada PM que gastar, recebe +2 no teste.",
       nivel: 1,
+      pmCost: 1, // Minimum 1 logic, but it's variable.
     },
     {
       name: "Palavras Afiadas",
-      text: "Você pode gastar uma ação padrão e 1 PM para fazer um teste de Diplomacia ou Intimidação oposto ao teste de Vontade de uma criatura inteligente (Int –3 ou maior) em alcance curto. Se vencer, você causa 2d6 pontos de dano psíquico não letal à criatura. Se perder, causa metade deste dano. Se a criatura for reduzida a 0 ou menos PV, em vez de cair inconsciente, ela se rende (se você usou Diplomacia) ou fica apavorada e foge de você da maneira mais eficiente possível (se usou Intimidação). A cada quatro níveis, você pode gastar +1 PM para aumentar o dano (veja a tabela da classe). Mental.",
+      text: "Você pode gastar uma ação padrão e 1 PM para fazer um teste de Diplomacia ou Intimidação oposto ao teste de Vontade de uma criatura inteligente (Int –3 ou maior) em alcance curto. Se vencer, você causa 2d6 pontos de dano psíquico não letal à criatura. Se perder, causa metade deste dano. Se a criatura for reduzida a 0 ou menos PV, em vez de cair inconsciente, ela se rende (se você usou Diplomacia) ou fica apavorada e foge de você da maneira mais eficiente possível (se usou Intimidação). A cada quatro níveis, você pode gastar +1 PM para aumentar o dano (veja a tabela da classe).",
       nivel: 2,
+      pmCost: 1,
     },
     {
       name: "Riqueza",
@@ -89,6 +91,7 @@ const NOBRE: ClassDescription = {
       name: "Presença Aristocrática",
       text: "A partir do 5º nível, sempre que uma criatura inteligente tentar machucá-lo (causar dano com um ataque, magia ou habilidade) você pode gastar 2 PM. Se fizer isso, a criatura deve fazer um teste de Vontade (CD Car). Se falhar, não conseguirá machucá-lo e perderá a ação. Você só pode usar esta habilidade uma vez por cena contra cada criatura.",
       nivel: 5,
+      pmCost: 2,
     },
     {
       name: "Realeza",
@@ -117,6 +120,7 @@ const NOBRE: ClassDescription = {
     {
       name: "Autoridade Feudal",
       text: "Você pode gastar uma hora e 2 PM para conclamar o povo a ajudá-lo (qualquer pessoa sem um título de nobreza ou uma posição numa igreja reconhecida pelo seu reino). Em termos de jogo, essas pessoas contam como um parceiro iniciante de um tipo a sua escolha (aprovado pelo mestre) que lhe acompanha até o fim da aventura. Esta habilidade só pode ser usada em locais onde sua posição carregue alguma influência (a critério do mestre).",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.NIVEL, value: 6 }]],
     },
     {
@@ -158,6 +162,7 @@ const NOBRE: ClassDescription = {
     {
       name: "Estrategista",
       text: "Você pode direcionar aliados em alcance curto. Gaste uma ação padrão e 1 PM por aliado que quiser direcionar (limitado pelo seu Carisma). No próximo turno do aliado, ele ganha uma ação de movimento.",
+      pmCost: 1, // Per ally
       requirements: [
         [
           { type: RequirementType.ATRIBUTO, name: "Inteligência", value: 1 },
@@ -169,6 +174,7 @@ const NOBRE: ClassDescription = {
     {
       name: "Favor",
       text: "Você pode usar sua influência para pedir favores a pessoas poderosas. Isso gasta 5 PM e uma hora de conversa e bajulação, ou mais, de acordo com o mestre, e funciona como o uso persuasão de Diplomacia (veja a página 118). Porém, você pode pedir favores ainda mais caros, difíceis ou perigosos — um convite para uma festa particular, uma carona de barco até Galrasia ou mesmo acesso aos planos militares do reino. Se você falhar, não pode pedir o mesmo favor por pelo menos uma semana.",
+      pmCost: 5,
       requirements: [],
     },
     {
@@ -189,11 +195,13 @@ const NOBRE: ClassDescription = {
     {
       name: "Inspirar Confiança",
       text: "Sua presença faz as pessoas darem o melhor de si. Quando um aliado em alcance curto faz um teste, você pode gastar 2 PM para fazer com que ele possa rolar esse teste novamente.",
+      pmCost: 2,
       requirements: [],
     },
     {
       name: "Inspirar Glória",
       text: "A presença de um nobre motiva as pessoas a realizarem grandes façanhas. Uma vez por rodada, você pode gastar 5 PM para fazer um aliado em alcance curto ganhar uma ação padrão adicional no próximo turno dele. Você só pode usar esta habilidade uma vez por cena em cada aliado.",
+      pmCost: 5,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Inspirar Confiança" },
@@ -204,16 +212,19 @@ const NOBRE: ClassDescription = {
     {
       name: "Jogo da Corte",
       text: "Você pode gastar 1 PM para rolar novamente um teste recém realizado de Diplomacia, Intuição ou Nobreza.",
+      pmCost: 1,
       requirements: [],
     },
     {
       name: "Liderar pelo Exemplo",
       text: "Você pode gastar 2 PM para servir de inspiração. Até o início de seu próximo turno, sempre que você passar em um teste de perícia, aliados em alcance curto que fizerem um teste da mesma perícia podem usar o resultado do seu teste em vez de fazer o seu próprio.",
+      pmCost: 2,
       requirements: [[{ type: RequirementType.NIVEL, value: 6 }]],
     },
     {
       name: "Língua de Ouro",
       text: "Você pode gastar uma ação padrão e 4 PM para gerar o efeito da magia Enfeitiçar com os aprimoramentos de sugerir ação e afetar todas as criaturas dentro do alcance (CD Car). Esta não é uma habilidade mágica e provém de sua capacidade de influenciar outras pessoas.",
+      pmCost: 4,
       requirements: [
         [
           { type: RequirementType.PODER, name: "Língua de Prata" },
@@ -224,6 +235,7 @@ const NOBRE: ClassDescription = {
     {
       name: "Língua de Prata",
       text: "Quando faz um teste de perícia baseada em Carisma, você pode gastar 2 PM para receber um bônus no teste igual a metade do seu nível.",
+      pmCost: 2,
       requirements: [],
     },
     {

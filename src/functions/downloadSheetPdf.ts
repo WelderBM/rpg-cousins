@@ -1,68 +1,68 @@
-import { Atributo } from '@/data/atributos';
-import CharacterSheet from '@/interfaces/CharacterSheet';
-import { ClassAbility, ClassPower } from '@/interfaces/Class';
-import Equipment from '@/interfaces/Equipment';
-import { OriginPower } from '@/interfaces/Poderes';
-import { RaceAbility } from '@/interfaces/Race';
-import Skill from '@/interfaces/Skills';
-import { PDFDocument } from 'pdf-lib';
+import { Atributo } from "@/data/atributos";
+import CharacterSheet from "@/interfaces/CharacterSheet";
+import { ClassAbility, ClassPower } from "@/interfaces/Class";
+import Equipment from "@/interfaces/Equipment";
+import { OriginPower } from "@/interfaces/Poderes";
+import { RaceAbility } from "@/interfaces/Race";
+import Skill from "@/interfaces/Skills";
+import { PDFDocument } from "pdf-lib";
 
 function filterUnique<T>(array: T[]) {
   return array.filter((v, i, a) => a.indexOf(v) === i);
 }
 
 const generateClassPowerText = (power: ClassPower | ClassAbility) =>
-  power.text || '';
+  power.text || "";
 const generateGeneralPowerText = (power: RaceAbility | OriginPower) =>
-  power.description || '';
+  power.description || "";
 
 const preparePDF: (
   sheet: CharacterSheet
 ) => Promise<Uint8Array<ArrayBufferLike>> = async (sheet) => {
-  const url = 'https://fichasdenimb.com.br/sheet.pdf';
+  const url = "https://fichasdenimb.com.br/sheet.pdf";
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const form = pdfDoc.getForm();
 
   // Get all fields in the PDF
-  const nameField = form.getTextField('Nome');
-  const raceField = form.getTextField('Raca');
-  const originField = form.getTextField('Origem');
-  const classField = form.getTextField('Classe');
-  const deytiField = form.getTextField('Divindade');
+  const nameField = form.getTextField("Nome");
+  const raceField = form.getTextField("Raca");
+  const originField = form.getTextField("Origem");
+  const classField = form.getTextField("Classe");
+  const deytiField = form.getTextField("Divindade");
 
-  const forceField = form.getTextField('modFor');
-  const dexterityField = form.getTextField('modDes');
-  const constitutionField = form.getTextField('modCon');
-  const intelligenceField = form.getTextField('modInt');
-  const wisdomField = form.getTextField('modSab');
-  const charismaField = form.getTextField('modCar');
+  const forceField = form.getTextField("modFor");
+  const dexterityField = form.getTextField("modDes");
+  const constitutionField = form.getTextField("modCon");
+  const intelligenceField = form.getTextField("modInt");
+  const wisdomField = form.getTextField("modSab");
+  const charismaField = form.getTextField("modCar");
 
-  const pvMaxField = form.getTextField('vidaMax');
-  const pmMaxField = form.getTextField('manaMax');
-  const modDefense = form.getDropdown('modDef');
-  const defenseField = form.getTextField('Texto13');
-  const displacimentField = form.getTextField('deslocamento');
-  const proficienciesField = form.getTextField('caracteristicas');
-  const halfLevelField = form.getTextField('metadeDoNivel');
+  const pvMaxField = form.getTextField("vidaMax");
+  const pmMaxField = form.getTextField("manaMax");
+  const modDefense = form.getDropdown("modDef");
+  const defenseField = form.getTextField("Texto13");
+  const displacimentField = form.getTextField("deslocamento");
+  const proficienciesField = form.getTextField("caracteristicas");
+  const halfLevelField = form.getTextField("metadeDoNivel");
 
-  const equipamentsFirstField = form.getTextField('item1');
-  const equipamentsSecondField = form.getTextField('item2');
-  const currentCargoField = form.getTextField('cargaAtual');
-  const maxCargoField = form.getTextField('cargaMaxima');
-  const carryCapacityField = form.getTextField('levantar');
+  const equipamentsFirstField = form.getTextField("item1");
+  const equipamentsSecondField = form.getTextField("item2");
+  const currentCargoField = form.getTextField("cargaAtual");
+  const maxCargoField = form.getTextField("cargaMaxima");
+  const carryCapacityField = form.getTextField("levantar");
 
-  const powersField = form.getTextField('Historico');
-  const spellsField = form.getTextField('Atualização');
+  const powersField = form.getTextField("Historico");
+  const spellsField = form.getTextField("Atualização");
 
-  const craftSkillFirstField = form.getTextField('Texto8');
-  const craftSkillSecondField = form.getTextField('Texto9');
+  const craftSkillFirstField = form.getTextField("Texto8");
+  const craftSkillSecondField = form.getTextField("Texto9");
 
   nameField.setText(sheet.nome);
   raceField.setText(sheet.raca.name);
-  originField.setText(sheet.origin?.name || '');
+  originField.setText(sheet.origin?.name || "");
   classField.setText(`${sheet.classe.name} ${sheet.nivel}`);
-  deytiField.setText(sheet.devoto?.divindade.name || '');
+  deytiField.setText(sheet.devoto?.divindade.name || "");
   forceField.setText(sheet.atributos.Força.mod.toString());
   dexterityField.setText(sheet.atributos.Destreza.mod.toString());
   constitutionField.setText(sheet.atributos.Constituição.mod.toString());
@@ -80,10 +80,10 @@ const preparePDF: (
   const weapons = bagEquipaments.Arma;
 
   const fightSkill = sheet.completeSkills?.find(
-    (skill) => skill.name === 'Luta'
+    (skill) => skill.name === "Luta"
   );
   const rangeSkill = sheet.completeSkills?.find(
-    (skill) => skill.name === 'Pontaria'
+    (skill) => skill.name === "Pontaria"
   );
 
   const fightAttrBonus = fightSkill?.modAttr
@@ -115,14 +115,14 @@ const preparePDF: (
     weaponNameField.setText(weapon.nome);
     weaponDamageField.setText(weapon.dano);
     weaponCritField.setText(weapon.critico);
-    weaponTypeField.setText(weapon.tipo || '');
-    weaponRangeField.setText(weapon.alcance || '');
+    weaponTypeField.setText(weapon.tipo || "");
+    weaponRangeField.setText(weapon.alcance || "");
 
-    const isRange = weapon.alcance && weapon.alcance !== '-';
+    const isRange = weapon.alcance && weapon.alcance !== "-";
 
     const modAtk = isRange ? rangeBonus : fightBonus;
     const atk = weapon.atkBonus ? weapon.atkBonus + modAtk : modAtk;
-    weaponBonusField.setText(`${atk >= 0 ? '+' : ''}${atk}`);
+    weaponBonusField.setText(`${atk >= 0 ? "+" : ""}${atk}`);
   });
 
   const defenseEquipments = bagEquipaments.Armadura.concat(
@@ -135,10 +135,10 @@ const preparePDF: (
 
     defenseNameField.setText(defense.nome);
     defenseBonusField.setText(
-      `${defense.defenseBonus >= 0 ? '+' : ''}${defense.defenseBonus}`
+      `${defense.defenseBonus >= 0 ? "+" : ""}${defense.defenseBonus}`
     );
     penaltyField.setText(
-      `${defense.armorPenalty >= 0 ? '+' : ''}${defense.armorPenalty}`
+      `${defense.armorPenalty >= 0 ? "+" : ""}${defense.armorPenalty}`
     );
   });
 
@@ -146,30 +146,30 @@ const preparePDF: (
   const equipsEntriesNoWeapons: Equipment[] = Object.entries(
     sheet.bag.getEquipments()
   )
-    .filter(([key]) => key !== 'Arma' && key !== 'Armadura' && key !== 'Escudo')
+    .filter(([key]) => key !== "Arma" && key !== "Armadura" && key !== "Escudo")
     .flatMap((value) => value[1]);
 
   // Concanenate all equipments names into one string
   const equipmentsNames = equipsEntriesNoWeapons
     .map(
       (equip) =>
-        `${equip.nome}${equip.spaces ? ` (${equip.spaces} espaços)` : ''}`
+        `${equip.nome}${equip.spaces ? ` (${equip.spaces} espaços)` : ""}`
     )
-    .join('\n');
+    .join("\n");
 
   const weaponsNames = weapons
     .map(
       (weapon) =>
-        `${weapon.nome}${weapon.spaces ? ` (${weapon.spaces} espaços)` : ''}`
+        `${weapon.nome}${weapon.spaces ? ` (${weapon.spaces} espaços)` : ""}`
     )
-    .join('\n');
+    .join("\n");
 
   const defenseNames = defenseEquipments
     .map(
       (defense) =>
-        `${defense.nome}${defense.spaces ? ` (${defense.spaces} espaços)` : ''}`
+        `${defense.nome}${defense.spaces ? ` (${defense.spaces} espaços)` : ""}`
     )
-    .join('\n');
+    .join("\n");
 
   const allEquipments = `${equipmentsNames}\n${weaponsNames}\n${defenseNames}`;
   equipamentsFirstField.setText(allEquipments.slice(0, 1000));
@@ -184,7 +184,7 @@ const preparePDF: (
 
   // Add defense bonus
   const defenseBonus = sheet.defesa;
-  modDefense.select('modDes');
+  modDefense.select("modDes");
   defenseField.setText(`${defenseBonus}`);
 
   // Add powers as one big string
@@ -204,14 +204,20 @@ const preparePDF: (
     ...filterUnique(generalPowers),
   ].sort((a, b) => a.name.localeCompare(b.name));
 
-  const powersText = uniquePowers
-    .map(
-      (power) =>
-        `- ${power.name}: ${generateClassPowerText(
-          power as ClassPower
-        )}${generateGeneralPowerText(power as RaceAbility | OriginPower)}`
-    )
-    .join('\n');
+  const deityInfo = sheet.devoto
+    ? `[DEVOÇÃO: ${sheet.devoto.divindade.name}]\nCRENÇAS: ${sheet.devoto.divindade.crencasObjetivos}\nRESTRIÇÕES: ${sheet.devoto.divindade.obrigacoesRestricoes}\n\n`
+    : "";
+
+  const powersText =
+    deityInfo +
+    uniquePowers
+      .map(
+        (power) =>
+          `- ${power.name}: ${generateClassPowerText(
+            power as ClassPower
+          )}${generateGeneralPowerText(power as RaceAbility | OriginPower)}`
+      )
+      .join("\n");
   powersField.setText(powersText);
   const powersFieldFontSize = () => {
     if (powersText.length > 7000) {
@@ -229,22 +235,22 @@ const preparePDF: (
 
   // Add spells
   const spells = sheet.spells || [];
-  const spellsText = spells.map((spell) => spell.nome).join('\n');
+  const spellsText = spells.map((spell) => spell.nome).join("\n");
   spellsField.setText(spellsText);
 
   // Proficiencies
   const proficienciesText = sheet.classe.proficiencias
     .map((proficiency) => `${proficiency}`)
-    .join('\n');
+    .join("\n");
   proficienciesField.setText(proficienciesText);
 
   // The PDF sheet only allows 30 skills, being two max "Oficios". We need to make sure we don't exceed that.
   // If there is more than 2 "Oficios", we will remove the extra ones. If there is only one, let's create a empty one (we need always two).
   const skills =
-    sheet.completeSkills?.filter((skill) => !skill.name.includes('Ofício')) ||
+    sheet.completeSkills?.filter((skill) => !skill.name.includes("Ofício")) ||
     [];
   const oficioSkills =
-    sheet.completeSkills?.filter((skill) => skill.name.includes('Ofício')) ||
+    sheet.completeSkills?.filter((skill) => skill.name.includes("Ofício")) ||
     [];
   if (oficioSkills.length > 2) {
     oficioSkills.splice(2);
@@ -285,26 +291,26 @@ const preparePDF: (
       // Fill fields
       skillTotalField.setText(`${skillTotal}`);
       switch (skill.modAttr) {
-        case 'Força':
-          skillAttrField.select('modFor');
+        case "Força":
+          skillAttrField.select("modFor");
           break;
-        case 'Destreza':
-          skillAttrField.select('modDes');
+        case "Destreza":
+          skillAttrField.select("modDes");
           break;
-        case 'Constituição':
-          skillAttrField.select('modCon');
+        case "Constituição":
+          skillAttrField.select("modCon");
           break;
-        case 'Inteligência':
-          skillAttrField.select('modInt');
+        case "Inteligência":
+          skillAttrField.select("modInt");
           break;
-        case 'Sabedoria':
-          skillAttrField.select('modSab');
+        case "Sabedoria":
+          skillAttrField.select("modSab");
           break;
-        case 'Carisma':
-          skillAttrField.select('modCar');
+        case "Carisma":
+          skillAttrField.select("modCar");
           break;
         default:
-          skillAttrField.select('modDes');
+          skillAttrField.select("modDes");
           break;
       }
       skillTrainingValueField.setText(`${skill.training ?? 0}`);
@@ -314,22 +320,22 @@ const preparePDF: (
       skillOthersField.setText(`${skill.others ?? 0}`);
 
       // If the current skill is some kind of "Oficio", we will add the text between the parantheses
-      if (skill.name.includes('Ofício')) {
+      if (skill.name.includes("Ofício")) {
         // Use regex to get the text between the parantheses
         const oficioMatch = skill.name.match(/Ofício\s*(.*)/);
-        const oficioText = oficioMatch ? oficioMatch[1] : '';
+        const oficioText = oficioMatch ? oficioMatch[1] : "";
         // There are two "Oficio" fields in the PDF, the first is for skill index 22, the second for index 23
         // So we need to check the index
         if (oficioText) {
           const oficioField =
             index === 22 ? craftSkillFirstField : craftSkillSecondField;
-          oficioField.setText(oficioText.replace('(', '').replace(')', ''));
+          oficioField.setText(oficioText.replace("(", "").replace(")", ""));
         }
       }
     });
 
   pdfDoc.setTitle(`Ficha de ${sheet.nome}`);
-  pdfDoc.setAuthor('Fichas de Nimb');
+  pdfDoc.setAuthor("Fichas de Nimb");
   const pdfBytes = await pdfDoc.save();
 
   return pdfBytes;
