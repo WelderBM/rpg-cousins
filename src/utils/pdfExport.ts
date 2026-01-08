@@ -378,6 +378,37 @@ function createCharacterSheetHTML(character: Character): HTMLElement {
       </div>
     </div>
 
+    <!-- ESPAÇO NA MOCHILA -->
+    <div class="section">
+      <div class="section-title">Espaço na Mochila</div>
+      <div class="stat-box" style="text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div class="stat-label">Carga</div>
+          <div class="stat-value" style="font-size: 18px;">
+            <span style="color: ${
+              usedSpaces > maxSpaces ? "#ef4444" : "#1c1917"
+            };">${usedSpaces}</span>
+            <span style="font-size: 14px; color: #78716c;"> / ${maxSpaces}</span>
+          </div>
+        </div>
+        <div style="width: 100%; height: 12px; background: #e7e5e4; border-radius: 6px; overflow: hidden; border: 1px solid #d6d3d1;">
+          <div style="width: ${Math.min(
+            100,
+            (usedSpaces / maxSpaces) * 100
+          )}%; height: 100%; background: ${
+    usedSpaces > maxSpaces
+      ? "#ef4444"
+      : "linear-gradient(90deg, #d97706 0%, #f59e0b 100%)"
+  }; transition: width 0.3s;"></div>
+        </div>
+        ${
+          usedSpaces > maxSpaces
+            ? '<div style="margin-top: 8px; font-size: 11px; color: #ef4444; font-weight: bold;">⚠️ Você está sobrecarregado!</div>'
+            : ""
+        }
+      </div>
+    </div>
+
     <!-- PERÍCIAS -->
     ${
       character.skills && character.skills.length > 0

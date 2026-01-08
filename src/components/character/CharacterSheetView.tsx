@@ -33,6 +33,7 @@ import {
   Search,
   MapPin,
   Dices,
+  Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Atributo } from "@/data/atributos";
@@ -41,6 +42,8 @@ import { compressImage } from "@/utils/imageCompression";
 import { exportCharacterToPDF } from "@/utils/pdfExport";
 import Link from "next/link";
 import Skill from "@/interfaces/Skills";
+import { calculateCarryCapacity } from "@/utils/inventoryUtils";
+import Bag, { calcBagSpaces } from "@/interfaces/Bag";
 
 // --- SUB-COMPONENTS ---
 
@@ -627,6 +630,8 @@ export function CharacterSheetView({
         originPowers.push(item);
       }
     });
+  }
+
   // --- INVENTORY & SPACE CALCULATIONS ---
   const bag = (activeCharacter as any).bag;
   const inventory = (activeCharacter as any).inventory || [];
@@ -651,13 +656,23 @@ export function CharacterSheetView({
     );
   }
 
-  const usedSpaces = [...(weapons || []), ...others].reduce(
-    (acc: number, item: any) =>
-      acc + (item.spaces || 0) * (item.quantidade || 1),
-    0
-  );
-  const forValue = getAttrMod(activeCharacter.attributes[Atributo.FORCA]);
-  const maxSpaces = 10 + 2 * forValue;
+  // Calculate used spaces - use Bag method if available, otherwise calculate manually
+  let usedSpaces = 0;
+  if (bag && typeof bag.getSpaces === "function") {
+    usedSpaces = bag.getSpaces();
+  } else if (bag && bag.equipments) {
+    usedSpaces = calcBagSpaces(bag.equipments);
+  } else {
+    // Fallback: manual calculation
+    usedSpaces = [...(weapons || []), ...others].reduce(
+      (acc: number, item: any) =>
+        acc + (item.spaces || 0) * (item.quantidade || 1),
+      0
+    );
+  }
+
+  // Calculate max spaces using the proper function that considers backpacks
+  const maxSpaces = calculateCarryCapacity(activeCharacter);
 
   return (
     <div className="text-neutral-200 pb-20 font-sans selection:bg-amber-900 selection:text-white relative min-h-screen">
@@ -997,7 +1012,13 @@ export function CharacterSheetView({
                       >
                         {usedSpaces}
                       </span>
-                      <span className="text-[10px] font-bold text-stone-500 uppercase">
+                      <span
+                        className={`text-[10px] font-bold uppercase ${
+                          usedSpaces > maxSpaces
+                            ? "text-red-500"
+                            : "text-stone-500"
+                        }`}
+                      >
                         / {maxSpaces}
                       </span>
                     </div>
@@ -1008,7 +1029,7 @@ export function CharacterSheetView({
                       animate={{
                         width: `${Math.min(
                           100,
-                          (usedSpaces / maxSpaces) * 100
+                          maxSpaces > 0 ? (usedSpaces / maxSpaces) * 100 : 0
                         )}%`,
                       }}
                       className={`h-full relative z-10 ${
