@@ -17,43 +17,18 @@ import {
   Menu,
   X,
   LayoutGrid,
+  Brain,
 } from "lucide-react";
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: (string | undefined | null | false)[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from "@/lib/utils";
 
 const primaryNavItems = [
   { name: "Home", href: "/", icon: Home },
-  { name: "Meu Herói", href: "/my-character", icon: User },
-  { name: "Wiki", href: "/wiki", icon: Scroll },
+  { name: "Heróis", href: "/herois", icon: User },
+  { name: "Conhecimentos", href: "/conhecimentos", icon: Brain },
   { name: "Mestre", href: "/mestre", icon: ShieldAlert },
 ];
 
 const secondaryNavItems = [
-  {
-    name: "Novo Personagem",
-    href: "/wizard",
-    icon: Wand2,
-    description: "Crie um novo herói lendário",
-    color: "from-amber-400 to-orange-600",
-  },
-  {
-    name: "Meus Heróis",
-    href: "/characters",
-    icon: Users,
-    description: "Gerencie todos os seus personagens",
-    color: "from-blue-400 to-indigo-600",
-  },
-  {
-    name: "Grimório",
-    href: "/grimorio",
-    icon: BookOpen,
-    description: "Consulte o grimório de magias",
-    color: "from-purple-400 to-fuchsia-600",
-  },
   {
     name: "Mercado",
     href: "/market",
