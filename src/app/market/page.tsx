@@ -490,8 +490,11 @@ const InventoryItemCard = ({ item, onSell, onAdd, activeCharacter }: any) => {
             <span className="bg-emerald-900/30 px-2 py-1 rounded text-emerald-400 font-bold text-xs border border-emerald-500/30">
               x{item.quantidade || 1}
             </span>
-            <span className="font-cinzel font-bold text-xs text-emerald-500">
-              {!item.preco ? "FREE" : `${item.preco} T$`}
+            <span
+              className="font-cinzel font-bold text-xs text-emerald-500"
+              title="Preço de venda (50%)"
+            >
+              {!item.preco ? "FREE" : `${Math.floor(item.preco * 0.5)} T$`}
             </span>
           </div>
 
@@ -1050,7 +1053,7 @@ const MarketPage = () => {
     }
 
     // Sell Logic (Existing, slightly modified to ensure safety)
-    const price = item.preco || 0;
+    const price = Math.floor((item.preco || 0) * 0.5);
     let newMoney = activeCharacter.money + price;
 
     // Optimistic Update
@@ -1191,14 +1194,17 @@ const MarketPage = () => {
     setTimeout(() => setFeedback(null), 3000);
   };
 
-  const handleConfirmSell = async (charId: string, item: Equipment) => {
+  const handleConfirmSell = async (
+    charId: string,
+    item: Equipment,
+    finalPrice: number
+  ) => {
     if (!auth?.currentUser) return;
 
     const targetChar = myCharacters.find((c) => c.id === charId);
     if (!targetChar) return;
 
-    const price = item.preco || 0;
-    const newMoney = (targetChar.money || 0) + price;
+    const newMoney = (targetChar.money || 0) + finalPrice;
 
     try {
       // Calculate new Bag
