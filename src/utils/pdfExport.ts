@@ -214,7 +214,7 @@ function createCharacterSheetHTML(character: Character): HTMLElement {
     <div class="pdf-header">
       <h1>${character.name || "Personagem"}</h1>
       <p>${character.race?.name || "Raça"} (${
-    character.race?.subrace || ""
+    (character.race as any)?.subrace || ""
   }) • ${character.class?.name || "Classe"} Nível ${character.level || 1}</p>
     </div>
 
@@ -228,7 +228,9 @@ function createCharacterSheetHTML(character: Character): HTMLElement {
       <div class="field">
         <span class="field-label">Raça:</span>
         <span class="field-value">${character.race?.name || "Não definida"} ${
-    character.race?.subrace ? `(${character.race.subrace})` : ""
+    (character.race as any)?.subrace
+      ? `(${(character.race as any).subrace})`
+      : ""
   }</span>
       </div>
       <div class="field">
@@ -342,7 +344,9 @@ function createCharacterSheetHTML(character: Character): HTMLElement {
         </div>
         <div class="stat-box">
           <div class="stat-label">Deslocamento</div>
-          <div class="stat-value">${character.race?.deslocamento || "9m"}</div>
+          <div class="stat-value">${
+            (character.race as any)?.deslocamento || "9m"
+          }</div>
         </div>
       </div>
     </div>
@@ -585,20 +589,41 @@ function createCharacterSheetHTML(character: Character): HTMLElement {
           <div class="list-item">
             <div class="list-item-title">${power.name || power.nome}</div>
             ${
-              power.cost
-                ? `<div style="font-size: 10px; color: #78716c; margin-top: 3px;">Custo: ${power.cost}</div>`
+              power.description || power.text
+                ? `
+              <div class="list-item-desc">${
+                power.description || power.text
+              }</div>
+            `
                 : ""
             }
-            ${
-              power.range
-                ? `<div style="font-size: 10px; color: #78716c;">Alcance: ${power.range}</div>`
-                : ""
-            }
-            ${
-              power.duration
-                ? `<div style="font-size: 10px; color: #78716c;">Duração: ${power.duration}</div>`
-                : ""
-            }
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    `
+        : ""
+    }
+
+    <!-- PODERES CONCEDIDOS -->
+    ${
+      (character.grantedPowers && character.grantedPowers.length > 0) ||
+      (character as any).grantedPower
+        ? `
+      <div class="section">
+        <div class="section-title">Poderes Concedidos (${
+          character.deity?.name || (character as any).deityName || "Divindade"
+        })</div>
+        ${(character.grantedPowers && character.grantedPowers.length > 0
+          ? character.grantedPowers
+          : [(character as any).grantedPower]
+        )
+          .filter(Boolean)
+          .map(
+            (power: any) => `
+          <div class="list-item">
+            <div class="list-item-title">${power.name || power.nome}</div>
             ${
               power.description || power.text
                 ? `

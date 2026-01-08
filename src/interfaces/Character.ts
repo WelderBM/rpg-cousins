@@ -55,7 +55,7 @@ export interface Character {
   }[];
   deity: Divindade | null;
   prohibitedObligations?: string[];
-  grantedPower: GeneralPower | null;
+  grantedPowers: GeneralPower[] | null;
   bag: Bag; // Note: Bag class might need serialization handling for Firestore
   money: number;
   currentPv?: number;

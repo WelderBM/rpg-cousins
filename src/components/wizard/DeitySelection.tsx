@@ -29,7 +29,6 @@ const DeitySelection = () => {
   const {
     selectDeity,
     selectGrantedPowers,
-    selectedGrantedPowers,
     selectedClass,
     setStep,
     selectOrigin,
@@ -45,9 +44,18 @@ const DeitySelection = () => {
     );
   }, [selectedClass]);
 
+  const powerLimit = useMemo(() => {
+    if (!selectedClass) return 1;
+    if (selectedClass.qtdPoderesConcedidos === "all") return 99; // Represents 'all'
+    return Number(selectedClass.qtdPoderesConcedidos || 1);
+  }, [selectedClass]);
+
   const [selectedPreview, setSelectedPreview] = useState<Divindade | null>(
     null
   );
+  const [localSelectedPowers, setLocalSelectedPowers] = useState<
+    GeneralPower[]
+  >([]);
 
   // Scroll to top when entering/leaving preview
   React.useEffect(() => {
@@ -60,15 +68,40 @@ const DeitySelection = () => {
 
   const handleSelectDeityReview = (deity: Divindade) => {
     setSelectedPreview(deity);
-    // AUTO-GRANT ALL POWERS
-    // Mestre Rule: Receive all granted powers directly
-    selectGrantedPowers(deity.poderes);
+    if (powerLimit >= 99) {
+      // Clerics/Paladins receive all directly
+      setLocalSelectedPowers(deity.poderes);
+    } else {
+      setLocalSelectedPowers([]);
+    }
+  };
+
+  const togglePower = (power: GeneralPower) => {
+    if (powerLimit >= 99) return; // Cannot toggle if receiving all
+
+    const isSelected = localSelectedPowers.some((p) => p.name === power.name);
+    if (isSelected) {
+      setLocalSelectedPowers(
+        localSelectedPowers.filter((p) => p.name !== power.name)
+      );
+    } else {
+      if (localSelectedPowers.length < powerLimit) {
+        setLocalSelectedPowers([...localSelectedPowers, power]);
+      }
+    }
   };
 
   const handleConfirm = () => {
     if (!selectedPreview) return;
+
+    // Check if limit is reached (unless receiving all)
+    if (powerLimit < 99 && localSelectedPowers.length < powerLimit) {
+      alert(`Você deve escolher ${powerLimit} poder(es) concedido(s).`);
+      return;
+    }
+
     selectDeity(selectedPreview);
-    // Powers are already set in state by handleSelectDeityReview
+    selectGrantedPowers(localSelectedPowers);
     setStep(5); // Go to SummarySelection
   };
 
@@ -109,9 +142,19 @@ const DeitySelection = () => {
               transition={{ delay: 0.2 }}
               className="text-neutral-400 text-center font-cinzel tracking-[0.2em] text-sm md:text-base uppercase -mt-4 opacity-70"
             >
-              Você receberá{" "}
-              <span className="text-amber-500 font-bold">todos</span> os poderes
-              concedidos.
+              {powerLimit >= 99 ? (
+                <>
+                  Você receberá{" "}
+                  <span className="text-amber-500 font-bold">todos</span> os
+                  poderes concedidos.
+                </>
+              ) : (
+                <>
+                  Escolha{" "}
+                  <span className="text-amber-500 font-bold">{powerLimit}</span>{" "}
+                  poder(es) concedido(s).
+                </>
+              )}
             </motion.p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -128,12 +171,11 @@ const DeitySelection = () => {
                         👤
                       </div>
                       <div>
-                        <h3 className="text-xl font-cinzel text-stone-300 group-hover:text-white transition-colors">
-                          Seguir Próprio Destino
+                        <h3 className="text-xl font-cinzel text-white mb-2">
+                          Sem Divindade
                         </h3>
-                        <p className="text-xs text-stone-500 mt-2">
-                          Não ser devoto de nenhuma divindade (Ateu ou
-                          Independente).
+                        <p className="text-sm text-stone-500">
+                          Siga seu próprio caminho sem obrigações divinas.
                         </p>
                       </div>
                     </div>
@@ -196,7 +238,7 @@ const DeitySelection = () => {
               >
                 <ChevronLeft size={24} />
                 <span className="ml-1 font-bold uppercase tracking-wider text-xs">
-                  Voltar
+                  Voltar para lista
                 </span>
               </button>
               <h2 className="text-3xl md:text-4xl font-cinzel text-amber-500 drop-shadow-lg">
@@ -221,9 +263,16 @@ const DeitySelection = () => {
                 </div>
 
                 <div className="relative z-10 w-full flex flex-col items-center">
-                  <span className="text-sm font-bold px-4 py-2 rounded-full border bg-emerald-900/60 text-emerald-300 border-emerald-500/50 shadow-xl backdrop-blur-sm">
-                    {selectedPreview.poderes.length} Poderes Incluídos
-                    Automáticamente
+                  <span
+                    className={`text-sm font-bold px-4 py-2 rounded-full border backdrop-blur-sm shadow-xl ${
+                      powerLimit >= 99
+                        ? "bg-emerald-900/60 text-emerald-300 border-emerald-500/50"
+                        : "bg-amber-900/60 text-amber-300 border-amber-500/50"
+                    }`}
+                  >
+                    {powerLimit >= 99
+                      ? `${selectedPreview.poderes.length} Poderes Incluídos Automáticamente`
+                      : `Selecione ${powerLimit} poder(es) de ${selectedPreview.poderes.length}`}
                   </span>
                 </div>
               </div>
@@ -293,22 +342,54 @@ const DeitySelection = () => {
                 <div>
                   <h3 className="text-stone-500 lowercase tracking-widest font-bold text-xs mb-4 flex items-center gap-2">
                     <Flame size={16} className="text-amber-600" /> PODERES
-                    CONCEDIDOS
+                    CONCEDIDOS{" "}
+                    {powerLimit < 99 && (
+                      <span className="text-amber-500 ml-2">
+                        ({localSelectedPowers.length} / {powerLimit})
+                      </span>
+                    )}
                   </h3>
                   <div className="grid gap-3">
                     {selectedPreview.poderes.map((power) => {
+                      const isSelected = localSelectedPowers.some(
+                        (p) => p.name === power.name
+                      );
+                      const canSelectMore =
+                        localSelectedPowers.length < powerLimit;
+                      const isDisabled =
+                        powerLimit < 99 && !isSelected && !canSelectMore;
+
                       return (
                         <div
                           key={power.name}
-                          className="p-5 rounded-xl border border-emerald-500/30 bg-emerald-900/10 transition-all relative group"
+                          onClick={() => togglePower(power)}
+                          className={`p-5 rounded-xl border transition-all relative group cursor-pointer ${
+                            isSelected
+                              ? "border-emerald-500/50 bg-emerald-900/20"
+                              : isDisabled
+                              ? "border-stone-800 bg-stone-900/50 opacity-50 grayscale cursor-not-allowed"
+                              : "border-stone-800 bg-stone-900/40 hover:border-amber-500/30"
+                          }`}
                         >
                           <div className="flex justify-between items-start mb-2">
-                            <span className="font-bold font-cinzel text-lg text-emerald-100">
+                            <span
+                              className={`font-bold font-cinzel text-lg ${
+                                isSelected
+                                  ? "text-emerald-100"
+                                  : "text-stone-200"
+                              }`}
+                            >
                               {power.name}
                             </span>
-                            <div className="bg-emerald-500/20 text-emerald-400 p-1 rounded-full">
-                              <Check size={16} />
-                            </div>
+                            {isSelected ? (
+                              <div className="bg-emerald-500/20 text-emerald-400 p-1 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                                <Check size={16} />
+                              </div>
+                            ) : (
+                              powerLimit < 99 && (
+                                <div className="w-6 h-6 rounded-full border-2 border-stone-700" />
+                              )
+                            )}
                           </div>
                           <p className="text-sm text-stone-400 leading-relaxed font-light">
                             {(power as any).text ||
@@ -336,9 +417,19 @@ const DeitySelection = () => {
                 )}
                 <button
                   onClick={handleConfirm}
-                  className="flex-[2] py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.99] bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 shadow-amber-900/20 hover:scale-[1.01]"
+                  disabled={
+                    powerLimit < 99 && localSelectedPowers.length < powerLimit
+                  }
+                  className={`flex-[2] py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.99] ${
+                    powerLimit < 99 && localSelectedPowers.length < powerLimit
+                      ? "bg-stone-800 text-stone-600 cursor-not-allowed opacity-50"
+                      : "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 shadow-amber-900/20 hover:scale-[1.01]"
+                  }`}
                 >
-                  <Check size={24} /> Confirmar Fé
+                  <Check size={24} />
+                  {powerLimit < 99 && localSelectedPowers.length < powerLimit
+                    ? `Escolha mais ${powerLimit - localSelectedPowers.length}`
+                    : "Confirmar Fé"}
                 </button>
               </div>
             </div>
