@@ -8,15 +8,11 @@ import {
   Coins,
   Package,
   ArrowRight,
-  Shield,
-  Ghost,
 } from "lucide-react";
 import Equipment from "../../interfaces/Equipment";
 import { Character } from "../../interfaces/Character";
-import Bag, { calcBagSpaces } from "../../interfaces/Bag";
-import { Atributo } from "../../data/atributos";
 
-interface PurchaseModalProps {
+interface SellModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (characterId: string, item: Equipment) => Promise<void>;
@@ -25,7 +21,7 @@ interface PurchaseModalProps {
   activeCharacterId?: string;
 }
 
-export const PurchaseModal: React.FC<PurchaseModalProps> = ({
+export const SellModal: React.FC<SellModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
@@ -63,12 +59,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   );
 
   const price = item?.preco || 0;
-  const itemSlots = item?.spaces ?? 1; // Default to 1 if undefined, though usually 0 or 1. If 0 it's 0.
-  // Wait, if item.spaces is explicitly 0, it should be 0.
-  // In AbilityCard: item.spaces !== undefined ? item.spaces : ...
-  // Let's use item.spaces ?? 1 safely, but check if 0 is truthy (it is not).
-  // Safe: (item?.spaces !== undefined && item?.spaces !== null) ? item.spaces : 1;
-  // Actually, standard default for undefined spaces in T20 is usually 1, but "não ocupa espaço" is specific.
+  const itemSlots = item?.spaces ?? 1;
   const actualItemSlots =
     item?.spaces !== undefined && item?.spaces !== null ? item.spaces : 1;
 
@@ -76,68 +67,33 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const status = useMemo(() => {
     if (!selectedChar || !item)
       return {
-        canBuy: false,
+        canSell: false,
         msg: "Selecione um personagem",
         currentMoney: 0,
         newMoney: 0,
-        currentSlots: 0,
-        newSlots: 0,
-        maxSlots: 0,
       };
 
     // Money
     const currentMoney = selectedChar.money || 0;
-    const newMoney = currentMoney - price;
-    const hasMoney = newMoney >= 0;
-
-    // Slots
-    // Handle generic object vs Bag instance
-    let bagEquipments: any = {};
-    if (selectedChar.bag instanceof Bag) {
-      bagEquipments = selectedChar.bag.getEquipments();
-    } else if ((selectedChar.bag as any)?.equipments) {
-      bagEquipments = (selectedChar.bag as any).equipments;
-    }
-
-    const currentSlots = calcBagSpaces(bagEquipments);
-    const newSlots = currentSlots + actualItemSlots;
-
-    // Load Limit: 10 + (Str mod * 2) - T20 Standard
-    // Access the attribute correctly: it's an object with a 'mod' property
-    const strAttr = selectedChar.attributes?.[Atributo.FORCA];
-    const strMod =
-      typeof strAttr === "object" && strAttr !== null ? strAttr.mod : 0;
-    const maxSlots = 10 + strMod * 2;
-
-    const hasSlots = newSlots <= maxSlots;
-
-    let msg = "";
-    if (!hasMoney) msg = "Dinheiro insuficiente";
-    else if (!hasSlots) msg = "Sem espaço na mochila";
-    else msg = "Pronto para comprar";
+    const newMoney = currentMoney + price;
 
     return {
-      canBuy: hasMoney && hasSlots,
-      msg,
+      canSell: true,
+      msg: "Pronto para vender",
       currentMoney,
       newMoney,
-      currentSlots,
-      newSlots,
-      maxSlots,
-      hasMoney,
-      hasSlots,
     };
-  }, [selectedChar, item, price, actualItemSlots]);
+  }, [selectedChar, item, price]);
 
   const handleConfirm = async () => {
-    if (!status.canBuy || isProcessing || !selectedCharId || !item) return;
+    if (!status.canSell || isProcessing || !selectedCharId || !item) return;
 
     setIsProcessing(true);
     try {
       await onConfirm(selectedCharId, item);
-      // Modal will be closed by parent component after successful purchase
+      // Modal will be closed by parent component after successful sale
     } catch (e) {
-      console.error("Purchase error:", e);
+      console.error("Sale error:", e);
       setIsProcessing(false);
     }
   };
@@ -164,7 +120,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
           {/* Header */}
           <div className="bg-[#1a1a1a] p-4 border-b border-white/5 flex items-center justify-between">
             <h3 className="font-serif text-lg text-amber-500 font-bold flex items-center gap-2">
-              <Coins size={20} /> Confirmar Compra
+              <Coins size={20} /> Confirmar Venda
             </h3>
             <button
               onClick={onClose}
@@ -190,8 +146,8 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                     {item.group || "Item Geral"}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-amber-500 font-bold text-sm">
-                      {item.preco} T$
+                    <span className="text-emerald-500 font-bold text-sm">
+                      +{item.preco} T$
                     </span>
                     <span className="text-xs text-stone-600">•</span>
                     <span className="text-stone-400 text-xs">
@@ -209,7 +165,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             {/* Character Selection */}
             <div className="space-y-2">
               <label className="text-xs uppercase font-bold text-stone-500">
-                Comprador
+                Vendedor
               </label>
               <div className="relative">
                 <select
@@ -231,77 +187,22 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
             {/* Validation Panel */}
             {selectedChar && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 {/* Money Validation */}
-                <div
-                  className={`p-3 rounded-lg border ${
-                    status.hasMoney
-                      ? "bg-stone-900/50 border-white/5"
-                      : "bg-red-950/20 border-red-500/30"
-                  }`}
-                >
+                <div className="p-3 rounded-lg border bg-emerald-950/20 border-emerald-500/30">
                   <div className="flex items-center gap-2 mb-2 text-stone-500 text-xs font-bold uppercase">
                     <Coins size={12} /> Tibares
                   </div>
                   <div className="flex items-center justify-between">
-                    <span
-                      className={
-                        status.hasMoney ? "text-stone-400" : "text-red-400"
-                      }
-                    >
+                    <span className="text-stone-400">
                       {status.currentMoney}
                     </span>
                     <ArrowRight size={12} className="text-stone-700" />
-                    <span
-                      className={`font-bold ${
-                        status.hasMoney ? "text-amber-500" : "text-red-500"
-                      }`}
-                    >
+                    <span className="font-bold text-emerald-500">
                       {status.newMoney}
                     </span>
                   </div>
                 </div>
-
-                {/* Slots Validation */}
-                <div
-                  className={`p-3 rounded-lg border ${
-                    status.hasSlots
-                      ? "bg-stone-900/50 border-white/5"
-                      : "bg-red-950/20 border-red-500/30"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-2 text-stone-500 text-xs font-bold uppercase">
-                    <Package size={12} /> Carga
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={
-                        status.hasSlots ? "text-stone-400" : "text-red-400"
-                      }
-                    >
-                      {status.currentSlots}
-                    </span>
-                    <ArrowRight size={12} className="text-stone-700" />
-                    <span
-                      className={`font-bold ${
-                        status.hasSlots ? "text-stone-200" : "text-red-500"
-                      }`}
-                    >
-                      {status.newSlots}
-                    </span>
-                    <span className="text-stone-600 text-xs self-end mb-0.5">
-                      /{status.maxSlots}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Error Message */}
-            {!status.canBuy && (
-              <div className="flex items-center gap-2 text-red-500 text-sm bg-red-950/20 p-3 rounded-lg border border-red-900/30">
-                <AlertCircle size={16} />
-                <span>{status.msg}</span>
               </div>
             )}
           </div>
@@ -319,10 +220,10 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={!status.canBuy || isProcessing}
+              disabled={!status.canSell || isProcessing}
               className={`px-6 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-all ${
-                status.canBuy && !isProcessing
-                  ? "bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-900/20"
+                status.canSell && !isProcessing
+                  ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20"
                   : "bg-stone-800 text-stone-500 cursor-not-allowed"
               }`}
             >
@@ -334,7 +235,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               ) : (
                 <>
                   <Check size={16} />
-                  Confirmar Compra
+                  Confirmar Venda
                 </>
               )}
             </button>
@@ -343,11 +244,11 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
           {/* Processing Overlay */}
           {isProcessing && (
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
-              <div className="bg-[#111] p-6 rounded-xl border border-amber-500/30 shadow-2xl">
+              <div className="bg-[#111] p-6 rounded-xl border border-emerald-500/30 shadow-2xl">
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-                  <p className="text-amber-500 font-bold">
-                    Processando compra...
+                  <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                  <p className="text-emerald-500 font-bold">
+                    Processando venda...
                   </p>
                 </div>
               </div>

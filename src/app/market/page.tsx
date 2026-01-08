@@ -31,6 +31,7 @@ import {
   Apple,
   Crosshair,
   Dices,
+  Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,6 +40,7 @@ import Equipment from "../../interfaces/Equipment";
 import { getInitialMoney } from "../../functions/general";
 import Bag, { calcBagSpaces } from "../../interfaces/Bag";
 import { PurchaseModal } from "./PurchaseModal";
+import { SellModal } from "./SellModal";
 import { getItemIcon, getFallbackIcon } from "../../utils/assetUtils";
 
 // Animation Variants
@@ -355,6 +357,167 @@ const ItemCard = ({
   );
 };
 
+// Inventory Item Card - Same design as ItemCard but with green theme for owned items
+const InventoryItemCard = ({ item, onSell, onAdd, activeCharacter }: any) => {
+  // Function to create intelligent Google search query
+  const handleGoogleSearch = () => {
+    const itemName = item.nome;
+    const category = item.subGroup || item.group;
+
+    // Build intelligent search query targeted for RPG/Fantasy images
+    const searchQuery = `"${itemName}" medieval fantasy`;
+    const encodedQuery = encodeURIComponent(searchQuery);
+    // Use tbm=isch for Image Search
+    const googleUrl = `https://www.google.com/search?tbm=isch&q=${encodedQuery}`;
+
+    // Open in new tab
+    window.open(googleUrl, "_blank");
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      className="relative group transition-all duration-300"
+    >
+      <div className="h-full border rounded-lg p-3 flex flex-col gap-2 shadow-sm transition-all duration-300 relative overflow-hidden backdrop-blur-sm border-emerald-500/50 bg-emerald-950/20 hover:border-emerald-500 hover:bg-emerald-950/30">
+        {/* Compact Header: Icon + Stats */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center border transition-colors bg-emerald-900/30 border-emerald-500/50 text-emerald-500">
+            {getItemSymbol(item)}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-end gap-1 flex-1">
+            {(item as any).defenseBonus !== undefined &&
+              (item as any).defenseBonus > 0 && (
+                <span className="text-[8px] font-bold text-blue-400 bg-blue-900/20 px-1 rounded border border-blue-500/10 flex items-center gap-0.5">
+                  <Shield size={8} /> +{(item as any).defenseBonus}
+                </span>
+              )}
+            {(item as any).armorPenalty !== undefined &&
+              (item as any).armorPenalty > 0 && (
+                <span className="text-[8px] font-bold text-amber-600 bg-amber-950/20 px-1 rounded border border-amber-500/10 flex items-center gap-0.5">
+                  <Shield size={8} /> -{(item as any).armorPenalty}
+                </span>
+              )}
+            {item.dano && (
+              <div className="flex flex-col items-end gap-0.5">
+                <span className="text-[8px] font-bold text-red-500 bg-red-950/20 px-1 rounded border border-red-500/10 whitespace-nowrap flex items-center gap-0.5">
+                  <Sword size={8} /> {item.dano}
+                </span>
+                {item.critico && item.critico !== "-" && (
+                  <span className="text-[7px] font-medium text-amber-500/80 bg-amber-950/20 px-1 rounded border border-amber-500/10 whitespace-nowrap flex items-center gap-1">
+                    {item.critico.split("/").map((part: string, i: number) => (
+                      <React.Fragment key={i}>
+                        {i > 0 && <span>/</span>}
+                        {part.includes("x") ? (
+                          <span>{part}</span>
+                        ) : (
+                          <span className="flex items-center gap-0.5">
+                            <Dices size={8} className="text-amber-500/60" />
+                            {part}
+                          </span>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </span>
+                )}
+                {item.tipo && (
+                  <span className="text-[7px] font-medium text-neutral-400 bg-neutral-900 px-1 rounded border border-white/5 whitespace-nowrap">
+                    {item.tipo}
+                  </span>
+                )}
+                {item.alcance && item.alcance !== "-" && (
+                  <span className="text-[7px] font-medium text-blue-400 bg-blue-950/20 px-1 rounded border border-blue-500/10 whitespace-nowrap">
+                    Alcance: {item.alcance}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Item Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-sans font-bold text-xs text-neutral-200 group-hover:text-emerald-400 transition-colors leading-tight line-clamp-1 truncate flex-1">
+              {item.nome}
+            </h3>
+            {/* Preferred Weapon Badge */}
+            {activeCharacter?.deity?.armaPreferida &&
+              item.group === "Arma" &&
+              activeCharacter.deity.armaPreferida
+                .toLowerCase()
+                .includes(item.nome.toLowerCase()) && (
+                <span
+                  className="flex-shrink-0 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[7px] font-black px-1 rounded flex items-center gap-0.5 animate-pulse"
+                  title="Arma preferida da sua divindade"
+                >
+                  <Sparkles size={6} /> PREFERIDA
+                </span>
+              )}
+            {/* Google Search Button */}
+            <motion.button
+              onClick={handleGoogleSearch}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="flex-shrink-0 w-6 h-6 rounded-md bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 hover:border-blue-500/60 flex items-center justify-center transition-all group/search"
+              title="Pesquisar no Google"
+            >
+              <Search
+                size={12}
+                className="text-blue-400 group-hover/search:text-blue-300"
+              />
+            </motion.button>
+          </div>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[8px] text-neutral-500 uppercase tracking-tighter flex items-center gap-1">
+              {getCategoryIcon(item.subGroup || item.group, 8)}
+              {item.subGroup || item.group}
+            </span>
+            {item.spaces > 0 && (
+              <span className="text-[8px] text-neutral-600 flex items-center gap-0.5">
+                • <Package size={8} /> {item.spaces}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Quantity Badge */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="bg-emerald-900/30 px-2 py-1 rounded text-emerald-400 font-bold text-xs border border-emerald-500/30">
+              x{item.quantidade || 1}
+            </span>
+            <span className="font-cinzel font-bold text-xs text-emerald-500">
+              {!item.preco ? "FREE" : `${item.preco} T$`}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <motion.button
+              onClick={onSell}
+              whileTap={{ scale: 0.95 }}
+              className="px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all shadow-sm bg-red-600 hover:bg-red-500 text-white"
+              title="Vender um"
+            >
+              Vender
+            </motion.button>
+            <motion.button
+              onClick={onAdd}
+              whileTap={{ scale: 0.95 }}
+              className="w-7 h-7 flex items-center justify-center rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all"
+              title="Adicionar mais um"
+            >
+              +
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 const ITEMS_PER_PAGE = 48;
 
 type SortOrder = "name-asc" | "name-desc" | "price-asc" | "price-desc";
@@ -635,6 +798,9 @@ const MarketPage = () => {
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [purchasingItem, setPurchasingItem] = useState<Equipment | null>(null);
   const [successItems, setSuccessItems] = useState<string[]>([]);
+
+  const [isSellModalOpen, setIsSellModalOpen] = useState(false);
+  const [sellingItem, setSellingItem] = useState<Equipment | null>(null);
 
   // --- HOOKS REGISTRATION ---
 
@@ -948,12 +1114,10 @@ const MarketPage = () => {
       // Calculate new Bag
       let currentEquips: any = {};
       if (targetChar.bag instanceof Bag) {
-        // Should not happen for myCharacters list items usually?
         currentEquips = targetChar.bag.getEquipments();
       } else if (targetChar.bag?.equipments) {
         currentEquips = targetChar.bag.equipments;
       } else {
-        // Fallback if empty
         currentEquips = new Bag().getEquipments();
       }
 
@@ -975,12 +1139,11 @@ const MarketPage = () => {
         bag: {
           equipments: newEquips,
           spaces: calcBagSpaces(newEquips),
-          armorPenalty: 0, // logic for penalty needed?
+          armorPenalty: 0,
         } as any,
       });
 
-      // Refresh MyCharacters list to reflect changes
-      // We can optimistically update the list
+      // Refresh MyCharacters list
       setMyCharacters((prev) =>
         prev.map((c) => {
           if (c.id === charId) {
@@ -1002,20 +1165,126 @@ const MarketPage = () => {
         addToBag(item);
       }
 
+      // Show success feedback
       setFeedback({
-        msg: `Compra realizada para ${targetChar.name}!`,
+        msg: `${item.nome} comprado com sucesso!`,
         type: "success",
       });
 
-      // Show success animation on the button
+      // Show success animation
       setSuccessItems((prev) => [...prev, item.nome]);
       setTimeout(() => {
         setSuccessItems((prev) => prev.filter((n) => n !== item.nome));
-      }, 1500);
+      }, 2000);
+
+      // Close modal after short delay
+      setTimeout(() => {
+        setIsPurchaseModalOpen(false);
+        setPurchasingItem(null);
+      }, 500);
     } catch (e) {
       console.error(e);
       setFeedback({ msg: "Erro ao processar compra", type: "error" });
     }
+
+    setTimeout(() => setFeedback(null), 3000);
+  };
+
+  const handleConfirmSell = async (charId: string, item: Equipment) => {
+    if (!auth?.currentUser) return;
+
+    const targetChar = myCharacters.find((c) => c.id === charId);
+    if (!targetChar) return;
+
+    const price = item.preco || 0;
+    const newMoney = (targetChar.money || 0) + price;
+
+    try {
+      // Calculate new Bag
+      let currentEquips: any = {};
+      if (targetChar.bag instanceof Bag) {
+        currentEquips = targetChar.bag.getEquipments();
+      } else if (targetChar.bag?.equipments) {
+        currentEquips = targetChar.bag.equipments;
+      } else {
+        currentEquips = new Bag().getEquipments();
+      }
+
+      const newEquips = JSON.parse(JSON.stringify(currentEquips));
+      const group = item.group || "Item Geral";
+
+      if (newEquips[group]) {
+        const existing = newEquips[group].find(
+          (i: any) => i.nome === item.nome
+        );
+
+        if (existing) {
+          if (existing.quantidade > 1) {
+            existing.quantidade -= 1;
+          } else {
+            // Remove item completely
+            newEquips[group] = newEquips[group].filter(
+              (i: any) => i.nome !== item.nome
+            );
+          }
+        }
+      }
+
+      // Update Firebase
+      await CharacterService.updateCharacter(auth.currentUser.uid, charId, {
+        money: newMoney,
+        bag: {
+          equipments: newEquips,
+          spaces: calcBagSpaces(newEquips),
+          armorPenalty: 0,
+        } as any,
+      });
+
+      // Refresh MyCharacters list
+      const updatedCharacters = myCharacters.map((c) => {
+        if (c.id === charId) {
+          return {
+            ...c,
+            money: newMoney,
+            bag: {
+              equipments: newEquips,
+              spaces: calcBagSpaces(newEquips),
+              armorPenalty: 0,
+            } as any,
+          };
+        }
+        return c;
+      });
+
+      setMyCharacters(updatedCharacters);
+
+      // If active character, update it with the fresh data
+      if (activeCharacter?.id === charId) {
+        const updatedActiveChar = updatedCharacters.find(
+          (c) => c.id === charId
+        );
+        if (updatedActiveChar) {
+          setActiveCharacter(updatedActiveChar);
+        }
+      }
+
+      // Show success feedback
+      setFeedback({
+        msg: `${item.nome} vendido com sucesso!`,
+        type: "success",
+      });
+
+      // Close modal after short delay
+      setTimeout(() => {
+        setIsSellModalOpen(false);
+        setSellingItem(null);
+      }, 500);
+    } catch (e) {
+      console.error(e);
+      setFeedback({ msg: "Erro ao processar venda", type: "error" });
+    }
+
+    setTimeout(() => setFeedback(null), 3000);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -1500,82 +1769,27 @@ const MarketPage = () => {
           </main>
 
           {/* Right Inventory Panel (Desktop) */}
-          <aside className="hidden 2xl:block w-72 h-[calc(100vh-2rem)] sticky top-4 bg-[#111]/50 border border-white/5 rounded-2xl p-6 backdrop-blur-sm mr-4 my-4">
+          <aside className="hidden 2xl:block w-80 h-[calc(100vh-2rem)] sticky top-4 bg-[#111]/50 border border-white/5 rounded-2xl p-6 backdrop-blur-sm mr-4 my-4">
             <h2 className="font-cinzel text-lg text-neutral-300 mb-6 flex items-center gap-2">
-              <ShoppingBag className="text-amber-500" size={18} /> Inventário
+              <ShoppingBag className="text-emerald-500" size={18} /> Inventário
             </h2>
-            <div className="space-y-2 h-[calc(100vh-120px)] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-1 gap-3 h-[calc(100vh-180px)] overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar">
               {bagItems.length === 0 ? (
                 <p className="text-sm text-neutral-600 text-center mt-10">
                   Vazio.
                 </p>
               ) : (
                 bagItems.map((item, i) => (
-                  <div
+                  <InventoryItemCard
                     key={`${item.nome}-${i}-inv`}
-                    className="group relative bg-[#0c0c0c] border border-white/5 p-3 rounded-xl hover:border-amber-500/30 transition-all flex flex-col gap-2"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-bold text-neutral-200 group-hover:text-amber-400">
-                          {item.nome}
-                        </div>
-                        <div className="text-[10px] text-neutral-500 font-medium">
-                          {item.preco === undefined ||
-                          item.preco === null ? null : item.preco === 0 ? (
-                            <span className="text-emerald-500 font-bold">
-                              Grátis
-                            </span>
-                          ) : (
-                            `${item.preco} T$ cada`
-                          )}
-                        </div>
-                        {activeCharacter?.deity?.armaPreferida &&
-                          item.group === "Arma" &&
-                          activeCharacter.deity.armaPreferida
-                            .toLowerCase()
-                            .includes(item.nome.toLowerCase()) && (
-                            <div className="mt-1 flex items-center gap-1 text-[8px] font-black text-cyan-400 bg-cyan-950/30 px-1.5 py-0.5 rounded border border-cyan-500/20 animate-pulse w-fit">
-                              <Sparkles size={8} /> ARMA PREFERIDA
-                            </div>
-                          )}
-                      </div>
-                      <div className="text-amber-500 font-bold font-cinzel text-sm">
-                        x{item.quantidade || 1}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-1">
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => handleTransaction(item, "sell")}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-950/20 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90"
-                          title="Remover um"
-                        >
-                          -
-                        </button>
-                        <button
-                          onClick={() => handleTransaction(item, "buy")}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg bg-emerald-950/20 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all active:scale-90"
-                          title="Adicionar mais um"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={async () => {
-                          const qty = item.quantidade || 1;
-                          for (let k = 0; k < qty; k++) {
-                            await handleTransaction(item, "sell");
-                          }
-                        }}
-                        className="text-[10px] font-bold text-neutral-500 hover:text-red-400 transition-colors px-2 py-1"
-                      >
-                        LIMPAR
-                      </button>
-                    </div>
-                  </div>
+                    item={item}
+                    onSell={() => {
+                      setSellingItem(item);
+                      setIsSellModalOpen(true);
+                    }}
+                    onAdd={() => handleTransaction(item, "buy")}
+                    activeCharacter={activeCharacter}
+                  />
                 ))
               )}
             </div>
@@ -1653,77 +1867,25 @@ const MarketPage = () => {
                 className="fixed right-0 top-0 bottom-0 w-[85%] max-w-sm bg-[#111] z-50 p-6 border-l border-white/10 lg:hidden"
               >
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="font-cinzel text-xl text-amber-500">
+                  <h2 className="font-cinzel text-xl text-emerald-500">
                     Mochila
                   </h2>
                   <button onClick={() => setShowMobileCart(false)}>
                     <X size={24} className="text-neutral-400" />
                   </button>
                 </div>
-                <div className="space-y-3 overflow-y-auto h-[calc(100vh-100px)] pb-10">
+                <div className="grid grid-cols-1 gap-3 overflow-y-auto overflow-x-hidden h-[calc(100vh-120px)] pb-10">
                   {bagItems.map((item, i) => (
-                    <div
+                    <InventoryItemCard
                       key={`${item.nome}-${i}-mob`}
-                      className="bg-[#0c0c0c] border border-white/5 p-4 rounded-xl flex flex-col gap-3"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-bold text-neutral-200">
-                            {item.nome}
-                          </p>
-                          <p className="text-xs text-amber-500/70">
-                            {item.preco === undefined ||
-                            item.preco === null ? null : item.preco === 0 ? (
-                              <span className="text-emerald-500 font-bold">
-                                Grátis
-                              </span>
-                            ) : (
-                              `${item.preco} T$ cada`
-                            )}
-                          </p>
-                          {activeCharacter?.deity?.armaPreferida &&
-                            item.group === "Arma" &&
-                            activeCharacter.deity.armaPreferida
-                              .toLowerCase()
-                              .includes(item.nome.toLowerCase()) && (
-                              <div className="mt-1 flex items-center gap-1 text-[8px] font-black text-cyan-400 bg-cyan-950/30 px-1.5 py-0.5 rounded border border-cyan-500/20 animate-pulse w-fit">
-                                <Sparkles size={8} /> ARMA PREFERIDA
-                              </div>
-                            )}
-                        </div>
-                        <div className="bg-amber-900/20 px-2 py-1 rounded text-amber-500 font-bold text-sm">
-                          x{item.quantidade || 1}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleTransaction(item, "sell")}
-                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-red-950/20 border border-red-500/30 text-red-500 active:scale-95"
-                          >
-                            -
-                          </button>
-                          <button
-                            onClick={() => handleTransaction(item, "buy")}
-                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-950/20 border border-emerald-500/30 text-emerald-500 active:scale-95"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <button
-                          onClick={async () => {
-                            const qty = item.quantidade || 1;
-                            for (let k = 0; k < qty; k++) {
-                              await handleTransaction(item, "sell");
-                            }
-                          }}
-                          className="text-xs font-bold text-neutral-500 px-3 py-2"
-                        >
-                          REMOVER TODOS
-                        </button>
-                      </div>
-                    </div>
+                      item={item}
+                      onSell={() => {
+                        setSellingItem(item);
+                        setIsSellModalOpen(true);
+                      }}
+                      onAdd={() => handleTransaction(item, "buy")}
+                      activeCharacter={activeCharacter}
+                    />
                   ))}
                 </div>
               </motion.div>
@@ -1735,6 +1897,14 @@ const MarketPage = () => {
           onClose={() => setIsPurchaseModalOpen(false)}
           onConfirm={handleConfirmPurchase}
           item={purchasingItem}
+          characters={myCharacters}
+          activeCharacterId={activeCharacter?.id}
+        />
+        <SellModal
+          isOpen={isSellModalOpen}
+          onClose={() => setIsSellModalOpen(false)}
+          onConfirm={handleConfirmSell}
+          item={sellingItem}
           characters={myCharacters}
           activeCharacterId={activeCharacter?.id}
         />
