@@ -43,6 +43,7 @@ import { CharacterPreviewCard } from "@/components/characters/CharacterPreviewCa
 import { CharacterSheetView } from "@/components/character/CharacterSheetView";
 import { Character } from "@/interfaces/Character";
 import { CharacterService } from "@/lib/characterService";
+import { hydrateCharacter } from "@/utils/characterHydration";
 
 // Password for DM area
 const MESTRE_PASSWORD = "mestre-cousins";
@@ -85,11 +86,14 @@ export default function MestreClient() {
         unsubscribe = onSnapshot(
           q,
           (snapshot) => {
-            const fetchedHeroes = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              path: doc.ref.path,
-              ...(doc.data() as any),
-            })) as Character[];
+            const fetchedHeroes = snapshot.docs.map((doc) => {
+              const rawData = {
+                id: doc.id,
+                path: doc.ref.path,
+                ...(doc.data() as any),
+              };
+              return hydrateCharacter(rawData);
+            });
             setHeroes(fetchedHeroes);
             setIsLoading(false);
           },

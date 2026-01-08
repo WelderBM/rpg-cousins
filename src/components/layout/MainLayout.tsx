@@ -22,10 +22,15 @@ import {
 import { cn } from "@/lib/utils";
 
 const primaryNavItems = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Heróis", href: "/herois", icon: User },
-  { name: "Conhecimentos", href: "/conhecimentos", icon: Brain },
-  { name: "Mestre", href: "/mestre", icon: ShieldAlert },
+  { name: "Home", href: "/", icon: Home, mobileLabel: "Home" },
+  { name: "Heróis", href: "/herois", icon: User, mobileLabel: "Heróis" },
+  {
+    name: "Conhecimentos",
+    href: "/conhecimentos",
+    icon: Brain,
+    mobileLabel: "Saber",
+  },
+  { name: "Mestre", href: "/mestre", icon: ShieldAlert, mobileLabel: "Mestre" },
 ];
 
 const secondaryNavItems = [
@@ -201,7 +206,8 @@ export default function MainLayout({
                 )}
                 <item.icon
                   className={cn(
-                    "h-5 w-5 relative z-10 transition-transform duration-300",
+                    "relative z-10 transition-transform duration-300",
+                    item.name === "Conhecimentos" ? "h-6 w-6" : "h-5 w-5",
                     isActive && "scale-110"
                   )}
                   strokeWidth={isActive ? 2 : 1.5}
@@ -259,7 +265,7 @@ export default function MainLayout({
                 >
                   <div
                     className={cn(
-                      "p-2 rounded-2xl mb-0.5 relative transition-all duration-500",
+                      "p-2 rounded-2xl mb-0.5 relative transition-all duration-500 shrink-0",
                       isActive && "bg-medieval-gold/10 scale-110"
                     )}
                   >
@@ -270,7 +276,10 @@ export default function MainLayout({
                       />
                     )}
                     <item.icon
-                      className="h-6 w-6 relative z-10"
+                      className={cn(
+                        "relative z-10",
+                        item.name === "Conhecimentos" ? "h-7 w-7" : "h-6 w-6"
+                      )}
                       strokeWidth={isActive ? 2.5 : 1.5}
                     />
                   </div>
@@ -282,7 +291,7 @@ export default function MainLayout({
                         : "opacity-0 scale-75 h-0 overflow-hidden"
                     )}
                   >
-                    {item.name}
+                    {item.mobileLabel}
                   </span>
                 </div>
                 {isActive && (
