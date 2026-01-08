@@ -303,7 +303,7 @@ Epic medieval fantasy art style, hyper-realistic, dynamic lighting, cinematic co
         originBenefits,
         deity: selectedDeity,
         grantedPower: selectedGrantedPowers[0] || null,
-        bag: bag, // existing instance
+        bag: finalBag, // Use finalBag which contains origin items
         money: money,
         currentPv: hpBase + conMod,
         currentPm: pmBase,
