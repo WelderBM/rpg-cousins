@@ -30,6 +30,7 @@ import {
   Backpack,
   Apple,
   Crosshair,
+  Dices,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -83,8 +84,7 @@ const getItemSymbol = (item: any) => {
       name.includes("disparo")
     )
       return <Crosshair size={18} />;
-    if (name.includes("machado"))
-      return <Hammer size={18} className="rotate-45" />; // Closest to axe if Axe not imported
+    if (name.includes("machado")) return <Hammer size={18} />;
     if (name.includes("adaga") || name.includes("faca"))
       return <Sword size={16} />;
     return <Sword size={18} />;
@@ -180,7 +180,29 @@ const getCategoryIcon = (groupName: string, size = 12) => {
 };
 
 // Re-designed compact Item Card
-const ItemCard = ({ item, isInBag, isSuccess, canAfford, onBuy }: any) => {
+const ItemCard = ({
+  item,
+  isInBag,
+  isSuccess,
+  canAfford,
+  onBuy,
+  activeCharacter,
+}: any) => {
+  // Function to create intelligent Google search query
+  const handleGoogleSearch = () => {
+    const itemName = item.nome;
+    const category = item.subGroup || item.group;
+
+    // Build intelligent search query targeted for RPG/Fantasy images
+    const searchQuery = `"${itemName}" medieval fantasy`;
+    const encodedQuery = encodeURIComponent(searchQuery);
+    // Use tbm=isch for Image Search
+    const googleUrl = `https://www.google.com/search?tbm=isch&q=${encodedQuery}`;
+
+    // Open in new tab
+    window.open(googleUrl, "_blank");
+  };
+
   return (
     <motion.div
       variants={itemVariants}
@@ -208,24 +230,88 @@ const ItemCard = ({ item, isInBag, isSuccess, canAfford, onBuy }: any) => {
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-1 flex-1">
-            {(item as any).defenseBonus && (
-              <span className="text-[8px] font-bold text-blue-400 bg-blue-900/20 px-1 rounded border border-blue-500/10 flex items-center gap-0.5">
-                <Shield size={8} /> +{(item as any).defenseBonus}
-              </span>
-            )}
+            {(item as any).defenseBonus !== undefined &&
+              (item as any).defenseBonus > 0 && (
+                <span className="text-[8px] font-bold text-blue-400 bg-blue-900/20 px-1 rounded border border-blue-500/10 flex items-center gap-0.5">
+                  <Shield size={8} /> +{(item as any).defenseBonus}
+                </span>
+              )}
+            {(item as any).armorPenalty !== undefined &&
+              (item as any).armorPenalty > 0 && (
+                <span className="text-[8px] font-bold text-amber-600 bg-amber-950/20 px-1 rounded border border-amber-500/10 flex items-center gap-0.5">
+                  <Shield size={8} /> -{(item as any).armorPenalty}
+                </span>
+              )}
             {item.dano && (
-              <span className="text-[8px] font-bold text-red-500 bg-red-950/20 px-1 rounded border border-red-500/10 whitespace-nowrap flex items-center gap-0.5">
-                <Sword size={8} /> {item.dano}
-              </span>
+              <div className="flex flex-col items-end gap-0.5">
+                <span className="text-[8px] font-bold text-red-500 bg-red-950/20 px-1 rounded border border-red-500/10 whitespace-nowrap flex items-center gap-0.5">
+                  <Sword size={8} /> {item.dano}
+                </span>
+                {item.critico && item.critico !== "-" && (
+                  <span className="text-[7px] font-medium text-amber-500/80 bg-amber-950/20 px-1 rounded border border-amber-500/10 whitespace-nowrap flex items-center gap-1">
+                    {item.critico.split("/").map((part: string, i: number) => (
+                      <React.Fragment key={i}>
+                        {i > 0 && <span>/</span>}
+                        {part.includes("x") ? (
+                          <span>{part}</span>
+                        ) : (
+                          <span className="flex items-center gap-0.5">
+                            <Dices size={8} className="text-amber-500/60" />
+                            {part}
+                          </span>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </span>
+                )}
+                {item.tipo && (
+                  <span className="text-[7px] font-medium text-neutral-400 bg-neutral-900 px-1 rounded border border-white/5 whitespace-nowrap">
+                    {item.tipo}
+                  </span>
+                )}
+                {item.alcance && item.alcance !== "-" && (
+                  <span className="text-[7px] font-medium text-blue-400 bg-blue-950/20 px-1 rounded border border-blue-500/10 whitespace-nowrap">
+                    Alcance: {item.alcance}
+                  </span>
+                )}
+              </div>
             )}
           </div>
         </div>
 
         {/* Item Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-sans font-bold text-xs text-neutral-200 group-hover:text-amber-400 transition-colors leading-tight line-clamp-1 truncate">
-            {item.nome}
-          </h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-sans font-bold text-xs text-neutral-200 group-hover:text-amber-400 transition-colors leading-tight line-clamp-1 truncate flex-1">
+              {item.nome}
+            </h3>
+            {/* Preferred Weapon Badge */}
+            {activeCharacter?.deity?.armaPreferida &&
+              item.group === "Arma" &&
+              activeCharacter.deity.armaPreferida
+                .toLowerCase()
+                .includes(item.nome.toLowerCase()) && (
+                <span
+                  className="flex-shrink-0 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[7px] font-black px-1 rounded flex items-center gap-0.5 animate-pulse"
+                  title="Arma preferida da sua divindade"
+                >
+                  <Sparkles size={6} /> PREFERIDA
+                </span>
+              )}
+            {/* Google Search Button */}
+            <motion.button
+              onClick={handleGoogleSearch}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="flex-shrink-0 w-6 h-6 rounded-md bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 hover:border-blue-500/60 flex items-center justify-center transition-all group/search"
+              title="Pesquisar no Google"
+            >
+              <Search
+                size={12}
+                className="text-blue-400 group-hover/search:text-blue-300"
+              />
+            </motion.button>
+          </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="text-[8px] text-neutral-500 uppercase tracking-tighter flex items-center gap-1">
               {getCategoryIcon(item.subGroup || item.group, 8)}
@@ -1146,12 +1232,28 @@ const MarketPage = () => {
                   </button>
                 </div>
 
-                <div className="flex items-center gap-2 mb-2 text-neutral-400 text-xs uppercase tracking-wider font-bold">
-                  <Coins size={12} /> Seus Fundos
-                </div>
-                <div className="text-2xl font-bold text-amber-500 font-cinzel">
-                  {activeCharacter?.money}{" "}
-                  <span className="text-sm text-amber-700">T$</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-neutral-400 text-[10px] uppercase tracking-wider font-bold">
+                      <Coins size={10} /> Seus Fundos
+                    </div>
+                    <div className="text-2xl font-bold text-amber-500 font-cinzel">
+                      {activeCharacter?.money}{" "}
+                      <span className="text-sm text-amber-700">T$</span>
+                    </div>
+                  </div>
+                  {activeCharacter?.deity && (
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-1 text-cyan-500 text-[10px] uppercase tracking-wider font-bold">
+                        <Star size={10} /> {activeCharacter.deity.name}
+                      </div>
+                      {activeCharacter.deity.canalizacaoEnergia && (
+                        <div className="text-[9px] font-bold text-purple-400/80 bg-purple-900/20 px-1.5 py-0.5 rounded border border-purple-500/20">
+                          {activeCharacter.deity.canalizacaoEnergia}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1363,6 +1465,7 @@ const MarketPage = () => {
                       isSuccess={isSuccess}
                       canAfford={canAfford}
                       onBuy={() => handleTransaction(item, "buy")}
+                      activeCharacter={activeCharacter}
                     />
                   );
                 })
@@ -1427,6 +1530,15 @@ const MarketPage = () => {
                             `${item.preco} T$ cada`
                           )}
                         </div>
+                        {activeCharacter?.deity?.armaPreferida &&
+                          item.group === "Arma" &&
+                          activeCharacter.deity.armaPreferida
+                            .toLowerCase()
+                            .includes(item.nome.toLowerCase()) && (
+                            <div className="mt-1 flex items-center gap-1 text-[8px] font-black text-cyan-400 bg-cyan-950/30 px-1.5 py-0.5 rounded border border-cyan-500/20 animate-pulse w-fit">
+                              <Sparkles size={8} /> ARMA PREFERIDA
+                            </div>
+                          )}
                       </div>
                       <div className="text-amber-500 font-bold font-cinzel text-sm">
                         x{item.quantidade || 1}
@@ -1569,6 +1681,15 @@ const MarketPage = () => {
                               `${item.preco} T$ cada`
                             )}
                           </p>
+                          {activeCharacter?.deity?.armaPreferida &&
+                            item.group === "Arma" &&
+                            activeCharacter.deity.armaPreferida
+                              .toLowerCase()
+                              .includes(item.nome.toLowerCase()) && (
+                              <div className="mt-1 flex items-center gap-1 text-[8px] font-black text-cyan-400 bg-cyan-950/30 px-1.5 py-0.5 rounded border border-cyan-500/20 animate-pulse w-fit">
+                                <Sparkles size={8} /> ARMA PREFERIDA
+                              </div>
+                            )}
                         </div>
                         <div className="bg-amber-900/20 px-2 py-1 rounded text-amber-500 font-bold text-sm">
                           x{item.quantidade || 1}
