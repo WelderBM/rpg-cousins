@@ -10,10 +10,14 @@ import {
   Book,
   Sparkles,
   AlertTriangle,
+  Sword,
+  ChevronDown,
 } from "lucide-react";
 import Origin from "../../interfaces/Origin";
 import Skill from "../../interfaces/Skills";
 import { GeneralPower, OriginPower } from "../../interfaces/Poderes";
+import EQUIPAMENTOS, { Armas } from "../../data/equipamentos";
+import Equipment from "../../interfaces/Equipment";
 
 import { formatAssetName } from "../../utils/assetUtils";
 
@@ -84,9 +88,12 @@ const OriginSelection = () => {
     selectedSkills,
     selectedRace,
     setStep,
+    selectedOriginWeapons,
+    setSelectedOriginWeapons,
   } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] = useState<Origin | null>(null);
+  const [localOriginWeapons, setLocalOriginWeapons] = useState<Equipment[]>([]);
 
   // Scroll to top when entering/leaving preview
   React.useEffect(() => {
@@ -116,11 +123,33 @@ const OriginSelection = () => {
       })),
     ];
     setOriginBenefits(allBenefits);
+
+    // Initialize weapon choices
+    if (origin.getItems) {
+      const items = origin.getItems();
+      const choices = items.filter((i) => !!i.choice);
+      if (choices.length > 0) {
+        // If we already have selections in store for this origin, use them
+        if (
+          selectedOrigin?.name === origin.name &&
+          selectedOriginWeapons.length > 0
+        ) {
+          setLocalOriginWeapons(selectedOriginWeapons);
+        } else {
+          // Default to whatever getItems() returns (first weapon in list usually)
+          const defaults = choices
+            .map((c) => (typeof c.equipment !== "string" ? c.equipment : null))
+            .filter(Boolean) as Equipment[];
+          setLocalOriginWeapons(defaults);
+        }
+      }
+    }
   };
 
   const handleConfirm = () => {
     if (!selectedPreview) return;
     selectOrigin(selectedPreview);
+    setSelectedOriginWeapons(localOriginWeapons);
   };
 
   return (
@@ -332,6 +361,72 @@ const OriginSelection = () => {
               </div>
             </div>
 
+            {/* Weapon Choice if Applicable */}
+            {selectedPreview.getItems &&
+              selectedPreview.getItems().some((i) => !!i.choice) && (
+                <div className="bg-amber-900/10 p-6 rounded-xl border border-amber-900/30 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Sword className="text-amber-500" size={20} />
+                    <h4 className="text-sm font-bold text-amber-200 uppercase tracking-widest">
+                      Escolha seu Equipamento de Origem
+                    </h4>
+                  </div>
+                  <p className="text-xs text-stone-400">
+                    Sua origem permite que você escolha uma arma específica de
+                    um grupo.
+                  </p>
+
+                  <div className="grid gap-4">
+                    {selectedPreview
+                      .getItems()
+                      .filter((i) => !!i.choice)
+                      .map((item, idx) => {
+                        const available =
+                          item.choice === "Armas Marciais"
+                            ? [
+                                ...EQUIPAMENTOS.armasSimples,
+                                ...EQUIPAMENTOS.armasMarciais,
+                              ]
+                            : EQUIPAMENTOS.armasSimples;
+
+                        return (
+                          <div key={idx} className="space-y-2">
+                            <label className="text-[10px] text-stone-500 font-bold uppercase tracking-tighter">
+                              {item.description || "Escolha uma arma"}
+                            </label>
+                            <div className="relative group">
+                              <select
+                                value={localOriginWeapons[idx]?.nome || ""}
+                                onChange={(e) => {
+                                  const w = available.find(
+                                    (arm) => arm.nome === e.target.value
+                                  );
+                                  if (w) {
+                                    const next = [...localOriginWeapons];
+                                    next[idx] = w;
+                                    setLocalOriginWeapons(next);
+                                  }
+                                }}
+                                className="w-full bg-black/40 border border-stone-800 text-stone-200 p-4 rounded-xl outline-none focus:border-amber-500 appearance-none cursor-pointer transition-all"
+                              >
+                                {available.map((arm) => (
+                                  <option key={arm.nome} value={arm.nome}>
+                                    {arm.nome} ({arm.dano} | {arm.critico})
+                                  </option>
+                                ))}
+                              </select>
+                              <ChevronDown
+                                size={18}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-amber-500/50 group-hover:text-amber-500 pointer-events-none transition-colors"
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
             {/* Items Summary (Just visuals) */}
             <div className="bg-black/20 p-6 rounded-xl border border-stone-800/50">
               <h4 className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-3">
@@ -339,15 +434,34 @@ const OriginSelection = () => {
               </h4>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-stone-400">
                 {selectedPreview.getItems ? (
-                  selectedPreview.getItems().map((item, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-stone-700 rounded-full" />
-                      {item.qtd ? `${item.qtd}x ` : ""}
-                      {typeof item.equipment === "string"
-                        ? item.equipment
-                        : item.description}
-                    </li>
-                  ))
+                  selectedPreview.getItems().map((item, i) => {
+                    // Check if this is a choice item
+                    const isChoice = !!item.choice;
+                    const choiceIdx = selectedPreview
+                      .getItems()
+                      .filter((x, prevIdx) => !!x.choice && prevIdx < i).length;
+
+                    return (
+                      <li key={i} className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-stone-700 rounded-full" />
+                        {item.qtd ? `${item.qtd}x ` : ""}
+                        {isChoice && localOriginWeapons[choiceIdx] ? (
+                          <span className="text-amber-500 font-medium">
+                            {localOriginWeapons[choiceIdx].nome}
+                          </span>
+                        ) : typeof item.equipment === "string" ? (
+                          item.equipment
+                        ) : (
+                          item.equipment.nome
+                        )}
+                        {isChoice && (
+                          <span className="text-[10px] bg-amber-900/30 text-amber-500 px-1.5 py-0.5 rounded ml-1">
+                            ESCOLHIDO
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })
                 ) : (
                   <li className="italic opacity-50">Itens padrão da origem.</li>
                 )}

@@ -13,6 +13,7 @@ import {
   Swords,
   Brain,
   Sparkles,
+  Sword,
 } from "lucide-react";
 import { ClassDescription, ClassPower } from "../../interfaces/Class";
 import Skill from "../../interfaces/Skills";
@@ -24,7 +25,11 @@ import ARCANISTA, {
   ArcanistaSubtypes,
 } from "../../data/classes/arcanista";
 
+import EQUIPAMENTOS, { Armas } from "../../data/equipamentos";
+
 import { formatAssetName } from "../../utils/assetUtils";
+import { getWeapons } from "@/functions/general";
+import Equipment from "@/interfaces/Equipment";
 
 /**
  * Componente de Card de Classe Visual
@@ -95,6 +100,8 @@ const RoleSelection = () => {
     roleSelectionState,
     setRoleSelectionState,
     selectClassPowers,
+    selectedClassWeapons,
+    setSelectedClassWeapons,
   } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] =
@@ -109,6 +116,7 @@ const RoleSelection = () => {
   const [selectedClassPowers, setSelectedClassPowers] = useState<ClassPower[]>(
     []
   );
+  const [localWeapons, setLocalWeapons] = useState<Equipment[]>([]);
 
   // --- CONFIG MODAL STATE ---
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
@@ -150,6 +158,19 @@ const RoleSelection = () => {
     generalSkillChoices,
     setRoleSelectionState,
   ]);
+
+  // Initialize local weapons from store or defaults
+  useEffect(() => {
+    if (selectedPreview) {
+      if (selectedClassWeapons.length > 0) {
+        setLocalWeapons(selectedClassWeapons);
+      } else {
+        // Fallback to default weapons for the class if nothing is selected yet
+        const defaultWeapons = getWeapons(selectedPreview);
+        setLocalWeapons(defaultWeapons);
+      }
+    }
+  }, [selectedPreview]);
 
   // Scroll to top when entering/leaving preview
   useEffect(() => {
@@ -194,8 +215,7 @@ const RoleSelection = () => {
   }, [selectedPreview, selectedRace, baseAttributes, flexibleAttributeChoices]);
 
   const limits = useMemo(() => {
-    if (!selectedPreview || !stats)
-      return { class: 0, general: 0, raceBonus: 0 };
+    if (!selectedPreview || !stats) return { class: 0, extra: 0, raceBonus: 0 };
 
     const classQty = selectedPreview.periciasrestantes.qtd;
     const isHuman = selectedRace?.name === "Humano";
@@ -231,6 +251,26 @@ const RoleSelection = () => {
     return allSkills.filter((s) => !alreadyPicked.includes(s)).sort();
   }, [pickedInBasic, classSkillChoices, selectedPreview]);
 
+  const availableWeapons = useMemo(() => {
+    if (!selectedPreview) return [];
+    const profs = selectedPreview.proficiencias;
+    let list = [...EQUIPAMENTOS.armasSimples];
+    if (profs.includes("Armas Marciais"))
+      list = [...list, ...EQUIPAMENTOS.armasMarciais];
+    if (profs.includes("Armas de Fogo"))
+      list = [...list, ...EQUIPAMENTOS.armasDeFogo];
+    if (profs.includes("Armas Exóticas"))
+      list = [...list, ...EQUIPAMENTOS.armasExoticas];
+    return list;
+  }, [selectedPreview]);
+
+  const weaponSlots = useMemo(() => {
+    if (!selectedPreview) return 0;
+    if (selectedPreview.name === "Caçador") return 2;
+    if (selectedPreview.name === "Ladino") return 2;
+    return 1;
+  }, [selectedPreview]);
+
   // --- HANDLERS ---
   const toggleClassSkill = (skill: Skill) => {
     if (classSkillChoices.includes(skill)) {
@@ -250,6 +290,12 @@ const RoleSelection = () => {
         setGeneralSkillChoices([...generalSkillChoices, skill]);
       }
     }
+  };
+
+  const toggleWeapon = (weapon: Equipment, slotIdx: number) => {
+    const newWeapons = [...localWeapons];
+    newWeapons[slotIdx] = weapon;
+    setLocalWeapons(newWeapons);
   };
 
   // Helper to check if power requirements are met
@@ -318,6 +364,7 @@ const RoleSelection = () => {
 
     updateSkills(finalSkills);
     selectClassPowers(selectedClassPowers);
+    setSelectedClassWeapons(localWeapons);
     setStep(4);
   };
 
@@ -345,7 +392,8 @@ const RoleSelection = () => {
       g.type === "or" ? !!basicSkillChoices[i] : true
     );
     const classDone = classSkillChoices.length === limits.class;
-    const extraDone = generalSkillChoices.length === Math.max(0, limits.extra);
+    const extraDone =
+      generalSkillChoices.length === Math.max(0, limits.extra || 0);
     const powersDone = selectedClassPowers.length === 1; // Level 1 = 1 power
     return basicDone && classDone && extraDone && powersDone;
   }, [
@@ -667,7 +715,8 @@ const RoleSelection = () => {
                   {availableForGeneral.map((skill) => {
                     const isSelected = generalSkillChoices.includes(skill);
                     const isDisabled =
-                      !isSelected && generalSkillChoices.length >= limits.extra;
+                      !isSelected &&
+                      generalSkillChoices.length >= (limits.extra || 0);
                     return (
                       <button
                         key={skill}
@@ -808,6 +857,93 @@ const RoleSelection = () => {
                     </button>
                   );
                 })}
+              </div>
+            </section>
+
+            {/* WEAPON SELECTION SECTION */}
+            <section className="space-y-6 pt-6 border-t border-stone-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-cinzel text-amber-500">
+                    Equipamento Inicial
+                  </h3>
+                  <p className="text-sm text-stone-400">
+                    Escolha suas armas iniciais com base em suas proficiências.
+                  </p>
+                </div>
+                <div className="px-4 py-2 bg-amber-900/20 border border-amber-900/50 rounded-full">
+                  <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">
+                    {weaponSlots} {weaponSlots > 1 ? "Espaços" : "Espaço"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid gap-6">
+                {Array.from({ length: weaponSlots }).map((_, slotIdx) => (
+                  <div
+                    key={slotIdx}
+                    className="p-6 rounded-2xl bg-stone-900/50 border border-stone-800 space-y-4"
+                  >
+                    <div className="flex items-center gap-3 text-amber-100/60 uppercase text-[10px] font-bold tracking-[0.2em]">
+                      <Sword size={12} className="text-amber-500" />
+                      Slot de Arma {slotIdx + 1}
+                    </div>
+
+                    <div className="relative group">
+                      <select
+                        value={localWeapons[slotIdx]?.nome || ""}
+                        onChange={(e) => {
+                          const w = availableWeapons.find(
+                            (weapon) => weapon.nome === e.target.value
+                          );
+                          if (w) toggleWeapon(w, slotIdx);
+                        }}
+                        className="w-full bg-black/40 border border-stone-700 text-stone-100 p-4 rounded-xl outline-none focus:border-amber-500 transition-all appearance-none cursor-pointer group-hover:bg-black/60"
+                      >
+                        <option value="" disabled>
+                          Selecione uma arma...
+                        </option>
+                        {availableWeapons.map((weapon) => (
+                          <option key={weapon.nome} value={weapon.nome}>
+                            {weapon.nome} ({weapon.dano} | {weapon.critico})
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-amber-500/50 group-hover:text-amber-500 transition-colors">
+                        <ChevronRight size={20} className="rotate-90" />
+                      </div>
+                    </div>
+
+                    {localWeapons[slotIdx] && (
+                      <div className="flex flex-wrap gap-4 text-xs">
+                        <div className="flex items-center gap-1.5 text-stone-400">
+                          <span className="text-amber-500/50 font-bold uppercase tracking-tighter">
+                            Dano:
+                          </span>
+                          <span className="text-stone-200 font-medium">
+                            {localWeapons[slotIdx].dano}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-stone-400">
+                          <span className="text-amber-500/50 font-bold uppercase tracking-tighter">
+                            Crítico:
+                          </span>
+                          <span className="text-stone-200 font-medium">
+                            {localWeapons[slotIdx].critico}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-stone-400">
+                          <span className="text-amber-500/50 font-bold uppercase tracking-tighter">
+                            Tipo:
+                          </span>
+                          <span className="text-stone-200 font-medium">
+                            {localWeapons[slotIdx].tipo}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </section>
 
