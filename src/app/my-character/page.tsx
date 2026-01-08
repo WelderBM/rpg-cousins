@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCharacterStore } from "@/store/useCharacterStore";
 import { Character } from "@/interfaces/Character";
 import { Shield, User } from "lucide-react";
@@ -10,12 +10,13 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebaseConfig";
 import { motion } from "framer-motion";
 import { CharacterService } from "@/lib/characterService";
-import { getRaceByName } from "@/data/racas";
-import CLASSES from "@/data/classes";
+import { hydrateCharacter } from "@/utils/characterHydration";
 import { CharacterSheetView } from "@/components/character/CharacterSheetView";
 
 export default function MyCharacterPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { activeCharacter, setActiveCharacter, updateActiveCharacter } =
     useCharacterStore();
   const [initializing, setInitializing] = useState(true);
@@ -31,19 +32,18 @@ export default function MyCharacterPage() {
         return;
       }
 
-      // Prioritize the last selected character from localStorage
       const storedCharId = localStorage.getItem("rpg_active_char_id");
+      const isStrictFavoriteMode =
+        pathname === "/herois" && searchParams.get("tab") === "meu-heroi";
 
       try {
-        const { doc, getDoc, collection, query, where, getDocs } = await import(
+        const { collection, query, where, getDocs, doc, getDoc } = await import(
           "firebase/firestore"
         );
         const { db } = await import("@/firebaseConfig");
 
-        let charData: Character | null = null;
-
-        // 1. Try to load the selected character
-        if (storedCharId) {
+        if (!isStrictFavoriteMode && storedCharId) {
+          // If we are NOT in strict mode and we have a stored ID, try to load that specific character
           const charRef = doc(
             db!,
             "users",
@@ -52,32 +52,36 @@ export default function MyCharacterPage() {
             storedCharId
           );
           const charSnap = await getDoc(charRef);
+
           if (charSnap.exists()) {
-            charData = { id: charSnap.id, ...charSnap.data() } as Character;
+            const charData = hydrateCharacter({
+              id: charSnap.id,
+              ...charSnap.data(),
+            } as any);
+            setActiveCharacter(charData);
+            setInitializing(false);
+            setNoFavorite(false);
+            return;
           }
         }
 
-        // 2. If no selected character (or invalid ID), fallback to Favorite as a default
-        if (!charData) {
-          const q = query(
-            collection(db!, "users", user.uid, "characters"),
-            where("isFavorite", "==", true)
-          );
-          const snapshot = await getDocs(q);
-          if (!snapshot.empty) {
-            const charDoc = snapshot.docs[0];
-            charData = { id: charDoc.id, ...charDoc.data() } as Character;
-            // Update storage to remember this default
-            localStorage.setItem("rpg_active_char_id", charDoc.id);
-          }
-        }
+        // Fallback or Strict Mode: Load the Favorite character
+        const q = query(
+          collection(db!, "users", user.uid, "characters"),
+          where("isFavorite", "==", true)
+        );
+        const snapshot = await getDocs(q);
 
-        if (charData) {
+        if (!snapshot.empty) {
+          const charDoc = snapshot.docs[0];
+          const rawData = { id: charDoc.id, ...charDoc.data() } as any;
+          const charData = hydrateCharacter(rawData);
           setActiveCharacter(charData);
           setInitializing(false);
           setNoFavorite(false);
         } else {
-          // No character selected and no favorite found
+          // No favorite found
+          setActiveCharacter(null); // Clear active if none favorite
           setNoFavorite(true);
           setInitializing(false);
         }
@@ -89,7 +93,7 @@ export default function MyCharacterPage() {
     });
 
     return () => unsubscribeAuth();
-  }, [router, setActiveCharacter]); // Only run on mount or auth change
+  }, [router, setActiveCharacter, pathname, searchParams]); // Only run on mount, auth change, or navigation change
 
   // Real-time Synchronization
   useEffect(() => {
@@ -110,32 +114,29 @@ export default function MyCharacterPage() {
           className?: string;
         };
 
-        // Hydration Logic
-        if (!data.race && data.raceName) {
-          try {
-            data.race = getRaceByName(data.raceName);
-          } catch (e) {
-            console.error("Failed to hydrate race:", e);
-          }
+        // If the character is no longer favorite, it should disappear from this view ONLY if checking strictly
+        const isStrictFavoriteMode =
+          pathname === "/herois" && searchParams.get("tab") === "meu-heroi";
+
+        if (isStrictFavoriteMode && data.isFavorite === false) {
+          setActiveCharacter(null);
+          setNoFavorite(true);
+          return;
         }
 
-        if (!data.class && data.className) {
-          try {
-            const foundClass = CLASSES.find((c) => c.name === data.className);
-            if (foundClass) {
-              data.class = JSON.parse(JSON.stringify(foundClass));
-            }
-          } catch (e) {
-            console.error("Failed to hydrate class:", e);
-          }
-        }
+        // Hydration Logic
+        hydrateCharacter(data);
 
         updateActiveCharacter(data);
+      } else {
+        // Character deleted
+        setActiveCharacter(null);
+        setNoFavorite(true);
       }
     });
 
     return () => unsubscribeSnapshot();
-  }, [activeCharacter?.id, updateActiveCharacter]);
+  }, [activeCharacter?.id, updateActiveCharacter, pathname, searchParams]);
 
   const handleUpdate = async (updates: Partial<Character>) => {
     if (!auth?.currentUser || !activeCharacter) return;
@@ -186,11 +187,11 @@ export default function MyCharacterPage() {
 
           <div>
             <h1 className="text-4xl md:text-5xl font-serif text-amber-500 mb-4 drop-shadow-sm">
-              Nenhum Herói Selecionado
+              Ative um Herói
             </h1>
             <p className="text-stone-400 text-lg max-w-lg mx-auto leading-relaxed">
-              Para visualizar os detalhes do seu herói aqui, você precisa
-              selecioná-lo na lista de personagens.
+              Para começar sua jornada e permitir que o Mestre veja sua ficha,
+              você precisa ativar um herói na sua lista.
             </p>
           </div>
 
@@ -203,13 +204,13 @@ export default function MyCharacterPage() {
               },
               {
                 step: "2",
-                title: "Escolha",
-                desc: "Clique no card do personagem que deseja jogar",
+                title: "Ative",
+                desc: "Clique no ícone de coração para 'Ativar' seu herói",
               },
               {
                 step: "3",
                 title: "Pronto!",
-                desc: "Os detalhes do seu herói aparecerão aqui",
+                desc: "Seu herói agora está visível para você e para o Mestre!",
               },
             ].map((item, i) => (
               <motion.div
@@ -238,13 +239,16 @@ export default function MyCharacterPage() {
             </div>
             <div>
               <p className="text-stone-300 leading-relaxed">
-                <strong className="text-amber-500 block mb-1">Dica:</strong>
-                Você pode selecionar qualquer herói para jogar. Apenas heróis
-                marcados como{" "}
+                <strong className="text-amber-500 block mb-1">
+                  Por que ativar?
+                </strong>
+                Apenas o herói{" "}
                 <span className="text-amber-400 font-semibold italic">
-                  Favorito
+                  Ativado
                 </span>{" "}
-                (na criação ou edição) aparecem para o Mestre.
+                fica visível para o Mestre da mesa. Isso permite que ele
+                acompanhe seus PVs, PMs e inventário em tempo real durante a
+                sessão.
               </p>
             </div>
           </div>
@@ -253,7 +257,7 @@ export default function MyCharacterPage() {
             onClick={() => router.push("/characters")}
             className="px-10 py-4 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded-xl transition-all shadow-lg hover:shadow-amber-500/20 active:scale-95 text-lg"
           >
-            Ver meus personagens
+            Ir para Meus Heróis
           </button>
         </motion.div>
       </div>
