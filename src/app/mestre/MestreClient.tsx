@@ -60,21 +60,69 @@ export default function MestreClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedHero, setSelectedHero] = useState<Character | null>(null);
 
-  const fetchActiveHeroes = async () => {
+  // Real-time synchronization for active heroes
+  useEffect(() => {
+    if (!isAuthenticated || activeTab !== "herois") return;
+
+    let unsubscribe: () => void;
     setIsLoading(true);
-    try {
-      const favs = (await CharacterService.getCharacters(
-        undefined,
-        true,
-        true
-      )) as Character[];
-      setHeroes(favs);
-    } catch (e) {
-      console.error("Failed to fetch heroes", e);
-    } finally {
-      setIsLoading(false);
+
+    const setupHeroSync = async () => {
+      try {
+        const { collectionGroup, query, where, onSnapshot } = await import(
+          "firebase/firestore"
+        );
+        const { db } = await import("@/firebaseConfig");
+
+        if (!db) return;
+
+        // Query all characters across all users where isFavorite is true
+        const q = query(
+          collectionGroup(db, "characters"),
+          where("isFavorite", "==", true)
+        );
+
+        unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            const fetchedHeroes = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              path: doc.ref.path,
+              ...(doc.data() as any),
+            })) as Character[];
+            setHeroes(fetchedHeroes);
+            setIsLoading(false);
+          },
+          (error) => {
+            console.error("Hero sync failed:", error);
+            setIsLoading(false);
+          }
+        );
+      } catch (e) {
+        console.error("Error setting up hero sync:", e);
+        setIsLoading(false);
+      }
+    };
+
+    setupHeroSync();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [isAuthenticated, activeTab]);
+
+  // Keep selectedHero in sync with heroes list
+  useEffect(() => {
+    if (selectedHero) {
+      const updated = heroes.find((h) => h.id === selectedHero.id);
+      if (updated && JSON.stringify(updated) !== JSON.stringify(selectedHero)) {
+        setSelectedHero(updated);
+      } else if (!updated && heroes.length > 0) {
+        // If the favorite was removed, deselect it
+        setSelectedHero(null);
+      }
     }
-  };
+  }, [heroes, selectedHero]);
 
   // Form State
   const [formData, setFormData] = useState<Partial<ThreatSheet>>({
@@ -488,7 +536,6 @@ export default function MestreClient() {
           onClick={() => {
             setActiveTab("herois");
             setSelectedHero(null);
-            fetchActiveHeroes();
           }}
           className={`px-6 py-3 font-serif text-lg transition-all border-b-2 flex items-center gap-2 ${
             activeTab === "herois"
