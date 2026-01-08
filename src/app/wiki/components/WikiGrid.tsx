@@ -46,7 +46,7 @@ export function WikiGrid({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:px-16 custom-scrollbar pb-32">
+    <div className="flex-1 p-4 md:p-8 lg:px-16 pb-32">
       <div className="w-full mx-auto">
         <motion.div
           layout

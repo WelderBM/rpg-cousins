@@ -85,7 +85,7 @@ export function WikiControls(props: WikiControlsProps) {
     maxPrice !== "";
 
   return (
-    <header className="p-4 md:p-8 bg-gradient-to-b from-stone-900/50 to-transparent md:sticky md:top-0 z-10 backdrop-blur-sm">
+    <header className="p-4 md:p-8 bg-gradient-to-b from-stone-900/50 to-transparent md:sticky md:top-0 z-40 backdrop-blur-sm">
       <div className="max-w-5xl mx-auto flex flex-col gap-4 md:gap-6">
         {/* Search Bar */}
         <div className="relative group">
