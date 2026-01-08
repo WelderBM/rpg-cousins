@@ -49,6 +49,24 @@ function createCharacterSheetHTML(character: Character): HTMLElement {
   const armorPenalty = (character.bag as any)?.armorPenalty || 0;
   const defense = 10 + dexMod + armorPenalty;
 
+  const forValue = getAttrMod(character.attributes?.Força);
+  const maxSpaces = 10 + 2 * forValue;
+
+  // Calcular espaço utilizado
+  const bagData = character.bag as any;
+  let itemsList: any[] = [];
+  if (bagData) {
+    if (Array.isArray(bagData.items)) {
+      itemsList = bagData.items;
+    } else if (bagData.equipments) {
+      itemsList = Object.values(bagData.equipments).flat();
+    }
+  }
+  const usedSpaces = itemsList.reduce(
+    (acc, item) => acc + (item.spaces || 0) * (item.quantidade || 1),
+    0
+  );
+
   // Dinheiro
   const money = character.money || 0;
   const gold = typeof money === "number" ? money : (money as any).gold || 0;
