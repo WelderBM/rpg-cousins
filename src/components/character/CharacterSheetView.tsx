@@ -627,7 +627,37 @@ export function CharacterSheetView({
         originPowers.push(item);
       }
     });
+  // --- INVENTORY & SPACE CALCULATIONS ---
+  const bag = (activeCharacter as any).bag;
+  const inventory = (activeCharacter as any).inventory || [];
+  const equips =
+    bag && typeof bag.getEquipments === "function"
+      ? bag.getEquipments()
+      : bag?.equipments || {};
+
+  const weapons =
+    equips["Arma"] ||
+    inventory.filter((i: any) => i.group?.toLowerCase().includes("arma"));
+
+  let others = [];
+  if (Object.keys(equips).length > 0) {
+    others = Object.entries(equips)
+      .filter(([group]) => group !== "Arma")
+      .map(([_, items]) => items)
+      .flat();
+  } else {
+    others = inventory.filter(
+      (i: any) => !i.group?.toLowerCase().includes("arma")
+    );
   }
+
+  const usedSpaces = [...(weapons || []), ...others].reduce(
+    (acc: number, item: any) =>
+      acc + (item.spaces || 0) * (item.quantidade || 1),
+    0
+  );
+  const forValue = getAttrMod(activeCharacter.attributes[Atributo.FORCA]);
+  const maxSpaces = 10 + 2 * forValue;
 
   return (
     <div className="text-neutral-200 pb-20 font-sans selection:bg-amber-900 selection:text-white relative min-h-screen">
@@ -947,6 +977,56 @@ export function CharacterSheetView({
                     </div>
                   )}
                 </div>
+
+                {/* Espaço (Carga) */}
+                <div className="col-span-2 bg-stone-900/90 backdrop-blur-md border border-stone-800/70 rounded-3xl p-5 shadow-2xl flex flex-col hover:border-amber-500/30 transition-all border-white/5">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-2 text-amber-500/90">
+                      <Backpack size={16} className="text-amber-500" />
+                      <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
+                        Espaço na Mochila
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-1">
+                      <span
+                        className={`text-lg font-black tabular-nums ${
+                          usedSpaces > maxSpaces
+                            ? "text-red-500"
+                            : "text-stone-100"
+                        }`}
+                      >
+                        {usedSpaces}
+                      </span>
+                      <span className="text-[10px] font-bold text-stone-500 uppercase">
+                        / {maxSpaces}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/5 relative">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: `${Math.min(
+                          100,
+                          (usedSpaces / maxSpaces) * 100
+                        )}%`,
+                      }}
+                      className={`h-full relative z-10 ${
+                        usedSpaces > maxSpaces
+                          ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                          : "bg-gradient-to-r from-amber-600 to-amber-400"
+                      }`}
+                    />
+                    {usedSpaces > maxSpaces && (
+                      <div className="absolute inset-0 bg-red-500/20 animate-pulse" />
+                    )}
+                  </div>
+                  {usedSpaces > maxSpaces && (
+                    <p className="text-[9px] text-red-400 mt-2 font-black uppercase tracking-tighter animate-pulse">
+                      ⚠️ Você está sobrecarregado!
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Skills */}
@@ -1022,46 +1102,14 @@ export function CharacterSheetView({
               </div>
 
               {/* Inventory Split */}
-              {(() => {
-                const bag = (activeCharacter as any).bag;
-                const inventory = activeCharacter.inventory || [];
-
-                // If the character has a 'bag' object with equipments (legacy or helper-based)
-                const equips =
-                  bag && typeof bag.getEquipments === "function"
-                    ? bag.getEquipments()
-                    : bag?.equipments || {};
-
-                const weapons =
-                  equips["Arma"] ||
-                  inventory.filter((i: any) =>
-                    i.group?.toLowerCase().includes("arma")
-                  );
-
-                // If we have bag categories, get everything except weapons
-                let others = [];
-                if (Object.keys(equips).length > 0) {
-                  others = Object.entries(equips)
-                    .filter(([group]) => group !== "Arma")
-                    .map(([_, items]) => items)
-                    .flat();
-                } else {
-                  others = inventory.filter(
-                    (i: any) => !i.group?.toLowerCase().includes("arma")
-                  );
-                }
-
-                return (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <ItemList
-                      title="Armas & Ataques"
-                      items={weapons || []}
-                      icon={Swords}
-                    />
-                    <ItemList title="Mochila" items={others} icon={Backpack} />
-                  </div>
-                );
-              })()}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <ItemList
+                  title="Armas & Ataques"
+                  items={weapons || []}
+                  icon={Swords}
+                />
+                <ItemList title="Mochila" items={others} icon={Backpack} />
+              </div>
             </div>
           </div>
         </main>
