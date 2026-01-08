@@ -17,7 +17,9 @@ interface Props {
 export const ThreatBasicInfo: React.FC<Props> = ({ formData, setFormData }) => {
   const handleImageSearch = () => {
     if (!formData.name) return;
-    const query = encodeURIComponent(`${formData.name} fantasy art rpg`);
+    const query = encodeURIComponent(
+      `${formData.name} fantasy digital art rpg`
+    );
     window.open(`https://www.google.com/search?q=${query}&tbm=isch`, "_blank");
   };
 
