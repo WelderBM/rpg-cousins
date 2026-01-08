@@ -90,13 +90,15 @@ export function CharacterSheetView({
     extra: "",
     height: "",
   });
+  const [tempName, setTempName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   // Sync temp states when character changes
   useEffect(() => {
     if (activeCharacter) {
-      setTempMoney(activeCharacter.money || 0);
+      if (!isEditingMoney) setTempMoney(activeCharacter.money || 0);
+      if (!isEditingTraits) setTempName(activeCharacter.name || "");
 
       const getAttrMod = (attr: any) => {
         if (typeof attr === "object" && attr !== null) {
@@ -114,7 +116,7 @@ export function CharacterSheetView({
       if (!isEditingPv) setTempPv(activeCharacter.currentPv ?? hpMax);
       if (!isEditingPm) setTempPm(activeCharacter.currentPm ?? pmMax);
 
-      if (activeCharacter.physicalTraits) {
+      if (activeCharacter.physicalTraits && !isEditingTraits) {
         setTempTraits({
           gender: activeCharacter.physicalTraits.gender || "",
           hair: activeCharacter.physicalTraits.hair || "",
@@ -126,10 +128,19 @@ export function CharacterSheetView({
         });
       }
     }
-  }, [activeCharacter, isEditingMoney, isEditingPv, isEditingPm]);
+  }, [
+    activeCharacter,
+    isEditingMoney,
+    isEditingPv,
+    isEditingPm,
+    isEditingTraits,
+  ]);
 
   const saveTraits = async () => {
-    await onUpdate({ physicalTraits: tempTraits });
+    await onUpdate({
+      physicalTraits: tempTraits,
+      name: tempName || activeCharacter.name,
+    });
     setIsEditingTraits(false);
   };
 
@@ -375,8 +386,15 @@ export function CharacterSheetView({
               {/* Name & Basic Info */}
               <div className="flex-1 text-center md:text-left space-y-2 relative z-20">
                 <div className="flex items-center justify-center md:justify-start gap-4">
-                  <h1 className="text-4xl md:text-5xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 drop-shadow-sm">
+                  <h1
+                    className="text-4xl md:text-5xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 drop-shadow-sm cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-3 group/name"
+                    onClick={() => setIsEditingTraits(true)}
+                  >
                     {activeCharacter.name}
+                    <Edit
+                      size={20}
+                      className="text-amber-500/0 group-hover/name:text-amber-500/50 transition-all"
+                    />
                   </h1>
                   {!isMestre && (
                     <button
@@ -862,6 +880,19 @@ export function CharacterSheetView({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Name */}
+                  <div className="md:col-span-2">
+                    <label className="text-[10px] font-black text-amber-500 uppercase tracking-widest block mb-1">
+                      O Nome do Herói
+                    </label>
+                    <input
+                      type="text"
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                      placeholder="Ex: Valerius de Valkaria"
+                      className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-3 text-xl font-cinzel text-amber-100 focus:border-amber-500/50 outline-none"
+                    />
+                  </div>
                   {/* Fields */}
                   {["gender", "hair", "eyes", "skin", "height", "scars"].map(
                     (field) => (
