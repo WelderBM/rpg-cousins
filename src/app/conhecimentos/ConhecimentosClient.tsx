@@ -62,8 +62,7 @@ export default function ConhecimentosClient({
             </div>
             <div>
               <h1 className="text-2xl font-serif font-bold text-parchment-light tracking-wide">
-                Sala de{" "}
-                <span className="text-medieval-gold">Conhecimentos</span>
+                <span className="text-medieval-gold">Conhecer</span>
               </h1>
               <p className="text-[10px] text-parchment-dark uppercase tracking-[0.2em] font-bold opacity-60">
                 Saberes e Mistérios de Arton

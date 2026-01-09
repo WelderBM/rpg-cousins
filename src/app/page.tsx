@@ -53,7 +53,7 @@ export default function Home() {
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
           <h3 className="text-2xl font-serif text-parchment-light group-hover:text-medieval-gold transition-colors mb-2 relative z-10">
-            Conhecer
+            Conhecimentos
           </h3>
           <p className="text-sm text-parchment-dark relative z-10">
             Compêndio de regras, Grimório de magias e lore de Tormenta 20.

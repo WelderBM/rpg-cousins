@@ -25,10 +25,10 @@ const primaryNavItems = [
   { name: "Home", href: "/", icon: Home, mobileLabel: "Home" },
   { name: "Heróis", href: "/herois", icon: User, mobileLabel: "Heróis" },
   {
-    name: "Conhecimentos",
+    name: "Conhecer",
     href: "/conhecimentos",
     icon: Brain,
-    mobileLabel: "Saber",
+    mobileLabel: "Conhecer",
   },
   { name: "Mestre", href: "/mestre", icon: ShieldAlert, mobileLabel: "Mestre" },
 ];
@@ -207,7 +207,7 @@ export default function MainLayout({
                 <item.icon
                   className={cn(
                     "relative z-10 transition-transform duration-300",
-                    item.name === "Conhecimentos" ? "h-6 w-6" : "h-5 w-5",
+                    item.name === "Conhecer" ? "h-6 w-6" : "h-5 w-5",
                     isActive && "scale-110"
                   )}
                   strokeWidth={isActive ? 2 : 1.5}
@@ -278,7 +278,7 @@ export default function MainLayout({
                     <item.icon
                       className={cn(
                         "relative z-10",
-                        item.name === "Conhecimentos" ? "h-7 w-7" : "h-6 w-6"
+                        item.name === "Conhecer" ? "h-7 w-7" : "h-6 w-6"
                       )}
                       strokeWidth={isActive ? 2.5 : 1.5}
                     />
