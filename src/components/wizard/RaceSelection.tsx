@@ -83,8 +83,27 @@ const RaceCard = React.memo(
 RaceCard.displayName = "RaceCard";
 
 const RaceSelection = () => {
-  const selectRace = useCharacterStore((state) => state.selectRace);
+  const { selectRace, setStep, wizardDrafts, setWizardDraft } =
+    useCharacterStore();
   const [selectedPreview, setSelectedPreview] = useState<Race | null>(null);
+
+  // Sync LOCAL state with STORE draft
+  React.useEffect(() => {
+    const draft = wizardDrafts.race;
+    if (draft.previewName) {
+      const race = RACAS.find((r) => r.name === draft.previewName);
+      if (race) {
+        setSelectedPreview(race);
+      }
+    }
+  }, []);
+
+  // Sync draft whenever state changes
+  React.useEffect(() => {
+    setWizardDraft("race", {
+      previewName: selectedPreview?.name || null,
+    });
+  }, [selectedPreview, setWizardDraft]);
 
   // Scroll to top when entering preview
   React.useEffect(() => {
@@ -186,9 +205,9 @@ const RaceSelection = () => {
                     width={800}
                     height={1200}
                     className="object-contain opacity-100 h-full w-auto"
-                    style={{ 
-                      maxHeight: '100%',
-                      objectPosition: 'center center'
+                    style={{
+                      maxHeight: "100%",
+                      objectPosition: "center center",
                     }}
                     priority
                   />
@@ -196,7 +215,10 @@ const RaceSelection = () => {
               </div>
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-stone-950/80" />
               <button
-                onClick={() => setSelectedPreview(null)}
+                onClick={() => {
+                  setSelectedPreview(null);
+                  setWizardDraft("race", { previewName: null });
+                }}
                 className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2 bg-black/60 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-200 hover:text-amber-400 hover:border-amber-500/50 transition-all"
               >
                 <ChevronLeft size={20} />

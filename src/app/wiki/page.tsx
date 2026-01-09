@@ -36,7 +36,7 @@ export default function WikiPage() {
   );
 }
 
-function WikiContent() {
+export function WikiContent() {
   const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<Category>("magias");
   const [searchQuery, setSearchQuery] = useState("");
@@ -348,9 +348,9 @@ function WikiContent() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 text-neutral-200 font-sans selection:bg-amber-500/30">
+    <div className="h-full bg-stone-950 text-neutral-200 font-sans selection:bg-amber-500/30">
       <FloatingBackButton />
-      <div className="flex flex-col md:flex-row h-screen overflow-hidden">
+      <div className="flex flex-col md:flex-row h-full overflow-hidden">
         {/* Desktop Sidebar (hidden on mobile) */}
         <WikiSidebar
           activeCategory={activeCategory}
@@ -358,7 +358,7 @@ function WikiContent() {
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col overflow-hidden relative">
+        <main className="flex-1 flex flex-col overflow-y-auto custom-scrollbar relative">
           {/* Mobile Top Bar */}
           <WikiMobileTopBar />
 
@@ -432,6 +432,19 @@ function WikiContent() {
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(251, 191, 36, 0.2);
+        }
+        .sidebar-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb {
+          background: transparent;
+          border-radius: 10px;
+        }
+        .sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
           background: rgba(251, 191, 36, 0.2);
         }
         .font-cinzel {

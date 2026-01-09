@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { useCharacterStore } from "@/store/useCharacterStore";
 import { Character } from "@/interfaces/Character";
 import { motion } from "framer-motion";
-import { User, Sword, ArrowRight, Trash2, AlertTriangle } from "lucide-react";
+import {
+  User,
+  Sword,
+  ArrowRight,
+  Trash2,
+  AlertTriangle,
+  Heart,
+} from "lucide-react";
 import { CharacterService } from "@/lib/characterService";
 
 export default function CharacterSelectPage() {
@@ -24,6 +31,7 @@ export default function CharacterSelectPage() {
     name: string;
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [togglingFavorite, setTogglingFavorite] = useState<string | null>(null);
 
   useEffect(() => {
     let authUnsubscribe: (() => void) | undefined;
@@ -86,15 +94,30 @@ export default function CharacterSelectPage() {
     };
   }, [setUserCharacters]);
 
+  const handleToggleFavorite = async (e: React.MouseEvent, char: any) => {
+    e.stopPropagation();
+    if (!currentUser || togglingFavorite) return;
+
+    setTogglingFavorite(char.id);
+    try {
+      await CharacterService.setFavoriteCharacter(
+        currentUser.uid,
+        char.id,
+        char.isFavorite
+      );
+    } catch (e) {
+      console.error("Error toggling favorite", e);
+    } finally {
+      setTogglingFavorite(null);
+    }
+  };
+
   const handleSelectCharacter = async (charId: string) => {
     if (!currentUser) return;
 
     try {
       const { doc, getDoc } = await import("firebase/firestore");
       const { db } = await import("@/firebaseConfig");
-
-      // Auto-favorite removed as per user request
-      // await CharacterService.setFavoriteCharacter(currentUser.uid, charId);
 
       // Finding the character in the DB
       const charRef = doc(
@@ -179,14 +202,29 @@ export default function CharacterSelectPage() {
             className="group relative bg-[#1e1e1e] border-2 border-medieval-iron rounded-xl overflow-hidden hover:border-medieval-gold transition-all duration-300 shadow-lg cursor-pointer flex flex-col"
             onClick={() => handleSelectCharacter(char.id)}
           >
-            {/* Top Buttons: Delete only (Favorite removed) */}
+            {/* Top Buttons: Delete and Favorite */}
             <div className="absolute top-2 right-2 z-20 flex gap-2">
+              <button
+                onClick={(e) => handleToggleFavorite(e, char)}
+                disabled={togglingFavorite === char.id}
+                className={`p-2 rounded-full transition-all shadow-lg border backdrop-blur-sm ${
+                  char.isFavorite
+                    ? "text-red-500 bg-red-500/10 border-red-500/50"
+                    : "text-stone-500 bg-black/60 border-stone-800 hover:text-red-400"
+                }`}
+                title={char.isFavorite ? "Desativar Herói" : "Ativar Herói"}
+              >
+                <Heart
+                  size={18}
+                  fill={char.isFavorite ? "currentColor" : "none"}
+                />
+              </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setCharacterToDelete({ id: char.id, name: char.name });
                 }}
-                className="p-2 text-red-500 hover:text-red-400 bg-black/60 rounded-full hover:bg-black/80 transition-colors shadow-lg border border-red-500/20"
+                className="p-2 text-red-500/70 hover:text-red-400 bg-black/60 rounded-full hover:bg-black/80 transition-colors shadow-lg border border-red-500/20"
                 title="Apagar Herói"
               >
                 <Trash2 size={18} />
@@ -194,9 +232,21 @@ export default function CharacterSelectPage() {
             </div>
             {/* Character Card Content */}
             <div className="p-6 flex flex-row items-center gap-4 relative z-10">
-              <div className="h-16 w-16 bg-medieval-stone rounded-full border border-medieval-gold/30 flex items-center justify-center text-2xl">
+              <div
+                className={`h-16 w-16 rounded-full border flex items-center justify-center text-2xl transition-colors ${
+                  char.isFavorite
+                    ? "bg-amber-500/10 border-amber-500"
+                    : "bg-medieval-stone border-medieval-gold/30"
+                }`}
+              >
                 {/* Placeholder Avatar based on Race or Class */}
-                <User className="text-medieval-gold opacity-80" />
+                <User
+                  className={
+                    char.isFavorite
+                      ? "text-amber-500"
+                      : "text-medieval-gold opacity-80"
+                  }
+                />
               </div>
 
               <div className="flex-1">

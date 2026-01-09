@@ -170,7 +170,11 @@ export const CharacterService = {
     }
   },
 
-  async setFavoriteCharacter(uid: string, charId: string) {
+  async setFavoriteCharacter(
+    uid: string,
+    charId: string,
+    isCurrentlyFavorite: boolean
+  ) {
     try {
       const { collection, getDocs, writeBatch, doc } = await import(
         "firebase/firestore"
@@ -181,23 +185,27 @@ export const CharacterService = {
       const charsRef = collection(db!, "users", uid, "characters");
       const snapshot = await getDocs(charsRef);
 
-      // Ensures only ONE favorite exists (Radio Button behavior)
-      snapshot.docs.forEach((d) => {
-        const charRef = doc(db!, "users", uid, "characters", d.id);
-        const data = d.data();
+      // If we are unfavoriting the current one
+      if (isCurrentlyFavorite) {
+        const charRef = doc(db!, "users", uid, "characters", charId);
+        batch.update(charRef, { isFavorite: false });
+      } else {
+        // Ensures only ONE favorite exists (Radio Button behavior)
+        snapshot.docs.forEach((d) => {
+          const charRef = doc(db!, "users", uid, "characters", d.id);
+          const data = d.data();
 
-        if (d.id === charId) {
-          // Verify if it needs update to avoid unnecessary writes
-          if (data.isFavorite !== true) {
-            batch.update(charRef, { isFavorite: true });
+          if (d.id === charId) {
+            if (data.isFavorite !== true) {
+              batch.update(charRef, { isFavorite: true });
+            }
+          } else {
+            if (data.isFavorite === true) {
+              batch.update(charRef, { isFavorite: false });
+            }
           }
-        } else {
-          // Unset all others
-          if (data.isFavorite === true) {
-            batch.update(charRef, { isFavorite: false });
-          }
-        }
-      });
+        });
+      }
 
       await batch.commit();
     } catch (error) {

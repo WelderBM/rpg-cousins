@@ -15,7 +15,7 @@ export function WikiSidebar({
   setActiveCategory,
 }: WikiSidebarProps) {
   return (
-    <nav className="hidden md:flex w-64 lg:w-72 bg-neutral-900/50 backdrop-blur-xl border-r border-amber-900/20 flex-col z-20 h-screen sticky top-0">
+    <nav className="hidden md:flex w-64 lg:w-72 bg-neutral-900/50 backdrop-blur-xl border-r border-amber-900/20 flex-col z-20 h-full">
       <div className="p-6">
         {/* <Link href="/" className="flex items-center gap-3 group mb-8">
           <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/20 group-hover:border-amber-500/50 transition-all">
@@ -34,7 +34,7 @@ export function WikiSidebar({
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-1 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-1 sidebar-scrollbar">
         {CATEGORIES.map((cat) => (
           <button
             key={cat.id}

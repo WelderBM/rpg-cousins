@@ -15,7 +15,11 @@ import { Character } from "../../interfaces/Character";
 interface SellModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (characterId: string, item: Equipment) => Promise<void>;
+  onConfirm: (
+    characterId: string,
+    item: Equipment,
+    finalPrice: number
+  ) => Promise<void>;
   item: Equipment | null;
   characters: Character[];
   activeCharacterId?: string;
@@ -30,12 +34,16 @@ export const SellModal: React.FC<SellModalProps> = ({
   activeCharacterId,
 }) => {
   const [selectedCharId, setSelectedCharId] = useState<string>("");
+  const [bargainType, setBargainType] = useState<
+    "none" | "success" | "critical"
+  >("none");
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Reset processing state when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
       setIsProcessing(false);
+      setBargainType("none");
     }
   }, [isOpen]);
 
@@ -58,7 +66,16 @@ export const SellModal: React.FC<SellModalProps> = ({
     [characters, selectedCharId]
   );
 
-  const price = item?.preco || 0;
+  // T20 Commercial Rules: 50% base price
+  const basePrice = item?.preco || 0;
+  const sellMultiplier = useMemo(() => {
+    let mult = 0.5; // Base 50%
+    if (bargainType === "success") mult += 0.1; // +10%
+    if (bargainType === "critical") mult += 0.2; // +20%
+    return mult;
+  }, [bargainType]);
+
+  const finalPrice = Math.floor(basePrice * sellMultiplier);
   const itemSlots = item?.spaces ?? 1;
   const actualItemSlots =
     item?.spaces !== undefined && item?.spaces !== null ? item.spaces : 1;
@@ -75,7 +92,7 @@ export const SellModal: React.FC<SellModalProps> = ({
 
     // Money
     const currentMoney = selectedChar.money || 0;
-    const newMoney = currentMoney + price;
+    const newMoney = currentMoney + finalPrice;
 
     return {
       canSell: true,
@@ -83,14 +100,14 @@ export const SellModal: React.FC<SellModalProps> = ({
       currentMoney,
       newMoney,
     };
-  }, [selectedChar, item, price]);
+  }, [selectedChar, item, finalPrice]);
 
   const handleConfirm = async () => {
     if (!status.canSell || isProcessing || !selectedCharId || !item) return;
 
     setIsProcessing(true);
     try {
-      await onConfirm(selectedCharId, item);
+      await onConfirm(selectedCharId, item, finalPrice);
       // Modal will be closed by parent component after successful sale
     } catch (e) {
       console.error("Sale error:", e);
@@ -147,7 +164,7 @@ export const SellModal: React.FC<SellModalProps> = ({
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-emerald-500 font-bold text-sm">
-                      +{item.preco} T$
+                      +{finalPrice} T$
                     </span>
                     <span className="text-xs text-stone-600">•</span>
                     <span className="text-stone-400 text-xs">
@@ -159,6 +176,72 @@ export const SellModal: React.FC<SellModalProps> = ({
                 </div>
               </div>
             )}
+
+            <hr className="border-white/5" />
+
+            {/* Bargaining / Diplomacy Section */}
+            <div className="space-y-3">
+              <label className="text-xs uppercase font-bold text-stone-500 flex items-center gap-2">
+                <Dices size={12} className="text-amber-500" /> Negociação
+                (Diplomacia)
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                <button
+                  onClick={() => setBargainType("none")}
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                    bargainType === "none"
+                      ? "bg-stone-800 border-amber-500/50 text-white"
+                      : "bg-[#0c0c0c] border-white/5 text-stone-500 hover:border-white/10"
+                  }`}
+                >
+                  <div className="flex flex-col items-start translate-y-[1px]">
+                    <span className="text-sm font-bold">Sem Negociar</span>
+                    <span className="text-[10px] opacity-60">
+                      Venda padrão (50%)
+                    </span>
+                  </div>
+                  {bargainType === "none" && <Check size={16} />}
+                </button>
+
+                <button
+                  onClick={() => setBargainType("success")}
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                    bargainType === "success"
+                      ? "bg-amber-950/20 border-amber-500/50 text-amber-500"
+                      : "bg-[#0c0c0c] border-white/5 text-stone-500 hover:border-white/10"
+                  }`}
+                >
+                  <div className="flex flex-col items-start translate-y-[1px]">
+                    <span className="text-sm font-bold">Sucesso</span>
+                    <span className="text-[10px] opacity-60">
+                      Bônus de +10% (60% total)
+                    </span>
+                  </div>
+                  {bargainType === "success" && <Check size={16} />}
+                </button>
+
+                <button
+                  onClick={() => setBargainType("critical")}
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                    bargainType === "critical"
+                      ? "bg-emerald-950/20 border-emerald-500/50 text-emerald-500"
+                      : "bg-[#0c0c0c] border-white/5 text-stone-500 hover:border-white/10"
+                  }`}
+                >
+                  <div className="flex flex-col items-start translate-y-[1px]">
+                    <span className="text-sm font-bold">Sucesso Crítico</span>
+                    <span className="text-[10px] opacity-60">
+                      Bônus de +20% (70% total)
+                    </span>
+                  </div>
+                  {bargainType === "critical" && <Check size={16} />}
+                </button>
+              </div>
+              <p className="text-[10px] text-stone-600 italic">
+                De acordo com Tormenta 20: Jogo do Ano, a venda base é 50%.
+                Sucesso na barganha aumenta o valor.
+              </p>
+            </div>
 
             <hr className="border-white/5" />
 
