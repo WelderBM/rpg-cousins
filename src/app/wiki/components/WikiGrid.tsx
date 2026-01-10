@@ -50,7 +50,7 @@ export function WikiGrid({
       <div className="w-full mx-auto">
         <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-4"
+          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-3 md:gap-4"
         >
           <AnimatePresence mode="popLayout">
             {itemsToShow.map((item, idx) => {
@@ -65,41 +65,44 @@ export function WikiGrid({
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ delay: Math.min(idx * 0.02, 0.3) }}
                   onClick={() => setSelectedItem(item)}
-                  className="group relative bg-neutral-900/40 border border-neutral-800 rounded-2xl p-5 cursor-pointer hover:bg-neutral-800/60 hover:border-amber-700/50 hover:shadow-2xl hover:shadow-amber-500/5 transition-all active:scale-[0.98]"
+                  className="group relative bg-neutral-900/40 border border-neutral-800 rounded-xl p-3 md:p-5 cursor-pointer hover:bg-neutral-800/60 hover:border-amber-700/50 hover:shadow-2xl hover:shadow-amber-500/5 transition-all active:scale-95"
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-2 rounded-lg bg-white/5 text-neutral-400 group-hover:text-amber-500 transition-colors">
-                      <CategoryIcon size={18} />
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="p-1.5 rounded-lg bg-white/5 text-neutral-400 group-hover:text-amber-500 transition-colors">
+                      <CategoryIcon size={14} className="md:size-[18px]" />
                     </div>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleCopyLink(item);
                       }}
-                      className="p-2 text-neutral-600 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors z-10"
+                      className="p-1.5 text-neutral-600 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors z-10"
                     >
                       {copiedId === item.id ? (
-                        <CheckCircle2 size={16} className="text-emerald-500" />
+                        <CheckCircle2
+                          size={14}
+                          className="text-emerald-500 md:size-[16px]"
+                        />
                       ) : (
-                        <Copy size={16} />
+                        <Copy size={14} className="md:size-[16px]" />
                       )}
                     </button>
                   </div>
 
-                  <h3 className="font-cinzel text-lg text-neutral-200 group-hover:text-amber-100 mb-1 line-clamp-1">
+                  <h3 className="font-cinzel text-sm md:text-lg text-neutral-200 group-hover:text-amber-100 mb-0.5 line-clamp-1">
                     {item.name}
                   </h3>
-                  <p className="text-[10px] text-amber-500/70 font-bold uppercase tracking-widest mb-3">
+                  <p className="text-[8px] md:text-[10px] text-amber-500/70 font-bold uppercase tracking-widest mb-2">
                     {item.type}
                   </p>
 
-                  <p className="text-xs text-neutral-500 line-clamp-2 italic leading-relaxed">
+                  <p className="hidden md:block text-xs text-neutral-500 line-clamp-2 italic leading-relaxed">
                     {item.description ||
                       "Nenhuma descrição detalhada disponível."}
                   </p>
 
-                  <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    <ChevronRight size={18} className="text-amber-500" />
+                  <div className="absolute bottom-3 right-3 opacity-0 md:group-hover:opacity-100 -translate-x-2 md:group-hover:translate-x-0 transition-all duration-300">
+                    <ChevronRight size={16} className="text-amber-500" />
                   </div>
                 </motion.div>
               );

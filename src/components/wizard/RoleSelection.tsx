@@ -26,7 +26,7 @@ import ARCANISTA, {
 } from "../../data/classes/arcanista";
 
 import EQUIPAMENTOS, { Armas } from "../../data/equipamentos";
-
+import PROFICIENCIAS from "../../data/proficiencias";
 import { formatAssetName } from "../../utils/assetUtils";
 import { getWeapons } from "@/functions/general";
 import Equipment from "@/interfaces/Equipment";
@@ -73,12 +73,12 @@ const RoleCard = React.memo(
               />
               <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-900/20 to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-300" />
             </div>
-            <div className="relative p-4 bg-gradient-to-t from-stone-950 to-stone-900/50 border-t border-amber-700/30">
-              <h3 className="text-xl font-cinzel text-center text-amber-100 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
+            <div className="relative p-2 md:p-4 bg-gradient-to-t from-stone-950 to-stone-900/50 border-t border-amber-700/30">
+              <h3 className="text-sm md:text-xl font-cinzel text-center text-amber-100 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
                 {role.name}
               </h3>
-              <div className="absolute -top-3 right-4 bg-amber-600 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg shadow-amber-600/50">
-                <ChevronRight className="w-4 h-4 text-white" />
+              <div className="absolute -top-3 right-2 md:right-4 bg-amber-600 rounded-full p-1 md:p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg shadow-amber-600/50">
+                <ChevronRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
               </div>
             </div>
           </div>
@@ -100,6 +100,8 @@ const RoleSelection = () => {
     wizardDrafts,
     setWizardDraft,
     selectClassPowers,
+    setSelectedClassWeapons,
+    selectedClassWeapons,
   } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] =
@@ -114,6 +116,7 @@ const RoleSelection = () => {
   const [selectedClassPowers, setSelectedClassPowers] = useState<ClassPower[]>(
     []
   );
+  const [localWeapons, setLocalWeapons] = useState<Equipment[]>([]);
 
   // --- CONFIG MODAL STATE ---
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
@@ -134,6 +137,7 @@ const RoleSelection = () => {
         setClassSkillChoices(draft.classSkills);
         setGeneralSkillChoices(draft.generalSkills);
         setSelectedClassPowers(draft.classPowers);
+        setLocalWeapons(draft.localWeapons || []);
         setArcanistConfig(draft.arcanistConfig);
       }
     }
@@ -148,6 +152,7 @@ const RoleSelection = () => {
         classSkills: classSkillChoices,
         generalSkills: generalSkillChoices,
         classPowers: selectedClassPowers,
+        localWeapons,
         arcanistConfig,
       });
     }
@@ -157,6 +162,7 @@ const RoleSelection = () => {
     classSkillChoices,
     generalSkillChoices,
     selectedClassPowers,
+    localWeapons,
     arcanistConfig,
     setWizardDraft,
   ]);
@@ -173,6 +179,7 @@ const RoleSelection = () => {
       setClassSkillChoices([]);
       setGeneralSkillChoices([]);
       setSelectedClassPowers([]);
+      setLocalWeapons([]);
       setArcanistConfig({ subtype: null, lineage: null, damageType: null });
 
       // Immediate draft clearing for the new preview
@@ -182,6 +189,7 @@ const RoleSelection = () => {
         classSkills: [],
         generalSkills: [],
         classPowers: [],
+        localWeapons: [],
         arcanistConfig: { subtype: null, lineage: null, damageType: null },
       });
     } else if (!cls) {
@@ -281,6 +289,32 @@ const RoleSelection = () => {
     setLocalWeapons(newWeapons);
   };
 
+  const weaponSlots = useMemo(() => {
+    if (!selectedPreview) return [];
+
+    // Standard T20 rule: 1 simple weapon, + 1 martial if proficient
+    const slots = ["Arma Simples"];
+    const hasMartial = selectedPreview.proficiencias.includes(
+      PROFICIENCIAS.MARCIAIS
+    );
+    if (hasMartial) {
+      slots.push("Arma Marcial");
+    }
+    return slots;
+  }, [selectedPreview]);
+
+  // Ensure localWeapons array size matches slots
+  useEffect(() => {
+    if (selectedPreview && localWeapons.length !== weaponSlots.length) {
+      // Default to common weapons: Dagger (Simple) and Shortsword/Longsword (Martial)
+      const newLocal = weaponSlots.map((slot, i) => {
+        if (localWeapons[i]) return localWeapons[i];
+        return slot === "Arma Simples" ? Armas.ADAGA : Armas.ESPADACURTA;
+      });
+      setLocalWeapons(newLocal);
+    }
+  }, [selectedPreview, weaponSlots]);
+
   // Helper to check if power requirements are met
   const checkPowerRequirements = (power: ClassPower): boolean => {
     if (!power.requirements || power.requirements.length === 0) return true;
@@ -347,13 +381,14 @@ const RoleSelection = () => {
 
     updateSkills(finalSkills);
     selectClassPowers(selectedClassPowers);
+    setSelectedClassWeapons(localWeapons);
     setStep(4);
   };
 
   const handleConfigConfirm = () => {
     if (!selectedPreview) return;
 
-    if (selectedPreview.name === "Arcanista") {
+    if (selectedPreview?.name === "Arcanista") {
       if (!arcanistConfig.subtype) return; // Should be disabled if not selected
 
       // Apply setup with options
@@ -377,13 +412,19 @@ const RoleSelection = () => {
     const extraDone =
       generalSkillChoices.length === Math.max(0, limits.extra || 0);
     const powersDone = selectedClassPowers.length === 1; // Level 1 = 1 power
-    return basicDone && classDone && extraDone && powersDone;
+
+    const weaponsDone =
+      localWeapons.filter(Boolean).length === weaponSlots.length;
+
+    return basicDone && classDone && extraDone && powersDone && weaponsDone;
   }, [
     selectedPreview,
     basicSkillChoices,
     classSkillChoices,
     generalSkillChoices,
     selectedClassPowers,
+    localWeapons,
+    weaponSlots,
     limits,
   ]);
 
@@ -436,7 +477,7 @@ const RoleSelection = () => {
               Defina seu caminho marcial ou mágico
             </motion.p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
               {CLASSES.map((role, index) => (
                 <motion.div
                   key={role.name}
@@ -455,114 +496,94 @@ const RoleSelection = () => {
         ) : (
           <motion.div
             key="detail"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
-            transition={{ duration: 0.3 }}
-            className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 pb-48 md:pb-32"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            className="max-w-2xl mx-auto w-full p-4 md:p-8 space-y-6 pb-32"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-stone-800 pb-4">
-              <button
-                onClick={() => setSelectedPreview(null)}
-                className="flex items-center text-neutral-400 hover:text-white transition-colors"
-                aria-label="Voltar"
-              >
-                <ChevronLeft size={24} />
-                <span className="ml-1 font-bold uppercase tracking-wider text-xs">
-                  Voltar
-                </span>
-              </button>
-              <h2 className="text-3xl md:text-4xl font-cinzel text-amber-500 drop-shadow-lg">
-                {selectedPreview.name}
-              </h2>
-              <div className="w-8" />
-            </div>
-
-            {/* Stats & Description */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Image & Description Banner */}
-              <div className="md:col-span-2 relative overflow-hidden flex items-center bg-stone-950 rounded-2xl min-h-[300px] md:min-h-[500px]">
-                {/* Background Image - Vertically Aligned with dark side padding */}
-                <div className="absolute inset-0 bg-stone-950">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Image
-                      src={`/assets/classes/${formatAssetName(
-                        selectedPreview.name
-                      )}.webp`}
-                      alt={selectedPreview.name}
-                      width={800}
-                      height={1200}
-                      className="object-contain opacity-30 h-full w-auto"
-                      style={{
-                        maxHeight: "100%",
-                        objectPosition: "center center",
-                      }}
-                    />
-                  </div>
+            {/* Header & Stats Banner */}
+            <div className="relative overflow-hidden rounded-2xl bg-stone-950 border border-white/5">
+              <div className="relative h-48 md:h-64 flex items-center justify-center bg-stone-950">
+                <Image
+                  src={`/assets/classes/${formatAssetName(
+                    selectedPreview?.name || ""
+                  )}.webp`}
+                  alt={selectedPreview?.name || ""}
+                  width={600}
+                  height={900}
+                  className="object-contain opacity-40 h-full w-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 md:left-6">
+                  <h2 className="text-2xl md:text-4xl font-cinzel text-amber-100 drop-shadow-2xl">
+                    {selectedPreview?.name}
+                  </h2>
                 </div>
-                {/* Text Content */}
-                <div className="relative z-10 p-6 w-full">
-                  <div className="bg-stone-950/90 backdrop-blur-sm rounded-xl p-4 border border-stone-800/50">
-                    <p className="text-neutral-300 leading-relaxed italic text-sm md:text-base border-l-4 border-amber-600/50 pl-4">
-                      "
-                      {selectedPreview.description || "Descrição indisponível."}
-                      "
-                    </p>
-                  </div>
-                </div>
+                {/* Discrete Back Button */}
+                <button
+                  onClick={() => setSelectedPreview(null)}
+                  className="absolute top-4 left-4 z-10 p-2 bg-black/40 backdrop-blur-md border border-white/10 text-white rounded-full active:scale-95 transition-all"
+                >
+                  <ChevronLeft size={20} />
+                </button>
               </div>
 
-              <div className="flex flex-row md:flex-col gap-4">
-                <div className="flex-1 bg-red-950/20 p-4 rounded-xl border border-red-900/30 flex flex-col items-center justify-center">
-                  <div className="flex items-center gap-2 mb-1 text-red-400/80">
-                    <Shield size={16} />
-                    <span className="text-[10px] font-bold uppercase">PV</span>
-                  </div>
-                  <span className="text-3xl font-cinzel text-red-100 font-bold">
+              {/* Quick Stats Overlay */}
+              <div className="grid grid-cols-2 border-t border-white/5 bg-stone-900/40 backdrop-blur-md">
+                <div className="p-3 flex flex-col items-center border-r border-white/5">
+                  <span className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">
+                    PV Iniciais
+                  </span>
+                  <span className="text-2xl font-cinzel text-red-100 font-bold">
                     {stats?.hp}
                   </span>
                 </div>
-                <div className="flex-1 bg-blue-950/20 p-4 rounded-xl border border-blue-900/30 flex flex-col items-center justify-center">
-                  <div className="flex items-center gap-2 mb-1 text-blue-400/80">
-                    <Zap size={16} />
-                    <span className="text-[10px] font-bold uppercase">PM</span>
-                  </div>
-                  <span className="text-3xl font-cinzel text-blue-100 font-bold">
+                <div className="p-3 flex flex-col items-center">
+                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">
+                    PM Iniciais
+                  </span>
+                  <span className="text-2xl font-cinzel text-blue-100 font-bold">
                     {stats?.pm}
                   </span>
                 </div>
               </div>
-              {/* SKILLS - BASIC */}
-              <section className="space-y-4 pt-4 border-t border-stone-800 md:col-span-3 w-full">
-                <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
-                  <Sparkles size={18} /> Habilidades de 1º Nível
-                </h3>
-                <div className="grid gap-3">
-                  {selectedPreview.abilities
-                    .filter((a) => a.nivel === 1)
-                    .map((ability, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-stone-900/50 p-4 rounded-xl border border-stone-800 space-y-2"
-                      >
-                        <h4 className="font-ciszel font-bold text-amber-100">
-                          {ability.name}
-                        </h4>
-                        <p className="text-sm text-stone-400 leading-relaxed">
-                          {ability.text}
-                        </p>
-                      </div>
-                    ))}
-                  {selectedPreview.abilities.filter((a) => a.nivel === 1)
-                    .length === 0 && (
-                    <p className="text-stone-500 italic">
-                      Nenhuma habilidade inicial específica.
-                    </p>
-                  )}
-                </div>
-              </section>
             </div>
+
+            {/* Lore Refined */}
+            <div className="bg-stone-900/30 border border-stone-800/50 p-4 rounded-xl italic text-xs md:text-sm text-stone-400 leading-relaxed">
+              "{selectedPreview?.description}"
+            </div>
+
+            {/* SKILLS - BASIC */}
+            <section className="space-y-4 pt-4 border-t border-stone-800 md:col-span-3 w-full">
+              <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
+                <Sparkles size={18} /> Habilidades de 1º Nível
+              </h3>
+              <div className="grid gap-3">
+                {selectedPreview?.abilities
+                  .filter((a) => a.nivel === 1)
+                  .map((ability, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-stone-900/50 p-4 rounded-xl border border-stone-800 space-y-2"
+                    >
+                      <h4 className="font-ciszel font-bold text-amber-100">
+                        {ability.name}
+                      </h4>
+                      <p className="text-sm text-stone-400 leading-relaxed">
+                        {ability.text}
+                      </p>
+                    </div>
+                  ))}
+                {selectedPreview?.abilities.filter((a) => a.nivel === 1)
+                  .length === 0 && (
+                  <p className="text-stone-500 italic">
+                    Nenhuma habilidade inicial específica.
+                  </p>
+                )}
+              </div>
+            </section>
 
             {/* SKILLS - BASIC */}
             <section className="space-y-4">
@@ -570,7 +591,7 @@ const RoleSelection = () => {
                 <Book size={18} /> Perícias Básicas
               </h3>
               <div className="grid gap-3">
-                {selectedPreview.periciasbasicas.map((group, idx) => (
+                {selectedPreview?.periciasbasicas.map((group, idx) => (
                   <div
                     key={idx}
                     className="bg-stone-900/50 p-4 rounded-xl border border-stone-800"
@@ -754,7 +775,7 @@ const RoleSelection = () => {
               </p>
 
               <div className="grid gap-3">
-                {selectedPreview.powers.map((power) => {
+                {selectedPreview?.powers.map((power) => {
                   const isSelected = selectedClassPowers.some(
                     (p) => p.name === power.name
                   );
@@ -842,19 +863,77 @@ const RoleSelection = () => {
               </div>
             </section>
 
+            {/* WEAPONS */}
+            <section className="space-y-4">
+              <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
+                <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
+                  <Sword size={18} /> Armas Iniciais
+                </h3>
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-950/40 text-emerald-400 border border-emerald-900/50">
+                  {localWeapons.filter(Boolean).length} / {weaponSlots.length}
+                </span>
+              </div>
+
+              <p className="text-xs text-stone-500 italic">
+                Você recebe uma arma simples. Se for proficiente em armas
+                marciais, recebe uma arma adicional.
+              </p>
+
+              <div className="grid gap-4">
+                {weaponSlots.map((slot, idx) => {
+                  const options =
+                    slot === "Arma Simples"
+                      ? EQUIPAMENTOS.armasSimples
+                      : [
+                          ...EQUIPAMENTOS.armasSimples,
+                          ...EQUIPAMENTOS.armasMarciais,
+                        ];
+
+                  return (
+                    <div key={idx} className="space-y-2">
+                      <label className="text-[10px] text-stone-500 font-black uppercase tracking-widest pl-1">
+                        {slot}
+                      </label>
+                      <div className="relative group">
+                        <select
+                          value={localWeapons[idx]?.nome || ""}
+                          onChange={(e) => {
+                            const weapon = options.find(
+                              (w) => w.nome === e.target.value
+                            );
+                            if (weapon) toggleWeapon(weapon, idx);
+                          }}
+                          className="w-full bg-stone-900 border border-stone-800 text-stone-200 p-4 rounded-xl outline-none focus:border-amber-500 appearance-none cursor-pointer transition-all hover:bg-stone-800"
+                        >
+                          {options.map((w) => (
+                            <option key={w.nome} value={w.nome}>
+                              {w.nome} ({w.dano} | {w.critico})
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-amber-500/50 group-hover:text-amber-500 transition-colors">
+                          <Sword size={16} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
             {/* ACTION FOOTER */}
-            <div className="sticky bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
-              <div className="max-w-4xl mx-auto">
+            <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-50">
+              <div className="max-w-2xl mx-auto">
                 <button
                   onClick={handleConfirm}
                   disabled={!isValid}
-                  className={`w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.99] ${
+                  className={`w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-95 ${
                     isValid
-                      ? "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 shadow-amber-900/20"
-                      : "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700"
+                      ? "bg-amber-600 text-stone-950 shadow-amber-900/20"
+                      : "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700 opacity-50 grayscale"
                   }`}
                 >
-                  <Check size={24} /> Confirmar Classe
+                  <Check size={20} /> Confirmar Classe
                 </button>
               </div>
             </div>

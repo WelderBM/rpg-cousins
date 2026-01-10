@@ -286,7 +286,7 @@ export default function CharacterSelectPage() {
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => router.push("/wizard")}
+          onClick={() => router.push("/herois?tab=novo-heroi")}
           className="min-h-[140px] bg-medieval-stone/30 border-2 border-dashed border-medieval-iron/50 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-medieval-gold/5 hover:border-medieval-gold/50 transition-all group"
         >
           <div className="p-3 rounded-full bg-black/20 group-hover:bg-medieval-gold/20 transition-colors">

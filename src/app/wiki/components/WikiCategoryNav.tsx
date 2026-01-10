@@ -2,15 +2,18 @@ import React, { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CATEGORIES } from "../constants";
 import { Category } from "../types";
+import { cn } from "@/lib/utils";
 
 interface WikiCategoryNavProps {
   activeCategory: Category;
   setActiveCategory: (cat: Category) => void;
+  isEmbedded?: boolean;
 }
 
 export function WikiCategoryNav({
   activeCategory,
   setActiveCategory,
+  isEmbedded = false,
 }: WikiCategoryNavProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -31,10 +34,15 @@ export function WikiCategoryNav({
   }, [activeCategory]);
 
   return (
-    <div className="md:hidden sticky top-[61px] z-20 bg-neutral-900/95 backdrop-blur border-b border-amber-900/10 shadow-lg">
+    <div
+      className={cn(
+        "sticky z-20 bg-neutral-900/95 backdrop-blur border-b border-amber-900/10 shadow-lg",
+        isEmbedded ? "top-0" : "md:hidden top-[61px]"
+      )}
+    >
       <div
         ref={containerRef}
-        className="flex overflow-x-auto gap-2 p-3 no-scrollbar items-center"
+        className="flex overflow-x-auto gap-2 py-2 px-3 no-scrollbar items-center"
       >
         {CATEGORIES.map((cat) => (
           <button

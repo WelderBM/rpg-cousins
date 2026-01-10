@@ -171,83 +171,70 @@ const AttributeSelection = () => {
   }, [flexibleBonuses, flexibleAttributeChoices, pointsRemaining]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-950 via-neutral-950 to-stone-950 relative overflow-hidden">
+    <div className="min-h-screen bg-stone-950 text-neutral-100 pb-32">
       <AnimatePresence>
         {showExplanation && (
           <SystemExplanationModal onClose={() => setShowExplanation(false)} />
         )}
       </AnimatePresence>
 
-      <div className="relative max-w-5xl mx-auto p-4 sm:p-6 min-h-screen flex flex-col pb-48 md:pb-32">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => setStep(1)}
-            className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-200 hover:text-amber-400"
-          >
-            <ChevronLeft size={20} />
-            <span className="hidden sm:inline">Voltar</span>
-          </button>
-
-          <div className="text-center flex-1">
-            <h2 className="text-3xl md:text-4xl font-cinzel text-amber-500 drop-shadow-[0_0_30px_rgba(251,191,36,0.3)]">
+      <div className="relative max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
+        {/* Header Compacto */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-xl md:text-3xl font-cinzel text-amber-500">
               Atributos
-            </h2>
-            <div className="flex justify-center mt-2">
+            </h1>
+            <div className="mt-1">
               <BuildArchetypeBadge attributes={finalAttributes} />
             </div>
           </div>
 
           <button
             onClick={() => setShowExplanation(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-amber-900/20 backdrop-blur-md border border-amber-700/30 rounded-lg text-amber-400"
+            className="p-3 bg-amber-900/20 backdrop-blur-md border border-amber-700/30 rounded-xl text-amber-400 active:scale-95 transition-all"
           >
             <HelpCircle size={20} />
-            <span className="hidden sm:inline">Ajuda</span>
           </button>
         </div>
 
-        {/* Points Display */}
+        {/* Points Display - More Compact */}
         <motion.div
           animate={shakePoints ? { x: [-10, 10, -10, 10, 0] } : {}}
-          className="sticky top-4 z-20 mb-8 bg-stone-900/90 backdrop-blur-md rounded-2xl p-6 border-2 border-amber-700/30 shadow-2xl"
+          className="sticky top-4 z-20 bg-stone-900/40 backdrop-blur-md rounded-xl p-4 border border-white/5 shadow-2xl"
         >
-          <div className="flex justify-between items-center mb-4">
-            <div className="text-xs text-neutral-400 uppercase tracking-widest">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
               Pontos Disponíveis
-            </div>
-            <div
-              className={`text-3xl font-bold font-cinzel ${
+            </span>
+            <span
+              className={`text-2xl font-cinzel font-bold ${
                 pointsRemaining === 0 ? "text-emerald-500" : "text-amber-500"
               }`}
             >
               {pointsRemaining}
-            </div>
+            </span>
           </div>
           <PointsProgressBar points={pointsRemaining} />
         </motion.div>
 
-        {/* Flexible Bonuses */}
+        {/* Flexible Bonuses - Refined */}
         {flexibleBonuses.length > 0 && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
-            className="bg-amber-950/20 border-2 border-amber-700/30 rounded-2xl p-6 mb-8"
+            className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-4 space-y-4"
           >
-            <h3 className="text-xl font-cinzel text-amber-500 mb-4 flex items-center gap-2">
-              <Plus size={20} /> Bônus Flexíveis da Raça
+            <h3 className="text-xs font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
+              <Plus size={14} /> Bônus Flexíveis da Raça
             </h3>
-            <div className="space-y-6">
+            <div className="space-y-4">
               {flexibleBonuses.map((bonus) => (
-                <div key={bonus.index} className="space-y-3">
-                  <div className="text-sm text-neutral-400">
-                    Escolha um atributo para o bônus de{" "}
-                    <span className="text-amber-500 font-bold">
-                      +{bonus.mod}
-                    </span>
-                    :
+                <div key={bonus.index} className="space-y-2">
+                  <div className="text-[10px] text-stone-500">
+                    Escolha um atributo (+{bonus.mod}):
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                     {ATTRIBUTES_LIST.map((attr) => {
                       const isSelected =
                         flexibleAttributeChoices[bonus.index] === attr;
@@ -265,20 +252,15 @@ const AttributeSelection = () => {
                           onClick={() =>
                             setFlexibleAttributeChoice(bonus.index, attr)
                           }
-                          className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1 ${
+                          className={`py-2 rounded-lg border text-[10px] font-bold transition-all uppercase ${
                             isSelected
-                              ? "bg-amber-900/40 border-amber-500 text-amber-100 shadow-[0_0_15px_rgba(251,191,36,0.2)]"
+                              ? "bg-amber-600 text-stone-950 border-amber-500"
                               : isChosenInAnotherSlot
-                              ? "bg-neutral-900/30 border-neutral-800 text-neutral-600 cursor-not-allowed opacity-40"
-                              : "bg-black/40 border-neutral-800 text-neutral-400 hover:border-amber-700"
-                          }`}
+                              ? "bg-stone-900 border-stone-800 text-stone-700 opacity-30"
+                              : "bg-black/20 border-white/5 text-stone-400"
+                          } active:scale-95`}
                         >
-                          <span className="text-xs font-bold">{attr}</span>
-                          {isSelected && (
-                            <motion.div layoutId="flex-check">
-                              <Check size={14} className="text-amber-500" />
-                            </motion.div>
-                          )}
+                          {attr.substring(0, 3)}
                         </button>
                       );
                     })}
@@ -289,13 +271,11 @@ const AttributeSelection = () => {
           </motion.div>
         )}
 
-        <div className="mb-8">
-          <ImpactPanel finalAttributes={finalAttributes} />
-        </div>
+        <ImpactPanel finalAttributes={finalAttributes} />
 
-        {/* Attribute Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 flex-1">
-          {ATTRIBUTES_LIST.map((attr, index) => (
+        {/* Attribute Grid - Forced 1 col on mobile, 2 on tablet */}
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-4">
+          {ATTRIBUTES_LIST.map((attr) => (
             <AttributeCard
               key={attr}
               attr={attr}
@@ -308,20 +288,27 @@ const AttributeSelection = () => {
           ))}
         </div>
 
-        {/* Action Button - Centered in Parent */}
-        <div className="mt-12 pb-12 flex justify-center w-full">
-          <button
-            onClick={() => setStep(3)}
-            disabled={!canProceed}
-            className={`w-full max-w-md py-4 font-bold rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.98] ${
-              canProceed
-                ? "bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-black"
-                : "bg-neutral-800 text-neutral-500 opacity-50 cursor-not-allowed border border-neutral-700"
-            }`}
-          >
-            {canProceed ? "Pronto para a Aventura!" : "Confirme seus Pontos"}
-            <ChevronRight size={20} />
-          </button>
+        {/* Action Footer */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-50">
+          <div className="max-w-2xl mx-auto">
+            <button
+              onClick={() => setStep(3)}
+              disabled={!canProceed}
+              className={`w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-95 ${
+                canProceed
+                  ? "bg-amber-600 text-stone-950"
+                  : "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700 opacity-50 grayscale"
+              }`}
+            >
+              {canProceed ? (
+                <>
+                  <Check size={20} /> Atributos Definidos
+                </>
+              ) : (
+                "Distribua os Pontos"
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -63,12 +63,12 @@ const OriginCard = React.memo(
               />
               <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-900/20 to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-300" />
             </div>
-            <div className="relative p-4 bg-gradient-to-t from-stone-950 to-stone-900/50 border-t border-amber-700/30">
-              <h3 className="text-xl font-cinzel text-center text-amber-100 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
+            <div className="relative p-2 md:p-4 bg-gradient-to-t from-stone-950 to-stone-900/50 border-t border-amber-700/30">
+              <h3 className="text-sm md:text-xl font-cinzel text-center text-amber-100 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
                 {origin.name}
               </h3>
-              <div className="absolute -top-3 right-4 bg-amber-600 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg shadow-amber-600/50">
-                <ChevronRight className="w-4 h-4 text-white" />
+              <div className="absolute -top-3 right-2 md:right-4 bg-amber-600 rounded-full p-1 md:p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg shadow-amber-600/50">
+                <ChevronRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
               </div>
             </div>
           </div>
@@ -167,9 +167,12 @@ const OriginSelection = () => {
                       ...EQUIPAMENTOS.armasMarciais,
                     ]
                   : EQUIPAMENTOS.armasSimples
-              ).filter((arm) => arm.preco <= 30);
+              ).filter((arm) => (arm.preco ?? 0) <= 30);
 
-              if (typeof c.equipment !== "string" && c.equipment.preco <= 30) {
+              if (
+                typeof c.equipment !== "string" &&
+                (c.equipment.preco ?? 0) <= 30
+              ) {
                 return c.equipment;
               }
 
@@ -218,15 +221,8 @@ const OriginSelection = () => {
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-8 p-4 md:p-8 max-w-7xl mx-auto pb-48 md:pb-32"
           >
-            <div className="flex items-center justify-between mt-4">
-              <button
-                onClick={() => setStep(3)}
-                className="flex items-center gap-2 px-4 py-2 bg-stone-900 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10"
-              >
-                <ChevronLeft size={20} />
-                <span className="hidden sm:inline">Voltar</span>
-              </button>
-              <h2 className="text-3xl md:text-5xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
+            <div className="flex flex-col items-center justify-center gap-2 mt-4">
+              <h2 className="text-3xl md:text-5xl font-cinzel text-amber-500 text-center drop-shadow-xl">
                 Escolha sua Origem
               </h2>
             </div>
@@ -242,7 +238,7 @@ const OriginSelection = () => {
               (perícias ou poderes).
             </motion.p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
               {Object.values(ORIGINS)
                 // Filter to ensure we only have valid origin objects with unique names
                 .filter(
@@ -270,91 +266,82 @@ const OriginSelection = () => {
         ) : (
           <motion.div
             key="detail"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
-            transition={{ duration: 0.3 }}
-            className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 pb-48 md:pb-32"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            className="max-w-2xl mx-auto w-full p-4 md:p-8 space-y-6 pb-32"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-stone-800 pb-4">
+            {/* Header & Image Banner */}
+            <div className="relative overflow-hidden rounded-2xl bg-stone-950 border border-white/5 h-48 md:h-64">
+              <Image
+                src={`/assets/origins/${formatAssetName(
+                  selectedPreview?.name || ""
+                )}.webp`}
+                alt={selectedPreview?.name || ""}
+                fill
+                className="object-cover object-top opacity-30 grayscale-[20%]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/40 to-transparent" />
+              <div className="absolute bottom-4 left-4 md:left-6">
+                <h2 className="text-2xl md:text-4xl font-cinzel text-amber-100 drop-shadow-2xl">
+                  {selectedPreview?.name}
+                </h2>
+              </div>
+              {/* Discrete Back Button */}
               <button
                 onClick={() => {
                   setSelectedPreview(null);
                   setWizardDraft("origin", { previewName: null });
                 }}
-                className="flex items-center text-neutral-400 hover:text-white transition-colors"
-                aria-label="Voltar"
+                className="absolute top-4 left-4 z-10 p-2 bg-black/40 backdrop-blur-md border border-white/10 text-white rounded-full active:scale-95 transition-all"
               >
-                <ChevronLeft size={24} />
-                <span className="ml-1 font-bold uppercase tracking-wider text-xs">
-                  Voltar
-                </span>
+                <ChevronLeft size={20} />
               </button>
-              <h2 className="text-3xl md:text-4xl font-cinzel text-amber-500 drop-shadow-lg">
-                {selectedPreview.name}
-              </h2>
-              <div className="w-8" />
             </div>
 
-            {/* Selection Area */}
-            <div className="bg-stone-900/30 rounded-2xl border border-stone-800 overflow-hidden">
-              {/* Image Header Banner */}
-              <div className="relative min-h-[300px] md:min-h-[500px] flex items-center justify-center p-6">
-                <div className="absolute inset-0">
-                  <Image
-                    src={`/assets/origins/${formatAssetName(
-                      selectedPreview.name
-                    )}.webp`}
-                    alt={selectedPreview.name}
-                    fill
-                    className="object-cover object-top opacity-40 grayscale-[30%]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/60 to-stone-900/90" />
-                </div>
+            {/* Selection Progress Overlay */}
+            <div className="bg-stone-900/40 backdrop-blur-md border border-white/5 p-4 rounded-xl flex items-center justify-between">
+              <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
+                Benefícios da Origem
+              </span>
+              <span
+                className={`text-xs font-bold px-3 py-1 rounded-full ${
+                  originBenefits.length === 2
+                    ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50"
+                    : "bg-amber-900/40 text-amber-500 border border-amber-900/50"
+                }`}
+              >
+                {originBenefits.length} / 2
+              </span>
+            </div>
 
-                <div className="relative z-10 w-full flex flex-col items-center gap-4">
-                  <p className="text-sm text-amber-100/90 italic text-center drop-shadow-md">
-                    Escolha 2 benefícios (perícias ou poderes).
-                  </p>
-                  <span
-                    className={`text-sm font-bold px-4 py-2 rounded-full border backdrop-blur-sm transition-all shadow-xl ${
-                      originBenefits.length === 2
-                        ? "bg-emerald-900/60 text-emerald-300 border-emerald-500/50"
-                        : "bg-amber-900/40 text-amber-200 border-amber-500/50"
-                    }`}
-                  >
-                    {originBenefits.length} / 2 Benefícios Selecionados
-                  </span>
-                </div>
-              </div>
+            <div className="space-y-6">
+              {/* Skills */}
+              <div className="mb-8">
+                <h3 className="text-stone-500 uppercase tracking-widest font-bold text-xs mb-3 flex items-center gap-2">
+                  <Book size={14} /> Perícias Disponíveis
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedPreview?.pericias.map((skill) => {
+                    const isKnown = knownSkills.includes(skill);
+                    const isSelected = originBenefits.some(
+                      (b) => b.name === skill && b.type === "skill"
+                    );
+                    const isLimitReached = originBenefits.length >= 2;
 
-              <div className="p-6 pt-2">
-                {/* Skills */}
-                <div className="mb-8">
-                  <h3 className="text-stone-500 uppercase tracking-widest font-bold text-xs mb-3 flex items-center gap-2">
-                    <Book size={14} /> Perícias Disponíveis
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPreview.pericias.map((skill) => {
-                      const isKnown = knownSkills.includes(skill);
-                      const isSelected = originBenefits.some(
-                        (b) => b.name === skill && b.type === "skill"
-                      );
-                      const isLimitReached = originBenefits.length >= 2;
-
-                      return (
-                        <div key={skill} className="group/skill relative">
-                          <button
-                            disabled={isLimitReached && !isSelected}
-                            onClick={() =>
-                              toggleBenefit({
-                                type: "skill",
-                                name: skill,
-                                value: skill,
-                              })
-                            }
-                            className={`px-4 py-2 rounded-lg text-sm font-bold border transition-all flex items-center gap-2
+                    return (
+                      <div key={skill} className="group/skill relative">
+                        <button
+                          disabled={isLimitReached && !isSelected}
+                          onClick={() =>
+                            toggleBenefit({
+                              type: "skill",
+                              name: skill,
+                              value: skill,
+                            })
+                          }
+                          className={`px-4 py-2 rounded-lg text-sm font-bold border transition-all flex items-center gap-2
                                       ${
                                         isSelected
                                           ? "bg-emerald-900/40 text-emerald-200 border-emerald-500 shadow-[0_0_15px_-5px_var(--color-emerald-500)]"
@@ -365,61 +352,61 @@ const OriginSelection = () => {
                                           : "bg-stone-900 border-stone-700 text-stone-300 hover:border-amber-500/50"
                                       }
                                   `}
-                          >
-                            {skill}
-                            {isSelected && (
-                              <Check size={14} className="text-emerald-500" />
-                            )}
-                            {isKnown && !isSelected && (
-                              <AlertTriangle
-                                size={14}
-                                className="text-amber-900/50"
-                              />
-                            )}
-                          </button>
-
-                          {/* Tooltip for Known Skills */}
-                          {isKnown && (
-                            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-64 p-3 bg-stone-950 border border-amber-500/30 rounded-xl text-xs text-amber-100 shadow-2xl opacity-0 group-hover/skill:opacity-100 transition-opacity pointer-events-none z-50 text-center backdrop-blur-md">
-                              <p className="font-bold mb-1 text-amber-500">
-                                Perícia já treinada
-                              </p>
-                              Você já possui treinamento nesta perícia via Raça
-                              ou Classe. Se escolher ela aqui, não receberá
-                              benefício extra.
-                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-stone-950"></div>
-                            </div>
+                        >
+                          {skill}
+                          {isSelected && (
+                            <Check size={14} className="text-emerald-500" />
                           )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                          {isKnown && !isSelected && (
+                            <AlertTriangle
+                              size={14}
+                              className="text-amber-900/50"
+                            />
+                          )}
+                        </button>
+
+                        {/* Tooltip for Known Skills */}
+                        {isKnown && (
+                          <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-64 p-3 bg-stone-950 border border-amber-500/30 rounded-xl text-xs text-amber-100 shadow-2xl opacity-0 group-hover/skill:opacity-100 transition-opacity pointer-events-none z-50 text-center backdrop-blur-md">
+                            <p className="font-bold mb-1 text-amber-500">
+                              Perícia já treinada
+                            </p>
+                            Você já possui treinamento nesta perícia via Raça ou
+                            Classe. Se escolher ela aqui, não receberá benefício
+                            extra.
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-stone-950"></div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
+              </div>
 
-                {/* Powers */}
-                <div>
-                  <h3 className="text-stone-500 uppercase tracking-widest font-bold text-xs mb-3 flex items-center gap-2">
-                    <Sparkles size={14} /> Poderes Disponíveis
-                  </h3>
-                  <div className="grid gap-3">
-                    {selectedPreview.poderes.map((power: any, idx: number) => {
-                      const isSelected = originBenefits.some(
-                        (b) => b.name === power.name && b.type === "power"
-                      );
-                      const isLimitReached = originBenefits.length >= 2;
+              {/* Powers */}
+              <div>
+                <h3 className="text-stone-500 uppercase tracking-widest font-bold text-xs mb-3 flex items-center gap-2">
+                  <Sparkles size={14} /> Poderes Disponíveis
+                </h3>
+                <div className="grid gap-3">
+                  {selectedPreview?.poderes.map((power: any, idx: number) => {
+                    const isSelected = originBenefits.some(
+                      (b) => b.name === power.name && b.type === "power"
+                    );
+                    const isLimitReached = originBenefits.length >= 2;
 
-                      return (
-                        <button
-                          key={idx}
-                          disabled={isLimitReached && !isSelected}
-                          onClick={() =>
-                            toggleBenefit({
-                              type: "power",
-                              name: power.name,
-                              value: power,
-                            })
-                          }
-                          className={`p-4 rounded-xl border transition-all relative text-left group
+                    return (
+                      <button
+                        key={idx}
+                        disabled={isLimitReached && !isSelected}
+                        onClick={() =>
+                          toggleBenefit({
+                            type: "power",
+                            name: power.name,
+                            value: power,
+                          })
+                        }
+                        className={`p-4 rounded-xl border transition-all relative text-left group
                                     ${
                                       isSelected
                                         ? "bg-emerald-900/20 border-emerald-500 shadow-[0_0_15px_-5px_var(--color-emerald-500)]"
@@ -428,102 +415,98 @@ const OriginSelection = () => {
                                         : "bg-stone-900 border-stone-800 hover:border-amber-500/40"
                                     }
                                   `}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <span
-                              className={`font-bold font-cinzel text-lg ${
-                                isSelected
-                                  ? "text-emerald-100"
-                                  : "text-stone-200"
-                              }`}
-                            >
-                              {power.name}
-                            </span>
-                            {isSelected && (
-                              <div className="bg-emerald-500/20 text-emerald-400 p-1 rounded-full">
-                                <Check size={14} />
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-sm text-stone-400 leading-relaxed group-hover:text-stone-300">
-                            {(power as any).text ||
-                              (power as any).description ||
-                              "Descrição indisponível."}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <span
+                            className={`font-bold font-cinzel text-lg ${
+                              isSelected ? "text-emerald-100" : "text-stone-200"
+                            }`}
+                          >
+                            {power.name}
+                          </span>
+                          {isSelected && (
+                            <div className="bg-emerald-500/20 text-emerald-400 p-1 rounded-full">
+                              <Check size={14} />
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-sm text-stone-400 leading-relaxed group-hover:text-stone-300">
+                          {(power as any).text ||
+                            (power as any).description ||
+                            "Descrição indisponível."}
+                        </p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
             {/* Weapon Choice if Applicable */}
-            {selectedPreview.getItems &&
-              selectedPreview.getItems().some((i) => !!i.choice) && (
-                <div className="bg-amber-900/10 p-6 rounded-xl border border-amber-900/30 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Sword className="text-amber-500" size={20} />
-                    <h4 className="text-sm font-bold text-amber-200 uppercase tracking-widest">
-                      Escolha seu Equipamento de Origem
-                    </h4>
-                  </div>
-                  <p className="text-xs text-stone-400">
-                    Sua origem permite que você escolha uma arma específica de
-                    um grupo.
-                  </p>
-
-                  <div className="grid gap-4">
-                    {selectedPreview
-                      .getItems()
-                      .filter((i) => !!i.choice)
-                      .map((item, idx) => {
-                        const available = (
-                          item.choice === "Armas Marciais"
-                            ? [
-                                ...EQUIPAMENTOS.armasSimples,
-                                ...EQUIPAMENTOS.armasMarciais,
-                              ]
-                            : EQUIPAMENTOS.armasSimples
-                        ).filter((arm) => arm.preco <= 30);
-
-                        return (
-                          <div key={idx} className="space-y-2">
-                            <label className="text-[10px] text-stone-500 font-bold uppercase tracking-tighter">
-                              {item.description || "Escolha uma arma"}
-                            </label>
-                            <div className="relative group">
-                              <select
-                                value={localOriginWeapons[idx]?.nome || ""}
-                                onChange={(e) => {
-                                  const w = available.find(
-                                    (arm) => arm.nome === e.target.value
-                                  );
-                                  if (w) {
-                                    const next = [...localOriginWeapons];
-                                    next[idx] = w;
-                                    setLocalOriginWeapons(next);
-                                  }
-                                }}
-                                className="w-full bg-black/40 border border-stone-800 text-stone-200 p-4 rounded-xl outline-none focus:border-amber-500 appearance-none cursor-pointer transition-all"
-                              >
-                                {available.map((arm) => (
-                                  <option key={arm.nome} value={arm.nome}>
-                                    {arm.nome} ({arm.dano} | {arm.critico})
-                                  </option>
-                                ))}
-                              </select>
-                              <ChevronDown
-                                size={18}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-amber-500/50 group-hover:text-amber-500 pointer-events-none transition-colors"
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
+            {selectedPreview?.getItems?.()?.some((i) => !!i.choice) && (
+              <div className="bg-amber-900/10 p-6 rounded-xl border border-amber-900/30 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Sword className="text-amber-500" size={20} />
+                  <h4 className="text-sm font-bold text-amber-200 uppercase tracking-widest">
+                    Escolha seu Equipamento de Origem
+                  </h4>
                 </div>
-              )}
+                <p className="text-xs text-stone-400">
+                  Sua origem permite que você escolha uma arma específica de um
+                  grupo.
+                </p>
+
+                <div className="grid gap-4">
+                  {selectedPreview
+                    ?.getItems()
+                    .filter((i) => !!i.choice)
+                    .map((item, idx) => {
+                      const available = (
+                        item.choice === "Armas Marciais"
+                          ? [
+                              ...EQUIPAMENTOS.armasSimples,
+                              ...EQUIPAMENTOS.armasMarciais,
+                            ]
+                          : EQUIPAMENTOS.armasSimples
+                      ).filter((arm) => (arm.preco ?? 0) <= 30);
+
+                      return (
+                        <div key={idx} className="space-y-2">
+                          <label className="text-[10px] text-stone-500 font-bold uppercase tracking-tighter">
+                            {item.description || "Escolha uma arma"}
+                          </label>
+                          <div className="relative group">
+                            <select
+                              value={localOriginWeapons[idx]?.nome || ""}
+                              onChange={(e) => {
+                                const w = available.find(
+                                  (arm) => arm.nome === e.target.value
+                                );
+                                if (w) {
+                                  const next = [...localOriginWeapons];
+                                  next[idx] = w;
+                                  setLocalOriginWeapons(next);
+                                }
+                              }}
+                              className="w-full bg-black/40 border border-stone-800 text-stone-200 p-4 rounded-xl outline-none focus:border-amber-500 appearance-none cursor-pointer transition-all"
+                            >
+                              {available.map((arm) => (
+                                <option key={arm.nome} value={arm.nome}>
+                                  {arm.nome} ({arm.dano} | {arm.critico})
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown
+                              size={18}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 text-amber-500/50 group-hover:text-amber-500 pointer-events-none transition-colors"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
 
             {/* Items Summary (Just visuals) */}
             <div className="bg-black/20 p-6 rounded-xl border border-stone-800/50">
@@ -531,13 +514,15 @@ const OriginSelection = () => {
                 Itens Iniciais (Automáticos)
               </h4>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-stone-400">
-                {selectedPreview.getItems ? (
-                  selectedPreview.getItems().map((item, i) => {
+                {selectedPreview?.getItems ? (
+                  selectedPreview?.getItems().map((item, i) => {
                     // Check if this is a choice item
                     const isChoice = !!item.choice;
-                    const choiceIdx = selectedPreview
-                      .getItems()
-                      .filter((x, prevIdx) => !!x.choice && prevIdx < i).length;
+                    const choiceIdx =
+                      selectedPreview
+                        ?.getItems()
+                        ?.filter((x, prevIdx) => !!x.choice && prevIdx < i)
+                        .length || 0;
 
                     return (
                       <li key={i} className="flex items-center gap-2">
@@ -566,20 +551,21 @@ const OriginSelection = () => {
               </ul>
             </div>
 
-            <div className="sticky bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950/95 to-transparent backdrop-blur-md z-30 border-t border-amber-900/20">
-              <div className="max-w-4xl mx-auto">
+            {/* Footer Action */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-50">
+              <div className="max-w-2xl mx-auto">
                 <button
                   onClick={handleConfirm}
                   disabled={originBenefits.length !== 2}
-                  className={`w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-[0.99] hover:scale-[1.01] ${
+                  className={`w-full py-3 md:py-4 font-bold font-cinzel text-base md:text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-95 ${
                     originBenefits.length === 2
-                      ? "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-stone-950 shadow-amber-900/20"
-                      : "bg-stone-800 text-stone-500 border border-stone-700 cursor-not-allowed grayscale"
+                      ? "bg-amber-600 text-stone-950 shadow-amber-900/20"
+                      : "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700 opacity-50 grayscale"
                   }`}
                 >
                   {originBenefits.length === 2 ? (
                     <>
-                      <Check size={24} /> Confirmar Escolhas
+                      <Check size={20} /> Confirmar Origem
                     </>
                   ) : (
                     `Escolha mais ${2 - originBenefits.length} benefício${
