@@ -52,12 +52,12 @@ export default function ConhecimentosClient({
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-medieval-stone/30">
+    <div className="flex flex-col bg-medieval-stone/30">
       {/* Tabs Header */}
-      <div className="sticky top-0 z-[60] bg-medieval-stone/95 backdrop-blur-xl border-b border-medieval-iron/30 px-4 pt-4 shadow-xl">
+      <div className="bg-medieval-stone/95 backdrop-blur-xl border-b border-medieval-iron/30 px-4 pt-4 shadow-xl">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="p-3 bg-medieval-gold/10 rounded-2xl border border-medieval-gold/20">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2.5 bg-medieval-gold/10 rounded-2xl border border-medieval-gold/20">
               <Scroll className="w-6 h-6 text-medieval-gold" />
             </div>
             <div>
@@ -122,7 +122,7 @@ export default function ConhecimentosClient({
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -133,26 +133,43 @@ export default function ConhecimentosClient({
             className="h-full"
           >
             {activeTab === "compendio" && (
-              <div className="h-full relative [&_.sticky]:top-[128px] [&_.h-screen]:h-[calc(100vh-128px)]">
+              <div className="relative">
                 <WikiContent isEmbedded={true} />
               </div>
             )}
             {activeTab === "grimorio" && (
-              <div className="container mx-auto max-w-7xl p-6">
-                <div className="mb-8 border-b border-medieval-iron/30 pb-4">
-                  <h1 className="text-4xl md:text-5xl font-serif font-bold text-medieval-gold drop-shadow-lg mb-2">
-                    Grimório Arcano
-                  </h1>
-                  <p className="text-parchment-DEFAULT text-lg">
-                    Consulte o acervo completo de magias conhecidas em Arton.
-                  </p>
+              <div className="">
+                <div className="container mx-auto max-w-7xl px-4 md:px-6 pt-6 pb-20">
+                  <div className="mb-8 border-b border-medieval-iron/30 pb-4">
+                    <h1 className="text-3xl md:text-5xl font-serif font-bold text-medieval-gold drop-shadow-lg mb-2">
+                      Grimório Arcano
+                    </h1>
+                    <p className="text-parchment-DEFAULT/80 text-sm md:text-lg italic">
+                      Consulte o acervo completo de magias conhecidas em Arton.
+                    </p>
+                  </div>
+                  <GrimorioClient initialSpells={initialSpells} />
                 </div>
-                <GrimorioClient initialSpells={initialSpells} />
               </div>
             )}
           </motion.div>
         </AnimatePresence>
       </div>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(184, 146, 64, 0.2);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(184, 146, 64, 0.4);
+        }
+      `}</style>
     </div>
   );
 }
