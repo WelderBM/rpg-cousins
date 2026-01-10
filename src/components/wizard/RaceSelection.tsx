@@ -65,12 +65,12 @@ const RaceCard = React.memo(
               />
               <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
             </div>
-            <div className="relative p-4 bg-gradient-to-t from-stone-950 to-stone-900/50 border-t border-amber-700/30">
-              <h3 className="text-xl font-cinzel text-center text-amber-100 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
+            <div className="relative p-2 md:p-4 bg-gradient-to-t from-stone-950 to-stone-900/50 border-t border-amber-700/30">
+              <h3 className="text-sm md:text-xl font-cinzel text-center text-amber-100 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
                 {race.name}
               </h3>
-              <div className="absolute -top-3 right-4 bg-amber-600 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg shadow-amber-600/50">
-                <ChevronRight className="w-4 h-4 text-white" />
+              <div className="absolute -top-3 right-2 md:right-4 bg-amber-600 rounded-full p-1 md:p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg shadow-amber-600/50">
+                <ChevronRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
               </div>
             </div>
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -129,7 +129,9 @@ const RaceSelection = () => {
             <div className="flex flex-col items-center gap-4 mb-12">
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => (window.location.href = "/")}
+                  onClick={() =>
+                    (window.location.href = "/herois?tab=novo-heroi")
+                  }
                   className="p-2 bg-black/40 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-2 group"
                 >
                   <ChevronLeft
@@ -162,7 +164,7 @@ const RaceSelection = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-5xl mx-auto w-full"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 max-w-5xl mx-auto w-full"
             >
               {RACAS.map((race, index) => (
                 <motion.div
@@ -186,230 +188,130 @@ const RaceSelection = () => {
         ) : (
           <motion.div
             key="detail"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-            className="relative flex flex-col h-full min-h-screen max-w-5xl mx-auto w-full"
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            className="relative flex flex-col h-full min-h-screen max-w-2xl mx-auto w-full"
           >
             {/* Header com imagem de fundo */}
-            <div className="relative h-72 md:h-[500px] overflow-hidden bg-stone-950">
-              {/* Background Image - Vertically Aligned with dark side padding */}
+            <div className="relative h-48 md:h-72 overflow-hidden bg-stone-950">
+              {/* Background Image */}
               <div className="absolute inset-0 flex items-center justify-center bg-stone-950">
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <Image
-                    src={`/assets/races/${getRaceImageName(
-                      selectedPreview.name
-                    )}.webp`}
-                    alt={selectedPreview.name}
-                    width={800}
-                    height={1200}
-                    className="object-contain opacity-100 h-full w-auto"
-                    style={{
-                      maxHeight: "100%",
-                      objectPosition: "center center",
-                    }}
-                    priority
-                  />
-                </div>
+                <Image
+                  src={`/assets/races/${getRaceImageName(
+                    selectedPreview.name
+                  )}.webp`}
+                  alt={selectedPreview.name}
+                  width={600}
+                  height={900}
+                  className="object-contain opacity-100 h-full w-auto"
+                  style={{ maxHeight: "100%" }}
+                  priority
+                />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-stone-950/80" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-stone-950" />
+              <div className="absolute bottom-4 left-4 md:left-6 z-10">
+                <h2 className="text-2xl md:text-4xl font-cinzel text-amber-100 drop-shadow-2xl">
+                  {selectedPreview.name}
+                </h2>
+              </div>
+              {/* Discrete Internal Back Button */}
               <button
                 onClick={() => {
                   setSelectedPreview(null);
                   setWizardDraft("race", { previewName: null });
                 }}
-                className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2 bg-black/60 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-200 hover:text-amber-400 hover:border-amber-500/50 transition-all"
+                className="absolute top-4 left-4 z-10 p-2 bg-black/40 backdrop-blur-md border border-white/10 text-white rounded-full active:scale-95 transition-all"
               >
                 <ChevronLeft size={20} />
-                <span className="hidden sm:inline">Voltar</span>
               </button>
-              <div className="absolute bottom-4 left-4 right-4 z-10">
-                <h2 className="text-3xl md:text-4xl font-cinzel text-amber-100 drop-shadow-2xl">
-                  {selectedPreview.name}
-                </h2>
-              </div>
             </div>
 
-            {/* Conteúdo scrollável com largura controlada */}
-            <div className="flex-1 overflow-y-auto bg-stone-950 p-6 md:p-8 space-y-10 scrollbar-thin scrollbar-thumb-amber-900/30 scrollbar-track-transparent">
-              {/* 1. Visão Geral (Lore) */}
-              <div className="space-y-6">
-                <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl relative overflow-hidden group">
-                  <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-                    <Users size={120} />
-                  </div>
-                  <h4 className="text-amber-500 font-cinzel text-xl mb-3 flex items-center gap-2">
-                    <Info size={18} /> Visão Geral
-                  </h4>
-                  <p className="text-neutral-300 leading-relaxed italic text-lg border-l-2 border-amber-500/20 pl-4">
-                    {selectedPreview.description ||
-                      "Uma raça única habitando as terras de Arton."}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3 bg-black/20 p-4 rounded-xl border border-white/5">
-                    <h5 className="text-amber-400 font-cinzel flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold">
-                      <Feather size={14} /> Aparência
-                    </h5>
-                    <p className="text-sm text-neutral-400 leading-relaxed italic">
-                      {selectedPreview.appearance ||
-                        "Aparência variada conforme a linhagem."}
-                    </p>
-                  </div>
-                  <div className="space-y-3 bg-black/20 p-4 rounded-xl border border-white/5">
-                    <h5 className="text-amber-400 font-cinzel flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold">
-                      <Brain size={14} /> Personalidade
-                    </h5>
-                    <p className="text-sm text-neutral-400 leading-relaxed italic">
-                      {selectedPreview.personality ||
-                        "Traços comportamentais distintos."}
-                    </p>
-                  </div>
-                </div>
+            {/* Conteúdo scrollável */}
+            <div className="flex-1 overflow-y-auto bg-stone-950 p-5 md:p-8 space-y-6 pb-32">
+              {/* Lore Compacta */}
+              <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-4 italic text-sm md:text-base text-stone-300 leading-relaxed">
+                {selectedPreview.description}
               </div>
 
-              {/* 2. Atributos Mecânicos (Visual) */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-cinzel text-amber-500 flex items-center gap-2">
-                  <Swords size={20} />
-                  Atributos & Modificadores
+              {/* Atributos Grid */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Swords size={12} /> Atributos Raciais
                 </h3>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {selectedPreview.attributes.attrs.map(
-                    (at: any, i: number) => (
-                      <div
-                        key={i}
-                        className="p-4 bg-black/30 border border-white/5 rounded-xl text-center group hover:border-amber-500/30 transition-all"
-                      >
-                        <div className="text-[10px] text-neutral-500 uppercase font-bold mb-1 group-hover:text-amber-500/70 transition-colors">
-                          {at.attr}
-                        </div>
-                        <div
-                          className={`text-2xl font-cinzel ${
-                            at.mod > 0 ? "text-emerald-400" : "text-red-400"
-                          }`}
-                        >
-                          {at.mod > 0 ? "+" : ""}
-                          {at.mod}
-                        </div>
-                      </div>
-                    )
-                  )}
-                  <div className="p-4 bg-black/30 border border-white/5 rounded-xl text-center">
-                    <div className="text-[10px] text-neutral-500 uppercase font-bold mb-1">
-                      Desloc.
-                    </div>
-                    <div className="text-2xl font-cinzel text-neutral-200">
-                      {selectedPreview.getDisplacement?.(selectedPreview) || 9}m
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. Fé & Devoção */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-cinzel text-amber-500 flex items-center gap-2">
-                  <Flame size={20} />
-                  Fé & Devoção
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h5 className="text-amber-400 font-cinzel text-[10px] uppercase tracking-wider flex items-center gap-2 font-bold">
-                      <Scale size={14} /> Religiões Comuns
-                    </h5>
-                    <p className="text-sm text-neutral-400 italic bg-black/20 p-4 rounded-xl border border-white/5">
-                      {selectedPreview.commonReligions ||
-                        "Variada entre o Panteão."}
-                    </p>
-                  </div>
-
-                  {selectedPreview.faithProbability && (
-                    <div className="space-y-4">
-                      <h5 className="text-amber-400 font-cinzel text-[10px] uppercase tracking-wider flex items-center gap-2 font-bold">
-                        <Star size={14} /> Afinidade Divina
-                      </h5>
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(selectedPreview.faithProbability).map(
-                          ([deus, prob]: [any, any]) => (
-                            <div
-                              key={deus}
-                              className="px-3 py-2 bg-neutral-900/50 border border-neutral-800 rounded-lg flex items-center gap-3"
-                            >
-                              <span className="text-[10px] font-bold text-neutral-300 uppercase letter-spacing-1">
-                                {deus}
-                              </span>
-                              <div className="flex gap-0.5">
-                                {Array.from({ length: 3 }).map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className={`w-1 h-3 rounded-full ${
-                                      i < (prob as number)
-                                        ? "bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]"
-                                        : "bg-white/5"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Habilidades de Raça */}
-              <div className="bg-stone-900/50 backdrop-blur-sm border border-amber-900/20 p-6 rounded-xl space-y-6">
-                <h3 className="text-lg font-cinzel text-amber-500 mb-4 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  Habilidades Raciais
-                </h3>
-                <ul className="space-y-6">
-                  {selectedPreview.abilities.map((ability, idx) => (
-                    <motion.li
-                      key={ability.name}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="border-l-2 border-amber-700/40 pl-6 group"
+                <div className="grid grid-cols-2 gap-2">
+                  {selectedPreview.attributes.attrs.map((at, i) => (
+                    <div
+                      key={i}
+                      className="bg-stone-900/50 border border-stone-800 p-3 rounded-xl flex items-center justify-between"
                     >
-                      <span className="font-cinzel font-bold text-amber-400 text-xl group-hover:text-amber-300 transition-colors">
-                        {ability.name}
+                      <span className="text-xs font-bold text-stone-500 uppercase">
+                        {at.attr}
                       </span>
-                      <p className="text-sm text-neutral-300 leading-relaxed mt-3 italic opacity-80 group-hover:opacity-100 transition-opacity">
+                      <span
+                        className={`text-lg font-cinzel font-bold ${
+                          at.mod > 0 ? "text-emerald-500" : "text-red-400"
+                        }`}
+                      >
+                        {at.mod > 0 ? "+" : ""}
+                        {at.mod}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="bg-stone-900/50 border border-stone-800 p-3 rounded-xl flex items-center justify-between">
+                    <span className="text-xs font-bold text-stone-500 uppercase">
+                      Passo
+                    </span>
+                    <span className="text-lg font-cinzel font-bold text-stone-200">
+                      {selectedPreview.getDisplacement?.(selectedPreview) || 9}m
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Habilidades Raciais */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Sparkles size={12} /> Habilidades de {selectedPreview.name}
+                </h3>
+                <div className="space-y-3">
+                  {selectedPreview.abilities.map((ability, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 rounded-xl bg-stone-900/30 border border-stone-800/50"
+                    >
+                      <h4 className="font-bold text-amber-200 text-sm mb-1">
+                        {ability.name}
+                      </h4>
+                      <p className="text-xs text-stone-400 leading-relaxed">
                         {ability.description}
                       </p>
-                    </motion.li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              {/* Dica */}
-              <div className="text-center text-[10px] text-neutral-600 uppercase tracking-widest bg-black/40 p-6 rounded-xl border border-neutral-900 select-none pb-32">
-                Ao selecionar esta raça, atributos e deslocamento serão
-                ajustados automaticamente em sua ficha de personagem.
+              {/* Devoção */}
+              <div className="space-y-3">
+                <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Flame size={12} /> Fé & Devoção
+                </h3>
+                <div className="p-4 rounded-xl bg-black/20 border border-white/5 italic text-xs text-stone-500">
+                  {selectedPreview.commonReligions || "Variada."}
+                </div>
               </div>
             </div>
 
-            {/* Footer Action - Sticky/Fixed */}
-            <div className="fixed bottom-24 md:bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-stone-950/90 border-t border-amber-900/20 backdrop-blur-md">
-              <div className="max-w-5xl mx-auto">
+            {/* Footer Action */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-50">
+              <div className="max-w-2xl mx-auto">
                 <button
                   onClick={() => selectRace(selectedPreview)}
-                  className="w-full block py-4 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500 text-white font-bold rounded-xl shadow-2xl shadow-amber-900/50 hover:shadow-amber-600/50 active:scale-[0.98] transition-all flex justify-center items-center gap-3 group"
+                  className="w-full py-4 bg-amber-600 hover:bg-amber-500 text-stone-950 font-black rounded-xl shadow-2xl active:scale-95 transition-all flex justify-center items-center gap-2 group uppercase tracking-widest text-sm"
                 >
-                  <Check
-                    size={24}
-                    className="group-hover:rotate-12 transition-transform"
-                  />
-                  <span className="text-lg">
-                    Confirmar {selectedPreview.name}
-                  </span>
+                  <Check size={20} />
+                  Confirmar {selectedPreview.name}
                 </button>
               </div>
             </div>

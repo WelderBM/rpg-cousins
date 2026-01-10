@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCharacterStore } from "@/store/useCharacterStore";
-import { RotateCcw, AlertTriangle, X, Check } from "lucide-react";
+import { RotateCcw, AlertTriangle, X, Check, ArrowLeft } from "lucide-react";
+import { FloatingBackButton } from "@/components/FloatingBackButton";
 
 import RaceSelection from "@/components/wizard/RaceSelection";
 import AttributeSelection from "@/components/wizard/AttributeSelection";
@@ -15,6 +16,7 @@ import WizardHub from "@/components/wizard/WizardHub";
 export default function WizardPage() {
   const {
     step,
+    setStep,
     resetWizard,
     selectedRace,
     selectedOrigin,
@@ -23,7 +25,6 @@ export default function WizardPage() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   // Decide if we should show the hub initially
-  // We default to showing Hub so user can choose "Continue" (if data exists) or "New".
   const [showHub, setShowHub] = useState(true);
 
   // Scroll to top on step change
@@ -44,18 +45,36 @@ export default function WizardPage() {
     setShowHub(false);
   };
 
+  const handleBack = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    } else {
+      setShowHub(true);
+    }
+  };
+
   return (
-    <div className="min-h-screen b'g-neutral-950 text-neutral-200">
-      {/* Reset Controls - Show only if NOT in Hub and NOT in Step 1 */}
-      {!showHub && step > 1 && (
-        <div className="fixed top-4 right-4 z-50">
-          <button
-            onClick={() => setShowResetConfirm(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-red-900/20 hover:bg-red-900/40 border border-red-900/50 text-red-500 rounded-lg text-xs font-bold uppercase tracking-wider backdrop-blur-sm transition-all shadow-lg"
-            title="Começar do zero"
-          >
-            <RotateCcw size={14} /> Resetar
-          </button>
+    <div className="bg-neutral-950 text-neutral-200">
+      {/* Navigation Controls */}
+      {!showHub && (
+        <div className="fixed top-4 left-4 right-4 z-[60] flex justify-between items-center pointer-events-none">
+          <div className="pointer-events-auto">
+            <button
+              onClick={handleBack}
+              className="p-3 bg-black/60 backdrop-blur-md border border-white/10 text-white rounded-full hover:bg-medieval-gold hover:text-black transition-all shadow-xl"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          </div>
+          <div className="pointer-events-auto">
+            <button
+              onClick={() => setShowResetConfirm(true)}
+              className="p-3 bg-red-900/20 backdrop-blur-md border border-red-900/50 text-red-500 rounded-full hover:bg-red-900/40 transition-all shadow-xl"
+              title="Resetar"
+            >
+              <RotateCcw size={20} />
+            </button>
+          </div>
         </div>
       )}
 
@@ -78,22 +97,22 @@ export default function WizardPage() {
                 </h3>
                 <p className="text-sm text-neutral-400">
                   Tem certeza que deseja apagar todo o progresso atual e começar
-                  uma nova ficha do zero? Esta ação é irreversível.
+                  uma nova ficha do zero?
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <button
                   onClick={() => setShowResetConfirm(false)}
-                  className="flex items-center justify-center gap-2 py-3 rounded-xl border border-stone-700 hover:bg-stone-800 text-stone-300 font-bold text-sm transition-colors"
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl border border-stone-700 hover:bg-stone-800 text-stone-300 font-bold text-sm"
                 >
                   <X size={16} /> Cancelar
                 </button>
                 <button
                   onClick={handleReset}
-                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-lg shadow-red-900/20 transition-colors"
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm"
                 >
-                  <RotateCcw size={16} /> Apagar Tudo
+                  <RotateCcw size={16} /> Apagar
                 </button>
               </div>
             </motion.div>
@@ -102,7 +121,7 @@ export default function WizardPage() {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="mx-auto w-full max-w-7xl 2xl:max-w-[90vw] min-h-screen bg-stone-900/10 md:border-x md:border-stone-800/30 shadow-2xl relative">
+      <div className="mx-auto w-full max-w-7xl relative">
         <AnimatePresence mode="wait">
           {showHub ? (
             <motion.div
@@ -111,7 +130,7 @@ export default function WizardPage() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.05 }}
               transition={{ duration: 0.3 }}
-              className="min-h-screen flex items-center justify-center"
+              className="flex items-center justify-center"
             >
               <WizardHub
                 onContinue={() => setShowHub(false)}
@@ -121,17 +140,19 @@ export default function WizardPage() {
           ) : (
             <motion.div
               key={step}
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
               className="min-h-screen"
             >
-              {step === 1 && <RaceSelection />}
-              {step === 2 && <AttributeSelection />}
-              {step === 3 && <RoleSelection />}
-              {step === 4 && <HistorySelection />}
-              {step === 5 && <SummarySelection />}
+              <div className="w-full">
+                {step === 1 && <RaceSelection />}
+                {step === 2 && <AttributeSelection />}
+                {step === 3 && <RoleSelection />}
+                {step === 4 && <HistorySelection />}
+                {step === 5 && <SummarySelection />}
+              </div>
 
               {/* Placeholder for future steps */}
               {step > 5 && (

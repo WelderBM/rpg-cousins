@@ -1333,7 +1333,7 @@ const MarketPage = () => {
   } else if (!activeCharacter) {
     // Character Selection Screen
     content = (
-      <div className="min-h-screen bg-[#0c0c0c] text-neutral-200 font-sans selection:bg-amber-900/30 flex flex-col items-center justify-center p-6 relative pb-20">
+      <div className="bg-[#0c0c0c] text-neutral-200 font-sans selection:bg-amber-900/30 flex flex-col items-center justify-center p-6 relative pb-20">
         <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-[#0c0c0c] to-[#0c0c0c] z-0" />
 
         <div className="relative z-10 w-full max-w-[95vw]">

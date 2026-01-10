@@ -158,7 +158,7 @@ export default function MyCharacterClient() {
 
   if (initializing) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-stone-950 text-amber-500 font-serif">
+      <div className="min-h-[220px] flex flex-col items-center justify-center bg-stone-950 text-amber-500 font-serif">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
@@ -178,13 +178,6 @@ export default function MyCharacterClient() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-2xl w-full text-center space-y-12"
         >
-          <div className="relative inline-block">
-            <div className="absolute inset-0 bg-amber-500/10 blur-3xl rounded-full" />
-            <div className="relative bg-stone-900 border border-stone-800 p-8 rounded-full shadow-2xl">
-              <User className="w-16 h-16 text-amber-500 animate-pulse" />
-            </div>
-          </div>
-
           <div>
             <h1 className="text-4xl md:text-5xl font-serif text-amber-500 mb-4 drop-shadow-sm">
               Ative um Herói
@@ -193,6 +186,13 @@ export default function MyCharacterClient() {
               Para começar sua jornada e permitir que o Mestre veja sua ficha,
               você precisa ativar um herói na sua lista.
             </p>
+
+            <button
+              onClick={() => router.push("/herois?tab=meus-herois")}
+              className="mt-6 px-10 py-4 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded-xl transition-all shadow-lg hover:shadow-amber-500/20 active:scale-95 text-lg"
+            >
+              Ir para Meus Heróis
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -200,7 +200,7 @@ export default function MyCharacterClient() {
               {
                 step: "1",
                 title: "Acesse",
-                desc: "Vá para a lista de 'Meus Heróis'",
+                desc: "Vá para a lista de 'Coleção'",
               },
               {
                 step: "2",
@@ -252,13 +252,6 @@ export default function MyCharacterClient() {
               </p>
             </div>
           </div>
-
-          <button
-            onClick={() => router.push("/characters")}
-            className="px-10 py-4 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded-xl transition-all shadow-lg hover:shadow-amber-500/20 active:scale-95 text-lg"
-          >
-            Ir para Meus Heróis
-          </button>
         </motion.div>
       </div>
     );

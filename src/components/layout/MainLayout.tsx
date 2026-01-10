@@ -30,10 +30,6 @@ const primaryNavItems = [
     icon: Brain,
     mobileLabel: "Conhecer",
   },
-  { name: "Mestre", href: "/mestre", icon: ShieldAlert, mobileLabel: "Mestre" },
-];
-
-const secondaryNavItems = [
   {
     name: "Mercado",
     href: "/market",
@@ -41,9 +37,10 @@ const secondaryNavItems = [
     description: "Compre e venda equipamentos",
     color: "from-emerald-400 to-teal-600",
   },
+  { name: "Mestre", href: "/mestre", icon: ShieldAlert, mobileLabel: "Mestre" },
 ];
 
-const allNavItems = [...primaryNavItems, ...secondaryNavItems];
+const allNavItems = [...primaryNavItems];
 
 import UserMenu from "@/components/auth/UserMenu";
 
@@ -54,7 +51,7 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
-  const [showSecondaryMenu, setShowSecondaryMenu] = React.useState(false);
+  const [showDrawer, setShowDrawer] = React.useState(false);
 
   const mainRef = React.useRef<HTMLElement>(null);
 
@@ -64,112 +61,94 @@ export default function MainLayout({
     }
     // Close menus on route change
     setShowMobileMenu(false);
-    setShowSecondaryMenu(false);
+    setShowDrawer(false);
   }, [pathname]);
 
   return (
     <div className="flex h-screen w-full flex-col md:flex-row overflow-hidden bg-medieval-stone text-parchment-DEFAULT">
-      {/* Mobile Header */}
-      <header className="md:hidden flex items-center justify-between px-6 py-4 bg-medieval-stone/95 border-b border-medieval-iron/50 relative z-50 shrink-0 backdrop-blur-md">
+      {/* Mobile Header - Minimalist */}
+      <header className="md:hidden flex items-center justify-between px-6 py-4 bg-medieval-stone/95 border-b border-medieval-iron/50 relative z-[70] shrink-0 backdrop-blur-md">
         <div className="flex items-center gap-2">
-          <h1 className="font-serif text-2xl font-bold text-medieval-gold tracking-[0.15em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+          <h1 className="font-serif text-xl font-bold text-medieval-gold tracking-[0.1em]">
             RPG{" "}
             <span className="text-parchment-DEFAULT font-light">COUSINS</span>
           </h1>
         </div>
         <button
-          onClick={() => setShowMobileMenu(!showMobileMenu)}
-          className={cn(
-            "p-2 rounded-full transition-all duration-300",
-            showMobileMenu
-              ? "bg-medieval-gold text-black scale-110 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
-              : "text-medieval-gold border border-medieval-gold/30 bg-black/20"
-          )}
+          onClick={() => setShowDrawer(true)}
+          className="p-1.5 rounded-xl border border-medieval-gold/30 bg-black/20 text-medieval-gold active:scale-90 transition-transform"
         >
-          {showMobileMenu ? <X size={20} /> : <User size={20} />}
+          <Menu size={20} />
         </button>
       </header>
 
-      {/* Mobile Profile Dropdown (Legacy location, kept for logic but styled better) */}
+      {/* Mobile Side Drawer (For Profile & Secondary Links) */}
       <AnimatePresence>
-        {showMobileMenu && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="md:hidden absolute top-16 right-4 z-50 w-72 bg-medieval-stone/98 border border-medieval-gold/20 shadow-2xl rounded-2xl overflow-hidden p-2 backdrop-blur-xl"
-          >
-            <UserMenu />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Secondary Menu (Grid of Items) */}
-      <AnimatePresence>
-        {showSecondaryMenu && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="md:hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex flex-col p-6"
-          >
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-serif font-bold text-medieval-gold tracking-widest">
-                MENU PRINCIPAL
-              </h2>
-              <button
-                onClick={() => setShowSecondaryMenu(false)}
-                className="p-3 rounded-full bg-white/5 text-medieval-gold border border-medieval-gold/20"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {secondaryNavItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="relative group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 flex flex-col gap-3 transition-all active:scale-95"
-                  onClick={() => setShowSecondaryMenu(false)}
+        {showDrawer && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowDrawer(false)}
+              className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[80]"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="md:hidden fixed right-0 top-0 bottom-0 w-[85%] max-w-sm bg-medieval-stone z-[90] border-l border-medieval-gold/20 flex flex-col shadow-2xl"
+            >
+              <div className="p-6 border-b border-medieval-iron/50 flex justify-between items-center">
+                <span className="font-serif text-lg font-bold text-medieval-gold uppercase tracking-widest">
+                  Painel
+                </span>
+                <button
+                  onClick={() => setShowDrawer(false)}
+                  className="p-2 text-parchment-dark"
                 >
-                  <div
-                    className={cn(
-                      "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-lg",
-                      item.color
-                    )}
-                  >
-                    <item.icon size={24} className="text-white" />
-                  </div>
-                  <div>
-                    <span className="block font-serif text-lg font-bold text-parchment-DEFAULT leading-tight">
-                      {item.name}
-                    </span>
-                    <span className="block text-[10px] text-parchment-dark/70 font-sans uppercase tracking-tighter mt-1">
-                      {item.description}
-                    </span>
-                  </div>
-                  <div className="absolute top-0 right-0 p-2 opacity-5">
-                    <item.icon size={64} />
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  <X size={24} />
+                </button>
+              </div>
 
-            <div className="mt-auto grid grid-cols-2 gap-2 pb-12">
-              {primaryNavItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/5 text-parchment-light transition-all active:scale-95"
-                  onClick={() => setShowSecondaryMenu(false)}
-                >
-                  <item.icon size={18} className="text-medieval-gold/60" />
-                  <span className="font-serif text-sm">{item.name}</span>
-                </Link>
-              ))}
-            </div>
-          </motion.div>
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                {/* User Info Section */}
+                <div className="bg-black/20 rounded-2xl p-4 border border-medieval-gold/10">
+                  <UserMenu />
+                </div>
+
+                {/* Primary Copy for Drawer (Accessibility) */}
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-sans font-black uppercase tracking-[0.3em] text-parchment-dark/50 px-2">
+                    Navegação
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {primaryNavItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setShowDrawer(false)}
+                        className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/5 text-parchment-DEFAULT text-sm font-serif"
+                      >
+                        <item.icon
+                          size={16}
+                          className="text-medieval-gold/60"
+                        />
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 border-t border-medieval-iron/30 text-center">
+                <span className="text-[10px] text-parchment-dark/40 uppercase tracking-widest">
+                  RPG Cousins v2.0
+                </span>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
@@ -236,90 +215,12 @@ export default function MainLayout({
         id="main-scroll-container"
         ref={mainRef}
         className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gradient-to-br from-medieval-stone to-[#12100e]"
-        onClick={() => setShowMobileMenu(false)}
       >
         {/* Background Texture Overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] mix-blend-overlay"></div>
 
-        <div className="relative z-10 pb-24 md:pb-0 min-h-full w-full mx-auto">
-          {children}
-        </div>
+        <div className="relative z-10 md:pb-0 w-full mx-auto">{children}</div>
       </main>
-
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-5 left-4 right-4 h-20 rounded-3xl border border-white/10 bg-[#0c0a09]/95 backdrop-blur-2xl flex justify-between items-center z-50 px-2 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
-        <div className="flex w-full justify-around items-center h-full">
-          {primaryNavItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex flex-col items-center justify-center flex-1 h-full relative group transition-all"
-              >
-                <div
-                  className={cn(
-                    "flex flex-col items-center gap-1 p-2 transition-all duration-300",
-                    isActive ? "text-medieval-gold" : "text-parchment-dark/70"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "p-2 rounded-2xl mb-0.5 relative transition-all duration-500 shrink-0",
-                      isActive && "bg-medieval-gold/10 scale-110"
-                    )}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="mobile-indicator-glow"
-                        className="absolute inset-0 rounded-2xl bg-medieval-gold/20 blur-md"
-                      />
-                    )}
-                    <item.icon
-                      className={cn(
-                        "relative z-10",
-                        item.name === "Conhecer" ? "h-7 w-7" : "h-6 w-6"
-                      )}
-                      strokeWidth={isActive ? 2.5 : 1.5}
-                    />
-                  </div>
-                  <span
-                    className={cn(
-                      "text-[9px] font-serif uppercase tracking-widest font-black transition-all",
-                      isActive
-                        ? "opacity-100 scale-100"
-                        : "opacity-0 scale-75 h-0 overflow-hidden"
-                    )}
-                  >
-                    {item.mobileLabel}
-                  </span>
-                </div>
-                {isActive && (
-                  <motion.div
-                    layoutId="mobile-active-bar"
-                    className="absolute bottom-1 w-1 h-1 bg-medieval-gold rounded-full shadow-[0_0_8px_rgba(245,158,11,1)]"
-                  />
-                )}
-              </Link>
-            );
-          })}
-
-          {/* More Menu Trigger */}
-          <button
-            onClick={() => setShowSecondaryMenu(true)}
-            className="flex flex-col items-center justify-center flex-1 h-full relative group"
-          >
-            <div className="text-parchment-dark/70 p-2 flex flex-col items-center gap-1">
-              <div className="p-2">
-                <LayoutGrid className="h-6 w-6" strokeWidth={1.5} />
-              </div>
-              <span className="text-[9px] font-serif uppercase tracking-widest font-black opacity-0 h-0 overflow-hidden">
-                MAIS
-              </span>
-            </div>
-          </button>
-        </div>
-      </nav>
     </div>
   );
 }

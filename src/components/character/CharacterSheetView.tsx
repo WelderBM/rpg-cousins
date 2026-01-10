@@ -387,7 +387,7 @@ export function CharacterSheetView({
               <div className="flex-1 text-center md:text-left space-y-2 relative z-20">
                 <div className="flex items-center justify-center md:justify-start gap-4">
                   <h1
-                    className="text-4xl md:text-5xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 drop-shadow-sm cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-3 group/name"
+                    className="text-3xl md:text-5xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 drop-shadow-sm cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-3 group/name"
                     onClick={() => setIsEditingTraits(true)}
                   >
                     {activeCharacter.name}
@@ -436,35 +436,35 @@ export function CharacterSheetView({
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2 justify-center md:justify-start items-center text-sm text-stone-100 font-serif">
-                  <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30">
-                    <Dna size={14} className="text-amber-500" />
+                  <span className="flex items-center gap-1.5 px-2 md:px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30 text-[10px] md:text-sm">
+                    <Dna size={12} className="text-amber-500" />
                     {activeCharacter.race?.name}
                   </span>
-                  <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30">
-                    <Swords size={14} className="text-amber-500" />
+                  <span className="flex items-center gap-1.5 px-2 md:px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30 text-[10px] md:text-sm">
+                    <Swords size={12} className="text-amber-500" />
                     {activeCharacter.class?.name}
                   </span>
                   {activeCharacter.origin && (
-                    <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30">
-                      <BookOpen size={14} className="text-amber-500" />
+                    <span className="flex items-center gap-1.5 px-2 md:px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30 text-[10px] md:text-sm">
+                      <BookOpen size={12} className="text-amber-500" />
                       {activeCharacter.origin.name}
                     </span>
                   )}
                   {activeCharacter.deity && (
                     <>
                       <span
-                        className="flex items-center gap-1.5 px-3 py-1 bg-cyan-900/10 rounded-lg border border-cyan-900/30 text-cyan-100"
+                        className="flex items-center gap-1.5 px-2 md:px-3 py-1 bg-cyan-900/10 rounded-lg border border-cyan-900/30 text-cyan-100 text-[10px] md:text-sm"
                         title={`Símbolo: ${activeCharacter.deity.simboloSagrado}`}
                       >
-                        <Star size={14} className="text-cyan-500" />
+                        <Star size={12} className="text-cyan-500" />
                         {activeCharacter.deity.name}
                       </span>
                       {activeCharacter.deity.canalizacaoEnergia && (
                         <span
-                          className="flex items-center gap-1.5 px-3 py-1 bg-purple-900/10 rounded-lg border border-purple-900/30 text-purple-100"
+                          className="flex items-center gap-1.5 px-2 md:px-3 py-1 bg-purple-900/10 rounded-lg border border-purple-900/30 text-purple-100 text-[10px] md:text-sm"
                           title="Canalização de Energia"
                         >
-                          <Zap size={14} className="text-purple-500" />
+                          <Zap size={12} className="text-purple-500" />
                           {activeCharacter.deity.canalizacaoEnergia}
                         </span>
                       )}
@@ -592,12 +592,12 @@ export function CharacterSheetView({
                         key={attr.key}
                         className={`bg-black/60 backdrop-blur-sm border ${
                           bonus > 0 ? "border-amber-500/40" : "border-white/10"
-                        } rounded-2xl p-4 flex flex-col items-center group transition-all`}
+                        } rounded-2xl p-3 md:p-4 flex flex-col items-center group transition-all`}
                       >
-                        <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">
+                        <span className="text-[8px] md:text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1 text-center">
                           {attr.label}
                         </span>
-                        <div className="text-3xl font-black text-stone-100 tabular-nums">
+                        <div className="text-2xl md:text-3xl font-black text-stone-100 tabular-nums">
                           {mod >= 0 ? `+${mod}` : mod}
                         </div>
                       </div>

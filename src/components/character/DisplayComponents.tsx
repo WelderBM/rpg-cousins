@@ -140,9 +140,9 @@ export const ItemList = ({ title, items, icon: Icon }: any) => {
             className="bg-stone-900/95 backdrop-blur-sm border border-stone-800/70 rounded-lg p-4 hover:border-amber-500/30 transition-all shadow-xl"
           >
             <div className="flex justify-between items-start mb-2">
-              <h4 className="font-bold text-stone-100 text-sm flex items-center gap-2 flex-1">
+              <h4 className="font-bold text-stone-100 text-xs md:text-sm flex items-center gap-2 flex-1">
                 <span className="text-amber-500/60">
-                  {getItemSymbol(item, 16)}
+                  {getItemSymbol(item, 14)}
                 </span>
                 {item.name || item.nome}
               </h4>
@@ -294,10 +294,10 @@ export const SimpleList = ({
                 <div className="mt-2.5 min-w-[6px] h-[6px] bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)] shrink-0" />
               )}
               <div className="flex-1">
-                <span className="font-cinzel font-bold block text-amber-100 text-lg mb-1 flex items-center gap-2">
+                <span className="font-cinzel font-bold block text-amber-100 text-base md:text-lg mb-1 flex items-center gap-2">
                   {name}
                   {isHighlighted && HighlightIcon && (
-                    <HighlightIcon size={14} className="text-amber-500" />
+                    <HighlightIcon size={12} className="text-amber-500" />
                   )}
                 </span>
                 {desc && (
@@ -346,7 +346,7 @@ export const SectionSlider = ({ title, items, icon: Icon }: any) => {
               key={idx}
               className="min-w-[300px] md:min-w-[350px] bg-gradient-to-br from-stone-900 to-stone-950 border border-stone-800 rounded-xl p-6 snap-start shadow-2xl hover:border-amber-900/50 transition-all flex flex-col border-white/5"
             >
-              <span className="font-serif font-bold text-amber-500 text-xl mb-4 block border-b border-white/5 pb-2">
+              <span className="font-serif font-bold text-amber-500 text-lg md:text-xl mb-4 block border-b border-white/5 pb-2">
                 {name}
               </span>
               {desc && (

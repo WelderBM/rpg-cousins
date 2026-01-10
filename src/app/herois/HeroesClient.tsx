@@ -37,29 +37,26 @@ export default function HeroesClient() {
   const tabs = [
     {
       id: "meu-heroi" as TabType,
-      label: "Meu Herói",
+      label: "Ficha ativa",
       icon: User,
-      description: "Ficha ativa",
       color: "amber",
     },
     {
       id: "meus-herois" as TabType,
-      label: "Meus Heróis",
+      label: "Coleção",
       icon: Users,
-      description: "Sua coleção",
       color: "blue",
     },
     {
       id: "novo-heroi" as TabType,
-      label: "Novo Herói",
+      label: "Criar",
       icon: Wand2,
-      description: "Criar lenda",
       color: "orange",
     },
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-medieval-stone/30">
+    <div className="flex flex-col bg-medieval-stone/30">
       {/* Tabs Header */}
       <div className="sticky top-0 z-40 bg-medieval-stone/95 backdrop-blur-xl border-b border-medieval-iron/30 px-4 pt-4 shadow-xl">
         <div className="container mx-auto max-w-6xl">
@@ -77,7 +74,7 @@ export default function HeroesClient() {
             </div>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-0">
+          <div className="flex gap-2 overflow-x-hidden no-scrollbar pb-0">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               const Icon = tab.icon;
@@ -109,9 +106,6 @@ export default function HeroesClient() {
                       )}
                     >
                       {tab.label}
-                    </span>
-                    <span className="block text-[9px] uppercase tracking-tighter opacity-50 font-bold">
-                      {tab.description}
                     </span>
                   </div>
 

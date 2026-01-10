@@ -19,6 +19,7 @@ import { WikiControls } from "./components/WikiControls";
 import { WikiGrid } from "./components/WikiGrid";
 import { WikiDetailDrawer } from "./components/WikiDetailDrawer";
 import { FloatingBackButton } from "@/components/FloatingBackButton";
+import { cn } from "@/lib/utils";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -36,7 +37,11 @@ export default function WikiPage() {
   );
 }
 
-export function WikiContent() {
+interface WikiContentProps {
+  isEmbedded?: boolean;
+}
+
+export function WikiContent({ isEmbedded = false }: WikiContentProps) {
   const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<Category>("magias");
   const [searchQuery, setSearchQuery] = useState("");
@@ -348,24 +353,42 @@ export function WikiContent() {
   };
 
   return (
-    <div className="h-full bg-stone-950 text-neutral-200 font-sans selection:bg-amber-500/30">
-      <FloatingBackButton />
-      <div className="flex flex-col md:flex-row h-full overflow-hidden">
+    <div
+      className={cn(
+        "h-full text-neutral-200 font-sans selection:bg-amber-500/30",
+        isEmbedded ? "bg-transparent" : "bg-stone-950"
+      )}
+    >
+      {!isEmbedded && <FloatingBackButton />}
+      <div
+        className={cn(
+          "flex flex-col md:flex-row",
+          isEmbedded ? "" : "h-full overflow-hidden"
+        )}
+      >
         {/* Desktop Sidebar (hidden on mobile) */}
-        <WikiSidebar
-          activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory}
-        />
+        {!isEmbedded && (
+          <WikiSidebar
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+          />
+        )}
 
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col overflow-y-auto custom-scrollbar relative">
+        <main
+          className={cn(
+            "flex-1 flex flex-col relative",
+            isEmbedded ? "" : "overflow-y-auto custom-scrollbar"
+          )}
+        >
           {/* Mobile Top Bar */}
-          <WikiMobileTopBar />
+          {!isEmbedded && <WikiMobileTopBar />}
 
           {/* Mobile Category Nav (Sticky below top bar) */}
           <WikiCategoryNav
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
+            isEmbedded={isEmbedded}
           />
 
           {/* Search & Filters */}
@@ -397,6 +420,7 @@ export function WikiContent() {
             powerType={powerType}
             setPowerType={setPowerType}
             resetFilters={resetFilters}
+            isEmbedded={isEmbedded}
           />
 
           {/* Grid Layout */}

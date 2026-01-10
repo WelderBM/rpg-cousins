@@ -341,22 +341,17 @@ const SummarySelection = () => {
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-neutral-100 pb-48 md:pb-40">
-      <div className="max-w-7xl mx-auto p-4 sm:p-8">
-        <div className="relative border-2 border-amber-900/20 rounded-3xl overflow-hidden bg-stone-950/50 shadow-2xl mb-20 min-h-[600px]">
-          <div className="absolute top-4 left-4 z-[100] flex gap-2">
-            <button
-              onClick={() => setStep(4)}
-              className="p-3 bg-stone-900/80 backdrop-blur-md border border-white/10 rounded-xl text-neutral-400 hover:text-amber-500 transition-all flex items-center gap-2 text-sm font-bold shadow-lg"
-            >
-              <ChevronLeft size={18} /> Voltar
-            </button>
-            <div className="px-4 py-3 bg-amber-900/20 backdrop-blur-md border border-amber-500/20 rounded-xl text-amber-500 text-sm font-black uppercase tracking-widest shadow-lg">
-              Resumo Final
-            </div>
-          </div>
+    <div className="min-h-screen bg-stone-950 text-neutral-100 pb-32">
+      <div className="max-w-2xl mx-auto p-4 sm:p-8 space-y-8">
+        <div className="text-center space-y-2">
+          <h2 className="text-3xl font-cinzel text-amber-500">Resumo Final</h2>
+          <p className="text-xs text-stone-500 uppercase tracking-widest font-bold">
+            Revise sua ficha antes de começar a aventura
+          </p>
+        </div>
 
-          <div className="pt-20">
+        <div className="relative border border-white/5 rounded-2xl overflow-hidden bg-stone-900/20 backdrop-blur-md shadow-2xl">
+          <div className="p-4 md:p-6">
             <CharacterSheetView
               character={previewCharacter}
               onUpdate={async (updates) => {
@@ -367,35 +362,38 @@ const SummarySelection = () => {
           </div>
 
           {!name && (
-            <div className="absolute top-40 inset-x-0 mx-auto max-w-md z-[110] p-8 bg-stone-900/90 backdrop-blur-xl border border-amber-500/30 rounded-3xl shadow-2xl text-center space-y-4">
-              <h2 className="text-2xl font-cinzel text-amber-500">
-                Como seu herói se chama?
-              </h2>
-              <input
-                type="text"
-                autoFocus
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Valerius de Valkaria"
-                className="w-full bg-black/40 border-b-2 border-amber-500/50 p-3 text-2xl font-cinzel text-amber-100 focus:outline-none focus:border-amber-400 transition-colors text-center"
-              />
+            <div className="absolute inset-0 z-40 flex items-center justify-center p-6 bg-stone-950/90 backdrop-blur-xl">
+              <div className="max-w-xs w-full text-center space-y-6">
+                <h2 className="text-2xl font-cinzel text-amber-500">
+                  Qual o seu nome?
+                </h2>
+                <input
+                  type="text"
+                  autoFocus
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ex: Valerius"
+                  className="w-full bg-transparent border-b-2 border-amber-500/50 p-2 text-2xl font-cinzel text-amber-100 focus:outline-none focus:border-amber-400 transition-colors text-center"
+                />
+              </div>
             </div>
           )}
         </div>
 
-        <div className="fixed bottom-24 md:bottom-0 left-0 md:left-64 right-0 p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-30 border-t border-amber-900/10">
-          <div className="max-w-5xl mx-auto flex flex-col items-center gap-3">
+        {/* Action Footer */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-stone-950 via-stone-950 to-transparent backdrop-blur-md z-50">
+          <div className="max-w-2xl mx-auto flex flex-col items-center gap-3">
             {!user && (
-              <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3 flex items-center gap-3 max-w-lg w-full">
+              <div className="bg-red-900/20 border border-red-500/50 rounded-xl p-3 flex items-center gap-3 w-full backdrop-blur-sm">
                 <div className="p-2 bg-red-500/10 rounded-full text-red-400">
-                  <User size={20} />
+                  <User size={16} />
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm text-red-200 font-bold">
-                    Autenticação Necessária
+                <div className="flex-1 text-left">
+                  <p className="text-[10px] text-red-200 font-bold uppercase tracking-widest">
+                    Acesso Exigido
                   </p>
-                  <p className="text-xs text-red-300/70">
-                    Você precisa estar logado para salvar seu herói.
+                  <p className="text-[10px] text-red-300/70">
+                    Faça login para salvar permanentemente.
                   </p>
                 </div>
               </div>
@@ -403,13 +401,16 @@ const SummarySelection = () => {
             <button
               onClick={handleFinalize}
               disabled={!user || isFinalizing}
-              className="w-full py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-black font-black font-cinzel uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+              className="w-full py-4 bg-amber-600 hover:bg-amber-500 text-stone-950 font-black rounded-xl shadow-2xl active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-100 uppercase tracking-widest text-sm flex justify-center items-center gap-2"
             >
-              {isFinalizing
-                ? "Salvando..."
-                : user
-                ? "Finalizar Personagem"
-                : "Faça Login para Salvar"}
+              {isFinalizing ? (
+                "Forjando Destino..."
+              ) : (
+                <>
+                  <CheckCircle2 size={20} />
+                  <span>{user ? "Finalizar Herói" : "Faça Login"}</span>
+                </>
+              )}
             </button>
           </div>
         </div>

@@ -15,6 +15,7 @@ import {
 } from "../utils/attributeUtils";
 import { ClassDescription, ClassPower } from "../interfaces/Class";
 import Skill from "../interfaces/Skills";
+import { ArcanistaSubtypes } from "../data/classes/arcanista";
 
 export interface CharacterSummary {
   id: string;
@@ -45,6 +46,7 @@ interface CharacterWizardState {
       classSkills: Skill[];
       generalSkills: Skill[];
       classPowers: ClassPower[];
+      localWeapons: Equipment[];
       arcanistConfig: {
         subtype: ArcanistaSubtypes | null;
         lineage: string | null;
@@ -154,6 +156,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
           classSkills: [],
           generalSkills: [],
           classPowers: [],
+          localWeapons: [],
           arcanistConfig: { subtype: null, lineage: null, damageType: null },
         },
         origin: { previewName: null, localWeapons: [] },
@@ -468,6 +471,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
               classSkills: [],
               generalSkills: [],
               classPowers: [],
+              localWeapons: [],
               arcanistConfig: {
                 subtype: null,
                 lineage: null,

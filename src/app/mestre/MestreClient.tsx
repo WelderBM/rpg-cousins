@@ -497,88 +497,111 @@ export default function MestreClient() {
 
   const CurrentStepComponent = stepsConfig[step - 1].component;
 
-  return (
-    <div className="w-full mx-auto space-y-8 min-h-screen pb-20">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-medieval-iron/30 pb-6">
-        <div>
-          <h1 className="font-serif text-3xl font-bold text-medieval-gold flex items-center gap-3">
-            <ShieldAlert className="w-8 h-8" />
-            Ferramentas do Mestre
-          </h1>
-          <p className="text-parchment-dark mt-1">
-            Gerencie ameaças, balanceie encontros e crie monstros épicos.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 border border-medieval-blood/30 text-medieval-blood hover:bg-medieval-blood/10 rounded-lg text-sm transition-all"
-          >
-            Sair
-          </button>
-        </div>
-      </div>
+  // Dynamic Tabs Configuration
+  const tabs = [
+    {
+      id: "lista" as Tab,
+      label: "Grimório",
+      icon: List,
+      description: "Catálogo de Ameaças",
+    },
+    {
+      id: "herois" as Tab,
+      label: "Heróis",
+      icon: Crown,
+      description: "Monitoramento em Tempo Real",
+    },
+    {
+      id: "criador" as Tab,
+      label: editingId ? "Editando" : "Criar",
+      icon: editingId ? LayoutGrid : Plus,
+      description: editingId ? "Ajustando Ameaça" : "Nova Ficha de Ameaça",
+    },
+  ];
 
-      {/* Tabs */}
-      <div className="flex border-b border-medieval-iron/30">
-        <button
-          onClick={() => {
-            setActiveTab("lista");
-            setSelectedHero(null);
-          }}
-          className={`px-6 py-3 font-serif text-lg transition-all border-b-2 flex items-center gap-2 ${
-            activeTab === "lista"
-              ? "border-medieval-gold text-medieval-gold bg-medieval-gold/5"
-              : "border-transparent text-parchment-dark hover:text-parchment-light hover:bg-white/5"
-          }`}
-        >
-          <List className="w-5 h-5" />
-          Grimório de Monstros
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab("herois");
-            setSelectedHero(null);
-          }}
-          className={`px-6 py-3 font-serif text-lg transition-all border-b-2 flex items-center gap-2 ${
-            activeTab === "herois"
-              ? "border-medieval-gold text-medieval-gold bg-medieval-gold/5"
-              : "border-transparent text-parchment-dark hover:text-parchment-light hover:bg-white/5"
-          }`}
-        >
-          <Crown className="w-5 h-5" />
-          Heróis Ativos
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab("criador");
-            setSelectedHero(null);
-          }}
-          className={`px-6 py-3 font-serif text-lg transition-all border-b-2 flex items-center gap-2 ${
-            activeTab === "criador"
-              ? "border-medieval-gold text-medieval-gold bg-medieval-gold/5"
-              : "border-transparent text-parchment-dark hover:text-parchment-light hover:bg-white/5"
-          }`}
-        >
-          {editingId ? (
-            <LayoutGrid className="w-5 h-5" />
-          ) : (
-            <Plus className="w-5 h-5" />
-          )}
-          {editingId ? "Editando Monstros" : "Criar Monstro"}
-        </button>
+  return (
+    <div className="flex flex-col bg-medieval-stone/30 min-h-screen">
+      {/* Unified Header & Tabs */}
+      {/* Unified Header & Tabs */}
+      <div className="bg-medieval-stone/95 backdrop-blur-xl border-b border-medieval-iron/30 px-4 pt-4 shadow-xl sticky top-0 z-50">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-medieval-gold/10 rounded-2xl border border-medieval-gold/20">
+                <ShieldAlert className="w-6 h-6 text-medieval-gold" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-serif font-bold text-parchment-light tracking-wide">
+                  <span className="text-medieval-gold">Mestre</span>
+                </h1>
+                <p className="text-[10px] text-parchment-dark uppercase tracking-[0.2em] font-bold opacity-60">
+                  Gerenciamento de Campanha
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-stone-900/50 hover:bg-medieval-gold/20 text-parchment-dark hover:text-medieval-gold border border-white/10 hover:border-medieval-gold/30 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+            >
+              Sair
+            </button>
+          </div>
+
+          <div className="flex w-full gap-2 pb-0">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setSelectedHero(null);
+                  }}
+                  className={`group relative flex-1 flex items-center justify-center gap-2 px-2 py-4 transition-all duration-300 rounded-t-2xl border-t border-x ${
+                    isActive
+                      ? "bg-medieval-gold/10 border-medieval-gold/30 text-medieval-gold shadow-[0_-4px_20px_rgba(245,158,11,0.1)]"
+                      : "bg-transparent border-transparent text-parchment-dark hover:text-parchment-light"
+                  }`}
+                >
+                  <Icon
+                    className={`w-5 h-5 transition-transform duration-300 ${
+                      isActive ? "scale-110" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block text-sm font-serif font-bold tracking-wide leading-none ${
+                      isActive ? "text-medieval-gold" : "text-parchment-DEFAULT"
+                    }`}
+                  >
+                    {tab.label}
+                  </span>
+
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-tab-indicator-mestre"
+                      className="absolute bottom-0 left-0 right-0 h-1 bg-medieval-gold rounded-t-full shadow-[0_0_15px_rgba(245,158,11,0.5)]"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="min-h-[60vh] relative">
+      <div className="flex-1 container mx-auto max-w-6xl p-4 md:p-6 pb-32">
         <AnimatePresence mode="wait">
           {activeTab === "lista" ? (
             <motion.div
               key="lista"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
               className="space-y-6"
             >
               {/* Search and Filters */}
@@ -669,9 +692,9 @@ export default function MestreClient() {
           ) : activeTab === "herois" ? (
             <motion.div
               key="herois"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
               className="space-y-8"
             >
               {selectedHero ? (
@@ -814,9 +837,9 @@ export default function MestreClient() {
           ) : (
             <motion.div
               key="criador"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
               className="flex flex-col lg:flex-row gap-8"
             >
               {/* Creator Form Side */}

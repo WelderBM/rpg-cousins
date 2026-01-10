@@ -1,6 +1,7 @@
 import React from "react";
 import { Search, X, Filter, ChevronUp, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { CATEGORIES } from "../constants";
 import { Category } from "../types";
 
@@ -39,6 +40,7 @@ interface WikiControlsProps {
   setPowerType: (v: string | "all") => void;
 
   resetFilters: () => void;
+  isEmbedded?: boolean;
 }
 
 export function WikiControls(props: WikiControlsProps) {
@@ -70,6 +72,7 @@ export function WikiControls(props: WikiControlsProps) {
     powerType,
     setPowerType,
     resetFilters,
+    isEmbedded = false,
   } = props;
 
   const isAnyFilterActive =
@@ -85,7 +88,14 @@ export function WikiControls(props: WikiControlsProps) {
     maxPrice !== "";
 
   return (
-    <header className="p-4 md:p-8 bg-gradient-to-b from-stone-900/50 to-transparent md:sticky md:top-0 z-40 backdrop-blur-sm">
+    <header
+      className={cn(
+        "bg-gradient-to-b from-stone-900/50 to-transparent z-40 backdrop-blur-sm transition-all duration-300",
+        isEmbedded
+          ? "sticky top-[48px] p-3 pt-1"
+          : "p-4 md:p-8 md:sticky md:top-0"
+      )}
+    >
       <div className="max-w-5xl mx-auto flex flex-col gap-4 md:gap-6">
         {/* Search Bar */}
         <div className="relative group">
