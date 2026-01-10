@@ -8,8 +8,19 @@
 }
 
 @layer base {
+  html {
+    @apply antialiased;
+    font-size: 16px;
+  }
+
+  @media (max-width: 640px) {
+    html {
+      font-size: 13px; /* Considerably smaller base for mobile */
+    }
+  }
+
   body {
-    @apply bg-stone-950 text-parchment-light font-sans;
+    @apply bg-stone-950 text-parchment-light font-sans text-base;
   }
   h1,
   h2,
@@ -44,17 +55,14 @@
   }
 
   /* Custom Scrollbar */
+  /* Hide Scrollbar Globally */
+  * {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-stone-900;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-amber-700/80 rounded-full hover:bg-amber-600;
+    display: none;
   }
 
   .scrollbar-none::-webkit-scrollbar {
