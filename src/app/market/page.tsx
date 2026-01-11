@@ -1592,15 +1592,15 @@ const MarketPage = () => {
                     <div className="p-2 bg-amber-900/20 rounded-lg text-amber-500">
                       <User size={20} />
                     </div>
-                    <Link href="/herois?tab=meu-heroi" className="block">
-                      <h2 className="text-sm font-bold text-neutral-300 line-clamp-1 hover:text-amber-500 transition-colors">
+                    <div>
+                      <h2 className="text-sm font-bold text-neutral-300 line-clamp-1">
                         {activeCharacter?.name}
                       </h2>
                       <p className="text-xs text-neutral-500">
                         {activeCharacter?.race?.name} • Nvl{" "}
                         {activeCharacter?.level || 1}
                       </p>
-                    </Link>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
