@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import MestreClient from "./MestreClient";
 
+// Force dynamic rendering since this page requires authentication
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Mestre | RPG Cousins",
   description: "Área do mestre para gerenciamento de monstros e campanhas.",
