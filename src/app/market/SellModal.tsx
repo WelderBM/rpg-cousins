@@ -8,6 +8,7 @@ import {
   Coins,
   Package,
   ArrowRight,
+  Dice6,
 } from "lucide-react";
 import Equipment from "../../interfaces/Equipment";
 import { Character } from "../../interfaces/Character";
@@ -182,7 +183,7 @@ export const SellModal: React.FC<SellModalProps> = ({
             {/* Bargaining / Diplomacy Section */}
             <div className="space-y-3">
               <label className="text-xs uppercase font-bold text-stone-500 flex items-center gap-2">
-                <Dices size={12} className="text-amber-500" /> Negociação
+                <Dice6 size={12} className="text-amber-500" /> Negociação
                 (Diplomacia)
               </label>
               <div className="grid grid-cols-1 gap-2">

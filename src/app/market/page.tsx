@@ -30,7 +30,7 @@ import {
   Backpack,
   Apple,
   Crosshair,
-  Dices,
+  Dice6,
   Sparkles,
   Star,
 } from "lucide-react";
@@ -455,7 +455,7 @@ const ItemCard = ({
                           <span>{part}</span>
                         ) : (
                           <span className="flex items-center gap-0.5">
-                            <Dices size={8} className="text-amber-500/60" />
+                            <Dice6 size={8} className="text-amber-500/60" />
                             {part}
                           </span>
                         )}
@@ -591,7 +591,7 @@ const InventoryItemCard = ({ item, onSell, onAdd, activeCharacter }: any) => {
                           <span>{part}</span>
                         ) : (
                           <span className="flex items-center gap-0.5">
-                            <Dices size={8} className="text-amber-500/60" />
+                            <Dice6 size={8} className="text-amber-500/60" />
                             {part}
                           </span>
                         )}
