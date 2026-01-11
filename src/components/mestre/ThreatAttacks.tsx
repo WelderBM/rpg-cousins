@@ -1,7 +1,7 @@
 import React from "react";
 import { ThreatSheet, ThreatAttack } from "@/interfaces/ThreatSheet";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Sword, Dices } from "lucide-react";
+import { Plus, Trash2, Sword, Dice6 } from "lucide-react";
 import {
   calculateDiceAverage,
   validateDiceString,
@@ -135,7 +135,7 @@ export const ThreatAttacks: React.FC<Props> = ({ formData, setFormData }) => {
 
               <div className="md:col-span-3 space-y-1">
                 <label className="text-[10px] font-bold text-parchment-dark uppercase tracking-widest flex items-center gap-1">
-                  <Dices size={10} /> Dados
+                  <Dice6 size={10} /> Dados
                 </label>
                 <input
                   type="text"

@@ -33,7 +33,7 @@ import {
   Download,
   Search,
   MapPin,
-  Dices,
+  Dice6,
   Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
