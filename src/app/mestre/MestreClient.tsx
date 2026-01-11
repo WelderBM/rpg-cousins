@@ -56,9 +56,9 @@ export default function MestreClient() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Initialize from URL or defaults
-  const initialTab = (searchParams.get("tab") as Tab) || "lista";
-  const initialStep = parseInt(searchParams.get("step") || "1");
+  // Initialize from URL or defaults - safely handle null searchParams during build
+  const initialTab = (searchParams?.get("tab") as Tab) || "lista";
+  const initialStep = parseInt(searchParams?.get("step") || "1");
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
@@ -73,9 +73,25 @@ export default function MestreClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedHero, setSelectedHero] = useState<Character | null>(null);
 
+  // Read URL params on mount (client-side only)
+  useEffect(() => {
+    if (typeof window === "undefined" || !searchParams) return;
+
+    const urlTab = searchParams.get("tab") as Tab;
+    const urlStep = searchParams.get("step");
+
+    if (urlTab) setActiveTab(urlTab);
+    if (urlStep) {
+      const parsedStep = parseInt(urlStep);
+      if (!isNaN(parsedStep)) setStep(parsedStep);
+    }
+  }, []); // Run once on mount
+
   // Sync URL with Tab and Step changes
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
 
     // Update Tab
     if (activeTab) {
@@ -92,8 +108,9 @@ export default function MestreClient() {
     }
 
     // Replace URL without reload
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [activeTab, step, pathname, router]); // Intentionally omitting searchParams to avoid loop
+    const newUrl = params.toString() ? `?${params.toString()}` : pathname;
+    window.history.replaceState({}, "", newUrl);
+  }, [activeTab, step, pathname]); // Removed router and searchParams from deps
 
   // Real-time synchronization for active heroes
   useEffect(() => {
