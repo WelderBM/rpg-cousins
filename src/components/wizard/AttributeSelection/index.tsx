@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCharacterStore } from "../../../store/useCharacterStore";
 import { Atributo } from "../../../data/atributos";
@@ -156,10 +162,13 @@ const AttributeSelection = () => {
     [baseAttributes, updateBaseAttribute]
   );
 
-  const canProceed = useMemo(() => {
-    const allFlexDefined = flexibleBonuses.every(
+  const allFlexDefined = useMemo(() => {
+    return flexibleBonuses.every(
       (bonus) => flexibleAttributeChoices[bonus.index]
     );
+  }, [flexibleBonuses, flexibleAttributeChoices]);
+
+  const canProceed = useMemo(() => {
     if (!allFlexDefined) return false;
 
     const selectedValues = Object.values(flexibleAttributeChoices);
@@ -168,7 +177,30 @@ const AttributeSelection = () => {
     if (!flexUnique) return false;
 
     return pointsRemaining === 0;
-  }, [flexibleBonuses, flexibleAttributeChoices, pointsRemaining]);
+  }, [
+    allFlexDefined,
+    flexibleBonuses,
+    flexibleAttributeChoices,
+    pointsRemaining,
+  ]);
+
+  // --- AUTO-SCROLL LOGIC ---
+  const flexRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const prevFlexComplete = useRef(false);
+
+  useEffect(() => {
+    if (flexibleBonuses.length === 0) return;
+
+    const currentFlexComplete = allFlexDefined;
+    const prev = prevFlexComplete.current;
+
+    if (!prev && currentFlexComplete) {
+      gridRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    prevFlexComplete.current = currentFlexComplete;
+  }, [allFlexDefined, flexibleBonuses.length]);
 
   return (
     <div className="min-h-screen bg-stone-950 text-neutral-100 pb-32">
@@ -179,14 +211,22 @@ const AttributeSelection = () => {
       </AnimatePresence>
 
       <div className="relative max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
-        {/* Header Compacto */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1">
-            <h1 className="text-xl md:text-3xl font-cinzel text-amber-500">
-              Atributos
-            </h1>
-            <div className="mt-1">
-              <BuildArchetypeBadge attributes={finalAttributes} />
+        {/* Header Compacto - Sticky */}
+        <div className="sticky top-0 z-40  bg-stone-950/90 backdrop-blur-xl border-b border-white/5 pb-4 pt-4 -mx-6 px-6 mb-6 flex items-center justify-between gap-4 shadow-lg">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setStep(1)}
+              className="p-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-400 hover:text-white hover:border-amber-500 transition-all active:scale-95"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div>
+              <h1 className="text-xl md:text-3xl font-cinzel text-amber-500 leading-none">
+                Atributos
+              </h1>
+              <div className="mt-1">
+                <BuildArchetypeBadge attributes={finalAttributes} />
+              </div>
             </div>
           </div>
 
@@ -221,6 +261,7 @@ const AttributeSelection = () => {
         {/* Flexible Bonuses - Refined */}
         {flexibleBonuses.length > 0 && (
           <motion.div
+            ref={flexRef}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-4 space-y-4"
@@ -274,7 +315,10 @@ const AttributeSelection = () => {
         <ImpactPanel finalAttributes={finalAttributes} />
 
         {/* Attribute Grid - Forced 1 col on mobile, 2 on tablet */}
-        <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-4">
+        <div
+          ref={gridRef}
+          className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-4"
+        >
           {ATTRIBUTES_LIST.map((attr) => (
             <AttributeCard
               key={attr}
@@ -294,9 +338,9 @@ const AttributeSelection = () => {
             <button
               onClick={() => setStep(3)}
               disabled={!canProceed}
-              className={`w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-95 ${
+              className={`w-full py-4 font-black rounded-xl shadow-2xl transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm active:scale-95 ${
                 canProceed
-                  ? "bg-amber-600 text-stone-950"
+                  ? "bg-amber-600 hover:bg-amber-500 text-stone-950 shadow-amber-900/20 group"
                   : "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700 opacity-50 grayscale"
               }`}
             >

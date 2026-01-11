@@ -113,8 +113,7 @@ const getItemSymbol = (item: any) => {
 
 // Helper to get small category icons for filters
 const getCategoryIcon = (groupName: string, size = 12) => {
-  const n = groupName.toLowerCase();
-  const group = groupName.toLowerCase(); // Ensure 'group' variable is defined from groupName
+  const group = groupName.toLowerCase();
   if (
     group.includes("defesa") ||
     group.includes("proteção") ||
@@ -129,11 +128,11 @@ const getCategoryIcon = (groupName: string, size = 12) => {
   )
     return <Sword size={size} />;
   if (
-    group.includes("alquimia") ||
+    group.includes("alquimía") ||
     group.includes("poção") ||
     group.includes("elixir") ||
     group.includes("mágico") ||
-    n.includes("mana")
+    group.includes("mana")
   )
     return <FlaskRound size={size} />;
   if (
@@ -155,49 +154,52 @@ const getCategoryIcon = (groupName: string, size = 12) => {
     group.includes("bebida") ||
     group.includes("alimentação") ||
     group.includes("taverna") ||
-    n.includes("refeição")
+    group.includes("refeição")
   )
     return <Apple size={size} />;
   if (
     group.includes("ferramenta") ||
     group.includes("ofício") ||
     group.includes("trabalho") ||
-    n.includes("instrumento") ||
-    n.includes("kit")
+    group.includes("instrumento") ||
+    group.includes("kit")
   )
     return <Hammer size={size} />;
   if (
     group.includes("mochila") ||
     group.includes("saco") ||
     group.includes("transporte") ||
-    n.includes("carga")
+    group.includes("carga")
   )
     return <Backpack size={size} />;
 
   // Damage types
-  if (n.includes("corte") || n.includes("perfuração"))
+  if (group.includes("corte") || group.includes("perfuração"))
     return <Sword size={size} />;
-  if (n.includes("impacto")) return <Hammer size={size} />;
+  if (group.includes("impacto")) return <Hammer size={size} />;
 
   return null;
 };
 
-// Re-designed compact Item Card
-const ItemCard = ({
+// --- ITEM DETAIL SIDEBAR ---
+const ItemDetailSidebar = ({
   item,
-  isInBag,
-  isSuccess,
-  canAfford,
+  onClose,
   onBuy,
   activeCharacter,
+  bagItems,
 }: any) => {
+  if (!item) return null;
+
+  const isInBag = bagItems?.some((i: any) => i.nome === item.nome);
+  const canAfford = (activeCharacter?.money || 0) >= (item.preco || 0);
+
   // Function to create intelligent Google search query
   const handleGoogleSearch = () => {
     const itemName = item.nome;
-    const category = item.subGroup || item.group;
 
     // Build intelligent search query targeted for RPG/Fantasy images
-    const searchQuery = `"${itemName}" medieval fantasy`;
+    const searchQuery = `"${itemName}" rpg fantasy item art`;
     const encodedQuery = encodeURIComponent(searchQuery);
     // Use tbm=isch for Image Search
     const googleUrl = `https://www.google.com/search?tbm=isch&q=${encodedQuery}`;
@@ -207,17 +209,211 @@ const ItemCard = ({
   };
 
   return (
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
+      />
+      <motion.div
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#0a0a0a] border-l border-white/5 z-50 shadow-2xl overflow-y-auto custom-scrollbar flex flex-col font-sans"
+      >
+        {/* Header Buttons */}
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
+          <button
+            onClick={() => {
+              onClose();
+              window.history.back();
+            }}
+            className="p-2 text-neutral-500 hover:text-white transition-colors flex items-center gap-2"
+            title="Voltar"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <button
+            onClick={onClose}
+            className="p-2 text-neutral-500 hover:text-white transition-colors"
+            title="Fechar"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 flex flex-col p-6 pt-20">
+          {/* Header with Icon */}
+          <div className="flex flex-col items-center mb-8 relative">
+            {/* Glow effect behind icon */}
+            <div className="absolute top-0 w-32 h-32 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none" />
+
+            <div className="relative w-24 h-24 mb-6 flex items-center justify-center rounded-2xl bg-[#0c0c0c] border border-amber-500/30 shadow-[0_0_20px_-5px_rgba(245,158,11,0.2)]">
+              {React.cloneElement(getItemSymbol(item), {
+                size: 40,
+                className: "text-amber-500",
+              })}
+            </div>
+
+            <h2 className="text-3xl font-cinzel font-bold text-white mb-3 text-center tracking-wide">
+              {item.nome}
+            </h2>
+
+            {/* Tags Row */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+              <span className="px-3 py-1.5 rounded-lg bg-[#141414] border border-white/10 text-[10px] text-neutral-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                {getCategoryIcon(item.subGroup || item.group, 12)}
+                {item.subGroup || item.group}
+              </span>
+              {item.spaces > 0 && (
+                <span className="px-3 py-1.5 rounded-lg bg-[#141414] border border-white/10 text-[10px] text-neutral-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                  <Package size={12} /> {item.spaces} espaços
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Description Card */}
+          <div className="bg-[#111] rounded-2xl p-5 border border-white/5 mb-6">
+            <h3 className="text-xs font-bold text-neutral-500 uppercase mb-3 flex items-center gap-2 tracking-widest">
+              <Scroll size={14} /> Descrição
+            </h3>
+            <p className="text-neutral-300 text-sm leading-relaxed italic border-l-2 border-white/10 pl-3 mb-6">
+              {item.descricao ||
+                item.description ||
+                "Nenhuma descrição detalhada disponível para este item."}
+            </p>
+
+            {/* Image Search Button */}
+            <button
+              onClick={handleGoogleSearch}
+              className="w-full py-3 rounded-xl bg-blue-900/10 hover:bg-blue-900/20 border border-blue-500/20 hover:border-blue-500/40 text-blue-400 text-sm font-bold transition-all flex items-center justify-center gap-2"
+            >
+              <Search size={16} />
+              Pesquisar Visual
+            </button>
+          </div>
+
+          {/* Price Bar */}
+          <div className="bg-[#050505] rounded-2xl px-6 py-4 border border-white/5 flex items-center justify-between mb-8">
+            <span className="text-xs font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-2">
+              <Coins size={14} /> Preço
+            </span>
+            <span
+              className={`font-cinzel font-bold text-xl ${
+                item.preco ? "text-amber-500" : "text-emerald-500"
+              }`}
+            >
+              {item.preco ? `${item.preco} T$` : "Grátis"}
+            </span>
+          </div>
+
+          {/* Additional Stats (Damage, Def, etc) if available - showing subtly below price */}
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            {item.dano && (
+              <div className="flex flex-col items-center p-3 rounded-xl bg-[#111] border border-white/5">
+                <span className="text-[10px] uppercase text-neutral-500 font-bold mb-1">
+                  Dano
+                </span>
+                <span className="text-white font-bold">{item.dano}</span>
+              </div>
+            )}
+            {item.critico && item.critico !== "-" && (
+              <div className="flex flex-col items-center p-3 rounded-xl bg-[#111] border border-white/5">
+                <span className="text-[10px] uppercase text-neutral-500 font-bold mb-1">
+                  Crítico
+                </span>
+                <span className="text-white font-bold">{item.critico}</span>
+              </div>
+            )}
+            {((item.defenseBonus !== undefined && item.defenseBonus > 0) ||
+              (item.armorPenalty !== undefined && item.armorPenalty > 0)) && (
+              <div className="col-span-2 flex flex-col items-center p-3 rounded-xl bg-[#111] border border-white/5">
+                <span className="text-[10px] uppercase text-neutral-500 font-bold mb-2">
+                  Defesa & Penalidade
+                </span>
+                <div className="flex gap-4">
+                  {item.defenseBonus > 0 && (
+                    <span className="text-blue-400 font-bold">
+                      +{item.defenseBonus} Defesa
+                    </span>
+                  )}
+                  {item.armorPenalty > 0 && (
+                    <span className="text-amber-600 font-bold">
+                      -{item.armorPenalty} Pen
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            {(item.tipo || (item.alcance && item.alcance !== "-")) && (
+              <div className="col-span-2 flex items-center justify-center gap-4 text-xs text-neutral-400">
+                {item.tipo && <span className="uppercase">{item.tipo}</span>}
+                {item.tipo && item.alcance && <span>•</span>}
+                {item.alcance && (
+                  <span className="uppercase capitalize">{item.alcance}</span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Footer Action */}
+          <div className="mt-auto">
+            <button
+              onClick={() => {
+                onBuy(item, "buy");
+              }}
+              disabled={!canAfford && item.preco}
+              className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all shadow-lg flex items-center justify-center gap-3 ${
+                !canAfford && item.preco
+                  ? "bg-neutral-800 text-neutral-500 cursor-not-allowed border border-white/5"
+                  : "bg-amber-600 hover:bg-amber-500 text-stone-950 hover:shadow-amber-500/20"
+              }`}
+            >
+              {!canAfford && item.preco ? (
+                <>
+                  <LogOut size={18} /> Saldo Insuficiente
+                </>
+              ) : (
+                <>
+                  <ShoppingBag size={18} /> Comprar Item
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </>
+  );
+};
+
+// Re-designed compact Item Card
+const ItemCard = ({
+  item,
+  isInBag,
+  isSuccess,
+  canAfford,
+  onBuy,
+  onClick,
+  activeCharacter,
+}: any) => {
+  return (
     <motion.div
       variants={itemVariants}
-      className={`relative group transition-all duration-300 ${
+      className={`relative group transition-all duration-300 cursor-pointer ${
         isInBag ? "z-10" : "z-0"
       }`}
+      onClick={onClick}
     >
       <div
         className={`h-full border rounded-lg p-3 flex flex-col gap-2 shadow-sm transition-all duration-300 relative overflow-hidden backdrop-blur-sm ${
           isInBag
             ? "border-amber-500 bg-amber-950/20"
-            : "border-white/5 bg-[#141414] hover:border-amber-500/30 hover:bg-[#1a1a1a]"
+            : "border-white/5 bg-[#141414] hover:border-amber-500/30 hover:bg-[#1a1a1a] hover:shadow-[0_0_15px_-5px_rgba(245,158,11,0.1)]"
         } ${!canAfford && !isSuccess ? "opacity-75" : ""}`}
       >
         {/* Compact Header: Icon + Stats */}
@@ -267,16 +463,6 @@ const ItemCard = ({
                     ))}
                   </span>
                 )}
-                {item.tipo && (
-                  <span className="text-[7px] font-medium text-neutral-400 bg-neutral-900 px-1 rounded border border-white/5 whitespace-nowrap">
-                    {item.tipo}
-                  </span>
-                )}
-                {item.alcance && item.alcance !== "-" && (
-                  <span className="text-[7px] font-medium text-blue-400 bg-blue-950/20 px-1 rounded border border-blue-500/10 whitespace-nowrap">
-                    Alcance: {item.alcance}
-                  </span>
-                )}
               </div>
             )}
           </div>
@@ -301,19 +487,6 @@ const ItemCard = ({
                   <Sparkles size={6} /> PREFERIDA
                 </span>
               )}
-            {/* Google Search Button */}
-            <motion.button
-              onClick={handleGoogleSearch}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="flex-shrink-0 w-6 h-6 rounded-md bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 hover:border-blue-500/60 flex items-center justify-center transition-all group/search"
-              title="Pesquisar no Google"
-            >
-              <Search
-                size={12}
-                className="text-blue-400 group-hover/search:text-blue-300"
-              />
-            </motion.button>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="text-[8px] text-neutral-500 uppercase tracking-tighter flex items-center gap-1">
@@ -339,7 +512,10 @@ const ItemCard = ({
           </span>
 
           <motion.button
-            onClick={onBuy}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent opening modal
+              onBuy(e);
+            }}
             whileTap={{ scale: 0.95 }}
             disabled={isSuccess || (!canAfford && item.preco)}
             className={`px-3 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all shadow-sm ${
@@ -745,6 +921,7 @@ const MarketPage = () => {
     clearActiveCharacter,
   } = useCharacterStore();
   const [loading, setLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Search & Filter State
   const [searchInput, setSearchInput] = useState("");
@@ -806,6 +983,96 @@ const MarketPage = () => {
   const [isSellModalOpen, setIsSellModalOpen] = useState(false);
   const [sellingItem, setSellingItem] = useState<Equipment | null>(null);
 
+  // New State for Side Modal
+  const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
+
+  // --- URL SYNCHRONIZATION ---
+
+  // Read from URL on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+
+    // Read all parameters
+    const urlTab = params.get("tab");
+    const urlSearch = params.get("search");
+    const urlSort = params.get("sort");
+    const urlMinPrice = params.get("minPrice");
+    const urlMaxPrice = params.get("maxPrice");
+    const urlSubGroups = params.get("subGroups");
+    const urlDamageTypes = params.get("damageTypes");
+    const urlAffordOnly = params.get("affordOnly");
+    const urlPage = params.get("page");
+    const urlItem = params.get("item");
+
+    // Apply URL state
+    if (urlTab) setActiveTab(urlTab);
+    if (urlSearch) {
+      setSearchInput(urlSearch);
+      setSearchTerm(urlSearch);
+    }
+    if (urlSort) setSortOrder(urlSort as SortOrder);
+    if (urlMinPrice || urlMaxPrice) {
+      setPriceRange({
+        min: urlMinPrice || "",
+        max: urlMaxPrice || "",
+      });
+    }
+    if (urlSubGroups) {
+      setSelectedSubGroups(urlSubGroups.split(","));
+    }
+    if (urlDamageTypes) {
+      setSelectedDamageTypes(urlDamageTypes.split(","));
+    }
+    if (urlAffordOnly === "true") {
+      setCanAffordOnly(true);
+    }
+    if (urlPage) {
+      setCurrentPage(parseInt(urlPage, 10));
+    }
+
+    setIsInitialized(true);
+  }, []);
+
+  // Update URL when filters change (after initialization)
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const params = new URLSearchParams();
+
+    // Add all active filters to URL
+    if (activeTab !== "all") params.set("tab", activeTab);
+    if (searchTerm) params.set("search", searchTerm);
+    if (sortOrder !== "name-asc") params.set("sort", sortOrder);
+    if (priceRange.min) params.set("minPrice", priceRange.min);
+    if (priceRange.max) params.set("maxPrice", priceRange.max);
+    if (selectedSubGroups.length > 0)
+      params.set("subGroups", selectedSubGroups.join(","));
+    if (selectedDamageTypes.length > 0)
+      params.set("damageTypes", selectedDamageTypes.join(","));
+    if (canAffordOnly) params.set("affordOnly", "true");
+    if (currentPage > 1) params.set("page", currentPage.toString());
+    if (selectedItem) params.set("item", selectedItem.nome);
+
+    // Update URL without reload
+    const newUrl = params.toString()
+      ? `?${params.toString()}`
+      : window.location.pathname;
+    window.history.replaceState({}, "", newUrl);
+  }, [
+    isInitialized,
+    activeTab,
+    searchTerm,
+    sortOrder,
+    priceRange,
+    selectedSubGroups,
+    selectedDamageTypes,
+    canAffordOnly,
+    currentPage,
+    selectedItem,
+  ]);
+
   // --- HOOKS REGISTRATION ---
 
   // Auth Check
@@ -864,6 +1131,24 @@ const MarketPage = () => {
     };
     loadData();
   }, []);
+
+  // Open item from URL after categories are loaded
+  useEffect(() => {
+    if (!isInitialized || Object.keys(categories).length === 0) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const urlItem = params.get("item");
+
+    if (urlItem && !selectedItem) {
+      // Find the item by name in all categories
+      const allItems = Object.values(categories).flat() as Equipment[];
+      const foundItem = allItems.find((item) => item.nome === urlItem);
+
+      if (foundItem) {
+        setSelectedItem(foundItem);
+      }
+    }
+  }, [isInitialized, categories, selectedItem]);
 
   // --- MEMOS ---
 
@@ -987,7 +1272,7 @@ const MarketPage = () => {
     // 5.5. Affordability Filter
     if (canAffordOnly && activeCharacter) {
       items = items.filter(
-        (item) => (item.preco || 0) <= activeCharacter.money
+        (item) => Number(item.preco || 0) <= Number(activeCharacter.money || 0)
       );
     }
 
@@ -1716,7 +2001,7 @@ const MarketPage = () => {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3 flex-1 content-start"
+              className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3 flex-1 content-start"
             >
               {paginatedItems.length === 0 ? (
                 <div className="col-span-full py-20 text-center text-neutral-600 flex flex-col items-center">
@@ -1741,6 +2026,7 @@ const MarketPage = () => {
                       isSuccess={isSuccess}
                       canAfford={canAfford}
                       onBuy={() => handleTransaction(item, "buy")}
+                      onClick={() => setSelectedItem(item)}
                       activeCharacter={activeCharacter}
                     />
                   );
@@ -1915,6 +2201,22 @@ const MarketPage = () => {
           characters={myCharacters}
           activeCharacterId={activeCharacter?.id}
         />
+
+        {/* Item Detail Side Modal */}
+        <AnimatePresence>
+          {selectedItem && (
+            <ItemDetailSidebar
+              item={selectedItem}
+              onClose={() => setSelectedItem(null)}
+              onBuy={(item: Equipment, type: string) => {
+                handleTransaction(item, "buy");
+                setSelectedItem(null);
+              }}
+              activeCharacter={activeCharacter}
+              bagItems={bagItems}
+            />
+          )}
+        </AnimatePresence>
       </div>
     );
   }

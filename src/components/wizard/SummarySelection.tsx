@@ -18,6 +18,7 @@ import {
   Scroll,
   Copy,
   Flame,
+  Check,
 } from "lucide-react";
 import { SimpleList } from "../character/DisplayComponents";
 import { CharacterService } from "../../lib/characterService";
@@ -66,10 +67,12 @@ const SummarySelection = () => {
     setStep,
     resetWizard,
     setActiveCharacter,
+    editingCharacterId,
   } = useCharacterStore();
 
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showNamePrompt, setShowNamePrompt] = useState(!name);
 
   const previewCharacter = React.useMemo<Character>(() => {
     const mappedAttributes: any = {};
@@ -91,7 +94,7 @@ const SummarySelection = () => {
           sources: ["Base", racial !== 0 ? "Raça" : ""].filter(Boolean),
           total,
         },
-        mod: Math.floor(total / 2) - 5,
+        mod: total,
       };
     });
 
@@ -274,9 +277,19 @@ const SummarySelection = () => {
         classPowers: selectedClassPowers,
       };
 
-      const savedId = await CharacterService.saveCharacter(
-        sanitizeForFirestore(characterData)
-      );
+      let savedId = "";
+      if (editingCharacterId && user?.uid) {
+        await CharacterService.updateCharacter(
+          user.uid,
+          editingCharacterId,
+          characterData as any
+        );
+        savedId = editingCharacterId;
+      } else {
+        savedId = await CharacterService.saveCharacter(
+          sanitizeForFirestore(characterData)
+        );
+      }
 
       const hpBase = selectedClass?.pv || 16;
       const pmBase = selectedClass?.pm || 4;
@@ -341,16 +354,28 @@ const SummarySelection = () => {
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-neutral-100 pb-32">
+    <div className="bg-stone-950 text-neutral-100 pb-32">
       <div className="max-w-2xl mx-auto p-4 sm:p-8 space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-cinzel text-amber-500">Resumo Final</h2>
-          <p className="text-xs text-stone-500 uppercase tracking-widest font-bold">
-            Revise sua ficha antes de começar a aventura
-          </p>
+        <div className="sticky top-0 z-0 bg-stone-950/90 backdrop-blur-xl border-b border-white/5 pb-4 pt-4 -mx-8 px-8 flex items-center justify-between gap-4 shadow-lg">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setStep(5)}
+              className="p-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-400 hover:text-white hover:border-amber-500 transition-all active:scale-95"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div className="space-y-1">
+              <h2 className="text-xl md:text-3xl font-cinzel text-amber-500 leading-none">
+                Resumo Final
+              </h2>
+              <p className="text-[10px] text-stone-500 uppercase tracking-widest font-bold hidden sm:block">
+                Revise sua ficha
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="relative border border-white/5 rounded-2xl overflow-hidden bg-stone-900/20 backdrop-blur-md shadow-2xl">
+        <div className="border border-white/5 rounded-2xl overflow-hidden bg-stone-900/20 backdrop-blur-md shadow-2xl">
           <div className="p-4 md:p-6">
             <CharacterSheetView
               character={previewCharacter}
@@ -361,20 +386,40 @@ const SummarySelection = () => {
             />
           </div>
 
-          {!name && (
+          {showNamePrompt && (
             <div className="absolute inset-0 z-40 flex items-center justify-center p-6 bg-stone-950/90 backdrop-blur-xl">
               <div className="max-w-xs w-full text-center space-y-6">
                 <h2 className="text-2xl font-cinzel text-amber-500">
                   Qual o seu nome?
                 </h2>
-                <input
-                  type="text"
-                  autoFocus
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex: Valerius"
-                  className="w-full bg-transparent border-b-2 border-amber-500/50 p-2 text-2xl font-cinzel text-amber-100 focus:outline-none focus:border-amber-400 transition-colors text-center"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    autoFocus
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && name.trim()) {
+                        setShowNamePrompt(false);
+                      }
+                    }}
+                    placeholder="Ex: Valerius"
+                    className="w-full bg-transparent border-b-2 border-amber-500/50 p-2 text-2xl font-cinzel text-amber-100 focus:outline-none focus:border-amber-400 transition-colors text-center pr-10"
+                  />
+                  <button
+                    onClick={() => {
+                      if (name.trim()) setShowNamePrompt(false);
+                    }}
+                    disabled={!name.trim()}
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all ${
+                      name.trim()
+                        ? "text-amber-500 hover:bg-amber-500/20 active:scale-95"
+                        : "text-stone-600 cursor-not-allowed"
+                    }`}
+                  >
+                    <Check size={20} />
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -401,7 +446,11 @@ const SummarySelection = () => {
             <button
               onClick={handleFinalize}
               disabled={!user || isFinalizing}
-              className="w-full py-4 bg-amber-600 hover:bg-amber-500 text-stone-950 font-black rounded-xl shadow-2xl active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-100 uppercase tracking-widest text-sm flex justify-center items-center gap-2"
+              className={`w-full py-4 font-black rounded-xl shadow-2xl transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm active:scale-95 ${
+                !user || isFinalizing
+                  ? "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700 opacity-50 grayscale"
+                  : "bg-amber-600 hover:bg-amber-500 text-stone-950 shadow-amber-900/20 group"
+              }`}
             >
               {isFinalizing ? (
                 "Forjando Destino..."

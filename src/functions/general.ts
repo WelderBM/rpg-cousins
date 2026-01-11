@@ -884,9 +884,30 @@ export function getClassEquipments(
   currentBag?: Bag,
   selectedWeapons?: Equipment[]
 ): Pick<BagEquipments, "Arma" | "Escudo" | "Armadura" | "Item Geral"> {
-  const weapons = getWeapons(classe, selectedWeapons);
-  const shields = getShields(classe);
-  const armors = getArmors(classe, currentBag);
+  const selectedItems = getWeapons(classe, selectedWeapons);
+
+  const weapons: Equipment[] = [];
+  const shields: DefenseEquipment[] = [];
+  const armors: DefenseEquipment[] = [];
+  const generalItems: Equipment[] = [];
+
+  selectedItems.forEach((item) => {
+    if (!item) return;
+    const group = (item.group || "").toLowerCase();
+
+    if (group.includes("arma")) {
+      weapons.push(item);
+    } else if (group.includes("escudo")) {
+      shields.push(item as DefenseEquipment);
+    } else if (group.includes("armadura")) {
+      armors.push(item as DefenseEquipment);
+    } else {
+      generalItems.push(item);
+    }
+  });
+
+  const finalShields = [...getShields(classe), ...shields];
+  const finalArmors = [...getArmors(classe, currentBag), ...armors];
 
   const instruments: Equipment[] = [];
   if (classe.name === "Bardo") {
@@ -898,9 +919,9 @@ export function getClassEquipments(
 
   return {
     Arma: weapons,
-    Escudo: shields,
-    Armadura: armors,
-    "Item Geral": instruments,
+    Escudo: finalShields,
+    Armadura: finalArmors,
+    "Item Geral": [...instruments, ...generalItems],
   };
 }
 

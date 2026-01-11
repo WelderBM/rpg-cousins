@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCharacterStore } from "@/store/useCharacterStore";
 import { RotateCcw, AlertTriangle, X, Check, ArrowLeft } from "lucide-react";
@@ -9,7 +9,8 @@ import { FloatingBackButton } from "@/components/FloatingBackButton";
 import RaceSelection from "@/components/wizard/RaceSelection";
 import AttributeSelection from "@/components/wizard/AttributeSelection";
 import RoleSelection from "@/components/wizard/RoleSelection";
-import HistorySelection from "@/components/wizard/HistorySelection";
+import OriginSelection from "@/components/wizard/OriginSelection";
+import DeitySelection from "@/components/wizard/DeitySelection";
 import SummarySelection from "@/components/wizard/SummarySelection";
 import WizardHub from "@/components/wizard/WizardHub";
 
@@ -21,11 +22,63 @@ export default function WizardPage() {
     selectedRace,
     selectedOrigin,
     clearActiveCharacter,
+    editingCharacterId,
   } = useCharacterStore();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   // Decide if we should show the hub initially
-  const [showHub, setShowHub] = useState(true);
+  const [showHub, setShowHub] = useState(!editingCharacterId);
+
+  // URL Sync Logic
+  const stepsMap = {
+    1: "race",
+    2: "attributes",
+    3: "class",
+    4: "origin",
+    5: "deity",
+    6: "summary",
+  };
+  const stepsRevMap = {
+    race: 1,
+    attributes: 2,
+    class: 3,
+    origin: 4,
+    deity: 5,
+    summary: 6,
+  };
+
+  useEffect(() => {
+    // Sync URL on mount or back button
+    const params = new URLSearchParams(window.location.search);
+    const stepParam = params.get("step");
+    if (stepParam === "0") {
+      setShowHub(true);
+    } else if (stepParam && stepParam in stepsRevMap) {
+      const stepNum = stepsRevMap[stepParam as keyof typeof stepsRevMap];
+      if (stepNum !== step) {
+        setStep(stepNum);
+      }
+      if (stepNum > 0) setShowHub(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Update URL when step changes
+    const params = new URLSearchParams(window.location.search);
+    const stepName = stepsMap[step as keyof typeof stepsMap];
+
+    if (showHub) {
+      if (params.get("step") !== "0") {
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set("step", "0");
+        window.history.pushState({}, "", newUrl);
+      }
+    } else if (stepName && params.get("step") !== stepName) {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set("step", stepName);
+      window.history.pushState({}, "", newUrl);
+    }
+  }, [step, showHub]);
 
   // Scroll to top on step change
   React.useEffect(() => {
@@ -37,6 +90,7 @@ export default function WizardPage() {
     resetWizard();
     setShowResetConfirm(false);
     setShowHub(false); // Go to step 1
+    // URL update handled by effect
   };
 
   const handleNewFromHub = () => {
@@ -53,9 +107,27 @@ export default function WizardPage() {
     }
   };
 
+  // Listen to popstate for browser back button
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const stepParam = params.get("step");
+      if (stepParam === "0") {
+        setShowHub(true);
+      } else if (stepParam && stepParam in stepsRevMap) {
+        setStep(stepsRevMap[stepParam as keyof typeof stepsRevMap]);
+        setShowHub(false);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   return (
     <div className="bg-neutral-950 text-neutral-200">
-      {/* Navigation Controls */}
+      {/* Navigation Controls - Hidden if showing Hub */
+      /* Note: We keep the floating back button as an extra convenience/safety, 
+         but the UI inside steps will now have their own back buttons too. */}
       {!showHub && (
         <div className="fixed top-4 left-4 right-4 z-[60] flex justify-between items-center pointer-events-none">
           <div className="pointer-events-auto">
@@ -150,12 +222,13 @@ export default function WizardPage() {
                 {step === 1 && <RaceSelection />}
                 {step === 2 && <AttributeSelection />}
                 {step === 3 && <RoleSelection />}
-                {step === 4 && <HistorySelection />}
-                {step === 5 && <SummarySelection />}
+                {step === 4 && <OriginSelection />}
+                {step === 5 && <DeitySelection />}
+                {step === 6 && <SummarySelection />}
               </div>
 
               {/* Placeholder for future steps */}
-              {step > 5 && (
+              {step > 6 && (
                 <div className="p-8 text-center pt-32">
                   <h2 className="text-2xl font-cinzel text-amber-500 mb-4">
                     Em Breve

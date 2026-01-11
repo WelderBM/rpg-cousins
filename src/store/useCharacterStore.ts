@@ -16,6 +16,7 @@ import {
 import { ClassDescription, ClassPower } from "../interfaces/Class";
 import Skill from "../interfaces/Skills";
 import { ArcanistaSubtypes } from "../data/classes/arcanista";
+import CLASSES from "../data/classes";
 
 export interface CharacterSummary {
   id: string;
@@ -87,6 +88,7 @@ interface CharacterWizardState {
   // Multi-character support
   userCharacters: CharacterSummary[];
   activeCharacter: Character | null;
+  editingCharacterId: string | null;
 
   // Actions
   setStep: (step: number) => void;
@@ -121,12 +123,13 @@ interface CharacterWizardState {
 
   // Multi-character Actions
   setUserCharacters: (list: CharacterSummary[]) => void;
-  setActiveCharacter: (char: Character) => void;
+  setActiveCharacter: (char: Character | null) => void;
   updateActiveCharacter: (updates: Partial<Character>) => void;
   clearActiveCharacter: () => void;
 
   // Wizard Management
   resetWizard: () => void;
+  loadCharacterToWizard: (character: any) => void;
 }
 
 const INITIAL_ATTRIBUTES: Record<Atributo, number> = {
@@ -177,8 +180,109 @@ export const useCharacterStore = create<CharacterWizardState>()(
       name: "",
       userCharacters: [],
       activeCharacter: null,
+      editingCharacterId: null,
 
       setStep: (step) => set({ step }),
+
+      loadCharacterToWizard: (character: any) => {
+        // Ensure bag is a proper Bag instance
+        let bagInstance = new Bag();
+        if (character.bag) {
+          if (character.bag instanceof Bag) {
+            bagInstance = character.bag;
+          } else if (character.bag.equipments) {
+            bagInstance.setEquipments(character.bag.equipments);
+          }
+        }
+
+        // Reconstruct Wizard Drafts
+        const drafts = {
+          race: { previewName: character.race?.name || null },
+          role: {
+            previewName: character.class?.name || null,
+            basic: {} as Record<number, Skill>,
+            classSkills: [] as Skill[],
+            generalSkills: [] as Skill[],
+            classPowers: character.classPowers || [],
+            localWeapons: [] as Equipment[], // Keeping empty to avoid money calc issues for now
+            arcanistConfig: { subtype: null, lineage: null, damageType: null },
+          },
+          origin: {
+            previewName: character.origin?.name || null,
+            localWeapons: [] as Equipment[],
+          },
+          deity: {
+            previewName: character.deity?.name || null,
+            localPowers: character.grantedPowers || [],
+          },
+        };
+
+        // Reconstruct Role Skills & Config
+        if (character.class && character.skills) {
+          const roleDef = CLASSES.find((c) => c.name === character.class.name);
+          if (roleDef) {
+            const allSkills = new Set<Skill>(character.skills);
+
+            // 1. Remove Fixed Basic Skills (AND)
+            roleDef.periciasbasicas.forEach((group) => {
+              if (group.type === "and") {
+                group.list.forEach((s) => allSkills.delete(s));
+              }
+            });
+
+            // 2. Identify Chosen Basic Skills (OR)
+            roleDef.periciasbasicas.forEach((group, idx) => {
+              if (group.type === "or") {
+                const found = group.list.find((s) => allSkills.has(s));
+                if (found) {
+                  drafts.role.basic[idx] = found;
+                  allSkills.delete(found);
+                }
+              }
+            });
+
+            // 3. Identify Class Skills
+            const availableForClass = roleDef.periciasrestantes.list;
+            const classChoices = Array.from(allSkills).filter((s) =>
+              availableForClass.includes(s)
+            );
+            drafts.role.classSkills = classChoices;
+            classChoices.forEach((s) => allSkills.delete(s));
+
+            // 4. Identify General Skills (Remaining)
+            drafts.role.generalSkills = Array.from(allSkills);
+
+            // 5. Arcanista Configuration Reconstruction (Heuristic)
+            if (character.class.name === "Arcanista") {
+              // Try to find subtype in features/abilities
+              // This is tricky without explicit storage, but we can try to infer from abilities
+              // For now, leaving as null might force user to re-select if they open the config
+              // but at least skills are saved.
+            }
+          }
+        }
+
+        set({
+          editingCharacterId: character.id,
+          step: 1, // Start at Race Selection
+          name: character.name || "",
+          selectedRace: character.race || null,
+          selectedClass: character.class || null,
+          selectedSkills: character.skills || [],
+          selectedOrigin: character.origin || null,
+          originBenefits: character.originBenefits || [],
+          selectedDeity: character.deity || null,
+          selectedGrantedPowers: character.grantedPowers || [],
+          selectedClassPowers: character.classPowers || [],
+          bag: bagInstance,
+          money: character.money ?? 0,
+          baseAttributes: character.baseAttributes || { ...INITIAL_ATTRIBUTES },
+          flexibleAttributeChoices: character.flexibleAttributeChoices || {},
+          selectedClassWeapons: [],
+          selectedOriginWeapons: [],
+          wizardDrafts: drafts,
+        });
+      },
 
       selectRace: (race) => {
         // Limpa escolhas flexíveis ao trocar de raça
@@ -457,6 +561,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
 
       resetWizard: () => {
         set({
+          editingCharacterId: null,
           step: 1,
           selectedRace: null,
           selectedClass: null,

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ORIGINS } from "../../data/origins";
@@ -126,6 +126,46 @@ const OriginSelection = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [selectedPreview]);
 
+  // --- AUTO-SCROLL LOGIC ---
+  const benefitsRef = useRef<HTMLDivElement>(null);
+  const weaponsRef = useRef<HTMLDivElement>(null);
+  const prevCompletion = useRef({
+    benefits: false,
+    weapons: false,
+  });
+
+  useEffect(() => {
+    if (!selectedPreview) return;
+
+    // Check completion status
+    const isBenefitsComplete = originBenefits.length === 2;
+
+    const weaponChoicesNeeded =
+      selectedPreview.getItems?.().filter((i) => !!i.choice).length || 0;
+    const isWeaponsComplete =
+      weaponChoicesNeeded === 0 ||
+      localOriginWeapons.filter(Boolean).length === weaponChoicesNeeded;
+
+    const current = {
+      benefits: isBenefitsComplete,
+      weapons: isWeaponsComplete,
+    };
+    const prev = prevCompletion.current;
+
+    const scrollToRef = (ref: React.RefObject<HTMLDivElement>) => {
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
+
+    // Transitions
+    if (!prev.benefits && current.benefits) {
+      if (!current.weapons) scrollToRef(weaponsRef);
+    } else if (!prev.weapons && current.weapons) {
+      if (!current.benefits) scrollToRef(benefitsRef);
+    }
+
+    prevCompletion.current = current;
+  }, [originBenefits, localOriginWeapons, selectedPreview]);
+
   // Combine already known skills to prevent duplicates
   const knownSkills = useMemo(() => {
     return [...selectedSkills];
@@ -207,6 +247,7 @@ const OriginSelection = () => {
     if (!selectedPreview) return;
     selectOrigin(selectedPreview);
     setSelectedOriginWeapons(localOriginWeapons);
+    setStep(5);
   };
 
   return (
@@ -221,9 +262,16 @@ const OriginSelection = () => {
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-8 p-4 md:p-8 max-w-7xl mx-auto pb-48 md:pb-32"
           >
-            <div className="flex flex-col items-center justify-center gap-2 mt-4">
-              <h2 className="text-3xl md:text-5xl font-cinzel text-amber-500 text-center drop-shadow-xl">
-                Escolha sua Origem
+            <div className="sticky top-0 z-40 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg -mx-8 px-8">
+              <button
+                onClick={() => setStep(3)}
+                className="flex items-center gap-2 px-4 py-2 bg-stone-900 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10"
+              >
+                <ChevronLeft size={20} />
+                <span className="hidden sm:inline">Voltar</span>
+              </button>
+              <h2 className="text-2xl md:text-4xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
+                Origem
               </h2>
             </div>
 
@@ -272,6 +320,23 @@ const OriginSelection = () => {
             transition={{ duration: 0.2 }}
             className="max-w-2xl mx-auto w-full p-4 md:p-8 space-y-6 pb-32"
           >
+            {/* Sticky Header for Detail View */}
+            <div className="sticky top-0 z-50 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
+              <button
+                onClick={() => {
+                  setSelectedPreview(null);
+                  setWizardDraft("origin", { previewName: null });
+                }}
+                className="flex items-center gap-2 px-3 py-2 bg-stone-900/80 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10 text-sm"
+              >
+                <ChevronLeft size={18} />
+                <span className="hidden sm:inline">Voltar</span>
+              </button>
+              <h2 className="text-xl md:text-2xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
+                {selectedPreview?.name}
+              </h2>
+            </div>
+
             {/* Header & Image Banner */}
             <div className="relative overflow-hidden rounded-2xl bg-stone-950 border border-white/5 h-48 md:h-64">
               <Image
@@ -288,16 +353,6 @@ const OriginSelection = () => {
                   {selectedPreview?.name}
                 </h2>
               </div>
-              {/* Discrete Back Button */}
-              <button
-                onClick={() => {
-                  setSelectedPreview(null);
-                  setWizardDraft("origin", { previewName: null });
-                }}
-                className="absolute top-4 left-4 z-10 p-2 bg-black/40 backdrop-blur-md border border-white/10 text-white rounded-full active:scale-95 transition-all"
-              >
-                <ChevronLeft size={20} />
-              </button>
             </div>
 
             {/* Selection Progress Overlay */}
@@ -316,7 +371,7 @@ const OriginSelection = () => {
               </span>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6" ref={benefitsRef}>
               {/* Skills */}
               <div className="mb-8">
                 <h3 className="text-stone-500 uppercase tracking-widest font-bold text-xs mb-3 flex items-center gap-2">
@@ -444,7 +499,10 @@ const OriginSelection = () => {
 
             {/* Weapon Choice if Applicable */}
             {selectedPreview?.getItems?.()?.some((i) => !!i.choice) && (
-              <div className="bg-amber-900/10 p-6 rounded-xl border border-amber-900/30 space-y-4">
+              <div
+                ref={weaponsRef}
+                className="bg-amber-900/10 p-6 rounded-xl border border-amber-900/30 space-y-4"
+              >
                 <div className="flex items-center gap-2">
                   <Sword className="text-amber-500" size={20} />
                   <h4 className="text-sm font-bold text-amber-200 uppercase tracking-widest">
@@ -557,9 +615,9 @@ const OriginSelection = () => {
                 <button
                   onClick={handleConfirm}
                   disabled={originBenefits.length !== 2}
-                  className={`w-full py-3 md:py-4 font-bold font-cinzel text-base md:text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-95 ${
+                  className={`w-full py-4 font-black rounded-xl shadow-2xl transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm active:scale-95 ${
                     originBenefits.length === 2
-                      ? "bg-amber-600 text-stone-950 shadow-amber-900/20"
+                      ? "bg-amber-600 hover:bg-amber-500 text-stone-950 shadow-amber-900/20 group"
                       : "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700 opacity-50 grayscale"
                   }`}
                 >

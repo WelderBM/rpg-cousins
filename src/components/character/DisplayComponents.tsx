@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Shield,
   Swords,
@@ -11,7 +11,12 @@ import {
   Package,
   Search,
   Dices,
+  Brain,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+import { CalculatedSkill } from "@/utils/skillUtils";
 
 export const getItemSymbol = (item: any, size = 18) => {
   const group = (item.group || "").toLowerCase();
@@ -353,6 +358,110 @@ export const SectionSlider = ({ title, items, icon: Icon }: any) => {
                 <p className="text-sm text-stone-300 leading-relaxed italic line-clamp-6">
                   {desc}
                 </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export const SkillsDisplay = ({
+  skills,
+  originSkills,
+}: {
+  skills: CalculatedSkill[];
+  originSkills: string[];
+}) => {
+  const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
+
+  if (!skills || skills.length === 0) return null;
+
+  return (
+    <div className="mb-8 select-none">
+      <h3 className="text-xs font-black text-amber-500/90 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
+        <Brain size={14} /> Perícias
+      </h3>
+      <div className="grid grid-cols-2 gap-2">
+        {skills.map((skill) => {
+          const isOrigin = originSkills && originSkills.includes(skill.name);
+          const isExpanded = expandedSkill === skill.name;
+
+          return (
+            <div
+              key={skill.name}
+              className={`bg-stone-900/40 backdrop-blur-sm border ${
+                isOrigin ? "border-amber-500/30" : "border-white/5"
+              } rounded-md overflow-hidden transition-all hover:border-amber-500/20`}
+            >
+              <div
+                className="flex items-center justify-between p-2 cursor-pointer"
+                onClick={() => setExpandedSkill(isExpanded ? null : skill.name)}
+              >
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <div className="relative shrink-0">
+                    <div className="w-6 h-6 rounded bg-stone-800 flex items-center justify-center border border-white/5 group-hover:border-amber-500/50 transition-colors">
+                      <span className="font-bold text-xs text-amber-100">
+                        {skill.total >= 0 ? `+${skill.total}` : skill.total}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <span className="font-bold text-stone-300 block text-[10px] sm:text-xs truncate flex items-center gap-1">
+                      {skill.name}
+                      {isOrigin && (
+                        <MapPin
+                          size={8}
+                          className="text-amber-500 shrink-0"
+                          title="Benefício de Origem"
+                        />
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Compact Breakdown */}
+              {isExpanded && (
+                <div className="bg-black/20 p-2 border-t border-white/5 grid grid-cols-4 gap-1 text-center animate-in slide-in-from-top-1 duration-150">
+                  <div className="flex flex-col items-center">
+                    <span className="text-[7px] text-stone-500 uppercase font-black">
+                      Nv/2
+                    </span>
+                    <span className="text-[9px] text-stone-300 font-bold">
+                      +{skill.halfLevel}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[7px] text-stone-500 uppercase font-black">
+                      {skill.modAttr.substring(0, 3)}
+                    </span>
+                    <span className="text-[9px] text-stone-300 font-bold">
+                      {skill.attrMod >= 0 ? `+${skill.attrMod}` : skill.attrMod}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[7px] text-stone-500 uppercase font-black">
+                      Tr
+                    </span>
+                    <span className="text-[9px] text-stone-300 font-bold">
+                      +{skill.training}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[7px] text-stone-500 uppercase font-black">
+                      Out
+                    </span>
+                    <span
+                      className={`text-[9px] font-bold ${
+                        skill.others < 0 ? "text-red-400" : "text-stone-300"
+                      }`}
+                    >
+                      {skill.others >= 0 ? `+${skill.others}` : skill.others}
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
           );
