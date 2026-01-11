@@ -541,6 +541,18 @@ export function recalculateSheet(
               updatedSheet.atributos[change.attribute].mod -= 1;
               break;
 
+            case "SkillsAdded": {
+              if (updatedSheet.skills) {
+                change.skills.forEach((skill: Skill) => {
+                  const skillIndex = updatedSheet.skills.indexOf(skill);
+                  if (skillIndex > -1) {
+                    updatedSheet.skills.splice(skillIndex, 1);
+                  }
+                });
+              }
+              break;
+            }
+
             default:
               // Other action types not yet implemented
               break;
