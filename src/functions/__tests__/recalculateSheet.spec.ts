@@ -1,5 +1,5 @@
 import { recalculateSheet } from "../recalculateSheet";
-import { createMockCharacterSheet } from "../../__mocks__/characterSheet";
+import { createMockCharacterSheet } from "@/__mocks__/characterSheet";
 import { applyRaceAbilities } from "../general";
 import combatPowers from "../../data/powers/combatPowers";
 import { DestinyPowers } from "../../data/powers/destinyPowers";

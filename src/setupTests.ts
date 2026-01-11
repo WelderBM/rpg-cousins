@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { expect, afterEach, beforeAll, afterAll } from "vitest";
 import { cleanup } from "@testing-library/react";
 import * as axeMatchers from "vitest-axe/matchers";
-import "vitest-axe/extend-expect";
+
 import { server } from "./mocks/server";
 
 // Extend Vitest with axe-core matchers
