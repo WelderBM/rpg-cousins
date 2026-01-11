@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import CLASSES from "../../data/classes";
@@ -25,11 +25,12 @@ import ARCANISTA, {
   ArcanistaSubtypes,
 } from "../../data/classes/arcanista";
 
-import EQUIPAMENTOS, { Armas } from "../../data/equipamentos";
-import PROFICIENCIAS from "../../data/proficiencias";
 import { formatAssetName } from "../../utils/assetUtils";
 import { getWeapons } from "@/functions/general";
 import Equipment from "@/interfaces/Equipment";
+
+import { Info } from "lucide-react";
+import EQUIPAMENTOS from "../../data/equipamentos";
 
 /**
  * Componente de Card de Classe Visual
@@ -102,6 +103,7 @@ const RoleSelection = () => {
     selectClassPowers,
     setSelectedClassWeapons,
     selectedClassWeapons,
+    updateMoney,
   } = useCharacterStore();
 
   const [selectedPreview, setSelectedPreview] =
@@ -125,6 +127,20 @@ const RoleSelection = () => {
     lineage: string | null;
     damageType: string | null;
   }>({ subtype: null, lineage: null, damageType: null });
+
+  // --- REFS FOR AUTO-SCROLL ---
+  const basicRef = useRef<HTMLDivElement>(null);
+  const classRef = useRef<HTMLDivElement>(null);
+  const generalRef = useRef<HTMLDivElement>(null);
+  const powersRef = useRef<HTMLDivElement>(null);
+
+  // Store previous completion states to detect transitions
+  const prevCompletion = useRef({
+    basic: false,
+    class: false,
+    general: false,
+    powers: false,
+  });
 
   // Sync LOCAL state with STORE when initialized or when Store changes
   useEffect(() => {
@@ -283,37 +299,53 @@ const RoleSelection = () => {
     }
   };
 
-  const toggleWeapon = (weapon: Equipment, slotIdx: number) => {
-    const newWeapons = [...localWeapons];
-    newWeapons[slotIdx] = weapon;
-    setLocalWeapons(newWeapons);
-  };
+  const STARTING_MONEY = 18;
 
-  const weaponSlots = useMemo(() => {
-    if (!selectedPreview) return [];
-
-    // Standard T20 rule: 1 simple weapon, + 1 martial if proficient
-    const slots = ["Arma Simples"];
-    const hasMartial = selectedPreview.proficiencias.includes(
-      PROFICIENCIAS.MARCIAIS
+  const currentMoney = useMemo(() => {
+    const spent = localWeapons.reduce(
+      (acc, item) => acc + (item.preco || 0),
+      0
     );
-    if (hasMartial) {
-      slots.push("Arma Marcial");
-    }
-    return slots;
-  }, [selectedPreview]);
+    return STARTING_MONEY - spent;
+  }, [localWeapons]);
 
-  // Ensure localWeapons array size matches slots
+  const STANDARD_KIT: Equipment[] = [
+    {
+      nome: "Mochila",
+      group: "Item Geral",
+      preco: 0,
+      spaces: 0,
+      description: "Conteúdo do Kit de Aventureiro",
+    },
+    {
+      nome: "Saco de dormir",
+      group: "Item Geral",
+      preco: 0,
+      spaces: 1,
+      description: "Conteúdo do Kit de Aventureiro",
+    },
+    {
+      nome: "Traje de viajante",
+      group: "Vestuário",
+      preco: 0,
+      spaces: 0, // Usually worn, doesn't count for space? Keeping 0 for free kit logic simplicity or 1 based on rules
+      description: "Conteúdo do Kit de Aventureiro",
+    },
+    {
+      nome: "Pederneira",
+      group: "Item Geral",
+      preco: 0,
+      spaces: 0,
+      description: "Conteúdo do Kit de Aventureiro",
+    },
+  ];
+
+  // Initialize Standard Kit if empty
   useEffect(() => {
-    if (selectedPreview && localWeapons.length !== weaponSlots.length) {
-      // Default to common weapons: Dagger (Simple) and Shortsword/Longsword (Martial)
-      const newLocal = weaponSlots.map((slot, i) => {
-        if (localWeapons[i]) return localWeapons[i];
-        return slot === "Arma Simples" ? Armas.ADAGA : Armas.ESPADACURTA;
-      });
-      setLocalWeapons(newLocal);
+    if (selectedPreview && localWeapons.length === 0) {
+      setLocalWeapons([...STANDARD_KIT]);
     }
-  }, [selectedPreview, weaponSlots]);
+  }, [selectedPreview]);
 
   // Helper to check if power requirements are met
   const checkPowerRequirements = (power: ClassPower): boolean => {
@@ -336,18 +368,8 @@ const RoleSelection = () => {
   };
 
   const toggleClassPower = (power: ClassPower) => {
-    const isSelected = selectedClassPowers.some((p) => p.name === power.name);
-
-    if (isSelected) {
-      setSelectedClassPowers(
-        selectedClassPowers.filter((p) => p.name !== power.name)
-      );
-    } else {
-      // Level 1 characters get 1 power
-      if (selectedClassPowers.length < 1) {
-        setSelectedClassPowers([...selectedClassPowers, power]);
-      }
-    }
+    // Powers are only for Level 2+
+    return;
   };
 
   const handleConfirm = () => {
@@ -380,8 +402,9 @@ const RoleSelection = () => {
     }
 
     updateSkills(finalSkills);
-    selectClassPowers(selectedClassPowers);
+    selectClassPowers([]);
     setSelectedClassWeapons(localWeapons);
+    updateMoney(currentMoney);
     setStep(4);
   };
 
@@ -411,12 +434,11 @@ const RoleSelection = () => {
     const classDone = classSkillChoices.length === limits.class;
     const extraDone =
       generalSkillChoices.length === Math.max(0, limits.extra || 0);
-    const powersDone = selectedClassPowers.length === 1; // Level 1 = 1 power
+    const powersDone = true; // Level 1 = 0 powers (Unlocked at Lvl 2)
 
-    const weaponsDone =
-      localWeapons.filter(Boolean).length === weaponSlots.length;
+    const shopDone = currentMoney >= 0;
 
-    return basicDone && classDone && extraDone && powersDone && weaponsDone;
+    return basicDone && classDone && extraDone && powersDone && shopDone;
   }, [
     selectedPreview,
     basicSkillChoices,
@@ -424,7 +446,7 @@ const RoleSelection = () => {
     generalSkillChoices,
     selectedClassPowers,
     localWeapons,
-    weaponSlots,
+    currentMoney,
     limits,
   ]);
 
@@ -443,6 +465,57 @@ const RoleSelection = () => {
     return true;
   }, [selectedPreview, arcanistConfig]);
 
+  // --- AUTO-SCROLL LOGIC ---
+  useEffect(() => {
+    if (!selectedPreview) return;
+
+    // Calculate current completion states
+    const isBasicComplete = selectedPreview.periciasbasicas.every((g, i) =>
+      g.type === "or" ? !!basicSkillChoices[i] : true
+    );
+    const isClassComplete = classSkillChoices.length === limits.class;
+    const isGeneralComplete =
+      generalSkillChoices.length === Math.max(0, limits.extra || 0);
+    const isPowersComplete = true;
+
+    const currentStates = {
+      basic: isBasicComplete,
+      class: isClassComplete,
+      general: isGeneralComplete,
+      powers: isPowersComplete,
+    };
+
+    const prev = prevCompletion.current;
+
+    // Helper to scroll to a ref
+    const scrollToRef = (ref: React.RefObject<HTMLDivElement>) => {
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
+
+    // Determine if we need to scroll
+    // Check transitions from Incomplete -> Complete
+    // Priority: Basic -> Class -> General -> Powers -> Shop
+
+    // 1. Basic Finished
+    if (!prev.basic && currentStates.basic) {
+      if (!currentStates.class) scrollToRef(classRef);
+      else if (!currentStates.general && limits.extra > 0)
+        scrollToRef(generalRef);
+      // else if (!currentStates.powers) scrollToRef(powersRef);
+    }
+
+    // Update previous state
+    prevCompletion.current = currentStates;
+  }, [
+    selectedPreview,
+    basicSkillChoices,
+    classSkillChoices,
+    generalSkillChoices,
+    selectedClassPowers,
+    localWeapons,
+    limits,
+  ]);
+
   return (
     <div className="w-full min-h-screen relative bg-stone-950 pb-32">
       <AnimatePresence mode="wait">
@@ -455,7 +528,7 @@ const RoleSelection = () => {
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-8 p-4 md:p-8 max-w-7xl mx-auto pb-48 md:pb-32"
           >
-            <div className="flex items-center justify-between mt-4">
+            <div className="sticky top-0 z-40 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg -mx-8 px-8">
               <button
                 onClick={() => setStep(2)}
                 className="flex items-center gap-2 px-4 py-2 bg-stone-900 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10"
@@ -463,7 +536,7 @@ const RoleSelection = () => {
                 <ChevronLeft size={20} />
                 <span className="hidden sm:inline">Voltar</span>
               </button>
-              <h2 className="text-3xl md:text-5xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
+              <h2 className="text-2xl md:text-4xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
                 Escolha sua Classe
               </h2>
             </div>
@@ -502,6 +575,20 @@ const RoleSelection = () => {
             transition={{ duration: 0.2 }}
             className="max-w-2xl mx-auto w-full p-4 md:p-8 space-y-6 pb-32"
           >
+            {/* Sticky Header for Detail View */}
+            <div className="sticky top-0 z-50 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
+              <button
+                onClick={() => setSelectedPreview(null)}
+                className="flex items-center gap-2 px-3 py-2 bg-stone-900/80 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10 text-sm"
+              >
+                <ChevronLeft size={18} />
+                <span className="hidden sm:inline">Voltar</span>
+              </button>
+              <h2 className="text-xl md:text-2xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
+                {selectedPreview?.name}
+              </h2>
+            </div>
+
             {/* Header & Stats Banner */}
             <div className="relative overflow-hidden rounded-2xl bg-stone-950 border border-white/5">
               <div className="relative h-48 md:h-64 flex items-center justify-center bg-stone-950">
@@ -516,17 +603,13 @@ const RoleSelection = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 md:left-6">
+                  {/* Title removed from here as it is now in the sticky header, or we can keep it for impact? 
+                      Keeping it for impact but maybe smaller or relying on the header. 
+                      Actually, keeping it here looks good for the 'Hero' section feel. */}
                   <h2 className="text-2xl md:text-4xl font-cinzel text-amber-100 drop-shadow-2xl">
                     {selectedPreview?.name}
                   </h2>
                 </div>
-                {/* Discrete Back Button */}
-                <button
-                  onClick={() => setSelectedPreview(null)}
-                  className="absolute top-4 left-4 z-10 p-2 bg-black/40 backdrop-blur-md border border-white/10 text-white rounded-full active:scale-95 transition-all"
-                >
-                  <ChevronLeft size={20} />
-                </button>
               </div>
 
               {/* Quick Stats Overlay */}
@@ -586,7 +669,7 @@ const RoleSelection = () => {
             </section>
 
             {/* SKILLS - BASIC */}
-            <section className="space-y-4">
+            <section ref={basicRef} className="space-y-4">
               <h3 className="text-amber-500 font-cinzel text-lg border-b border-amber-900/30 pb-2 flex items-center gap-2">
                 <Book size={18} /> Perícias Básicas
               </h3>
@@ -644,7 +727,7 @@ const RoleSelection = () => {
             </section>
 
             {/* SKILLS - CLASS */}
-            <section className="space-y-4">
+            <section ref={classRef} className="space-y-4">
               <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
                 <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
                   <Swords size={18} /> Treinamento de Classe
@@ -698,7 +781,7 @@ const RoleSelection = () => {
 
             {/* SKILLS - EXTRA (INT) */}
             {limits.extra > 0 && (
-              <section className="space-y-4">
+              <section ref={generalRef} className="space-y-4">
                 <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
                   <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
                     <Sparkles size={18} /> Perícias Extras (Inteligência)
@@ -753,62 +836,41 @@ const RoleSelection = () => {
             )}
 
             {/* CLASS POWERS */}
-            <section className="space-y-4">
+            <section ref={powersRef} className="space-y-4 opacity-60">
               <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
                 <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
-                  <Zap size={18} /> Poderes de Classe
+                  <Zap size={18} /> Poderes de Classe (Nível 2+)
                 </h3>
-                <span
-                  className={`text-xs font-bold px-3 py-1 rounded-full ${
-                    selectedClassPowers.length === 1
-                      ? "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50"
-                      : "bg-stone-800 text-stone-400 border border-stone-700"
-                  }`}
-                >
-                  {selectedClassPowers.length} / 1
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-stone-800 text-stone-500 border border-stone-700">
+                  0 / 0
                 </span>
               </div>
 
               <p className="text-xs text-stone-500 italic">
-                Escolha 1 poder de classe. Poderes com requisitos não atendidos
-                aparecem desabilitados.
+                Poderes de classe tornam-se disponíveis a partir do 2º nível.
               </p>
 
-              <div className="grid gap-3">
+              <div className="grid gap-3 pointer-events-none grayscale">
                 {selectedPreview?.powers.map((power) => {
-                  const isSelected = selectedClassPowers.some(
-                    (p) => p.name === power.name
-                  );
+                  const isSelected = false;
                   const meetsRequirements = checkPowerRequirements(power);
-                  const isDisabled =
-                    !isSelected &&
-                    (!meetsRequirements || selectedClassPowers.length >= 1);
+                  // Always disabled visually
+                  const isDisabled = true;
 
                   return (
                     <button
                       key={power.name}
                       disabled={isDisabled}
-                      onClick={() => toggleClassPower(power)}
                       className={`text-left p-4 rounded-xl border transition-all ${
-                        isSelected
-                          ? "bg-purple-900/30 border-purple-500 text-purple-100"
-                          : isDisabled
+                        isDisabled
                           ? "opacity-40 cursor-not-allowed border-stone-800 text-stone-600 bg-stone-900/30"
                           : "bg-stone-900 border-stone-800 text-stone-300 hover:border-purple-900/50 hover:bg-stone-800"
                       }`}
                     >
                       <div className="flex items-start gap-3">
                         <div
-                          className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                            isSelected
-                              ? "bg-purple-500 border-purple-500"
-                              : "border-stone-600 bg-black/40"
-                          }`}
-                        >
-                          {isSelected && (
-                            <Check size={14} className="text-stone-950" />
-                          )}
-                        </div>
+                          className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 border-stone-600 bg-black/40`}
+                        ></div>
                         <div className="flex-1 space-y-2">
                           <div className="flex items-start justify-between gap-2">
                             <h4 className="font-bold text-base">
@@ -832,6 +894,9 @@ const RoleSelection = () => {
                             power.requirements.length > 0 && (
                               <div className="flex flex-wrap gap-1 pt-1">
                                 {power.requirements[0].map((req, idx) => {
+                                  // const reqMet = meetsRequirements;
+                                  // Visualizing requirements as "not met" or just informative since whole section disabled
+                                  // Keeping calculation for info
                                   const reqMet = meetsRequirements;
                                   return (
                                     <span
@@ -863,62 +928,109 @@ const RoleSelection = () => {
               </div>
             </section>
 
-            {/* WEAPONS */}
-            <section className="space-y-4">
+            {/* WEAPON SHOP */}
+            <section className="space-y-4 pt-4 border-t border-stone-800">
               <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
                 <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
-                  <Sword size={18} /> Armas Iniciais
+                  <Sword size={18} /> Equipamento Inicial
                 </h3>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-950/40 text-emerald-400 border border-emerald-900/50">
-                  {localWeapons.filter(Boolean).length} / {weaponSlots.length}
+                <span
+                  className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                    currentMoney >= 0
+                      ? "bg-amber-900/30 text-amber-500 border-amber-900/50"
+                      : "bg-red-900/30 text-red-500 border-red-900/50"
+                  }`}
+                >
+                  T$ {currentMoney} Restantes
                 </span>
               </div>
 
-              <p className="text-xs text-stone-500 italic">
-                Você recebe uma arma simples. Se for proficiente em armas
-                marciais, recebe uma arma adicional.
-              </p>
-
-              <div className="grid gap-4">
-                {weaponSlots.map((slot, idx) => {
-                  const options =
-                    slot === "Arma Simples"
-                      ? EQUIPAMENTOS.armasSimples
-                      : [
-                          ...EQUIPAMENTOS.armasSimples,
-                          ...EQUIPAMENTOS.armasMarciais,
-                        ];
-
-                  return (
-                    <div key={idx} className="space-y-2">
-                      <label className="text-[10px] text-stone-500 font-black uppercase tracking-widest pl-1">
-                        {slot}
-                      </label>
-                      <div className="relative group">
-                        <select
-                          value={localWeapons[idx]?.nome || ""}
-                          onChange={(e) => {
-                            const weapon = options.find(
-                              (w) => w.nome === e.target.value
-                            );
-                            if (weapon) toggleWeapon(weapon, idx);
-                          }}
-                          className="w-full bg-stone-900 border border-stone-800 text-stone-200 p-4 rounded-xl outline-none focus:border-amber-500 appearance-none cursor-pointer transition-all hover:bg-stone-800"
-                        >
-                          {options.map((w) => (
-                            <option key={w.nome} value={w.nome}>
-                              {w.nome} ({w.dano} | {w.critico})
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-amber-500/50 group-hover:text-amber-500 transition-colors">
-                          <Sword size={16} />
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* Standard Kit Info */}
+              <div className="bg-stone-900/50 p-4 rounded-xl border border-stone-800">
+                <h4 className="font-bold text-stone-300 text-sm mb-2 flex items-center gap-2">
+                  <Book size={14} /> Kit de Aventureiro (Grátis)
+                </h4>
+                <p className="text-xs text-stone-500">
+                  Inclui: Mochila, Saco de dormir, Traje de viajante e
+                  Pederneira.
+                </p>
               </div>
+
+              {/* Weapon List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[
+                  ...EQUIPAMENTOS.armasSimples,
+                  ...EQUIPAMENTOS.armasMarciais,
+                  ...EQUIPAMENTOS.escudos,
+                ]
+                  .filter((w) => (w.preco || 0) <= 200) // Show affordable-ish items
+                  .map((weapon) => {
+                    // Check if we own this specific item (not just same name, but bought from shop)
+                    // We identify shop items by having price > 0 (Standard kit is 0)
+                    const ownedCount = localWeapons.filter(
+                      (w) => w.nome === weapon.nome && (w.preco || 0) > 0
+                    ).length;
+
+                    return (
+                      <button
+                        key={weapon.nome}
+                        onClick={() => {
+                          if (ownedCount > 0) {
+                            // Specify to remove one instance
+                            const idx = localWeapons.findIndex(
+                              (w) =>
+                                w.nome === weapon.nome && (w.preco || 0) > 0
+                            );
+                            if (idx > -1) {
+                              const next = [...localWeapons];
+                              next.splice(idx, 1);
+                              setLocalWeapons(next);
+                            }
+                          } else {
+                            setLocalWeapons([...localWeapons, weapon]);
+                          }
+                        }}
+                        className={`text-left p-3 rounded-lg border transition-all flex justify-between items-center ${
+                          ownedCount > 0
+                            ? "bg-amber-900/20 border-amber-500/50"
+                            : "bg-stone-900 border-stone-800 hover:border-stone-600"
+                        }`}
+                      >
+                        <div>
+                          <div className="font-bold text-sm text-stone-200">
+                            {weapon.nome}
+                          </div>
+                          <div className="text-[10px] text-stone-500">
+                            {weapon.dano} | Crít: {weapon.critico}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div
+                            className={`text-xs font-bold ${
+                              ownedCount > 0
+                                ? "text-amber-500"
+                                : "text-stone-400"
+                            }`}
+                          >
+                            T$ {weapon.preco}
+                          </div>
+                          {ownedCount > 0 && (
+                            <div className="text-[10px] text-emerald-500 flex items-center justify-end gap-1">
+                              <Check size={10} /> Comprado
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+              </div>
+
+              {currentMoney < 0 && (
+                <div className="mt-4 p-3 bg-red-900/20 border border-red-500/50 rounded-xl text-red-200 text-xs text-center font-bold animate-pulse">
+                  Você gastou mais dinheiro do que possui! Remova itens para
+                  continuar.
+                </div>
+              )}
             </section>
 
             {/* ACTION FOOTER */}
@@ -927,9 +1039,9 @@ const RoleSelection = () => {
                 <button
                   onClick={handleConfirm}
                   disabled={!isValid}
-                  className={`w-full py-4 font-bold font-cinzel text-lg rounded-xl shadow-2xl transition-all flex justify-center items-center gap-3 active:scale-95 ${
+                  className={`w-full py-4 font-black rounded-xl shadow-2xl transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm active:scale-95 ${
                     isValid
-                      ? "bg-amber-600 text-stone-950 shadow-amber-900/20"
+                      ? "bg-amber-600 hover:bg-amber-500 text-stone-950 shadow-amber-900/20 group"
                       : "bg-stone-800 text-stone-500 cursor-not-allowed border border-stone-700 opacity-50 grayscale"
                   }`}
                 >

@@ -11,7 +11,7 @@ import {
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8 animate-in fade-in duration-700 pb-10">
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8 animate-in fade-in duration-700 pb-20">
       <div className="space-y-4 pt-10">
         <h2 className="text-3xl md:text-6xl font-serif font-bold text-medieval-gold drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
           Bem-vindo ao

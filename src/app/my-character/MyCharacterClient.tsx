@@ -17,8 +17,12 @@ export default function MyCharacterClient() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { activeCharacter, setActiveCharacter, updateActiveCharacter } =
-    useCharacterStore();
+  const {
+    activeCharacter,
+    setActiveCharacter,
+    updateActiveCharacter,
+    loadCharacterToWizard,
+  } = useCharacterStore();
   const [initializing, setInitializing] = useState(true);
   const [noFavorite, setNoFavorite] = useState(false);
 
@@ -257,11 +261,19 @@ export default function MyCharacterClient() {
     );
   }
 
+  const handleEditWizard = () => {
+    if (activeCharacter) {
+      loadCharacterToWizard(activeCharacter);
+      router.push("/herois?tab=novo-heroi");
+    }
+  };
+
   return (
     <CharacterSheetView
       character={activeCharacter!}
       onUpdate={handleUpdate}
       isMestre={false}
+      onEditWizard={handleEditWizard}
     />
   );
 }

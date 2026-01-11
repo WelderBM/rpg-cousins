@@ -14,6 +14,7 @@ import {
   Swords,
   Trash,
 } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 import {
@@ -51,15 +52,48 @@ const MESTRE_PASSWORD = "mestre-cousins";
 type Tab = "lista" | "criador" | "herois";
 
 export default function MestreClient() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Initialize from URL or defaults
+  const initialTab = (searchParams.get("tab") as Tab) || "lista";
+  const initialStep = parseInt(searchParams.get("step") || "1");
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
-  const [activeTab, setActiveTab] = useState<Tab>("lista");
+
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
+  const [step, setStep] = useState(isNaN(initialStep) ? 1 : initialStep);
+
   const [threats, setThreats] = useState<ThreatSheet[]>([]);
   const [heroes, setHeroes] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedHero, setSelectedHero] = useState<Character | null>(null);
+
+  // Sync URL with Tab and Step changes
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    // Update Tab
+    if (activeTab) {
+      params.set("tab", activeTab);
+    } else {
+      params.delete("tab");
+    }
+
+    // Update Step (only if in criador mode)
+    if (activeTab === "criador") {
+      params.set("step", step.toString());
+    } else {
+      params.delete("step");
+    }
+
+    // Replace URL without reload
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [activeTab, step, pathname, router]); // Intentionally omitting searchParams to avoid loop
 
   // Real-time synchronization for active heroes
   useEffect(() => {
@@ -150,7 +184,6 @@ export default function MestreClient() {
     imageUrl: "",
   });
 
-  const [step, setStep] = useState(1);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
 

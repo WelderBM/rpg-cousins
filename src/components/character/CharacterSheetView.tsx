@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Character } from "@/interfaces/Character";
 import {
   Coins,
@@ -44,6 +45,7 @@ import Link from "next/link";
 import Skill from "@/interfaces/Skills";
 import { calculateCarryCapacity } from "@/utils/inventoryUtils";
 import Bag, { calcBagSpaces } from "@/interfaces/Bag";
+import { calculateSkillBonuses } from "@/utils/skillUtils";
 
 // --- SUB-COMPONENTS ---
 
@@ -54,20 +56,28 @@ import {
   ItemList,
   SimpleList,
   SectionSlider,
+  SkillsDisplay,
 } from "./DisplayComponents";
 
 interface CharacterSheetViewProps {
   character: Character;
   onUpdate: (updates: Partial<Character>) => Promise<void>;
   isMestre?: boolean;
+  onEditWizard?: () => void;
 }
 
 export function CharacterSheetView({
   character: activeCharacter,
   onUpdate,
   isMestre = false,
+  onEditWizard,
 }: CharacterSheetViewProps) {
   // --- STATES ---
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Money
   const [isEditingMoney, setIsEditingMoney] = useState(false);
@@ -434,6 +444,15 @@ export function CharacterSheetView({
                       <Download size={24} />
                     )}
                   </button>
+                  {onEditWizard && (
+                    <button
+                      onClick={onEditWizard}
+                      className="p-2 transition-colors text-amber-500 hover:text-amber-400"
+                      title="Editar Personagem (Wizard)"
+                    >
+                      <Wand2 size={24} />
+                    </button>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2 justify-center md:justify-start items-center text-sm text-stone-100 font-serif">
                   <span className="flex items-center gap-1.5 px-2 md:px-3 py-1 bg-amber-900/10 rounded-lg border border-amber-900/30 text-[10px] md:text-sm">
@@ -715,12 +734,9 @@ export function CharacterSheetView({
               </div>
 
               {/* Skills */}
-              <SimpleList
-                title="Perícias"
-                items={activeCharacter.skills || []}
-                icon={Brain}
-                highlightedItems={originSkillsList}
-                highlightIcon={MapPin}
+              <SkillsDisplay
+                skills={calculateSkillBonuses(activeCharacter)}
+                originSkills={originSkillsList}
               />
             </div>
 
@@ -809,156 +825,176 @@ export function CharacterSheetView({
         </main>
       </div>
 
-      {/* Traits Modal */}
-      <AnimatePresence>
-        {isEditingTraits && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsEditingTraits(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-2xl bg-stone-900 border border-stone-800 rounded-3xl overflow-hidden shadow-2xl"
-            >
-              <div className="bg-stone-950 p-6 border-b border-stone-800 flex justify-between items-center">
-                <h2 className="text-2xl font-serif font-black text-amber-500">
-                  Estética do Herói
-                </h2>
-                <button
+      {/* Traits Modal - Use Portal */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {isEditingTraits && (
+              <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   onClick={() => setIsEditingTraits(false)}
-                  className="p-2 hover:bg-stone-800 rounded-full transition-colors"
+                  className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                />
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  className="relative w-full max-w-2xl bg-stone-900 border border-stone-800 rounded-3xl overflow-hidden shadow-2xl z-10"
                 >
-                  <X size={24} />
-                </button>
-              </div>
-              <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar space-y-8">
-                {/* Image */}
-                <div className="flex flex-col items-center p-6 bg-black/40 rounded-3xl border border-dashed border-stone-800 group">
-                  <div className="w-32 h-32 rounded-full border-4 border-stone-800 bg-stone-900 overflow-hidden mb-4 relative">
-                    {isUploading ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                        <Upload className="animate-bounce" />
-                      </div>
-                    ) : activeCharacter.imageUrl ? (
-                      <img
-                        src={activeCharacter.imageUrl}
-                        className="w-full h-full object-cover"
-                        alt="Avatar"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-4xl">
-                        🧙‍♂️
-                      </div>
-                    )}
+                  <div className="bg-stone-950 p-6 border-b border-stone-800 flex justify-between items-center">
+                    <h2 className="text-2xl font-serif font-black text-amber-500">
+                      Estética do Herói
+                    </h2>
+                    <button
+                      onClick={() => setIsEditingTraits(false)}
+                      className="p-2 hover:bg-stone-800 rounded-full transition-colors hidden md:block"
+                    >
+                      <X size={24} />
+                    </button>
+                    <button
+                      onClick={() => setIsEditingTraits(false)}
+                      className="p-2 hover:bg-stone-800 rounded-full transition-colors md:hidden text-stone-400"
+                    >
+                      <X size={20} />
+                    </button>
                   </div>
-                  <div className="flex gap-3">
-                    <label className="cursor-pointer bg-amber-600 hover:bg-amber-500 text-black font-black px-6 py-2 rounded-xl transition-all shadow-lg text-sm uppercase tracking-widest flex items-center gap-2">
-                      <Upload size={16} /> Carregar Imagem
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        disabled={isUploading}
-                      />
-                    </label>
-                    {activeCharacter.imageUrl && (
-                      <button
-                        onClick={handleDeleteImage}
-                        className="bg-red-600 hover:bg-red-500 text-white font-black px-6 py-2 rounded-xl transition-all shadow-lg text-sm uppercase tracking-widest flex items-center gap-2"
-                      >
-                        <Trash2 size={16} /> Apagar
-                      </button>
-                    )}
-                  </div>
-                </div>
+                  <div className="p-6 md:p-8 max-h-[80vh] overflow-y-auto custom-scrollbar space-y-8">
+                    {/* Image */}
+                    <div className="flex flex-col items-center p-6 bg-black/40 rounded-3xl border border-dashed border-stone-800 group">
+                      <div className="w-32 h-32 rounded-full border-4 border-stone-800 bg-stone-900 overflow-hidden mb-4 relative">
+                        {isUploading ? (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                            <Upload className="animate-bounce" />
+                          </div>
+                        ) : activeCharacter.imageUrl ? (
+                          <img
+                            src={activeCharacter.imageUrl}
+                            className="w-full h-full object-cover"
+                            alt="Avatar"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-4xl">
+                            🧙‍♂️
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-3">
+                        <label className="cursor-pointer bg-amber-600 hover:bg-amber-500 text-black font-black px-6 py-2 rounded-xl transition-all shadow-lg text-sm uppercase tracking-widest flex items-center gap-2">
+                          <Upload size={16} />{" "}
+                          <span className="hidden sm:inline">Carregar</span>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            disabled={isUploading}
+                          />
+                        </label>
+                        {activeCharacter.imageUrl && (
+                          <button
+                            onClick={handleDeleteImage}
+                            className="bg-red-600 hover:bg-red-500 text-white font-black px-6 py-2 rounded-xl transition-all shadow-lg text-sm uppercase tracking-widest flex items-center gap-2"
+                          >
+                            <Trash2 size={16} />{" "}
+                            <span className="hidden sm:inline">Apagar</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Name */}
-                  <div className="md:col-span-2">
-                    <label className="text-[10px] font-black text-amber-500 uppercase tracking-widest block mb-1">
-                      O Nome do Herói
-                    </label>
-                    <input
-                      type="text"
-                      value={tempName}
-                      onChange={(e) => setTempName(e.target.value)}
-                      placeholder="Ex: Valerius de Valkaria"
-                      className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-3 text-xl font-cinzel text-amber-100 focus:border-amber-500/50 outline-none"
-                    />
-                  </div>
-                  {/* Fields */}
-                  {["gender", "hair", "eyes", "skin", "height", "scars"].map(
-                    (field) => (
-                      <div key={field}>
-                        <label className="text-[10px] font-black text-amber-600/60 uppercase tracking-widest block mb-1">
-                          {field}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Name */}
+                      <div className="md:col-span-2">
+                        <label className="text-[10px] font-black text-amber-500 uppercase tracking-widest block mb-1">
+                          O Nome do Herói
                         </label>
                         <input
                           type="text"
-                          value={(tempTraits as any)[field]}
+                          value={tempName}
+                          onChange={(e) => setTempName(e.target.value)}
+                          placeholder="Ex: Valerius de Valkaria"
+                          className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-3 text-xl font-cinzel text-amber-100 focus:border-amber-500/50 outline-none"
+                        />
+                      </div>
+                      {/* Fields */}
+                      {[
+                        "gender",
+                        "hair",
+                        "eyes",
+                        "skin",
+                        "height",
+                        "scars",
+                      ].map((field) => (
+                        <div key={field}>
+                          <label className="text-[10px] font-black text-amber-600/60 uppercase tracking-widest block mb-1">
+                            {field}
+                          </label>
+                          <input
+                            type="text"
+                            value={(tempTraits as any)[field]}
+                            onChange={(e) =>
+                              setTempTraits({
+                                ...tempTraits,
+                                [field]: e.target.value,
+                              })
+                            }
+                            className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-2 focus:border-amber-500/50 outline-none"
+                          />
+                        </div>
+                      ))}
+                      <div className="md:col-span-2">
+                        <label className="text-[10px] font-black text-amber-600/60 uppercase tracking-widest block mb-1">
+                          Outros Detalhes
+                        </label>
+                        <textarea
+                          value={tempTraits.extra}
                           onChange={(e) =>
                             setTempTraits({
                               ...tempTraits,
-                              [field]: e.target.value,
+                              extra: e.target.value,
                             })
                           }
-                          className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-2 focus:border-amber-500/50 outline-none"
+                          className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-3 focus:border-amber-500/50 outline-none min-h-[80px]"
                         />
                       </div>
-                    )
-                  )}
-                  <div className="md:col-span-2">
-                    <label className="text-[10px] font-black text-amber-600/60 uppercase tracking-widest block mb-1">
-                      Outros Detalhes
-                    </label>
-                    <textarea
-                      value={tempTraits.extra}
-                      onChange={(e) =>
-                        setTempTraits({ ...tempTraits, extra: e.target.value })
-                      }
-                      className="w-full bg-black/40 border border-stone-800 rounded-xl px-4 py-3 focus:border-amber-500/50 outline-none min-h-[80px]"
-                    />
-                  </div>
-                </div>
+                    </div>
 
-                <div className="bg-stone-950/50 p-4 rounded-xl border border-stone-800">
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-bold text-amber-500 text-xs flex items-center gap-2">
-                      <Wand2 size={14} /> Gerador de Prompt IA
-                    </h4>
+                    <div className="bg-stone-950/50 p-4 rounded-xl border border-stone-800">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-bold text-amber-500 text-xs flex items-center gap-2">
+                          <Wand2 size={14} /> Gerador de Prompt IA
+                        </h4>
+                        <button
+                          onClick={copyPromptToClipboard}
+                          className="text-[10px] bg-stone-800 hover:bg-stone-700 px-2 py-1 rounded text-stone-300 transition-colors"
+                        >
+                          Copiar Prompt
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-stone-400 italic line-clamp-2">
+                        {generateCharacterPrompt({
+                          ...activeCharacter,
+                          physicalTraits: tempTraits,
+                        })}
+                      </p>
+                    </div>
+
                     <button
-                      onClick={copyPromptToClipboard}
-                      className="text-[10px] bg-stone-800 hover:bg-stone-700 px-2 py-1 rounded text-stone-300 transition-colors"
+                      onClick={saveTraits}
+                      className="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
                     >
-                      Copiar Prompt
+                      <Check size={20} /> Salvar Alterações
                     </button>
                   </div>
-                  <p className="text-[10px] text-stone-400 italic">
-                    {generateCharacterPrompt({
-                      ...activeCharacter,
-                      physicalTraits: tempTraits,
-                    })}
-                  </p>
-                </div>
-
-                <button
-                  onClick={saveTraits}
-                  className="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
-                >
-                  <Check size={20} /> Salvar Alterações
-                </button>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -124,47 +124,42 @@ const RaceSelection = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="relative flex flex-col gap-6 p-4 md:p-8 pb-48 md:pb-32"
+            className="flex flex-col gap-8 p-4 md:p-8 max-w-7xl mx-auto pb-48 md:pb-32"
           >
-            <div className="flex flex-col items-center gap-4 mb-12">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() =>
-                    (window.location.href = "/herois?tab=novo-heroi")
-                  }
-                  className="p-2 bg-black/40 backdrop-blur-md border border-amber-700/30 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-2 group"
-                >
-                  <ChevronLeft
-                    size={20}
-                    className="group-hover:-translate-x-1 transition-transform"
-                  />
-                  <span className="text-xs uppercase tracking-widest font-bold">
-                    Sair
-                  </span>
-                </button>
-                <motion.h2
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-cinzel text-amber-500 text-center drop-shadow-[0_0_15px_rgba(251,191,36,0.3)]"
-                >
-                  Escolha sua Raça
-                </motion.h2>
-              </div>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-neutral-400 text-center font-cinzel tracking-[0.2em] text-sm md:text-base uppercase"
+            <div className="sticky top-0 z-40 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg -mx-8 px-8">
+              <button
+                onClick={() =>
+                  (window.location.href = "/herois?tab=novo-heroi")
+                }
+                className="p-2 bg-stone-900 border border-amber-700/30 rounded-lg text-neutral-400 hover:text-white transition-all flex items-center gap-2 group text-sm z-10"
               >
-                Sua jornada em Arton começa aqui
-              </motion.p>
+                <ChevronLeft
+                  size={20}
+                  className="group-hover:-translate-x-1 transition-transform"
+                />
+                <span className="hidden sm:inline uppercase tracking-widest font-bold">
+                  Sair
+                </span>
+              </button>
+              <h2 className="text-2xl md:text-4xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
+                Escolha sua Raça
+              </h2>
             </div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-neutral-400 text-center font-cinzel tracking-[0.2em] text-sm md:text-base uppercase -mt-4"
+            >
+              Sua jornada em Arton começa aqui
+            </motion.p>
 
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 max-w-5xl mx-auto w-full"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 w-full"
             >
               {RACAS.map((race, index) => (
                 <motion.div
@@ -192,10 +187,27 @@ const RaceSelection = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="relative flex flex-col h-full min-h-screen max-w-2xl mx-auto w-full"
+            className="max-w-2xl mx-auto w-full p-4 md:p-8 space-y-6 pb-32"
           >
+            {/* Sticky Header for Detail View */}
+            <div className="sticky top-0 z-50 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
+              <button
+                onClick={() => {
+                  setSelectedPreview(null);
+                  setWizardDraft("race", { previewName: null });
+                }}
+                className="flex items-center gap-2 px-3 py-2 bg-stone-900/80 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10 text-sm"
+              >
+                <ChevronLeft size={18} />
+                <span className="hidden sm:inline">Voltar</span>
+              </button>
+              <h2 className="text-xl md:text-2xl font-cinzel text-amber-500 absolute left-0 right-0 text-center pointer-events-none drop-shadow-xl">
+                {selectedPreview.name}
+              </h2>
+            </div>
+
             {/* Header com imagem de fundo */}
-            <div className="relative h-48 md:h-72 overflow-hidden bg-stone-950">
+            <div className="relative h-48 md:h-72 overflow-hidden bg-stone-950 rounded-2xl border border-white/5">
               {/* Background Image */}
               <div className="absolute inset-0 flex items-center justify-center bg-stone-950">
                 <Image
@@ -216,90 +228,77 @@ const RaceSelection = () => {
                   {selectedPreview.name}
                 </h2>
               </div>
-              {/* Discrete Internal Back Button */}
-              <button
-                onClick={() => {
-                  setSelectedPreview(null);
-                  setWizardDraft("race", { previewName: null });
-                }}
-                className="absolute top-4 left-4 z-10 p-2 bg-black/40 backdrop-blur-md border border-white/10 text-white rounded-full active:scale-95 transition-all"
-              >
-                <ChevronLeft size={20} />
-              </button>
             </div>
 
-            {/* Conteúdo scrollável */}
-            <div className="flex-1 overflow-y-auto bg-stone-950 p-5 md:p-8 space-y-6 pb-32">
-              {/* Lore Compacta */}
-              <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-4 italic text-sm md:text-base text-stone-300 leading-relaxed">
-                {selectedPreview.description}
-              </div>
+            {/* Lore Compacta */}
+            <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-4 italic text-sm md:text-base text-stone-300 leading-relaxed">
+              {selectedPreview.description}
+            </div>
 
-              {/* Atributos Grid */}
-              <div className="space-y-3">
-                <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
-                  <Swords size={12} /> Atributos Raciais
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {selectedPreview.attributes.attrs.map((at, i) => (
-                    <div
-                      key={i}
-                      className="bg-stone-900/50 border border-stone-800 p-3 rounded-xl flex items-center justify-between"
-                    >
-                      <span className="text-xs font-bold text-stone-500 uppercase">
-                        {at.attr}
-                      </span>
-                      <span
-                        className={`text-lg font-cinzel font-bold ${
-                          at.mod > 0 ? "text-emerald-500" : "text-red-400"
-                        }`}
-                      >
-                        {at.mod > 0 ? "+" : ""}
-                        {at.mod}
-                      </span>
-                    </div>
-                  ))}
-                  <div className="bg-stone-900/50 border border-stone-800 p-3 rounded-xl flex items-center justify-between">
+            {/* Atributos Grid */}
+            <div className="space-y-3">
+              <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
+                <Swords size={12} /> Atributos Raciais
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {selectedPreview.attributes.attrs.map((at, i) => (
+                  <div
+                    key={i}
+                    className="bg-stone-900/50 border border-stone-800 p-3 rounded-xl flex items-center justify-between"
+                  >
                     <span className="text-xs font-bold text-stone-500 uppercase">
-                      Passo
+                      {at.attr}
                     </span>
-                    <span className="text-lg font-cinzel font-bold text-stone-200">
-                      {selectedPreview.getDisplacement?.(selectedPreview) || 9}m
+                    <span
+                      className={`text-lg font-cinzel font-bold ${
+                        at.mod > 0 ? "text-emerald-500" : "text-red-400"
+                      }`}
+                    >
+                      {at.mod > 0 ? "+" : ""}
+                      {at.mod}
                     </span>
                   </div>
+                ))}
+                <div className="bg-stone-900/50 border border-stone-800 p-3 rounded-xl flex items-center justify-between">
+                  <span className="text-xs font-bold text-stone-500 uppercase">
+                    Passo
+                  </span>
+                  <span className="text-lg font-cinzel font-bold text-stone-200">
+                    {selectedPreview.getDisplacement?.(selectedPreview) || 9}m
+                  </span>
                 </div>
               </div>
+            </div>
 
-              {/* Habilidades Raciais */}
+            {/* Habilidades Raciais */}
+            <div className="space-y-3">
+              <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
+                <Sparkles size={12} /> Habilidades de {selectedPreview.name}
+              </h3>
               <div className="space-y-3">
-                <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
-                  <Sparkles size={12} /> Habilidades de {selectedPreview.name}
-                </h3>
-                <div className="space-y-3">
-                  {selectedPreview.abilities.map((ability, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 rounded-xl bg-stone-900/30 border border-stone-800/50"
-                    >
-                      <h4 className="font-bold text-amber-200 text-sm mb-1">
-                        {ability.name}
-                      </h4>
-                      <p className="text-xs text-stone-400 leading-relaxed">
-                        {ability.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                {selectedPreview.abilities.map((ability, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-xl bg-stone-900/30 border border-stone-800/50"
+                  >
+                    <h4 className="font-bold text-amber-200 text-sm mb-1">
+                      {ability.name}
+                    </h4>
+                    <p className="text-xs text-stone-400 leading-relaxed">
+                      {ability.description}
+                    </p>
+                  </div>
+                ))}
               </div>
+            </div>
 
-              {/* Devoção */}
-              <div className="space-y-3">
-                <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
-                  <Flame size={12} /> Fé & Devoção
-                </h3>
-                <div className="p-4 rounded-xl bg-black/20 border border-white/5 italic text-xs text-stone-500">
-                  {selectedPreview.commonReligions || "Variada."}
-                </div>
+            {/* Devoção */}
+            <div className="space-y-3">
+              <h3 className="text-[10px] font-black text-amber-500/50 uppercase tracking-[0.2em] flex items-center gap-2">
+                <Flame size={12} /> Fé & Devoção
+              </h3>
+              <div className="p-4 rounded-xl bg-black/20 border border-white/5 italic text-xs text-stone-500">
+                {selectedPreview.commonReligions || "Variada."}
               </div>
             </div>
 
