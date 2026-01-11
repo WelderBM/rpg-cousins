@@ -10,7 +10,7 @@ import {
   Backpack,
   Package,
   Search,
-  Dices,
+  Dice6,
   Brain,
   MapPin,
   ChevronDown,
@@ -188,7 +188,7 @@ export const ItemList = ({ title, items, icon: Icon }: any) => {
                                   <span>{part}</span>
                                 ) : (
                                   <span className="flex items-center gap-1">
-                                    <Dices
+                                    <Dice6
                                       size={10}
                                       className="text-amber-500/60"
                                     />
