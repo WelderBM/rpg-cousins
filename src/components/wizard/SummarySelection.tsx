@@ -102,6 +102,22 @@ const SummarySelection = () => {
     const pmBase = selectedClass?.pm || 4;
     const conMod = mappedAttributes[Atributo.CONSTITUICAO].mod;
 
+    // Construct a temporary bag for the preview that includes wizard choices
+    const previewBag = new Bag(bag.getEquipments());
+
+    // Only add class/origin items for preview if they aren't already there
+    // This is just for UI feedback, the real logic is in handleFinalize
+    if (selectedClass) {
+      const classEquips = getClassEquipments(
+        selectedClass,
+        previewBag,
+        selectedClassWeapons
+      );
+      // We don't blindly add to avoid triple-count in preview, but for preview it's better to show what's coming
+      // However, to keep it simple, let's just show the current bag.
+      // If we want it to be accurate, we'd need a more complex merge.
+    }
+
     return {
       name: name || "Sem Nome",
       race: selectedRace,
@@ -113,7 +129,7 @@ const SummarySelection = () => {
       originBenefits: originBenefits,
       deity: selectedDeity,
       grantedPowers: selectedGrantedPowers,
-      bag: bag,
+      bag: bag, // Store already has the bag which now includes the starting kit
       money,
       currentPv: hpBase + conMod,
       currentPm: pmBase,
@@ -175,70 +191,100 @@ const SummarySelection = () => {
         ...GENERAL_EQUIPMENT.food,
       ];
 
-      const finalBag = new Bag();
+      const finalBag = new Bag(bag.getEquipments());
 
-      if (selectedClass) {
-        const classEquips = getClassEquipments(
-          selectedClass,
-          finalBag,
-          selectedClassWeapons
-        );
-        finalBag.addEquipment(classEquips);
-      }
+      // Only add Class and Origin items if this is a NEW character
+      // Or if the user explicitly chose new weapons in the wizard steps.
+      // For existing characters, they already have their kit and origin items in the bag.
+      if (!editingCharacterId) {
+        if (selectedClass) {
+          const classEquips = getClassEquipments(
+            selectedClass,
+            finalBag,
+            selectedClassWeapons
+          );
+          finalBag.addEquipment(classEquips);
+        }
 
-      if (selectedOrigin?.getItems) {
-        const originItems = selectedOrigin.getItems();
-        let choiceIdx = 0;
-        originItems.forEach((item) => {
-          let equipmentToAdd: any = null;
-          if (item.choice && selectedOriginWeapons[choiceIdx]) {
-            equipmentToAdd = { ...selectedOriginWeapons[choiceIdx] };
-            choiceIdx++;
-          } else if (typeof item.equipment === "string") {
-            const found =
-              Object.values(Armas).find(
-                (a) =>
-                  a.nome.toLowerCase() ===
-                  (item.equipment as string).toLowerCase()
-              ) ||
-              Object.values(Armaduras).find(
-                (a) =>
-                  a.nome.toLowerCase() ===
-                  (item.equipment as string).toLowerCase()
-              ) ||
-              Object.values(Escudos).find(
-                (a) =>
-                  a.nome.toLowerCase() ===
-                  (item.equipment as string).toLowerCase()
-              ) ||
-              allGeneralItems.find(
-                (a) =>
-                  a.nome.toLowerCase() ===
-                  (item.equipment as string).toLowerCase()
-              );
+        if (selectedOrigin?.getItems) {
+          const originItems = selectedOrigin.getItems();
+          let choiceIdx = 0;
+          originItems.forEach((item) => {
+            let equipmentToAdd: any = null;
+            if (item.choice && selectedOriginWeapons[choiceIdx]) {
+              equipmentToAdd = { ...selectedOriginWeapons[choiceIdx] };
+              choiceIdx++;
+            } else if (typeof item.equipment === "string") {
+              const found =
+                Object.values(Armas).find(
+                  (a) =>
+                    a.nome.toLowerCase() ===
+                    (item.equipment as string).toLowerCase()
+                ) ||
+                Object.values(Armaduras).find(
+                  (a) =>
+                    a.nome.toLowerCase() ===
+                    (item.equipment as string).toLowerCase()
+                ) ||
+                Object.values(Escudos).find(
+                  (a) =>
+                    a.nome.toLowerCase() ===
+                    (item.equipment as string).toLowerCase()
+                ) ||
+                allGeneralItems.find(
+                  (a) =>
+                    a.nome.toLowerCase() ===
+                    (item.equipment as string).toLowerCase()
+                );
 
-            if (found) {
-              equipmentToAdd = { ...found };
+              if (found) {
+                equipmentToAdd = { ...found };
+              } else {
+                equipmentToAdd = {
+                  nome: item.equipment,
+                  description: item.description || "Item de Origem",
+                  spaces: 1,
+                  group: "Item Geral",
+                };
+              }
             } else {
-              equipmentToAdd = {
-                nome: item.equipment,
-                description: item.description || "Item de Origem",
-                spaces: 1,
-                group: "Item Geral",
-              };
+              equipmentToAdd = { ...(item.equipment as any) };
             }
-          } else {
-            equipmentToAdd = { ...(item.equipment as any) };
-          }
 
-          if (equipmentToAdd) {
-            equipmentToAdd.quantidade = item.qtd || 1;
-            if (item.description) equipmentToAdd.description = item.description;
-            const payload: any = {};
-            payload[equipmentToAdd.group || "Item Geral"] = [equipmentToAdd];
+            if (equipmentToAdd) {
+              equipmentToAdd.quantidade = item.qtd || 1;
+              if (item.description)
+                equipmentToAdd.description = item.description;
+              const payload: any = {};
+              payload[equipmentToAdd.group || "Item Geral"] = [equipmentToAdd];
+              finalBag.addEquipment(payload);
+            }
+          });
+        }
+      } else {
+        // If EDITING, we might still want to add newly chosen weapons/origin weapons
+        // if the user visited those steps.
+        if (selectedClassWeapons.length > 0) {
+          // Add only weapons that aren't the default "Standard Kit" items which are now in the bag
+          const newWeapons = selectedClassWeapons.filter(
+            (w) =>
+              ![
+                "Mochila",
+                "Saco de dormir",
+                "Pederneira",
+                "Traje de viajante",
+              ].includes(w.nome)
+          );
+          if (newWeapons.length > 0) {
+            const payload: any = { Arma: newWeapons };
             finalBag.addEquipment(payload);
           }
-        });
+        }
+
+        if (selectedOriginWeapons.length > 0) {
+          const payload: any = { Arma: selectedOriginWeapons };
+          finalBag.addEquipment(payload);
+        }
       }
 
       const characterData = {
@@ -356,7 +402,7 @@ const SummarySelection = () => {
   return (
     <div className="bg-stone-950 text-neutral-100 pb-32">
       <div className="max-w-2xl mx-auto p-4 sm:p-8 space-y-8">
-        <div className="sticky top-0 z-0 bg-stone-950/90 backdrop-blur-xl border-b border-white/5 pb-4 pt-4 -mx-8 px-8 flex items-center justify-between gap-4 shadow-lg">
+        <div className="sticky top-14 z-40 bg-stone-950/90 backdrop-blur-xl border-b border-white/5 pb-4 pt-4 -mx-8 px-8 flex items-center justify-between gap-4 shadow-lg">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setStep(5)}

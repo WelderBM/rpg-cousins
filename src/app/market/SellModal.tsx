@@ -19,7 +19,8 @@ interface SellModalProps {
   onConfirm: (
     characterId: string,
     item: Equipment,
-    finalPrice: number
+    finalPrice: number,
+    quantity: number
   ) => Promise<void>;
   item: Equipment | null;
   characters: Character[];
@@ -38,6 +39,7 @@ export const SellModal: React.FC<SellModalProps> = ({
   const [bargainType, setBargainType] = useState<
     "none" | "success" | "critical"
   >("none");
+  const [quantity, setQuantity] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Reset processing state when modal opens/closes
@@ -45,6 +47,7 @@ export const SellModal: React.FC<SellModalProps> = ({
     if (!isOpen) {
       setIsProcessing(false);
       setBargainType("none");
+      setQuantity(1);
     }
   }, [isOpen]);
 
@@ -76,7 +79,10 @@ export const SellModal: React.FC<SellModalProps> = ({
     return mult;
   }, [bargainType]);
 
-  const finalPrice = Math.floor(basePrice * sellMultiplier);
+  const unitBasePrice = item?.preco || 0;
+  const unitFinalPrice = Math.floor(unitBasePrice * sellMultiplier);
+  const totalFinalPrice = unitFinalPrice * quantity;
+  const maxQuantity = item?.quantidade || 1;
   const itemSlots = item?.spaces ?? 1;
   const actualItemSlots =
     item?.spaces !== undefined && item?.spaces !== null ? item.spaces : 1;
@@ -93,7 +99,7 @@ export const SellModal: React.FC<SellModalProps> = ({
 
     // Money
     const currentMoney = selectedChar.money || 0;
-    const newMoney = currentMoney + finalPrice;
+    const newMoney = currentMoney + totalFinalPrice;
 
     return {
       canSell: true,
@@ -101,14 +107,14 @@ export const SellModal: React.FC<SellModalProps> = ({
       currentMoney,
       newMoney,
     };
-  }, [selectedChar, item, finalPrice]);
+  }, [selectedChar, item, totalFinalPrice]);
 
   const handleConfirm = async () => {
     if (!status.canSell || isProcessing || !selectedCharId || !item) return;
 
     setIsProcessing(true);
     try {
-      await onConfirm(selectedCharId, item, finalPrice);
+      await onConfirm(selectedCharId, item, totalFinalPrice, quantity);
       // Modal will be closed by parent component after successful sale
     } catch (e) {
       console.error("Sale error:", e);
@@ -120,23 +126,23 @@ export const SellModal: React.FC<SellModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 font-sans">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 font-sans">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className=" absolute inset-0 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm"
         />
 
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative bg-[#111] border border-stone-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
+          className="relative z-[95] bg-[#111] border border-stone-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
         >
           {/* Header */}
-          <div className="bg-[#1a1a1a] p-4 border-b border-white/5 flex items-center justify-between">
+          <div className="bg-[#1a1a1a] p-4 border-b border-white/5 flex items-center justify-between shrink-0">
             <h3 className="font-serif text-lg text-amber-500 font-bold flex items-center gap-2">
               <Coins size={20} /> Confirmar Venda
             </h3>
@@ -148,7 +154,7 @@ export const SellModal: React.FC<SellModalProps> = ({
             </button>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
             {/* Item Info */}
             {item && (
               <div className="flex gap-4">
@@ -165,7 +171,7 @@ export const SellModal: React.FC<SellModalProps> = ({
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-emerald-500 font-bold text-sm">
-                      +{finalPrice} T$
+                      +{unitFinalPrice} T$
                     </span>
                     <span className="text-xs text-stone-600">•</span>
                     <span className="text-stone-400 text-xs">
@@ -180,6 +186,49 @@ export const SellModal: React.FC<SellModalProps> = ({
 
             <hr className="border-white/5" />
 
+            {/* Quantity Selector */}
+            <div className="space-y-3">
+              <label className="text-xs uppercase font-bold text-stone-500 flex items-center justify-between">
+                <span>Quantidade (Possui: {maxQuantity})</span>
+                <span className="text-emerald-500 font-serif">
+                  Total: +{totalFinalPrice} T$
+                </span>
+              </label>
+              <div className="flex items-center gap-4 bg-[#0c0c0c] border border-white/10 rounded-xl p-2">
+                <button
+                  type="button"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-stone-800 text-white hover:bg-stone-700 transition-colors font-bold disabled:opacity-30"
+                  disabled={quantity <= 1}
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 1;
+                    setQuantity(Math.min(maxQuantity, Math.max(1, val)));
+                  }}
+                  className="flex-1 bg-transparent text-center text-white font-bold text-lg outline-none"
+                  min="1"
+                  max={maxQuantity}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQuantity(Math.min(maxQuantity, quantity + 1))
+                  }
+                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-stone-800 text-white hover:bg-stone-700 transition-colors font-bold disabled:opacity-30"
+                  disabled={quantity >= maxQuantity}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <hr className="border-white/5" />
+
             {/* Bargaining / Diplomacy Section */}
             <div className="space-y-3">
               <label className="text-xs uppercase font-bold text-stone-500 flex items-center gap-2">
@@ -188,6 +237,7 @@ export const SellModal: React.FC<SellModalProps> = ({
               </label>
               <div className="grid grid-cols-1 gap-2">
                 <button
+                  type="button"
                   onClick={() => setBargainType("none")}
                   className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                     bargainType === "none"
@@ -205,6 +255,7 @@ export const SellModal: React.FC<SellModalProps> = ({
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setBargainType("success")}
                   className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                     bargainType === "success"
@@ -222,6 +273,7 @@ export const SellModal: React.FC<SellModalProps> = ({
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setBargainType("critical")}
                   className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                     bargainType === "critical"
@@ -292,9 +344,10 @@ export const SellModal: React.FC<SellModalProps> = ({
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 bg-[#1a1a1a] border-t border-white/5 flex justify-end gap-3">
+          <div className="p-4 bg-[#1a1a1a] border-t border-white/5 flex justify-end gap-3 shrink-0">
             <button
               onClick={onClose}
+              type="button"
               disabled={isProcessing}
               className={`px-4 py-2 text-stone-400 hover:text-white transition-colors text-sm font-medium ${
                 isProcessing ? "opacity-50 cursor-not-allowed" : ""

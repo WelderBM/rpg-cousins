@@ -309,43 +309,7 @@ const RoleSelection = () => {
     return STARTING_MONEY - spent;
   }, [localWeapons]);
 
-  const STANDARD_KIT: Equipment[] = [
-    {
-      nome: "Mochila",
-      group: "Item Geral",
-      preco: 0,
-      spaces: 0,
-      description: "Conteúdo do Kit de Aventureiro",
-    },
-    {
-      nome: "Saco de dormir",
-      group: "Item Geral",
-      preco: 0,
-      spaces: 1,
-      description: "Conteúdo do Kit de Aventureiro",
-    },
-    {
-      nome: "Traje de viajante",
-      group: "Vestuário",
-      preco: 0,
-      spaces: 0, // Usually worn, doesn't count for space? Keeping 0 for free kit logic simplicity or 1 based on rules
-      description: "Conteúdo do Kit de Aventureiro",
-    },
-    {
-      nome: "Pederneira",
-      group: "Item Geral",
-      preco: 0,
-      spaces: 0,
-      description: "Conteúdo do Kit de Aventureiro",
-    },
-  ];
-
-  // Initialize Standard Kit if empty
-  useEffect(() => {
-    if (selectedPreview && localWeapons.length === 0) {
-      setLocalWeapons([...STANDARD_KIT]);
-    }
-  }, [selectedPreview]);
+  // Removed Standard Kit initialization from here as it's now handled by the store's initial bag state.
 
   // Helper to check if power requirements are met
   const checkPowerRequirements = (power: ClassPower): boolean => {
@@ -528,7 +492,7 @@ const RoleSelection = () => {
             transition={{ duration: 0.3 }}
             className="flex flex-col gap-8 p-4 md:p-8 max-w-7xl mx-auto pb-48 md:pb-32"
           >
-            <div className="sticky top-0 z-40 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg -mx-8 px-8">
+            <div className="sticky top-0 md:top-14 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg -mx-8 px-8 z-40">
               <button
                 onClick={() => setStep(2)}
                 className="flex items-center gap-2 px-4 py-2 bg-stone-900 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10"
@@ -576,7 +540,7 @@ const RoleSelection = () => {
             className="max-w-2xl mx-auto w-full p-4 md:p-8 space-y-6 pb-32"
           >
             {/* Sticky Header for Detail View */}
-            <div className="sticky top-0 z-50 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
+            <div className="sticky top-0 md:top-14 z-50 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
               <button
                 onClick={() => setSelectedPreview(null)}
                 className="flex items-center gap-2 px-3 py-2 bg-stone-900/80 border border-amber-900/40 rounded-lg text-neutral-300 hover:text-amber-500 hover:border-amber-500 transition-all z-10 text-sm"
@@ -926,111 +890,6 @@ const RoleSelection = () => {
                   );
                 })}
               </div>
-            </section>
-
-            {/* WEAPON SHOP */}
-            <section className="space-y-4 pt-4 border-t border-stone-800">
-              <div className="flex justify-between items-end border-b border-amber-900/30 pb-2">
-                <h3 className="text-amber-500 font-cinzel text-lg flex items-center gap-2">
-                  <Sword size={18} /> Equipamento Inicial
-                </h3>
-                <span
-                  className={`text-xs font-bold px-3 py-1 rounded-full border ${
-                    currentMoney >= 0
-                      ? "bg-amber-900/30 text-amber-500 border-amber-900/50"
-                      : "bg-red-900/30 text-red-500 border-red-900/50"
-                  }`}
-                >
-                  T$ {currentMoney} Restantes
-                </span>
-              </div>
-
-              {/* Standard Kit Info */}
-              <div className="bg-stone-900/50 p-4 rounded-xl border border-stone-800">
-                <h4 className="font-bold text-stone-300 text-sm mb-2 flex items-center gap-2">
-                  <Book size={14} /> Kit de Aventureiro (Grátis)
-                </h4>
-                <p className="text-xs text-stone-500">
-                  Inclui: Mochila, Saco de dormir, Traje de viajante e
-                  Pederneira.
-                </p>
-              </div>
-
-              {/* Weapon List */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {[
-                  ...EQUIPAMENTOS.armasSimples,
-                  ...EQUIPAMENTOS.armasMarciais,
-                  ...EQUIPAMENTOS.escudos,
-                ]
-                  .filter((w) => (w.preco || 0) <= 200) // Show affordable-ish items
-                  .map((weapon) => {
-                    // Check if we own this specific item (not just same name, but bought from shop)
-                    // We identify shop items by having price > 0 (Standard kit is 0)
-                    const ownedCount = localWeapons.filter(
-                      (w) => w.nome === weapon.nome && (w.preco || 0) > 0
-                    ).length;
-
-                    return (
-                      <button
-                        key={weapon.nome}
-                        onClick={() => {
-                          if (ownedCount > 0) {
-                            // Specify to remove one instance
-                            const idx = localWeapons.findIndex(
-                              (w) =>
-                                w.nome === weapon.nome && (w.preco || 0) > 0
-                            );
-                            if (idx > -1) {
-                              const next = [...localWeapons];
-                              next.splice(idx, 1);
-                              setLocalWeapons(next);
-                            }
-                          } else {
-                            setLocalWeapons([...localWeapons, weapon]);
-                          }
-                        }}
-                        className={`text-left p-3 rounded-lg border transition-all flex justify-between items-center ${
-                          ownedCount > 0
-                            ? "bg-amber-900/20 border-amber-500/50"
-                            : "bg-stone-900 border-stone-800 hover:border-stone-600"
-                        }`}
-                      >
-                        <div>
-                          <div className="font-bold text-sm text-stone-200">
-                            {weapon.nome}
-                          </div>
-                          <div className="text-[10px] text-stone-500">
-                            {weapon.dano} | Crít: {weapon.critico}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div
-                            className={`text-xs font-bold ${
-                              ownedCount > 0
-                                ? "text-amber-500"
-                                : "text-stone-400"
-                            }`}
-                          >
-                            T$ {weapon.preco}
-                          </div>
-                          {ownedCount > 0 && (
-                            <div className="text-[10px] text-emerald-500 flex items-center justify-end gap-1">
-                              <Check size={10} /> Comprado
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-              </div>
-
-              {currentMoney < 0 && (
-                <div className="mt-4 p-3 bg-red-900/20 border border-red-500/50 rounded-xl text-red-200 text-xs text-center font-bold animate-pulse">
-                  Você gastou mais dinheiro do que possui! Remova itens para
-                  continuar.
-                </div>
-              )}
             </section>
 
             {/* ACTION FOOTER */}

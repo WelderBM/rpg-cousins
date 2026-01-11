@@ -15,6 +15,7 @@ import {
   MapPin,
   ChevronDown,
   ChevronUp,
+  X,
 } from "lucide-react";
 import { CalculatedSkill } from "@/utils/skillUtils";
 
@@ -375,16 +376,44 @@ export const SkillsDisplay = ({
   originSkills: string[];
 }) => {
   const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   if (!skills || skills.length === 0) return null;
 
+  const filteredSkills = skills.filter((skill) =>
+    skill.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="mb-8 select-none">
-      <h3 className="text-xs font-black text-amber-500/90 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 border-b border-stone-800/50 pb-2">
-        <Brain size={14} /> Perícias
-      </h3>
+      <div className="flex items-center justify-between mb-4 border-b border-stone-800/50 pb-2">
+        <h3 className="text-xs font-black text-amber-500/90 uppercase tracking-[0.2em] flex items-center gap-2">
+          <Brain size={14} /> Perícias
+        </h3>
+        <div className="relative group/search">
+          <Search
+            size={12}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-500 group-focus-within/search:text-amber-500 transition-colors pointer-events-none"
+          />
+          <input
+            type="text"
+            placeholder="Buscar..."
+            className="bg-stone-950/40 border border-white/5 rounded-full py-1 pl-8 pr-8 text-[10px] text-stone-300 outline-none focus:border-amber-500/30 focus:bg-stone-900/60 transition-all w-24 sm:w-32 placeholder:text-stone-600"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-500 hover:text-amber-500 transition-colors"
+            >
+              <X size={10} />
+            </button>
+          )}
+        </div>
+      </div>
       <div className="grid grid-cols-2 gap-2">
-        {skills.map((skill) => {
+        {filteredSkills.map((skill) => {
           const isOrigin = originSkills && originSkills.includes(skill.name);
           const isExpanded = expandedSkill === skill.name;
 

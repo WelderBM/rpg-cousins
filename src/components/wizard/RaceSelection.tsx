@@ -126,7 +126,7 @@ const RaceSelection = () => {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="flex flex-col gap-8 p-4 md:p-8 max-w-7xl mx-auto pb-48 md:pb-32"
           >
-            <div className="sticky top-0 z-40 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg -mx-8 px-8">
+            <div className="sticky top-14 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg -mx-8 px-8 z-40">
               <button
                 onClick={() =>
                   (window.location.href = "/herois?tab=novo-heroi")
@@ -190,7 +190,7 @@ const RaceSelection = () => {
             className="max-w-2xl mx-auto w-full p-4 md:p-8 space-y-6 pb-32"
           >
             {/* Sticky Header for Detail View */}
-            <div className="sticky top-0 z-50 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
+            <div className="sticky top-14 z-50 bg-stone-950/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-amber-900/20 shadow-lg mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
               <button
                 onClick={() => {
                   setSelectedPreview(null);
