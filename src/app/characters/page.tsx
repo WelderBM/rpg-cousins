@@ -69,6 +69,7 @@ export default function CharacterSelectPage() {
                   className: c.class?.name || "Desconhecido",
                   level: c.level || 1,
                   isFavorite: c.isFavorite || false,
+                  imageUrl: c.imageUrl,
                 }));
 
                 setUserCharacters(summaryList);
@@ -233,20 +234,27 @@ export default function CharacterSelectPage() {
             {/* Character Card Content */}
             <div className="p-6 flex flex-row items-center gap-4 relative z-10">
               <div
-                className={`h-16 w-16 rounded-full border flex items-center justify-center text-2xl transition-colors ${
+                className={`h-16 w-16 rounded-full border flex items-center justify-center text-2xl transition-colors overflow-hidden ${
                   char.isFavorite
                     ? "bg-amber-500/10 border-amber-500"
                     : "bg-medieval-stone border-medieval-gold/30"
                 }`}
               >
-                {/* Placeholder Avatar based on Race or Class */}
-                <User
-                  className={
-                    char.isFavorite
-                      ? "text-amber-500"
-                      : "text-medieval-gold opacity-80"
-                  }
-                />
+                {char.imageUrl ? (
+                  <img
+                    src={char.imageUrl}
+                    alt={char.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User
+                    className={
+                      char.isFavorite
+                        ? "text-amber-500"
+                        : "text-medieval-gold opacity-80"
+                    }
+                  />
+                )}
               </div>
 
               <div className="flex-1">

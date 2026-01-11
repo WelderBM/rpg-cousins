@@ -39,7 +39,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getEquipmentsByCategory } from "../../lib/localData";
 import Equipment from "../../interfaces/Equipment";
 import { getInitialMoney } from "../../functions/general";
-import Bag, { calcBagSpaces } from "../../interfaces/Bag";
+import Bag, { calcBagSpaces, calcArmorPenalty } from "../../interfaces/Bag";
 import { PurchaseModal } from "./PurchaseModal";
 import { SellModal } from "./SellModal";
 import { getItemIcon, getFallbackIcon } from "../../utils/assetUtils";
@@ -555,9 +555,9 @@ const InventoryItemCard = ({ item, onSell, onAdd, activeCharacter }: any) => {
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
-      className="relative group transition-all duration-300"
+      className="relative group transition-all duration-300 h-fit"
     >
-      <div className="h-full border rounded-lg p-3 flex flex-col gap-2 shadow-sm transition-all duration-300 relative overflow-hidden backdrop-blur-sm border-emerald-500/50 bg-emerald-950/20 hover:border-emerald-500 hover:bg-emerald-950/30">
+      <div className="h-fit border rounded-lg p-3 flex flex-col gap-2 shadow-sm transition-all duration-300 relative overflow-hidden backdrop-blur-sm border-emerald-500/50 bg-emerald-950/20 hover:border-emerald-500 hover:bg-emerald-950/30">
         {/* Compact Header: Icon + Stats */}
         <div className="flex items-center justify-between gap-2">
           <div className="w-9 h-9 rounded-lg flex items-center justify-center border transition-colors bg-emerald-900/30 border-emerald-500/50 text-emerald-500">
@@ -615,7 +615,7 @@ const InventoryItemCard = ({ item, onSell, onAdd, activeCharacter }: any) => {
         </div>
 
         {/* Item Info */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0">
           <div className="flex items-center justify-between gap-2">
             <h3 className="font-sans font-bold text-xs text-neutral-200 group-hover:text-emerald-400 transition-colors leading-tight line-clamp-1 truncate flex-1">
               {item.nome}
@@ -1337,66 +1337,28 @@ const MarketPage = () => {
       return;
     }
 
-    // Sell Logic (Existing, slightly modified to ensure safety)
-    const price = Math.floor((item.preco || 0) * 0.5);
-    let newMoney = activeCharacter.money + price;
-
-    // Optimistic Update
-    removeFromBag(item);
-    updateActiveCharacter({ money: newMoney });
-    setFeedback({ msg: `Vendeu ${item.nome}`, type: "success" });
-
-    // Persist
-    try {
-      const currentBagEquips = activeCharacter.bag.getEquipments();
-      const group = item.group || "Item Geral";
-      const newEquips = JSON.parse(JSON.stringify(currentBagEquips));
-
-      // Remove item logic (Mirroring store)
-      if (newEquips[group]) {
-        const idx = newEquips[group].findIndex(
-          (i: any) => i.nome === item.nome
-        );
-        if (idx > -1) {
-          const existing = newEquips[group][idx];
-          if ((existing.quantidade || 1) > 1) {
-            existing.quantidade = (existing.quantidade || 1) - 1;
-          } else {
-            newEquips[group].splice(idx, 1);
-          }
-        }
-      }
-
-      await CharacterService.updateCharacter(
-        auth.currentUser.uid,
-        activeCharacter.id!,
-        {
-          money: newMoney,
-          bag: {
-            equipments: newEquips,
-            // We should ideally calculate spaces here too if the DB relies on it,
-            // but the Bag class handles it on load.
-            spaces: calcBagSpaces(newEquips),
-            armorPenalty: 0, // Should calculate too but simplifying
-          } as any,
-        }
-      );
-    } catch (e) {
-      console.error(e);
-      setFeedback({ msg: "Erro ao salvar transação", type: "error" });
+    if (type === "sell") {
+      setSellingItem(item);
+      setIsSellModalOpen(true);
+      return;
     }
 
     setTimeout(() => setFeedback(null), 2000);
   };
 
-  const handleConfirmPurchase = async (charId: string, item: Equipment) => {
+  const handleConfirmPurchase = async (
+    charId: string,
+    item: Equipment,
+    quantity: number
+  ) => {
     if (!auth?.currentUser) return;
 
     const targetChar = myCharacters.find((c) => c.id === charId);
     if (!targetChar) return;
 
-    const price = item.preco || 0;
-    const newMoney = (targetChar.money || 0) - price;
+    const unitPrice = item.preco || 0;
+    const totalPrice = unitPrice * quantity;
+    const newMoney = (targetChar.money || 0) - totalPrice;
     const itemSlots = item.spaces ?? 1;
 
     try {
@@ -1417,9 +1379,9 @@ const MarketPage = () => {
       const existing = newEquips[group].find((i: any) => i.nome === item.nome);
 
       if (existing) {
-        existing.quantidade = (existing.quantidade || 1) + 1;
+        existing.quantidade = (existing.quantidade || 1) + quantity;
       } else {
-        newEquips[group].push({ ...item, quantidade: 1 });
+        newEquips[group].push({ ...item, quantidade: quantity });
       }
 
       // Update Firebase
@@ -1428,7 +1390,7 @@ const MarketPage = () => {
         bag: {
           equipments: newEquips,
           spaces: calcBagSpaces(newEquips),
-          armorPenalty: 0,
+          armorPenalty: calcArmorPenalty(newEquips),
         } as any,
       });
 
@@ -1447,11 +1409,22 @@ const MarketPage = () => {
       );
 
       // If active character, update store
+      // If active character, update store with the fresh data
       if (activeCharacter?.id === charId) {
-        updateActiveCharacter({
+        const updatedChar = {
+          ...targetChar,
           money: newMoney,
-        });
-        addToBag(item);
+          bag: {
+            ...targetChar.bag,
+            equipments: newEquips,
+            spaces: calcBagSpaces(newEquips),
+            armorPenalty: calcArmorPenalty(newEquips),
+          } as any,
+        };
+        setActiveCharacter(updatedChar);
+        if (typeof window !== "undefined" && charId) {
+          localStorage.setItem("rpg_active_char_id", charId);
+        }
       }
 
       // Show success feedback
@@ -1482,7 +1455,8 @@ const MarketPage = () => {
   const handleConfirmSell = async (
     charId: string,
     item: Equipment,
-    finalPrice: number
+    finalPrice: number,
+    quantity: number
   ) => {
     if (!auth?.currentUser) return;
 
@@ -1503,21 +1477,40 @@ const MarketPage = () => {
       }
 
       const newEquips = JSON.parse(JSON.stringify(currentEquips));
-      const group = item.group || "Item Geral";
+      let itemFound = false;
 
-      if (newEquips[group]) {
-        const existing = newEquips[group].find(
+      // First try the designated group
+      const targetGroup = item.group || "Item Geral";
+      if (newEquips[targetGroup]) {
+        const idx = newEquips[targetGroup].findIndex(
           (i: any) => i.nome === item.nome
         );
 
-        if (existing) {
-          if (existing.quantidade > 1) {
-            existing.quantidade -= 1;
+        if (idx > -1) {
+          const existing = newEquips[targetGroup][idx];
+          if ((existing.quantidade || 1) > quantity) {
+            existing.quantidade -= quantity;
           } else {
-            // Remove item completely
-            newEquips[group] = newEquips[group].filter(
-              (i: any) => i.nome !== item.nome
-            );
+            newEquips[targetGroup].splice(idx, 1);
+          }
+          itemFound = true;
+        }
+      }
+
+      // If not found in designated group, search all other groups
+      if (!itemFound) {
+        for (const g of Object.keys(newEquips)) {
+          if (g === targetGroup) continue;
+          const idx = newEquips[g].findIndex((i: any) => i.nome === item.nome);
+          if (idx > -1) {
+            const existing = newEquips[g][idx];
+            if ((existing.quantidade || 1) > quantity) {
+              existing.quantidade -= quantity;
+            } else {
+              newEquips[g].splice(idx, 1);
+            }
+            itemFound = true;
+            break;
           }
         }
       }
@@ -1528,7 +1521,7 @@ const MarketPage = () => {
         bag: {
           equipments: newEquips,
           spaces: calcBagSpaces(newEquips),
-          armorPenalty: 0,
+          armorPenalty: calcArmorPenalty(newEquips),
         } as any,
       });
 
@@ -1541,7 +1534,7 @@ const MarketPage = () => {
             bag: {
               equipments: newEquips,
               spaces: calcBagSpaces(newEquips),
-              armorPenalty: 0,
+              armorPenalty: calcArmorPenalty(newEquips),
             } as any,
           };
         }
@@ -1557,6 +1550,9 @@ const MarketPage = () => {
         );
         if (updatedActiveChar) {
           setActiveCharacter(updatedActiveChar);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("rpg_active_char_id", charId);
+          }
         }
       }
 
@@ -1671,10 +1667,11 @@ const MarketPage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
                     onClick={() => {
-                      setLoading(true); // Artificial visual feedback or ensuring state updates
+                      setLoading(true);
                       setActiveCharacter(char);
-                      // Small timeout to allow state propagation/animation if needed,
-                      // or just letting the next render cycle handle it.
+                      if (typeof window !== "undefined" && char.id) {
+                        localStorage.setItem("rpg_active_char_id", char.id);
+                      }
                       setTimeout(() => setLoading(false), 500);
                     }}
                     className="group relative bg-[#1a1a1a] border border-white/5 hover:border-amber-500/50 rounded-xl p-6 text-left transition-all duration-300 hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.15)] overflow-hidden"
@@ -1682,8 +1679,16 @@ const MarketPage = () => {
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                     <div className="relative z-10 flex items-start justify-between mb-4">
-                      <div className="p-3 bg-amber-900/20 rounded-lg text-amber-500 group-hover:scale-110 transition-transform duration-300">
-                        <User size={24} />
+                      <div className="w-12 h-12 bg-amber-900/20 rounded-lg text-amber-500 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {char.imageUrl ? (
+                          <img
+                            src={char.imageUrl}
+                            alt={char.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User size={24} />
+                        )}
                       </div>
                       <div className="text-right">
                         <span className="block text-xs text-neutral-500 uppercase tracking-widest font-bold">
@@ -1780,12 +1785,37 @@ const MarketPage = () => {
 
               {/* Character Info Card */}
               <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 shadow-inner">
-                <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
-                  <h2 className="text-sm font-bold text-neutral-300 line-clamp-1">
-                    {activeCharacter?.name}
-                  </h2>
+                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/5">
+                  <div className="w-10 h-10 rounded-lg bg-amber-900/20 border border-amber-500/30 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {activeCharacter?.imageUrl ? (
+                      <img
+                        src={activeCharacter.imageUrl}
+                        alt={activeCharacter.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User size={18} className="text-amber-500" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <button
+                      onClick={() => router.push("/my-character")}
+                      className="text-sm font-bold text-neutral-300 hover:text-amber-500 transition-colors line-clamp-1 text-left w-full"
+                    >
+                      {activeCharacter?.name}
+                    </button>
+                    <p className="text-[10px] text-neutral-500 truncate">
+                      {activeCharacter?.race?.name} • Nvl{" "}
+                      {activeCharacter?.level || 1}
+                    </p>
+                  </div>
                   <button
-                    onClick={() => clearActiveCharacter()}
+                    onClick={() => {
+                      clearActiveCharacter();
+                      if (typeof window !== "undefined") {
+                        localStorage.removeItem("rpg_active_char_id");
+                      }
+                    }}
                     className="p-1.5 hover:bg-white/5 rounded-lg text-neutral-500 hover:text-red-400 transition-colors"
                     title="Trocar Personagem"
                   >
@@ -1873,14 +1903,28 @@ const MarketPage = () => {
               {/* Mobile Character Info Card */}
               <div className="sticky bg-[#1a1a1a] rounded-xl p-4 border border-white/5 shadow-inner mb-4 z-50">
                 <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-900/20 rounded-lg text-amber-500">
-                      <User size={20} />
+                  <div
+                    className="flex items-center gap-3"
+                    onClick={() => {
+                      clearActiveCharacter();
+                      if (typeof window !== "undefined") {
+                        localStorage.removeItem("rpg_active_char_id");
+                      }
+                    }}
+                  >
+                    <div className="w-10 h-10 bg-amber-900/20 rounded-lg text-amber-500 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {activeCharacter?.imageUrl ? (
+                        <img
+                          src={activeCharacter.imageUrl}
+                          alt={activeCharacter.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User size={20} />
+                      )}
                     </div>
                     <div>
-                      <h2 className="text-sm font-bold text-neutral-300 line-clamp-1">
-                        {activeCharacter?.name}
-                      </h2>
+                      {activeCharacter?.name}
                       <p className="text-xs text-neutral-500">
                         {activeCharacter?.race?.name} • Nvl{" "}
                         {activeCharacter?.level || 1}
@@ -1898,7 +1942,12 @@ const MarketPage = () => {
                       )}
                     </button>
                     <button
-                      onClick={() => clearActiveCharacter()}
+                      onClick={() => {
+                        clearActiveCharacter();
+                        if (typeof window !== "undefined") {
+                          localStorage.removeItem("rpg_active_char_id");
+                        }
+                      }}
                       className="p-2 bg-stone-800 rounded-lg text-neutral-400 hover:text-red-400 transition-colors"
                       title="Trocar Personagem"
                     >

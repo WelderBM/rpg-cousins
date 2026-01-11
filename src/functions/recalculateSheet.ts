@@ -254,10 +254,7 @@ const calcDisplacement = (
   atributos: CharacterAttributes,
   baseDisplacement: number
 ): number => {
-  const maxSpaces =
-    atributos.Força.mod > 0
-      ? 10 + 2 * atributos.Força.mod
-      : 10 - atributos.Força.mod;
+  const maxSpaces = 10 + 2 * atributos.Força.mod;
 
   if (bag.getSpaces() > maxSpaces) {
     return raceDisplacement - 3;

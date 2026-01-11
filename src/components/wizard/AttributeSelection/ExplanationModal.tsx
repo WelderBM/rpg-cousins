@@ -35,27 +35,35 @@ export const SystemExplanationModal = React.memo(
         </div>
 
         {/* Content */}
-        <div className="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
-          {/* Atributo Base */}
+        <div className="p-8 space-y-8 max-h-[50vh] overflow-y-auto custom-scrollbar">
+          {/* Métodos */}
           <section>
             <h3 className="text-amber-500 font-cinzel text-lg mb-3">
-              1. O Valor Base
+              1. Escolha seu Método
             </h3>
             <p className="text-neutral-300 leading-relaxed italic">
-              Nesse sistema Artoniano, você distribui seus atributos diretamente
-              como modificadores. Todos os atributos começam em{" "}
-              <span className="text-white font-bold">0</span>.
+              Você pode gerar seus atributos de duas formas oficiais:
+              <br />•{" "}
+              <span className="text-white font-bold">
+                Compra de Pontos:
+              </span>{" "}
+              Equilibrado e estratégico.
+              <br />•{" "}
+              <span className="text-white font-bold">
+                Rolagem de Dados:
+              </span>{" "}
+              Aleatório e heróico (se o mestre permitir).
             </p>
           </section>
 
-          {/* Tabela de Custos */}
+          {/* Compra de Pontos */}
           <section>
             <h3 className="text-amber-500 font-cinzel text-lg mb-4">
-              2. Tabela de Custos
+              2. Compra de Pontos
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { val: "-1", cost: "Ganha +2pts" },
+                { val: "-1", cost: "Ganha 1pt" },
                 { val: "0", cost: "Custo 0" },
                 { val: "+1", cost: "Custo 1" },
                 { val: "+2", cost: "Custo 2" },
@@ -75,21 +83,30 @@ export const SystemExplanationModal = React.memo(
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-neutral-500 mt-4 italic">
-              * Reduzir um atributo para -1 libera 2 pontos extras para gastar
-              em outro lugar.
+          </section>
+
+          {/* Dados */}
+          <section>
+            <h3 className="text-amber-500 font-cinzel text-lg mb-3">
+              3. Rolagem de Dados
+            </h3>
+            <p className="text-neutral-300 leading-relaxed italic text-sm">
+              Role <span className="text-white font-bold">4d6</span> e descarte
+              o menor resultado. Repita isso 6 vezes. Insira os valores totais e
+              o sistema converterá para o modificador do Tormenta 20 conforme a
+              tabela oficial.
             </p>
           </section>
 
           {/* Bônus de Raça */}
           <section className="bg-amber-900/10 border border-amber-500/20 rounded-xl p-4">
             <h3 className="text-amber-200 font-cinzel mb-2">
-              3. Bônus de Raça
+              4. Bônus de Raça
             </h3>
             <p className="text-sm text-neutral-400">
               Os bônus de sua raça são aplicados{" "}
               <span className="text-amber-400 font-bold underline">após</span> a
-              compra manual. Eles não aumentam o custo de compra dos atributos.
+              definição base. Eles não aumentam o custo de compra dos atributos.
             </p>
           </section>
         </div>

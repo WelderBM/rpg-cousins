@@ -675,62 +675,6 @@ export function CharacterSheetView({
                     </div>
                   )}
                 </div>
-
-                {/* Espaço (Carga) */}
-                <div className="col-span-2 bg-stone-900/90 backdrop-blur-md border border-stone-800/70 rounded-3xl p-5 shadow-2xl flex flex-col hover:border-amber-500/30 transition-all border-white/5">
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-2 text-amber-500/90">
-                      <Backpack size={16} className="text-amber-500" />
-                      <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
-                        Espaço na Mochila
-                      </span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                      <span
-                        className={`text-lg font-black tabular-nums ${
-                          usedSpaces > maxSpaces
-                            ? "text-red-500"
-                            : "text-stone-100"
-                        }`}
-                      >
-                        {usedSpaces}
-                      </span>
-                      <span
-                        className={`text-[10px] font-bold uppercase ${
-                          usedSpaces > maxSpaces
-                            ? "text-red-500"
-                            : "text-stone-500"
-                        }`}
-                      >
-                        / {maxSpaces}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/5 relative">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{
-                        width: `${Math.min(
-                          100,
-                          maxSpaces > 0 ? (usedSpaces / maxSpaces) * 100 : 0
-                        )}%`,
-                      }}
-                      className={`h-full relative z-10 ${
-                        usedSpaces > maxSpaces
-                          ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                          : "bg-gradient-to-r from-amber-600 to-amber-400"
-                      }`}
-                    />
-                    {usedSpaces > maxSpaces && (
-                      <div className="absolute inset-0 bg-red-500/20 animate-pulse" />
-                    )}
-                  </div>
-                  {usedSpaces > maxSpaces && (
-                    <p className="text-[9px] text-red-400 mt-2 font-black uppercase tracking-tighter animate-pulse">
-                      ⚠️ Você está sobrecarregado!
-                    </p>
-                  )}
-                </div>
               </div>
 
               {/* Skills */}
@@ -812,6 +756,61 @@ export function CharacterSheetView({
               </div>
 
               {/* Inventory Split */}
+              {/* Espaço (Carga) */}
+              <div className="col-span-2 bg-stone-900/90 backdrop-blur-md border border-stone-800/70 rounded-3xl p-5 shadow-2xl flex flex-col hover:border-amber-500/30 transition-all border-white/5">
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-2 text-amber-500/90">
+                    <Backpack size={16} className="text-amber-500" />
+                    <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
+                      Espaço na Mochila
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span
+                      className={`text-lg font-black tabular-nums ${
+                        usedSpaces > maxSpaces
+                          ? "text-red-500"
+                          : "text-stone-100"
+                      }`}
+                    >
+                      {usedSpaces}
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold uppercase ${
+                        usedSpaces > maxSpaces
+                          ? "text-red-500"
+                          : "text-stone-500"
+                      }`}
+                    >
+                      / {maxSpaces}
+                    </span>
+                  </div>
+                </div>
+                <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/5 relative">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${Math.min(
+                        100,
+                        maxSpaces > 0 ? (usedSpaces / maxSpaces) * 100 : 0
+                      )}%`,
+                    }}
+                    className={`h-full relative z-10 ${
+                      usedSpaces > maxSpaces
+                        ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                        : "bg-gradient-to-r from-amber-600 to-amber-400"
+                    }`}
+                  />
+                  {usedSpaces > maxSpaces && (
+                    <div className="absolute inset-0 bg-red-500/20 animate-pulse" />
+                  )}
+                </div>
+                {usedSpaces > maxSpaces && (
+                  <p className="text-[9px] text-red-400 mt-2 font-black uppercase tracking-tighter animate-pulse">
+                    ⚠️ Você está sobrecarregado!
+                  </p>
+                )}
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <ItemList
                   title="Armas & Ataques"

@@ -19,7 +19,11 @@ import { Atributo } from "../../data/atributos";
 interface PurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (characterId: string, item: Equipment) => Promise<void>;
+  onConfirm: (
+    characterId: string,
+    item: Equipment,
+    quantity: number
+  ) => Promise<void>;
   item: Equipment | null;
   characters: Character[];
   activeCharacterId?: string;
@@ -34,12 +38,14 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   activeCharacterId,
 }) => {
   const [selectedCharId, setSelectedCharId] = useState<string>("");
+  const [quantity, setQuantity] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Reset processing state when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
       setIsProcessing(false);
+      setQuantity(1);
     }
   }, [isOpen]);
 
@@ -62,15 +68,17 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     [characters, selectedCharId]
   );
 
-  const price = item?.preco || 0;
+  const unitPrice = item?.preco || 0;
+  const totalPrice = unitPrice * quantity;
   const itemSlots = item?.spaces ?? 1; // Default to 1 if undefined, though usually 0 or 1. If 0 it's 0.
   // Wait, if item.spaces is explicitly 0, it should be 0.
   // In AbilityCard: item.spaces !== undefined ? item.spaces : ...
   // Let's use item.spaces ?? 1 safely, but check if 0 is truthy (it is not).
   // Safe: (item?.spaces !== undefined && item?.spaces !== null) ? item.spaces : 1;
   // Actually, standard default for undefined spaces in T20 is usually 1, but "não ocupa espaço" is specific.
-  const actualItemSlots =
+  const unitItemSlots =
     item?.spaces !== undefined && item?.spaces !== null ? item.spaces : 1;
+  const totalItemSlots = unitItemSlots * quantity;
 
   // Analysis of the selected character status
   const status = useMemo(() => {
@@ -87,7 +95,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
     // Money
     const currentMoney = selectedChar.money || 0;
-    const newMoney = currentMoney - price;
+    const newMoney = currentMoney - totalPrice;
     const hasMoney = newMoney >= 0;
 
     // Slots
@@ -100,7 +108,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     }
 
     const currentSlots = calcBagSpaces(bagEquipments);
-    const newSlots = currentSlots + actualItemSlots;
+    const newSlots = currentSlots + totalItemSlots;
 
     // Load Limit: 10 + (Str mod * 2) - T20 Standard
     // Access the attribute correctly: it's an object with a 'mod' property
@@ -127,14 +135,14 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
       hasMoney,
       hasSlots,
     };
-  }, [selectedChar, item, price, actualItemSlots]);
+  }, [selectedChar, item, totalPrice, totalItemSlots]);
 
   const handleConfirm = async () => {
     if (!status.canBuy || isProcessing || !selectedCharId || !item) return;
 
     setIsProcessing(true);
     try {
-      await onConfirm(selectedCharId, item);
+      await onConfirm(selectedCharId, item, quantity);
       // Modal will be closed by parent component after successful purchase
     } catch (e) {
       console.error("Purchase error:", e);
@@ -146,23 +154,23 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 font-sans">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 font-sans">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-hidden"
+          className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm overflow-hidden"
         />
 
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative bg-[#111] border border-stone-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
+          className="relative z-[95] bg-[#111] border border-stone-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
         >
           {/* Header */}
-          <div className="bg-[#1a1a1a] p-4 border-b border-white/5 flex items-center justify-between">
+          <div className="bg-[#1a1a1a] p-4 border-b border-white/5 flex items-center justify-between shrink-0">
             <h3 className="font-serif text-lg text-amber-500 font-bold flex items-center gap-2">
               <Coins size={20} /> Confirmar Compra
             </h3>
@@ -174,7 +182,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             </button>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
             {/* Item Info */}
             {item && (
               <div className="flex gap-4">
@@ -191,18 +199,56 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-amber-500 font-bold text-sm">
-                      {item.preco} T$
+                      {unitPrice} T$
                     </span>
                     <span className="text-xs text-stone-600">•</span>
                     <span className="text-stone-400 text-xs">
-                      {actualItemSlots === 0
+                      {unitItemSlots === 0
                         ? "Não ocupa espaço"
-                        : `${actualItemSlots} slot(s)`}
+                        : `${unitItemSlots} slot(s)`}
                     </span>
                   </div>
                 </div>
               </div>
             )}
+
+            <hr className="border-white/5" />
+
+            {/* Quantity Selector */}
+            <div className="space-y-3">
+              <label className="text-xs uppercase font-bold text-stone-500 flex items-center justify-between">
+                <span>Quantidade</span>
+                <span className="text-amber-500 font-serif">
+                  Total: {totalPrice} T$
+                </span>
+              </label>
+              <div className="flex items-center gap-4 bg-[#0c0c0c] border border-white/10 rounded-xl p-2">
+                <button
+                  type="button"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-stone-800 text-white hover:bg-stone-700 transition-colors font-bold disabled:opacity-30"
+                  disabled={quantity <= 1}
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                  }
+                  className="flex-1 bg-transparent text-center text-white font-bold text-lg outline-none"
+                  min="1"
+                />
+                <button
+                  type="button"
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-stone-800 text-white hover:bg-stone-700 transition-colors font-bold"
+                >
+                  +
+                </button>
+              </div>
+            </div>
 
             <hr className="border-white/5" />
 
@@ -307,7 +353,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 bg-[#1a1a1a] border-t border-white/5 flex justify-end gap-3">
+          <div className="p-4 bg-[#1a1a1a] border-t border-white/5 flex justify-end gap-3 shrink-0">
             <button
               onClick={onClose}
               disabled={isProcessing}

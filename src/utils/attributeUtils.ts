@@ -68,3 +68,20 @@ export function calculateTotalPointsSpent(
   });
   return total;
 }
+
+/**
+ * Converte o valor total dos dados (4d6 drop lowest) para o modificador do T20
+ * Baseado na tabela da Página 16 do Livro Básico (Jogo do Ano)
+ */
+export function convertDiceToMod(value: number): number {
+  if (value <= 3) return -4;
+  if (value <= 5) return -3;
+  if (value <= 7) return -2;
+  if (value <= 9) return -1;
+  if (value <= 11) return 0;
+  if (value <= 13) return 1;
+  if (value <= 15) return 2;
+  if (value <= 17) return 3;
+  if (value <= 19) return 4;
+  return 5;
+}

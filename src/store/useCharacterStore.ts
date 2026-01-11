@@ -25,6 +25,7 @@ export interface CharacterSummary {
   className: string;
   level: number;
   image?: string; // For the race image
+  imageUrl?: string;
   isFavorite?: boolean;
 }
 
@@ -78,9 +79,10 @@ interface CharacterWizardState {
   baseAttributes: Record<Atributo, number>;
   pointsRemaining: number;
 
+  generationMethod: "points" | "dice";
+  setGenerationMethod: (method: "points" | "dice") => void;
+
   // Escolhas de atributos flexíveis (para raças como Humano que têm "any")
-  // Mapeia índice do bônus flexível → atributo escolhido
-  flexibleAttributeChoices: Record<number, Atributo>;
 
   // Character Name
   name: string;
@@ -130,6 +132,7 @@ interface CharacterWizardState {
   // Wizard Management
   resetWizard: () => void;
   loadCharacterToWizard: (character: any) => void;
+  setBaseAttributes: (attributes: Record<Atributo, number>) => void;
 }
 
 const INITIAL_ATTRIBUTES: Record<Atributo, number> = {
@@ -171,11 +174,81 @@ export const useCharacterStore = create<CharacterWizardState>()(
       selectedDeity: null,
       selectedGrantedPowers: [],
       selectedClassPowers: [],
-      bag: new Bag(),
+      bag: (function () {
+        const b = new Bag();
+        b.addEquipment({
+          "Item Geral": [
+            {
+              nome: "Mochila",
+              group: "Item Geral",
+              preco: 2,
+              spaces: 0,
+              description: "Item essencial de aventureiro",
+            },
+            {
+              nome: "Saco de dormir",
+              group: "Item Geral",
+              preco: 1,
+              spaces: 1,
+              description: "Item essencial de aventureiro",
+            },
+            {
+              nome: "Pederneira",
+              group: "Item Geral",
+              preco: 1,
+              spaces: 0,
+              description: "Item essencial de aventureiro",
+            },
+            {
+              nome: "Tocha",
+              group: "Item Geral",
+              preco: 0.1,
+              spaces: 1,
+              quantidade: 2,
+              description: "Item essencial de aventureiro",
+            },
+            {
+              nome: "Cantil",
+              group: "Item Geral",
+              preco: 1,
+              spaces: 1,
+              description: "Item essencial de aventureiro",
+            },
+            {
+              nome: "Ração de viagem",
+              group: "Alimentação",
+              preco: 0.5,
+              spaces: 1,
+              quantidade: 7,
+              description: "Item essencial de aventureiro",
+            },
+            {
+              nome: "Corda (10m)",
+              group: "Item Geral",
+              preco: 1,
+              spaces: 1,
+              description: "Item essencial de aventureiro",
+            },
+          ],
+          Vestuário: [
+            {
+              nome: "Traje de viajante",
+              group: "Vestuário",
+              preco: 10,
+              spaces: 0,
+              description: "Roupas iniciais",
+            },
+          ],
+        });
+        return b;
+      })(),
       money: 18, // Default start
+      generationMethod: "points",
       baseAttributes: { ...INITIAL_ATTRIBUTES },
       pointsRemaining: INITIAL_POINTS,
       flexibleAttributeChoices: {}, // Inicialmente vazio
+
+      setGenerationMethod: (method) => set({ generationMethod: method }),
 
       name: "",
       userCharacters: [],
@@ -262,6 +335,13 @@ export const useCharacterStore = create<CharacterWizardState>()(
           }
         }
 
+        // Calculate points remaining based on loaded attributes
+        const loadedBaseAttributes = character.baseAttributes || {
+          ...INITIAL_ATTRIBUTES,
+        };
+        const totalSpent = calculateTotalPointsSpent(loadedBaseAttributes);
+        const calculatedPointsRemaining = INITIAL_POINTS - totalSpent;
+
         set({
           editingCharacterId: character.id,
           step: 1, // Start at Race Selection
@@ -276,7 +356,8 @@ export const useCharacterStore = create<CharacterWizardState>()(
           selectedClassPowers: character.classPowers || [],
           bag: bagInstance,
           money: character.money ?? 0,
-          baseAttributes: character.baseAttributes || { ...INITIAL_ATTRIBUTES },
+          baseAttributes: loadedBaseAttributes,
+          pointsRemaining: calculatedPointsRemaining,
           flexibleAttributeChoices: character.flexibleAttributeChoices || {},
           selectedClassWeapons: [],
           selectedOriginWeapons: [],
@@ -504,14 +585,21 @@ export const useCharacterStore = create<CharacterWizardState>()(
       updateBaseAttribute: (attr, value) => {
         const currentBase = get().baseAttributes;
         const newBase = { ...currentBase, [attr]: value };
-        const totalSpent = calculateTotalPointsSpent(newBase);
 
-        if (totalSpent <= INITIAL_POINTS) {
-          set({
-            baseAttributes: newBase,
-            pointsRemaining: INITIAL_POINTS - totalSpent,
-          });
-        }
+        // For point buy, we still want to keep pointsRemaining updated
+        const totalSpent = calculateTotalPointsSpent(newBase);
+        set({
+          baseAttributes: newBase,
+          pointsRemaining: INITIAL_POINTS - totalSpent,
+        });
+      },
+
+      setBaseAttributes: (attributes) => {
+        const totalSpent = calculateTotalPointsSpent(attributes);
+        set({
+          baseAttributes: attributes,
+          pointsRemaining: INITIAL_POINTS - totalSpent,
+        });
       },
 
       setFlexibleAttributeChoice: (index, attr) => {
@@ -563,6 +651,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
         set({
           editingCharacterId: null,
           step: 1,
+          generationMethod: "points",
           selectedRace: null,
           selectedClass: null,
           selectedSkills: [],
@@ -591,12 +680,79 @@ export const useCharacterStore = create<CharacterWizardState>()(
           selectedDeity: null,
           selectedGrantedPowers: [],
           selectedClassPowers: [],
-          bag: new Bag(),
           money: 18,
           baseAttributes: { ...INITIAL_ATTRIBUTES },
           pointsRemaining: INITIAL_POINTS,
           flexibleAttributeChoices: {},
           name: "",
+          bag: (function () {
+            const b = new Bag();
+            b.addEquipment({
+              "Item Geral": [
+                {
+                  nome: "Mochila",
+                  group: "Item Geral",
+                  preco: 2,
+                  spaces: 0,
+                  description: "Item essencial de aventureiro",
+                },
+                {
+                  nome: "Saco de dormir",
+                  group: "Item Geral",
+                  preco: 1,
+                  spaces: 1,
+                  description: "Item essencial de aventureiro",
+                },
+                {
+                  nome: "Pederneira",
+                  group: "Item Geral",
+                  preco: 1,
+                  spaces: 0,
+                  description: "Item essencial de aventureiro",
+                },
+                {
+                  nome: "Tocha",
+                  group: "Item Geral",
+                  preco: 0.1,
+                  spaces: 1,
+                  quantidade: 2,
+                  description: "Item essencial de aventureiro",
+                },
+                {
+                  nome: "Cantil",
+                  group: "Item Geral",
+                  preco: 1,
+                  spaces: 1,
+                  description: "Item essencial de aventureiro",
+                },
+                {
+                  nome: "Ração de viagem",
+                  group: "Alimentação",
+                  preco: 0.5,
+                  spaces: 1,
+                  quantidade: 7,
+                  description: "Item essencial de aventureiro",
+                },
+                {
+                  nome: "Corda (10m)",
+                  group: "Item Geral",
+                  preco: 1,
+                  spaces: 1,
+                  description: "Item essencial de aventureiro",
+                },
+              ],
+              Vestuário: [
+                {
+                  nome: "Traje de viajante",
+                  group: "Vestuário",
+                  preco: 10,
+                  spaces: 0,
+                  description: "Roupas iniciais",
+                },
+              ],
+            });
+            return b;
+          })(),
         });
       },
     }),
@@ -619,6 +775,7 @@ export const useCharacterStore = create<CharacterWizardState>()(
         baseAttributes: state.baseAttributes,
         pointsRemaining: state.pointsRemaining,
         flexibleAttributeChoices: state.flexibleAttributeChoices,
+        generationMethod: state.generationMethod,
         wizardDrafts: state.wizardDrafts,
         name: state.name,
         activeCharacter: state.activeCharacter,

@@ -54,6 +54,11 @@ export const AttributeCard = React.memo(
     pointsRemaining,
     onIncrement,
     onDecrement,
+    isDiceMethod,
+    rolls = [],
+    assignedIndex = null,
+    allAssignments = {} as Record<Atributo, number | null>,
+    onAssign,
   }: {
     attr: Atributo;
     baseValue: number;
@@ -61,6 +66,11 @@ export const AttributeCard = React.memo(
     pointsRemaining: number;
     onIncrement: () => void;
     onDecrement: () => void;
+    isDiceMethod?: boolean;
+    rolls?: number[];
+    assignedIndex?: number | null;
+    allAssignments?: Record<Atributo, number | null>;
+    onAssign?: (idx: number | null) => void;
   }) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const Icon = ATTRIBUTE_ICONS[attr];
@@ -70,6 +80,13 @@ export const AttributeCard = React.memo(
     const canUpgrade =
       costToUpgrade !== null && pointsRemaining >= costToUpgrade;
     const canDowngrade = baseValue > -1;
+
+    // Check if a roll is already used by ANOTHER attribute
+    const isRollUsedByOther = (idx: number) => {
+      return Object.entries(allAssignments).some(
+        ([a, val]) => a !== attr && val === idx
+      );
+    };
 
     return (
       <motion.div
@@ -142,38 +159,64 @@ export const AttributeCard = React.memo(
             </motion.div>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3">
-            <button
-              onClick={onDecrement}
-              disabled={!canDowngrade}
-              className="flex-1 h-10 md:h-12 bg-stone-900 border border-neutral-800 rounded-lg md:rounded-xl flex items-center justify-center hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
-            >
-              <Minus size={16} className="text-neutral-400 md:w-5 md:h-5" />
-            </button>
+          {!isDiceMethod ? (
+            <div className="flex items-center gap-2 md:gap-3">
+              <button
+                onClick={onDecrement}
+                disabled={!canDowngrade}
+                className="flex-1 h-10 md:h-12 bg-stone-900 border border-neutral-800 rounded-lg md:rounded-xl flex items-center justify-center hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
+              >
+                <Minus size={16} className="text-neutral-400 md:w-5 md:h-5" />
+              </button>
 
-            <div className="flex-1 text-center">
-              {costToUpgrade !== null ? (
-                <div className="text-[8px] md:text-[10px] uppercase text-neutral-500">
-                  Custo{" "}
-                  <span className="text-amber-500 font-bold">
-                    {costToUpgrade}pt
-                  </span>
-                </div>
-              ) : (
-                <div className="text-[8px] md:text-[10px] uppercase text-neutral-600">
-                  Limite
-                </div>
-              )}
+              <div className="flex-1 text-center">
+                {costToUpgrade !== null ? (
+                  <div className="text-[8px] md:text-[10px] uppercase text-neutral-500">
+                    Custo{" "}
+                    <span className="text-amber-500 font-bold">
+                      {costToUpgrade}pt
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-[8px] md:text-[10px] uppercase text-neutral-600">
+                    Limite
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={onIncrement}
+                disabled={!canUpgrade}
+                className="flex-1 h-10 md:h-12 bg-amber-600 border border-amber-500 rounded-lg md:rounded-xl flex items-center justify-center hover:bg-amber-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-amber-900/20"
+              >
+                <Plus size={16} className="text-white md:w-5 md:h-5" />
+              </button>
             </div>
-
-            <button
-              onClick={onIncrement}
-              disabled={!canUpgrade}
-              className="flex-1 h-10 md:h-12 bg-amber-600 border border-amber-500 rounded-lg md:rounded-xl flex items-center justify-center hover:bg-amber-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-amber-900/20"
-            >
-              <Plus size={16} className="text-white md:w-5 md:h-5" />
-            </button>
-          </div>
+          ) : (
+            <div className="space-y-2">
+              <label className="text-[10px] text-stone-500 uppercase font-black tracking-widest">
+                Dado Escolhido
+              </label>
+              <select
+                value={assignedIndex === null ? "" : assignedIndex}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  onAssign?.(val === "" ? null : parseInt(val));
+                }}
+                className="w-full bg-stone-950 border border-amber-700/30 rounded-lg py-2.5 px-3 text-xs text-amber-100 focus:border-amber-500 outline-none transition-all appearance-none cursor-pointer"
+              >
+                <option value="">Selecione um dado...</option>
+                {rolls.map((roll, idx) => {
+                  const used = isRollUsedByOther(idx);
+                  return (
+                    <option key={idx} value={idx} disabled={used}>
+                      Dado #{idx + 1} ({roll}) {used ? "(Ocupado)" : ""}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          )}
         </div>
       </motion.div>
     );

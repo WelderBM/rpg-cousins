@@ -11,6 +11,7 @@ import { Atributo } from "../../../data/atributos";
 import {
   calculateAttributeCost,
   INITIAL_POINTS,
+  convertDiceToMod,
 } from "../../../utils/attributeUtils";
 import Race from "../../../interfaces/Race";
 import {
@@ -19,6 +20,8 @@ import {
   ChevronRight,
   HelpCircle,
   Check,
+  Dice5,
+  Coins,
 } from "lucide-react";
 
 import { BuildArchetypeBadge } from "./ArchetypeBadge";
@@ -102,7 +105,25 @@ const AttributeSelection = () => {
     flexibleAttributeChoices,
     setFlexibleAttributeChoice,
     setStep,
+    generationMethod,
+    setGenerationMethod,
+    setBaseAttributes,
   } = useCharacterStore();
+
+  // Local state for dice rolls
+  const [diceRolls, setDiceRolls] = useState<number[]>([
+    10, 10, 10, 10, 10, 10,
+  ]);
+  const [assignment, setAssignment] = useState<Record<Atributo, number | null>>(
+    {
+      [Atributo.FORCA]: null,
+      [Atributo.DESTREZA]: null,
+      [Atributo.CONSTITUICAO]: null,
+      [Atributo.INTELIGENCIA]: null,
+      [Atributo.SABEDORIA]: null,
+      [Atributo.CARISMA]: null,
+    }
+  );
 
   const [showExplanation, setShowExplanation] = useState(false);
   const [shakePoints, setShakePoints] = useState(false);
@@ -162,6 +183,42 @@ const AttributeSelection = () => {
     [baseAttributes, updateBaseAttribute]
   );
 
+  const handleDiceAssignment = useCallback(
+    (attr: Atributo, rollIndex: number | null) => {
+      const newAssignment = { ...assignment, [attr]: rollIndex };
+      setAssignment(newAssignment);
+
+      // Sync with baseAttributes in store
+      const newBaseAttributes = { ...baseAttributes };
+      ATTRIBUTES_LIST.forEach((a) => {
+        const rIndex = newAssignment[a];
+        if (rIndex !== null) {
+          newBaseAttributes[a] = convertDiceToMod(diceRolls[rIndex]);
+        } else {
+          newBaseAttributes[a] = 0; // Default or keep as is? 0 is better.
+        }
+      });
+      setBaseAttributes(newBaseAttributes);
+    },
+    [assignment, baseAttributes, diceRolls, setBaseAttributes]
+  );
+
+  const handleDiceRollChange = (index: number, val: number) => {
+    const newRolls = [...diceRolls];
+    newRolls[index] = val;
+    setDiceRolls(newRolls);
+
+    // Update baseAttributes if already assigned
+    const newBaseAttributes = { ...baseAttributes };
+    ATTRIBUTES_LIST.forEach((a) => {
+      const rIndex = assignment[a];
+      if (rIndex === index) {
+        newBaseAttributes[a] = convertDiceToMod(val);
+      }
+    });
+    setBaseAttributes(newBaseAttributes);
+  };
+
   const allFlexDefined = useMemo(() => {
     return flexibleBonuses.every(
       (bonus) => flexibleAttributeChoices[bonus.index]
@@ -176,12 +233,19 @@ const AttributeSelection = () => {
     const flexUnique = uniqueValues.size === flexibleBonuses.length;
     if (!flexUnique) return false;
 
-    return pointsRemaining === 0;
+    if (generationMethod === "points") {
+      return pointsRemaining === 0;
+    } else {
+      // Check if all attributes have an assigned roll
+      return ATTRIBUTES_LIST.every((attr) => assignment[attr] !== null);
+    }
   }, [
     allFlexDefined,
     flexibleBonuses,
     flexibleAttributeChoices,
     pointsRemaining,
+    generationMethod,
+    assignment,
   ]);
 
   // --- AUTO-SCROLL LOGIC ---
@@ -212,7 +276,7 @@ const AttributeSelection = () => {
 
       <div className="relative max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
         {/* Header Compacto - Sticky */}
-        <div className="sticky top-0 z-40  bg-stone-950/90 backdrop-blur-xl border-b border-white/5 pb-4 pt-4 -mx-6 px-6 mb-6 flex items-center justify-between gap-4 shadow-lg">
+        <div className="sticky top-0 bg-stone-950/90 backdrop-blur-xl border-b border-white/5 pb-4 pt-4 -mx-6 px-6 mb-6 flex items-center justify-between gap-4 shadow-lg">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setStep(1)}
@@ -237,26 +301,93 @@ const AttributeSelection = () => {
             <HelpCircle size={20} />
           </button>
         </div>
+        {/* Toggle de Método */}
+        <div className="flex bg-stone-900/50 p-1 rounded-xl border border-white/5 shadow-inner">
+          <button
+            onClick={() => setGenerationMethod("points")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold transition-all ${
+              generationMethod === "points"
+                ? "bg-amber-600 text-stone-950 shadow-lg"
+                : "text-stone-500 hover:text-stone-300"
+            }`}
+          >
+            <Coins size={14} /> Pontos
+          </button>
+          <button
+            onClick={() => setGenerationMethod("dice")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold transition-all ${
+              generationMethod === "dice"
+                ? "bg-amber-600 text-stone-950 shadow-lg"
+                : "text-stone-500 hover:text-stone-300"
+            }`}
+          >
+            <Dice5 size={14} /> Dados
+          </button>
+        </div>
 
         {/* Points Display - More Compact */}
-        <motion.div
-          animate={shakePoints ? { x: [-10, 10, -10, 10, 0] } : {}}
-          className="sticky top-4 z-20 bg-stone-900/40 backdrop-blur-md rounded-xl p-4 border border-white/5 shadow-2xl"
-        >
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
-              Pontos Disponíveis
-            </span>
-            <span
-              className={`text-2xl font-cinzel font-bold ${
-                pointsRemaining === 0 ? "text-emerald-500" : "text-amber-500"
-              }`}
-            >
-              {pointsRemaining}
-            </span>
-          </div>
-          <PointsProgressBar points={pointsRemaining} />
-        </motion.div>
+        {generationMethod === "points" && (
+          <motion.div
+            animate={shakePoints ? { x: [-10, 10, -10, 10, 0] } : {}}
+            className="sticky top-28 z-30 bg-stone-900/40 backdrop-blur-md rounded-xl p-4 border border-white/5 shadow-2xl"
+          >
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
+                Pontos Disponíveis
+              </span>
+              <span
+                className={`text-2xl font-cinzel font-bold ${
+                  pointsRemaining === 0 ? "text-emerald-500" : "text-amber-500"
+                }`}
+              >
+                {pointsRemaining}
+              </span>
+            </div>
+            <PointsProgressBar points={pointsRemaining} />
+          </motion.div>
+        )}
+
+        {/* Dice Entry Section */}
+        {generationMethod === "dice" && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-stone-900/40 backdrop-blur-md rounded-xl p-6 border border-white/5 space-y-4"
+          >
+            <div className="flex flex-col gap-1">
+              <h3 className="text-sm font-cinzel text-amber-500 font-bold">
+                Resultados dos Dados
+              </h3>
+              <p className="text-[10px] text-stone-400">
+                Lançar 4d6 e descartar o menor 6 vezes. Insira os valores abaixo
+                e atribua aos atributos.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+              {diceRolls.map((roll, idx) => (
+                <div key={idx} className="space-y-1">
+                  <div className="text-[8px] text-stone-500 uppercase text-center font-bold">
+                    #{idx + 1}
+                  </div>
+                  <input
+                    type="number"
+                    min={3}
+                    max={21}
+                    value={roll}
+                    onChange={(e) =>
+                      handleDiceRollChange(idx, parseInt(e.target.value) || 0)
+                    }
+                    className="w-full bg-black/40 border border-white/10 rounded-lg py-2 text-center text-amber-400 font-bold focus:border-amber-500 outline-none transition-all"
+                  />
+                  <div className="text-[10px] text-center font-bold text-stone-400">
+                    Mod: {convertDiceToMod(roll) >= 0 ? "+" : ""}
+                    {convertDiceToMod(roll)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Flexible Bonuses - Refined */}
         {flexibleBonuses.length > 0 && (
@@ -328,6 +459,11 @@ const AttributeSelection = () => {
               pointsRemaining={pointsRemaining}
               onIncrement={() => handleIncrement(attr)}
               onDecrement={() => handleDecrement(attr)}
+              isDiceMethod={generationMethod === "dice"}
+              rolls={diceRolls}
+              assignedIndex={assignment[attr]}
+              allAssignments={assignment}
+              onAssign={(idx) => handleDiceAssignment(attr, idx)}
             />
           ))}
         </div>
@@ -348,8 +484,10 @@ const AttributeSelection = () => {
                 <>
                   <Check size={20} /> Atributos Definidos
                 </>
-              ) : (
+              ) : generationMethod === "points" ? (
                 "Distribua os Pontos"
+              ) : (
+                "Atribua todos os dados"
               )}
             </button>
           </div>
