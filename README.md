@@ -27,7 +27,7 @@ O processo de criação guia o usuário através de etapas lógicas, eliminando 
 * **UX:** Filtros inteligentes mostram apenas as origens e divindades compatíveis com as escolhas anteriores.
 
 <div align="center">
-  <img src="./public/assets/prints/print-criacao.png" width="80%" alt="Criação de Herói" style="border-radius: 8px; border: 1px solid #ddd" width="50%"/>
+  <img src="./public/assets/prints/print-criacao.png" alt="Criação de Herói" style="border-radius: 8px; border: 1px solid #ddd" width="30%"/>
 </div>
 
 ---
@@ -38,7 +38,7 @@ A ficha é o coração operacional do jogador. Ela utiliza um motor de funções
 * **Persistência Híbrida:** O estado da ficha é mantido via **Zustand** para performance máxima, sendo sincronizado com o Firestore apenas quando mudanças críticas ocorrem.
 
 <div align="center">
-  <img src="./public/assets/prints/print-ficha.png" width="80%" alt="Ficha do Herói" style="border-radius: 8px; border: 1px solid #ddd" width="50%"/>
+  <img src="./public/assets/prints/print-ficha.png" alt="Ficha do Herói" style="border-radius: 8px; border: 1px solid #ddd" width="30%"/>
 </div>
 
 ---
@@ -49,7 +49,7 @@ Uma interface dedicada para quem conduz o jogo, focada em monitorar o progresso 
 * **Controle de Grupo:** Visão holística dos PVs e PMs de todos os membros da mesa em tempo real.
 
 <div align="center">
-  <img src="./public/assets/prints/print-mestre.png" width="80%" alt="Área do Mestre" style="border-radius: 8px; border: 1px solid #ddd" width="50%"/>
+  <img src="./public/assets/prints/print-mestre.png"alt="Área do Mestre" style="border-radius: 8px; border: 1px solid #ddd" width="30%"/>
 </div>
 
 ---
@@ -60,7 +60,7 @@ Sistema de inventário e comércio que automatiza a gestão de Tibares (moeda do
 * **Validação de Regras:** Impede a compra de itens superiores ou mágicos sem os pré-requisitos necessários de nível ou ouro.
 
 <div align="center">
-  <img src="./public/assets/prints/print-mercado.png" width="80%" alt="Mercado e Inventário" style="border-radius: 8px; border: 1px solid #ddd" width="50%"/>
+  <img src="./public/assets/prints/print-mercado.png" alt="Mercado e Inventário" style="border-radius: 8px; border: 1px solid #ddd" width="30%"/>
 </div>
 
 ---
