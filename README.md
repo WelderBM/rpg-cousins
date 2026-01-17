@@ -1,7 +1,7 @@
-<h1 align="center">RPG-Cousins: Automação de Sistemas & Inteligência de Dados para T20</h1>
+<h1 align="center">RPG-Cousins: Ecossistema de Automação para Tormenta 20</h1>
 
 <div align="center">
-  <img src="./public/assets/preview-rpg.png" width="100%" alt="RPG-Cousins Preview" style="border-radius: 10px"/>
+  <img src="./public/assets/preview-rpg.png" width="100%" alt="RPG-Cousins Banner" style="border-radius: 10px"/>
 </div>
 
 <p align="center">
@@ -11,50 +11,76 @@
   <img src="https://img.shields.io/badge/Firebase-Persistence-orange?logo=firebase" alt="Firebase">
 </p>
 
-## 📌 O Projeto
+## 📌 Visão de Engenharia
 
-O **RPG-Cousins** surgiu de uma necessidade prática: simplificar a gestão de fichas do sistema *Tormenta 20* para o meu grupo de jogo. O foco central não foi apenas criar uma interface, mas sim **automatizar o trabalho braçal e repetitivo** de consulta a manuais, permitindo que os jogadores foquem no que realmente importa: a narrativa.
+O **RPG-Cousins** não é apenas uma ficha online; é uma solução de **Engenharia de Dados e UX** aplicada ao sistema *Tormenta 20*. O projeto nasceu da necessidade de eliminar a carga cognitiva e o erro humano durante as sessões do meu grupo de RPG. 
 
-## 🚀 Diferenciais de Engenharia & Criatividade
-
-### 1. Automação de Dados (Data Scripting)
-A maior barreira técnica de sistemas de RPG é a volumetria de dados (centenas de poderes, raças e magias). 
-* **Abordagem Inteligente:** Em vez de inserção manual, desenvolvi scripts em **Python** para processar, extrair e normalizar dados de fontes existentes, convertendo-os em estruturas JSON otimizadas.
-* **Impacto:** Redução drástica no erro humano e na latência de desenvolvimento. A inteligência do sistema é alimentada por automação, não por digitação.
-
-### 2. Arquitetura Local-First com Persistência Híbrida
-O sistema foi projetado para ser extremamente rápido e resiliente.
-* **Inteligência Local:** Toda a "biblioteca" de regras, classes e poderes reside e é processada no lado do cliente. Isso garante que buscas e filtros sejam instantâneos, sem dependência constante de requisições de rede.
-* **Backend como Persistência:** O **Cloud Firestore** atua exclusivamente como uma camada de backup e sincronização. Ele não armazena o livro de regras, mas sim o *resultado* da criatividade do usuário (as fichas criadas), otimizando custos e performance.
-
-### 3. Motor de Recálculo Dinâmico
-Implementação de uma lógica complexa de "efeito cascata" utilizando **Zustand** e TypeScript.
-* **Solução Técnica:** Mudar um único atributo (como Força) dispara automaticamente o recálculo de perícias, bônus de ataque e carga, refletindo as regras de *Tormenta 20* em tempo real na UI.
-
-## 🛠️ Stack Tecnológica
-
-* **Frontend:** Next.js 15 com App Router e Tailwind CSS.
-* **Gestão de Estado:** Zustand (Atômico e Modular).
-* **Automação:** Python (Scripts de tratamento de dados e extração).
-* **Persistência:** Firebase Firestore (Salva apenas os dados gerados pelo usuário).
-
-## ⚙️ Como executar o projeto
-
-1. **Clone o repositório:**
-   ```bash
-   git clone [https://github.com/WelderBM/rpg-cousins](https://github.com/WelderBM/rpg-cousins)
-   ```
-2. **Instale as dependências:**
-   ```bash
-   npm install
-   ```
-3. **Configure as variáveis do Firebase:**
-   Adicione suas chaves no `.env.local` (necessário apenas para a função de salvar fichas).
-4. **Inicie o servidor local:**
-   ```bash
-   npm run dev
-   ```
+**O Diferencial:** Através de um "Smart Fork" e scripts de automação em Python, consegui traduzir centenas de páginas de regras em um sistema **Local-First**, onde a inteligência reside no cliente e o Firebase atua apenas como persistência de segurança.
 
 ---
-**Autor:** [Welder Barroso](https://linkedin.com/in/welder-barroso-37b654207)
-*Desenvolvendo ferramentas que otimizam o tempo e potencializam a criatividade.*
+
+## 🛠️ Tour pelas Funcionalidades
+
+### 1. Criação de Herói (O Wizard Inteligente)
+O processo de criação guia o usuário através de etapas lógicas, eliminando a necessidade de consultar o livro básico a cada escolha.
+* **Automação:** Ao escolher uma Raça ou Classe, o sistema aplica automaticamente os bônus de atributos e perícias treinadas.
+* **UX:** Filtros inteligentes mostram apenas as origens e divindades compatíveis com as escolhas anteriores.
+
+<div align="center">
+  <img src="./public/assets/prints/print-criacao.png" width="80%" alt="Criação de Herói" style="border-radius: 8px; border: 1px solid #ddd"/>
+</div>
+
+---
+
+### 2. Ficha do Herói (Motor de Recálculo)
+A ficha é o coração operacional do jogador. Ela utiliza um motor de funções puras para gerenciar dependências cruzadas.
+* **Efeito Cascata:** Se o herói recebe um bônus de "Força", o sistema recalcula instantaneamente o Ataque, o Dano e a Capacidade de Carga.
+* **Persistência Híbrida:** O estado da ficha é mantido via **Zustand** para performance máxima, sendo sincronizado com o Firestore apenas quando mudanças críticas ocorrem.
+
+<div align="center">
+  <img src="./public/assets/prints/print-ficha.png" width="80%" alt="Ficha do Herói" style="border-radius: 8px; border: 1px solid #ddd"/>
+</div>
+
+---
+
+### 3. Área do Mestre (Gestão de Ameaças)
+Uma interface dedicada para quem conduz o jogo, focada em monitorar o progresso do grupo e gerenciar combates.
+* **Interactive Threats:** O mestre pode visualizar e operar fichas de monstros com a mesma facilidade que os jogadores.
+* **Controle de Grupo:** Visão holística dos PVs e PMs de todos os membros da mesa em tempo real.
+
+<div align="center">
+  <img src="./public/assets/prints/print-mestre.png" width="80%" alt="Área do Mestre" style="border-radius: 8px; border: 1px solid #ddd"/>
+</div>
+
+---
+
+### 4. Mercado (Economia Dinâmica)
+Sistema de inventário e comércio que automatiza a gestão de Tibares (moeda do jogo).
+* **Cálculo de Custo:** Compra e venda de itens com atualização automática do peso total carregado e do saldo disponível.
+* **Validação de Regras:** Impede a compra de itens superiores ou mágicos sem os pré-requisitos necessários de nível ou ouro.
+
+<div align="center">
+  <img src="./public/assets/prints/print-mercado.png" width="80%" alt="Mercado e Inventário" style="border-radius: 8px; border: 1px solid #ddd"/>
+</div>
+
+---
+
+## 🚀 Tecnologias Utilizadas
+
+| Camada | Tecnologia | Motivação |
+| :--- | :--- | :--- |
+| **Frontend** | Next.js 15 | SSR para SEO e App Router para navegação fluida. |
+| **Estado** | Zustand | Gestão atômica para evitar re-renders na ficha complexa. |
+| **Automação** | Python | Extração de dados (JSON) dos manuais oficiais. |
+| **Backend** | Firebase | Persistência leve e Auth para segurança dos usuários. |
+| **UI** | Tailwind CSS | Responsividade total para uso em tablets e celulares na mesa. |
+
+## ⚙️ Instalação e Uso
+
+1. **Clone:** `git clone https://github.com/WelderBM/rpg-cousins`
+2. **Dependências:** `npm install`
+3. **Variáveis de Ambiente:** Configure as chaves do Firebase no arquivo `.env.local`.
+4. **Dev:** `npm run dev`
+
+---
+**Desenvolvido por [Welder Barroso](https://linkedin.com/in/welder-barroso-37b654207)** *Criatividade aplicada à automação de sistemas complexos.*
