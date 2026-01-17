@@ -1,20 +1,54 @@
-import CharacterSheet, { SubStep } from '@/interfaces/CharacterSheet';
-import Skill from '@/interfaces/Skills';
-import tormentaPowers from '@/data/powers/tormentaPowers';
-import HUMANO from '@/data/races/humano';
+import CharacterSheet, { SubStep } from "@/interfaces/CharacterSheet";
+import Skill from "@/interfaces/Skills";
+import tormentaPowers from "@/data/powers/tormentaPowers";
+import HUMANO from "@/data/races/humano";
 import {
   getNotRepeatedRandom,
   getRandomItemFromArray,
   pickFromArray,
-} from '../randomUtils';
-import { getPowersAllowedByRequirements } from '../powers';
-import { addOtherBonusToSkill } from '../skills/general';
-import { applyPower } from '../general';
+} from "../randomUtils";
+import { getPowersAllowedByRequirements } from "../powers";
+import { addOtherBonusToSkill } from "../skills/general";
+import { applyPower } from "../general";
 
 export function applyHumanoVersatil(sheet: CharacterSheet): SubStep[] {
   const substeps: SubStep[] = [];
+
+  // Check if we already have a record for Versátil in the history
+  const historyEntry = sheet.sheetActionHistory.find(
+    (entry) => entry.source.type === "power" && entry.source.name === "Versátil"
+  );
+
+  if (historyEntry) {
+    // Re-apply sub-steps based on history
+    historyEntry.changes.forEach((change) => {
+      if (change.type === "SkillsAdded") {
+        change.skills.forEach((skill) => {
+          substeps.push({
+            name: "Versátil",
+            value: `Perícia treinada (${skill})`,
+          });
+        });
+      } else if (change.type === "PowerAdded") {
+        substeps.push({
+          name: "Versátil",
+          value: `Poder geral recebido (${change.powerName})`,
+        });
+      }
+    });
+    return substeps;
+  }
+
   const randomSkill = getNotRepeatedRandom(sheet.skills, Object.values(Skill));
   sheet.skills.push(randomSkill);
+
+  const historyChanges: any[] = [
+    { type: "SkillsAdded", skills: [randomSkill] },
+  ];
+  substeps.push({
+    name: "Versátil",
+    value: `Perícia treinada (${randomSkill})`,
+  });
 
   const shouldGetSkill = Math.random() > 0.5;
 
@@ -25,9 +59,10 @@ export function applyHumanoVersatil(sheet: CharacterSheet): SubStep[] {
     );
     sheet.skills.push(randomSecondSkill);
     substeps.push({
-      name: 'Versátil',
+      name: "Versátil",
       value: `Perícia treinada (${randomSecondSkill})`,
     });
+    historyChanges[0].skills.push(randomSecondSkill);
   } else {
     const allowedPowers = getPowersAllowedByRequirements(sheet);
     const randomPower = getNotRepeatedRandom(
@@ -36,10 +71,16 @@ export function applyHumanoVersatil(sheet: CharacterSheet): SubStep[] {
     );
     sheet.generalPowers.push(randomPower);
     substeps.push({
-      name: 'Versátil',
+      name: "Versátil",
       value: `Poder geral recebido (${randomPower.name})`,
     });
+    historyChanges.push({ type: "PowerAdded", powerName: randomPower.name });
   }
+
+  sheet.sheetActionHistory.push({
+    source: { type: "power", name: "Versátil" },
+    changes: historyChanges,
+  });
 
   return substeps;
 }
@@ -55,7 +96,7 @@ export function applyLefouDeformidade(sheet: CharacterSheet): SubStep[] {
   pickedSkills.forEach((randomSkill) => {
     addOtherBonusToSkill(sheet, randomSkill, 2);
     subSteps.push({
-      name: 'Deformidade',
+      name: "Deformidade",
       value: `+2 em Perícia (${randomSkill})`,
     });
   });
@@ -69,7 +110,7 @@ export function applyLefouDeformidade(sheet: CharacterSheet): SubStep[] {
     sheet.generalPowers.push(randomPower);
 
     subSteps.push({
-      name: 'Deformidade',
+      name: "Deformidade",
       value: `Poder da Tormenta recebido (${randomPower.name})`,
     });
   }
@@ -88,7 +129,7 @@ export function applyOsteonMemoriaPostuma(_sheet: CharacterSheet): SubStep[] {
       );
       sheet.skills.push(randomSkill);
       substeps.push({
-        name: 'Memória Póstuma',
+        name: "Memória Póstuma",
         value: `Perícia treinada (${randomSkill})`,
       });
     } else {
@@ -99,7 +140,7 @@ export function applyOsteonMemoriaPostuma(_sheet: CharacterSheet): SubStep[] {
       );
       sheet.generalPowers.push(randomPower);
       substeps.push({
-        name: 'Memória Póstuma',
+        name: "Memória Póstuma",
         value: `Poder geral recebido (${randomPower.name})`,
       });
     }
@@ -115,7 +156,7 @@ export function applyOsteonMemoriaPostuma(_sheet: CharacterSheet): SubStep[] {
       );
       sheet.raca.abilities?.push(randomAbility);
       substeps.push({
-        name: 'Memória Póstuma',
+        name: "Memória Póstuma",
         value: `${sheet.raca.oldRace.name} (${randomAbility.name})`,
       });
 

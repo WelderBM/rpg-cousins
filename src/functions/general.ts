@@ -288,9 +288,13 @@ function replaceGenericOficioWithSpecific(
   skills: Skill[],
   className?: string
 ): Skill[] {
-  return skills.map((skill) => {
+  const result: Skill[] = [];
+  const pickedOficios: Skill[] = [];
+
+  skills.forEach((skill) => {
     if (skill !== Skill.OFICIO) {
-      return skill;
+      result.push(skill);
+      return;
     }
 
     // Get contextual oficios for the class
@@ -298,9 +302,9 @@ function replaceGenericOficioWithSpecific(
       (className && CONTEXTUAL_OFICIOS_BY_CLASS[className]) ||
       DEFAULT_CONTEXTUAL_OFICIOS;
 
-    // Find oficios not already in the skill list
+    // Find oficios not already in the input skill list OR already picked in this process
     const availableOficios = contextualOficios.filter(
-      (oficio) => !skills.includes(oficio)
+      (oficio) => !skills.includes(oficio) && !pickedOficios.includes(oficio)
     );
 
     // If no contextual oficios available, use default ones
@@ -308,14 +312,21 @@ function replaceGenericOficioWithSpecific(
       availableOficios.length > 0
         ? availableOficios
         : DEFAULT_CONTEXTUAL_OFICIOS.filter(
-            (oficio) => !skills.includes(oficio)
+            (oficio) =>
+              !skills.includes(oficio) && !pickedOficios.includes(oficio)
           );
 
-    // Return a random specific oficio
-    return finalOficios.length > 0
-      ? getRandomItemFromArray(finalOficios)
-      : Skill.OFICIO_ARTESANATO; // Final fallback
+    // Pick a specific oficio
+    const chosenOficio =
+      finalOficios.length > 0
+        ? getRandomItemFromArray(finalOficios)
+        : Skill.OFICIO_ARTESANATO; // Final fallback
+
+    result.push(chosenOficio);
+    pickedOficios.push(chosenOficio);
   });
+
+  return result;
 }
 
 export function createTruqueSpell(originalSpell: Spell): Spell {
@@ -1259,13 +1270,16 @@ export const applyPower = (
         });
       } else if (sheetAction.action.type === "learnSkill") {
         // Use manual selections if provided, otherwise random
+        const availableSkills = sheetAction.action.availableSkills || [];
         const pickedSkills =
           (manualSelections?.skills as Skill[]) ||
-          pickFromAllowed(
-            sheetAction.action.availableSkills,
-            sheetAction.action.pick,
-            sheet.skills
-          );
+          (availableSkills.length > 0
+            ? pickFromAllowed(
+                availableSkills,
+                sheetAction.action.pick,
+                sheet.skills
+              )
+            : []);
 
         sheet.skills.push(...pickedSkills);
 
@@ -1316,13 +1330,16 @@ export const applyPower = (
         });
       } else if (sheetAction.action.type === "getGeneralPower") {
         // Use manual selections if provided, otherwise random
+        const availablePowers = sheetAction.action.availablePowers || [];
         const pickedPowers =
           manualSelections?.powers ||
-          pickFromAllowed(
-            sheetAction.action.availablePowers,
-            sheetAction.action.pick,
-            sheet.generalPowers
-          );
+          (availablePowers.length > 0
+            ? pickFromAllowed(
+                availablePowers,
+                sheetAction.action.pick,
+                sheet.generalPowers
+              )
+            : []);
 
         sheet.generalPowers.push(...pickedPowers);
 

@@ -1,11 +1,12 @@
-import { recalculateSheet } from '../recalculateSheet';
-import { createMockCharacterSheet } from '../../__mocks__/characterSheet';
-import combatPowers from '../../data/powers/combatPowers';
-import { DestinyPowers } from '../../data/powers/destinyPowers';
-import CharacterSheet from '../../interfaces/CharacterSheet';
-import Skill from '../../interfaces/Skills';
+import { recalculateSheet } from "../recalculateSheet";
+import { createMockCharacterSheet } from "@/__mocks__/characterSheet";
+import { applyRaceAbilities } from "../general";
+import combatPowers from "../../data/powers/combatPowers";
+import { DestinyPowers } from "../../data/powers/destinyPowers";
+import CharacterSheet from "../../interfaces/CharacterSheet";
+import Skill from "../../interfaces/Skills";
 
-describe('recalculateSheet', () => {
+describe("recalculateSheet", () => {
   let mockSheet: CharacterSheet;
 
   beforeEach(() => {
@@ -14,11 +15,12 @@ describe('recalculateSheet', () => {
     mockSheet.generalPowers = [];
     mockSheet.classPowers = [];
     mockSheet.sheetBonuses = [];
-    mockSheet.sheetActionHistory = [];
+    // Stabilize race abilities: apply them once so history is recorded
+    mockSheet = applyRaceAbilities(mockSheet);
   });
 
-  describe('Power Addition', () => {
-    it('should apply Esquiva bonuses correctly', () => {
+  describe("Power Addition", () => {
+    it("should apply Esquiva bonuses correctly", () => {
       // Get baseline values
       const baselineSheet = recalculateSheet(mockSheet);
       const baseDefense = baselineSheet.defesa;
@@ -43,7 +45,7 @@ describe('recalculateSheet', () => {
       expect(reflexosSkill?.others).toBe(baseReflexos + 2);
     });
 
-    it('should apply Treinamento em Perícia correctly', () => {
+    it("should apply Treinamento em Perícia correctly", () => {
       // Get baseline values
       const baselineSheet = recalculateSheet(mockSheet);
       const baseSkillCount = baselineSheet.skills.length;
@@ -59,13 +61,13 @@ describe('recalculateSheet', () => {
 
       // Should have sheet action history entry
       const treinamentoHistoryEntry = result.sheetActionHistory.find(
-        (entry) => entry.powerName === 'Treinamento em Perícia'
+        (entry) => entry.powerName === "Treinamento em Perícia"
       );
       expect(treinamentoHistoryEntry).toBeDefined();
-      expect(treinamentoHistoryEntry?.changes[0].type).toBe('SkillsAdded');
+      expect(treinamentoHistoryEntry?.changes[0].type).toBe("SkillsAdded");
     });
 
-    it('should apply Proficiência correctly', () => {
+    it("should apply Proficiência correctly", () => {
       // Get baseline values
       const baselineSheet = recalculateSheet(mockSheet);
       const baseProfCount = baselineSheet.classe.proficiencias.length;
@@ -81,17 +83,17 @@ describe('recalculateSheet', () => {
 
       // Should have sheet action history entry
       const proficienciaHistoryEntry = result.sheetActionHistory.find(
-        (entry) => entry.powerName === 'Proficiência'
+        (entry) => entry.powerName === "Proficiência"
       );
       expect(proficienciaHistoryEntry).toBeDefined();
       expect(proficienciaHistoryEntry?.changes[0].type).toBe(
-        'ProficiencyAdded'
+        "ProficiencyAdded"
       );
     });
   });
 
-  describe('Power Removal', () => {
-    it('should remove Esquiva bonuses when power is removed', () => {
+  describe("Power Removal", () => {
+    it("should remove Esquiva bonuses when power is removed", () => {
       // First, create a sheet with Esquiva applied
       const originalSheet = { ...mockSheet };
       originalSheet.generalPowers = [combatPowers.ESQUIVA];
@@ -130,7 +132,7 @@ describe('recalculateSheet', () => {
       expect(reflexosSkillAfter?.others).toBe(baseReflexos);
     });
 
-    it('should remove learned skills when Treinamento em Perícia is removed', () => {
+    it("should remove learned skills when Treinamento em Perícia is removed", () => {
       // First, create a sheet with Treinamento em Perícia applied
       const originalSheet = { ...mockSheet };
       originalSheet.generalPowers = [DestinyPowers.TREINAMENTO_EM_PERICIA];
@@ -158,12 +160,12 @@ describe('recalculateSheet', () => {
 
       // Verify Treinamento action history was cleaned
       const treinamentoHistoryEntry = result.sheetActionHistory.find(
-        (entry) => entry.powerName === 'Treinamento em Perícia'
+        (entry) => entry.powerName === "Treinamento em Perícia"
       );
       expect(treinamentoHistoryEntry).toBeUndefined();
     });
 
-    it('should remove proficiencies when Proficiência is removed', () => {
+    it("should remove proficiencies when Proficiência is removed", () => {
       // First, create a sheet with Proficiência applied
       const originalSheet = { ...mockSheet };
       originalSheet.generalPowers = [combatPowers.PROFICIENCIA];
@@ -190,14 +192,14 @@ describe('recalculateSheet', () => {
 
       // Verify Proficiência action history was cleaned
       const proficienciaHistoryEntry = result.sheetActionHistory.find(
-        (entry) => entry.powerName === 'Proficiência'
+        (entry) => entry.powerName === "Proficiência"
       );
       expect(proficienciaHistoryEntry).toBeUndefined();
     });
   });
 
-  describe('Multiple Powers', () => {
-    it('should handle multiple powers correctly', () => {
+  describe("Multiple Powers", () => {
+    it("should handle multiple powers correctly", () => {
       // Get baseline values
       const baselineSheet = recalculateSheet(mockSheet);
       const baseDefense = baselineSheet.defesa;
@@ -219,12 +221,12 @@ describe('recalculateSheet', () => {
 
       // Should have history entries for Treinamento (Esquiva doesn't create history)
       const treinamentoHistoryEntry = result.sheetActionHistory.find(
-        (entry) => entry.powerName === 'Treinamento em Perícia'
+        (entry) => entry.powerName === "Treinamento em Perícia"
       );
       expect(treinamentoHistoryEntry).toBeDefined();
     });
 
-    it('should remove only specified powers when multiple powers exist', () => {
+    it("should remove only specified powers when multiple powers exist", () => {
       // Get baseline
       const baselineSheet = recalculateSheet(mockSheet);
       const baseDefense = baselineSheet.defesa;
@@ -253,14 +255,14 @@ describe('recalculateSheet', () => {
       // Treinamento effects should remain
       expect(result.skills.length).toBeGreaterThan(baseSkillCount);
       const treinamentoHistoryEntry = result.sheetActionHistory.find(
-        (entry) => entry.powerName === 'Treinamento em Perícia'
+        (entry) => entry.powerName === "Treinamento em Perícia"
       );
       expect(treinamentoHistoryEntry).toBeDefined();
     });
   });
 
-  describe('Edge Cases', () => {
-    it('should handle empty power lists', () => {
+  describe("Edge Cases", () => {
+    it("should handle empty power lists", () => {
       mockSheet.generalPowers = [];
       mockSheet.classPowers = [];
 
@@ -270,7 +272,7 @@ describe('recalculateSheet', () => {
       expect(result.sheetBonuses).toHaveLength(0);
     });
 
-    it('should handle sheet without original sheet parameter', () => {
+    it("should handle sheet without original sheet parameter", () => {
       const esquivaPower = combatPowers.ESQUIVA;
       mockSheet.generalPowers = [esquivaPower];
 
@@ -284,7 +286,7 @@ describe('recalculateSheet', () => {
       expect(reflexosSkill?.others).toBe(2);
     });
 
-    it('should preserve basic character data during recalculation', () => {
+    it("should preserve basic character data during recalculation", () => {
       const originalName = mockSheet.nome;
       const originalLevel = mockSheet.nivel;
 
@@ -296,7 +298,7 @@ describe('recalculateSheet', () => {
       expect(result.nivel).toBe(originalLevel);
     });
 
-    it('should handle skills reset correctly', () => {
+    it("should handle skills reset correctly", () => {
       // Manually set a skill's others field
       if (mockSheet.completeSkills) {
         const reflexosSkill = mockSheet.completeSkills.find(
